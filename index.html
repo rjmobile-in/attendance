@@ -290,7 +290,6 @@
       appId: "1:19785118704:web:915272bdf29ebaefb6a335"
     };
 
-    // FIX: Using custom app initialization to separate login sessions
     const app = initializeApp(firebaseConfig, "AdminApp");
     const db = getFirestore(app);
     const auth = getAuth(app);
@@ -308,7 +307,9 @@
       document.getElementById('global-loader').style.display = 'none';
       if (user) {
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'flex';
+        
+        // BUG FIX: Changed from 'flex' to 'block' to fix the squeezed row layout
+        document.getElementById('dashboard').style.display = 'block'; 
         
         if (!isAppInitialized) {
             initFilters();
