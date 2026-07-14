@@ -20,8 +20,8 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg-base: #09090b; --card-bg: #18181b; --card-bg-alpha: rgba(24, 24, 27, 0.75);
-      --card-border: #27272a; --primary: #3b82f6; --primary-hover: #60a5fa; --primary-alpha: rgba(59, 130, 246, 0.15);
-      --text-main: #f4f4f5; --text-soft: #a1a1aa; --success: #10b981; --success-alpha: rgba(16, 185, 129, 0.15); --danger: #ef4444; --danger-alpha: rgba(239, 68, 68, 0.15);
+      --card-border: #27272a; --primary: #3b82f6; --primary-alpha: rgba(59, 130, 246, 0.15);
+      --text-main: #f4f4f5; --text-soft: #a1a1aa; --success: #10b981; --danger: #ef4444;
       --input-bg: #09090b; --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4); --shadow-glow: 0 10px 30px rgba(59, 130, 246, 0.2);
     }
     html.light-theme {
@@ -31,9 +31,9 @@
     body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); font-size: 15px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; transition: background-color 0.4s ease; overflow-x: hidden; }
     h1, h2, h3, .brand-title, .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; }
     .glass-effect { background: var(--card-bg-alpha); backdrop-filter: blur(16px); border: 1px solid var(--card-border); }
+    #app-container { width: 100%; max-width: 1200px; }
     
-    /* Login & Loader Styles */
-    #global-loader { position: fixed; inset: 0; background: rgba(var(--bg-base), 0.9); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: var(--text-soft); font-weight: 500; font-size: 15px; }
+    #global-loader { position: fixed; inset: 0; background: rgba(var(--bg-base), 0.9); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: var(--text-soft); font-weight: 500; }
     .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; margin-bottom: 20px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -49,7 +49,7 @@
     .checkbox-row input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
     
     #login-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px var(--primary-alpha); }
-    #login-btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+    #login-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
     #login-btn:active { transform: scale(0.97); }
     #error-msg { color: var(--danger); font-size: 14px; margin-top: 16px; display: none; font-weight: 500; background: var(--danger-alpha); padding: 10px; border-radius: 10px; }
 
@@ -58,37 +58,27 @@
     .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-soft); cursor: pointer; display: flex; transition: color 0.2s; }
     .toggle-password:hover { color: var(--primary); }
 
-    /* Dashboard Styles */
-    #dashboard { display: none; flex-direction: column; width: 100%; max-width: 1200px; }
+    #dashboard { display: none; width: 100%; max-width: 1200px; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding: 20px 24px; border-radius: 20px; box-shadow: var(--shadow-soft); }
     .brand-text .name { font-size: 24px; font-weight: 800; }
     .role-badge { display: inline-flex; background: var(--primary-alpha); color: var(--primary); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; margin-left: 12px; }
-    .header-controls { display: flex; gap: 12px; align-items: center; }
-    
     .btn-primary { background: var(--primary); color: #fff; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; border: none; transition: all 0.2s; }
-    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: var(--shadow-glow); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-    .btn-secondary:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha); }
-    
-    #theme-toggle { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-soft); padding: 10px; border-radius: 12px; cursor: pointer; transition: all 0.2s; display: flex;}
-    #theme-toggle:hover { color: var(--primary); border-color: var(--primary); }
-    
+    .btn-primary:hover { filter: brightness(1.1); box-shadow: var(--shadow-glow); }
+    .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+    #theme-toggle { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-soft); padding: 10px; border-radius: 12px; cursor: pointer; }
     .tab-controls { display: inline-flex; background: var(--input-bg); border-radius: 16px; padding: 6px; gap: 4px; border: 1px solid var(--card-border); margin-bottom: 24px; }
-    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 24px; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 24px; border-radius: 12px; cursor: pointer; }
     .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    
     .controls-wrapper { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-soft); }
     .filter-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
     .filter-group label { font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; }
-    
+    .filter-input { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); outline: none; }
     .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
     .metric-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; position: relative; }
     .metric-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), #3b82f6); }
     .metric-title { font-size: 13px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
     .metric-value { font-size: 36px; font-weight: 800; color: var(--text-main); }
-    
     .stats-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); margin-bottom: 24px; overflow: hidden;}
     .table-responsive { overflow-y: auto; overflow-x: auto; max-height: 500px; }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
@@ -97,7 +87,6 @@
     .badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-block; }
     .badge-in { background: var(--success-alpha); color: var(--success); }
     .badge-out { background: var(--danger-alpha); color: var(--danger); }
-    
     .camera-wrapper { max-width: 600px; margin: 0 auto; background: var(--card-bg); border-radius: 20px; padding: 24px; border: 1px solid var(--card-border); }
     #video-container { position: relative; background: #000; border-radius: 16px; overflow: hidden; width: 100%; height: 360px; margin-bottom: 24px; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; }
     #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
@@ -125,7 +114,6 @@
 </head>
 <body>
 
-  <!-- GLOBAL LOADER -->
   <div id="global-loader" class="glass-effect">
     <div class="spinner"></div>
     <p>Authenticating Connection...</p>
@@ -136,7 +124,6 @@
     <div id="toast-msg"></div>
   </div>
 
-  <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <img src="logo.png" alt="RJ Mobile Logo" style="height: 64px; width: auto; margin-bottom: 20px; border-radius: 12px; object-fit: contain;" onerror="this.style.display='none'" />
     <h2>Welcome Back</h2>
@@ -146,7 +133,7 @@
     <div class="password-wrapper">
       <input type="password" id="password-input" class="input-field" placeholder="Enter password" />
       <button id="toggle-password-btn" class="toggle-password" type="button" title="Show/Hide Password">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
@@ -158,7 +145,6 @@
     <div id="error-msg">Authentication failed.</div>
   </div>
 
-  <!-- MAIN DASHBOARD APP -->
   <div id="dashboard">
     <div class="header glass-effect">
       <div class="brand-text" style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
@@ -304,7 +290,8 @@
       appId: "1:19785118704:web:915272bdf29ebaefb6a335"
     };
 
-    const app = initializeApp(firebaseConfig);
+    // FIX: Using custom app initialization to separate login sessions
+    const app = initializeApp(firebaseConfig, "AdminApp");
     const db = getFirestore(app);
     const auth = getAuth(app);
 
@@ -317,22 +304,18 @@
     let currentReviewLogId = null; 
     let isAppInitialized = false;
 
-    // --- AUTHENTICATION LOGIC ---
     onAuthStateChanged(auth, (user) => {
       document.getElementById('global-loader').style.display = 'none';
       if (user) {
-        // User logged in: Reveal Dashboard
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'flex';
         
-        // Initialize fetch requests exactly once per session
         if (!isAppInitialized) {
             initFilters();
             fetchDatabaseLogs();
             isAppInitialized = true;
         }
       } else {
-        // Logged out: Show Login UI
         document.getElementById('login-screen').style.display = 'block';
         document.getElementById('dashboard').style.display = 'none';
       }
@@ -345,10 +328,10 @@
       const btn = e.currentTarget;
       if(input.type === 'password') {
         input.type = 'text';
-        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="eye-off-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
       } else {
         input.type = 'password';
-        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
       }
     });
 
@@ -653,7 +636,6 @@
       document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
     });
     
-    // Apply theme on load if necessary
     if (localStorage.getItem('rj_theme') === 'light') {
         document.getElementById('flatpickr-theme').href = 'https://npmcdn.com/flatpickr/dist/themes/light.css';
     }
