@@ -11,8 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Libraries: Chart.js, HTML2PDF, SortableJS, Flatpickr, FaceAPI -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Libraries: HTML2PDF, SortableJS, Flatpickr, FaceAPI -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
@@ -114,7 +113,8 @@
 
   <!-- LOGIN -->
   <div id="login-screen">
-    <h2>HQ Portal</h2>
+    <img src="logo.png" alt="RJ Mobile Logo" style="height: 64px; object-fit: contain; margin-bottom: 16px;" onerror="this.style.display='none'">
+    <h2>RJ Mobile Admin</h2>
     <p style="color: var(--text-soft); margin-bottom: 24px;">Secure management access.</p>
     <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
     <input type="password" id="password-input" class="input-field" placeholder="Password" />
@@ -127,6 +127,7 @@
     <!-- Header -->
     <div class="header-bar glass-effect">
       <div style="display: flex; align-items: center; gap: 16px;">
+        <img src="logo.png" alt="RJ Logo" style="height: 40px; object-fit: contain;" onerror="this.style.display='none'">
         <div>
           <div class="name" style="font-size: 20px;">RJ Mobile <span class="badge bg-green" style="margin-left: 8px;">ADMIN</span></div>
           <div style="font-size: 12px; color: var(--text-soft); margin-top: 4px;">Operational Command Center</div>
@@ -157,7 +158,7 @@
     <div class="tab-controls">
       <button class="tab-btn active" data-view="view-overview">Overview & Logs</button>
       <button class="tab-btn" data-view="view-absent">Absents & Exceptions</button>
-      <button class="tab-btn" data-view="view-matrix">7-Day Matrix</button>
+      <button class="tab-btn" data-view="view-matrix">Attendance Matrix</button>
       <button class="tab-btn" data-view="view-registry">Face Registry</button>
     </div>
 
@@ -194,14 +195,6 @@
               <span class="drag-handle">⣿</span>
             </div>
             <div class="metric-value" id="metric-absent" style="color: var(--danger);">0</div>
-          </div>
-          <!-- Widget 4 (Chart) -->
-          <div class="widget-card" data-id="w-chart" style="grid-column: span 2; min-height: 250px;">
-            <div class="widget-header">
-              <span class="widget-title">Branch Distribution</span>
-              <span class="drag-handle">⣿</span>
-            </div>
-            <canvas id="branchChart" style="max-height: 200px;"></canvas>
           </div>
         </div>
 
@@ -249,7 +242,14 @@
 
     <!-- VIEW 3: STAFF MATRIX -->
     <div id="view-matrix" class="app-view" style="display: none;">
-      <h2 style="font-size: 20px; margin-bottom: 20px;">7-Day Attendance Matrix</h2>
+      <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+        <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Attendance Matrix</h2>
+        <span style="color: var(--text-soft);">Past</span>
+        <input type="number" id="matrix-days-input" class="input-field" value="7" min="1" max="60" style="width: 80px; margin: 0; padding: 8px;">
+        <span style="color: var(--text-soft);">days</span>
+        <button id="btn-generate-matrix" class="btn-secondary" style="padding: 8px 16px;">Update View</button>
+      </div>
+
       <div class="table-card">
         <div class="table-responsive">
           <table id="matrix-table">
@@ -297,7 +297,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
     // 1. FIREBASE CONFIG
@@ -320,7 +320,6 @@
     let processedData = []; // The stitched data
     let exceptionsData = {}; // Fetched from an "exceptions" collection
     let selectedDate = new Date();
-    let branchChartInstance = null;
     let activeExceptionName = null;
 
     // --- INITIALIZATION & AUTH ---
@@ -385,7 +384,6 @@
       const isLight = document.documentElement.classList.toggle('light-theme');
       localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
       document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
-      if(branchChartInstance) { Chart.defaults.color = isLight ? '#64748b' : '#a1a1aa'; branchChartInstance.update(); }
     });
     
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -400,24 +398,23 @@
       });
     });
 
+    document.getElementById('btn-generate-matrix').addEventListener('click', generateMatrix);
+
     // --- DATA FETCHING (Module 2 Engine) ---
     async function fetchMasterData() {
-      // 1. Fetch Master Staff List from registered faces
       masterStaffList = [];
       const facesSnap = await getDocs(collection(db, "registered_faces"));
       facesSnap.forEach(doc => masterStaffList.push(doc.id));
 
-      // 2. Fetch Exceptions (Leaves, Holidays)
       const excSnap = await getDocs(collection(db, "attendance_exceptions"));
       excSnap.forEach(doc => { exceptionsData[doc.id] = doc.data(); });
 
-      // 3. Fetch All Logs (For Matrix and Daily Processing)
-      // Note: In production with thousands of logs, you'd filter this query by date range.
       allLogs = [];
       const logsSnap = await getDocs(collection(db, "attendance_logs"));
       logsSnap.forEach(doc => allLogs.push({id: doc.id, ...doc.data()}));
       
       processDailyData();
+      if(document.getElementById('view-matrix').style.display === 'block') generateMatrix();
     }
 
     // --- DATA PROCESSING (10 AM to 10 PM Logic) ---
@@ -436,41 +433,33 @@
 
       processedData = [];
       let totalPresent = 0, totalLate = 0;
-      const branchCounts = {};
 
       const searchFilter = document.getElementById('global-search').value.toLowerCase();
 
       for (const [name, data] of Object.entries(employeeGroups)) {
         if (searchFilter && !name.toLowerCase().includes(searchFilter)) continue;
 
-        // Sort chronological
         data.logs.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
         const clockIns = data.logs.filter(l => l.action === 'Clock In');
         const clockOuts = data.logs.filter(l => l.action === 'Clock Out');
 
-        // Check Exception Database for this specific Date + Name
         const excKey = `${name}_${selectedDate.toISOString().split('T')[0]}`;
         const hasException = exceptionsData[excKey] ? exceptionsData[excKey].reason : null;
 
         if (clockIns.length > 0 || clockOuts.length > 0 || hasException) {
-          totalPresent += hasException ? 0 : 1; // Don't count leaves as present
+          totalPresent += hasException ? 0 : 1; 
           
           let firstIn = clockIns.length > 0 ? clockIns[0].timestamp.toDate() : null;
           let lastOut = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1].timestamp.toDate() : null;
           
-          // Auto-Clock-Out Logic (If missing out punch, assume midnight or current time if today)
           if (firstIn && !lastOut) {
             const now = new Date();
-            if (selectedDate.toDateString() === now.toDateString()) {
-               // Still on shift today
-            } else {
-               // Missed punch yesterday. Auto set to 10:00 PM standard shift end.
+            if (selectedDate.toDateString() !== now.toDateString()) {
                lastOut = new Date(firstIn);
                lastOut.setHours(22, 0, 0, 0); 
             }
           }
 
-          // Calculate Hours
           let totalMs = 0; let formattedHours = "--"; let varianceBadge = "";
           if (firstIn && lastOut) {
             totalMs = lastOut.getTime() - firstIn.getTime();
@@ -478,27 +467,23 @@
             const mins = Math.floor((totalMs % 3600000) / 60000);
             formattedHours = `${hrs}h ${mins}m`;
 
-            // OT / Short Shift Calculation (Standard is 12 hours)
             const standardMs = 12 * 3600000;
-            if (totalMs > standardMs + 1800000) { // Over by 30 mins
+            if (totalMs > standardMs + 1800000) { 
                const otHrs = ((totalMs - standardMs) / 3600000).toFixed(1);
                varianceBadge = `<span class="badge bg-green">+${otHrs}h OT</span>`;
-            } else if (totalMs < standardMs - 1800000) { // Short by 30 mins
+            } else if (totalMs < standardMs - 1800000) {
                const shHrs = ((standardMs - totalMs) / 3600000).toFixed(1);
                varianceBadge = `<span class="badge bg-red">-${shHrs}h Short</span>`;
             }
           }
 
-          // Late Logic (Standard start 10:00 AM)
           let isLate = false;
           if (firstIn) {
-            const targetStart = new Date(firstIn); targetStart.setHours(10, 15, 0, 0); // 15 min grace
+            const targetStart = new Date(firstIn); targetStart.setHours(10, 15, 0, 0); 
             if (firstIn > targetStart) { isLate = true; totalLate++; }
           }
 
-          // Branch Stitches
           const branches = [...new Set(data.logs.map(l => l.branch))].join(' → ');
-          if(data.logs.length > 0) branchCounts[data.logs[0].branch] = (branchCounts[data.logs[0].branch] || 0) + 1;
 
           processedData.push({
             name, firstIn, lastOut, formattedHours, varianceBadge, isLate, branches, hasException
@@ -506,7 +491,6 @@
         }
       }
 
-      // Update Dashboard Widgets
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
       
@@ -515,15 +499,17 @@
 
       renderMasterTable();
       renderAbsentTable(missingStaff);
-      updateChart(branchCounts);
     }
 
-    document.getElementById('global-search').addEventListener('input', processDailyData);
+    document.getElementById('global-search').addEventListener('input', () => {
+      processDailyData();
+      if(document.getElementById('view-matrix').style.display === 'block') generateMatrix();
+    });
 
     // --- RENDERING TABLES ---
     function renderMasterTable() {
       const tb = document.getElementById('master-tbody');
-      if(processedData.length === 0) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;">No records for this date.</td></tr>'; return; }
+      if(processedData.length === 0) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;">No data available.</td></tr>'; return; }
       
       let html = '';
       processedData.forEach(d => {
@@ -547,10 +533,14 @@
 
     function renderAbsentTable(missingStaff) {
       const tb = document.getElementById('absent-tbody');
-      if(missingStaff.length === 0) { tb.innerHTML = '<tr><td colspan="3" style="text-align:center;">Everyone is present!</td></tr>'; return; }
+      if(missingStaff.length === 0) { tb.innerHTML = '<tr><td colspan="3" style="text-align:center;">No data available (Everyone present).</td></tr>'; return; }
+      
+      const searchFilter = document.getElementById('global-search').value.toLowerCase();
       
       let html = '';
       missingStaff.forEach(name => {
+        if (searchFilter && !name.toLowerCase().includes(searchFilter)) return;
+
         const excKey = `${name}_${selectedDate.toISOString().split('T')[0]}`;
         const hasException = exceptionsData[excKey] ? exceptionsData[excKey].reason : null;
         
@@ -564,9 +554,11 @@
           </td>
         </tr>`;
       });
+      
+      if(html === '') html = '<tr><td colspan="3" style="text-align:center;">No matching data.</td></tr>';
+      
       tb.innerHTML = html;
 
-      // Attach Modal Listeners
       document.querySelectorAll('.btn-manage-exc').forEach(btn => {
         btn.addEventListener('click', (e) => {
           activeExceptionName = e.target.getAttribute('data-name');
@@ -587,38 +579,38 @@
         await setDoc(doc(db, "attendance_exceptions", excKey), { name: activeExceptionName, date: selectedDate.toISOString().split('T')[0], reason: reason });
         exceptionsData[excKey] = { reason: reason }; // Update local cache
         document.getElementById('exception-modal').style.display = 'none';
-        processDailyData(); // Refresh UI
+        processDailyData(); 
+        if(document.getElementById('view-matrix').style.display === 'block') generateMatrix();
       } catch(err) { alert("Failed to save exception."); }
     });
 
-    // --- CHART LOGIC ---
-    function updateChart(branchData) {
-      const ctx = document.getElementById('branchChart');
-      if(branchChartInstance) branchChartInstance.destroy();
-      
-      branchChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(branchData),
-          datasets: [{ data: Object.values(branchData), backgroundColor: '#3b82f6', borderRadius: 6 }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-      });
-    }
 
-    // --- 7 DAY MATRIX (From earlier) ---
+    // --- ATTENDANCE MATRIX ---
     function generateMatrix() {
+      const daysInput = parseInt(document.getElementById('matrix-days-input').value) || 7;
       const header = document.getElementById('matrix-header');
       const body = document.getElementById('matrix-body');
       
+      if(masterStaffList.length === 0) {
+          body.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No data available.</td></tr>';
+          return;
+      }
+      
       const dates = [];
-      for(let i=6; i>=0; i--) { let d = new Date(); d.setDate(d.getDate()-i); dates.push(d); }
+      for(let i=daysInput-1; i>=0; i--) { let d = new Date(); d.setDate(d.getDate()-i); dates.push(d); }
       
       header.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dates.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
       
+      const searchFilter = document.getElementById('global-search').value.toLowerCase();
+
       body.innerHTML = '';
+      let renderedRows = 0;
+
       masterStaffList.forEach(name => {
-        let row = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border);">${name}</td>`;
+        if (searchFilter && !name.toLowerCase().includes(searchFilter)) return;
+        renderedRows++;
+
+        let row = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10;">${name}</td>`;
         
         dates.forEach(date => {
           const targetStr = date.toDateString();
@@ -628,7 +620,7 @@
 
           if(dayLogs.length === 0) {
             if(hasExc) row += `<td><span class="badge bg-orange" style="font-size:10px;">${hasExc.reason}</span></td>`;
-            else row += `<td><span class="badge bg-gray" style="font-size:10px;">Absent</span></td>`;
+            else row += `<td><span class="badge bg-gray" style="font-size:10px;">No Record</span></td>`;
           } else {
             const ins = dayLogs.filter(l => l.action === 'Clock In').sort((a,b)=>a.timestamp-b.timestamp);
             const inTime = ins.length ? ins[0].timestamp.toDate().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : 'N/A';
@@ -638,6 +630,10 @@
         row += '</tr>';
         body.innerHTML += row;
       });
+
+      if(renderedRows === 0) {
+        body.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No data available for search query.</td></tr>';
+      }
     }
 
     // --- EXPORT LOGIC ---
@@ -651,11 +647,29 @@
         const rows = processedData.map(d => [d.name, d.firstIn?d.firstIn.toLocaleTimeString():'N/A', d.lastOut?d.lastOut.toLocaleTimeString():'N/A', d.formattedHours, d.isLate?"Late":(d.hasException?d.hasException:"On Time")]);
 
         if (type === 'csv') {
+          if (rows.length === 0) { alert("No data to export"); return; }
           let csv = headers.join(",") + "\n" + rows.map(r => `"${r.join('","')}"`).join("\n");
           const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `RJ_Attendance_${selectedDate.toDateString()}.csv`; a.click();
         } else if (type === 'pdf') {
           const element = document.getElementById('export-container');
           html2pdf().set({ margin: 10, filename: `RJ_Report_${selectedDate.toDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+        } else if (type === 'xls') {
+           if (rows.length === 0) { alert("No data to export"); return; }
+           let tableStr = '<table><tr>';
+           headers.forEach(h => tableStr += `<th>${h}</th>`);
+           tableStr += '</tr>';
+           rows.forEach(r => { tableStr += '<tr>'; r.forEach(cell => tableStr += `<td>${cell}</td>`); tableStr += '</tr>'; });
+           tableStr += '</table>';
+           const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>${tableStr}</body></html>`;
+           const a = document.createElement("a");
+           a.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template)));
+           a.download = `RJ_Attendance_${selectedDate.toDateString()}.xls`;
+           a.click();
+        } else if (type === 'copy') {
+           if (rows.length === 0) { alert("No data to copy"); return; }
+           let clipboardTxt = headers.join("\t") + "\n";
+           rows.forEach(r => { clipboardTxt += r.join('\t') + "\n"; });
+           navigator.clipboard.writeText(clipboardTxt).then(() => alert("Copied to clipboard!"));
         }
       });
     });
@@ -686,7 +700,7 @@
       await setDoc(doc(db, "registered_faces", name), { employee_name: name, descriptor: Array.from(detection.descriptor), last_updated: new Date() });
       document.getElementById('reg-status').innerText = `Successfully registered: ${name}`;
       document.getElementById('reg-name').value = '';
-      fetchMasterData(); // Refresh list
+      fetchMasterData(); 
     });
 
   </script>
