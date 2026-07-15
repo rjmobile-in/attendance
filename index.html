@@ -3,284 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RJ Mobile — Admin Dashboard</title>
+  <title>RJ Mobile — Admin Portal</title>
   
-  <script>if (localStorage.getItem('rj_theme') === 'light') { document.documentElement.classList.add('light-theme'); }</script>
+  <script>
+    if (localStorage.getItem('rj_admin_theme') === 'light') {
+      document.documentElement.classList.add('light-theme');
+    }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
-  
-  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg-base: #09090b; --card-bg: #18181b; --card-bg-alpha: rgba(24, 24, 27, 0.75);
-      --card-border: #27272a; --primary: #3b82f6; --primary-alpha: rgba(59, 130, 246, 0.15);
-      --text-main: #f4f4f5; --text-soft: #a1a1aa; --success: #10b981; --danger: #ef4444;
-      --input-bg: #09090b; --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4); --shadow-glow: 0 10px 30px rgba(59, 130, 246, 0.2);
+      --card-border: #27272a; --primary: #8b5cf6; --primary-hover: #a78bfa;
+      --primary-alpha: rgba(139, 92, 246, 0.15); --text-main: #f4f4f5; --text-soft: #a1a1aa;
+      --success: #10b981; --success-alpha: rgba(16, 185, 129, 0.15); --danger: #ef4444;
+      --danger-alpha: rgba(239, 68, 68, 0.15); --input-bg: #09090b;
+      --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
     html.light-theme {
       --bg-base: #f8fafc; --card-bg: #ffffff; --card-bg-alpha: rgba(255, 255, 255, 0.85);
-      --card-border: #e2e8f0; --text-main: #0f172a; --text-soft: #64748b; --input-bg: #f1f5f9;
+      --card-border: #e2e8f0; --primary: #4f46e5; --primary-hover: #6366f1;
+      --primary-alpha: rgba(79, 70, 229, 0.1); --text-main: #0f172a; --text-soft: #64748b;
+      --input-bg: #f1f5f9; --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); font-size: 15px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; transition: background-color 0.4s ease; overflow-x: hidden; }
-    h1, h2, h3, .brand-title, .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); font-size: 15px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; overflow-x: hidden; }
     .glass-effect { background: var(--card-bg-alpha); backdrop-filter: blur(16px); border: 1px solid var(--card-border); }
-    #app-container { width: 100%; max-width: 1200px; }
-    
+
+    /* Loader & Toast */
     #global-loader { position: fixed; inset: 0; background: rgba(var(--bg-base), 0.9); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: var(--text-soft); font-weight: 500; }
-    .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; margin-bottom: 20px; }
+    .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite; margin-bottom: 20px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    #login-screen { display: none; background: var(--card-bg); padding: 48px 40px; border-radius: 24px; box-shadow: var(--shadow-soft); text-align: center; width: 100%; max-width: 420px; margin-top: 12vh; border: 1px solid var(--card-border); position: relative; overflow: hidden; }
-    #login-screen::before { content: ''; position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: var(--primary); filter: blur(100px); opacity: 0.3; z-index: 0; pointer-events: none; }
-    #login-screen > * { position: relative; z-index: 1; }
-    #login-screen h2 { font-weight: 800; font-size: 28px; margin-bottom: 8px; letter-spacing: -0.5px; }
-    #login-screen p { color: var(--text-soft); font-size: 15px; margin-bottom: 32px; }
-    
-    .input-field { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); font-size: 15px; margin-bottom: 16px; outline: none; transition: all 0.2s; font-family: 'Inter', sans-serif; cursor: pointer; }
-    .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-alpha); background: var(--card-bg); }
-    .checkbox-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; font-size: 14px; color: var(--text-soft); cursor: pointer; font-weight: 500; }
-    .checkbox-row input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
-    
-    #login-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px var(--primary-alpha); }
-    #login-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
-    #login-btn:active { transform: scale(0.97); }
-    #error-msg { color: var(--danger); font-size: 14px; margin-top: 16px; display: none; font-weight: 500; background: var(--danger-alpha); padding: 10px; border-radius: 10px; }
-
-    .password-wrapper { position: relative; width: 100%; margin-bottom: 16px; }
-    .password-wrapper .input-field { margin-bottom: 0; padding-right: 48px; }
-    .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-soft); cursor: pointer; display: flex; transition: color 0.2s; }
-    .toggle-password:hover { color: var(--primary); }
-
-    #dashboard { display: none; width: 100%; max-width: 1200px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding: 20px 24px; border-radius: 20px; box-shadow: var(--shadow-soft); }
-    .brand-text .name { font-size: 24px; font-weight: 800; }
-    .role-badge { display: inline-flex; background: var(--primary-alpha); color: var(--primary); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; margin-left: 12px; }
-    .btn-primary { background: var(--primary); color: #fff; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; border: none; transition: all 0.2s; }
-    .btn-primary:hover { filter: brightness(1.1); box-shadow: var(--shadow-glow); }
-    .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; }
-    #theme-toggle { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-soft); padding: 10px; border-radius: 12px; cursor: pointer; }
-    .tab-controls { display: inline-flex; background: var(--input-bg); border-radius: 16px; padding: 6px; gap: 4px; border: 1px solid var(--card-border); margin-bottom: 24px; }
-    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 24px; border-radius: 12px; cursor: pointer; }
-    .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .controls-wrapper { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-soft); }
-    .filter-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: flex-end; }
-    .filter-group { display: flex; flex-direction: column; gap: 8px; }
-    .filter-group label { font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; }
-    .filter-input { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); outline: none; }
-    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
-    .metric-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; position: relative; }
-    .metric-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), #3b82f6); }
-    .metric-title { font-size: 13px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
-    .metric-value { font-size: 36px; font-weight: 800; color: var(--text-main); }
-    .stats-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); margin-bottom: 24px; overflow: hidden;}
-    .table-responsive { overflow-y: auto; overflow-x: auto; max-height: 500px; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-    th { position: sticky; top: 0; background: var(--card-bg); color: var(--text-soft); padding: 18px 24px; border-bottom: 1px solid var(--card-border); text-transform: uppercase; font-size: 12px; z-index: 5;}
-    td { padding: 14px 24px; border-bottom: 1px solid var(--card-border); color: var(--text-main); font-weight: 500; vertical-align: middle; }
-    .badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-block; }
-    .badge-in { background: var(--success-alpha); color: var(--success); }
-    .badge-out { background: var(--danger-alpha); color: var(--danger); }
-    .camera-wrapper { max-width: 600px; margin: 0 auto; background: var(--card-bg); border-radius: 20px; padding: 24px; border: 1px solid var(--card-border); }
-    #video-container { position: relative; background: #000; border-radius: 16px; overflow: hidden; width: 100%; height: 360px; margin-bottom: 24px; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; }
-    #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-    #status-overlay { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; z-index: 10; }
-    
-    .load-more-container { text-align: center; padding: 16px; background: var(--input-bg); border-top: 1px solid var(--card-border); }
-    .btn-load { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-    .btn-load:hover { background: var(--primary-alpha); }
-
-    /* Review Modal Styling */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; }
-    .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
-    @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
-    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 32px; width: 100%; max-width: 500px; box-shadow: var(--shadow-glow); display: flex; flex-direction: column; gap: 20px; }
-    .modal-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; border-radius: 12px; border: 1px solid var(--card-border); background: #000; }
-    .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); }
-    .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; font-size: 15px; }
-    .check-wrap input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
-    .btn-review { background: var(--primary-alpha); color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.2s; }
-    .btn-review:hover { background: var(--primary); color: #fff; }
-
-    #toast { visibility: hidden; min-width: 300px; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 24px; position: fixed; z-index: 10000; bottom: 40px; left: 50%; transform: translate(-50%, 20px); font-size: 15px; font-weight: 600; color: var(--text-main); border-radius: 16px; background: var(--card-bg); border: 1px solid var(--card-border); opacity: 0; transition: opacity 0.3s, transform 0.3s, visibility 0.3s; }
+    #toast { visibility: hidden; min-width: 300px; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 24px; position: fixed; z-index: 10000; bottom: 40px; left: 50%; transform: translate(-50%, 20px); font-size: 15px; font-weight: 600; color: var(--text-main); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s, transform 0.3s, visibility 0.3s; }
     #toast.show { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
+
+    /* Login Screen */
+    #login-screen { display: none; background: var(--card-bg); padding: 48px 40px; border-radius: 24px; box-shadow: var(--shadow-soft); text-align: center; width: 100%; max-width: 420px; margin-top: 10vh; border: 1px solid var(--card-border); }
+    #login-screen h2 { font-weight: 800; font-size: 28px; margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif; }
+    #login-screen p { color: var(--text-soft); margin-bottom: 32px; }
+    .input-field { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; }
+    .input-field:focus { border-color: var(--primary); }
+    #login-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    #login-btn:hover { transform: translateY(-2px); }
+    #error-msg { color: var(--danger); font-size: 14px; margin-top: 16px; display: none; }
+
+    /* Dashboard Layout */
+    #dashboard { display: none; width: 100%; max-width: 1200px; flex-direction: column; gap: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: 20px; }
+    .brand-title { font-size: 20px; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+
+    /* Staff Matrix Styles */
+    .admin-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 24px; width: 100%; }
+    .section-header h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; margin-bottom: 4px; }
+    .section-header p { color: var(--text-soft); font-size: 14px; margin-bottom: 20px; }
+    
+    .table-container { width: 100%; overflow-x: auto; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 16px; }
+    #matrix-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    #matrix-table th, #matrix-table td { padding: 16px; border-bottom: 1px solid var(--card-border); border-right: 1px solid var(--card-border); text-align: center; font-size: 14px; vertical-align: top; }
+    #matrix-table th { background: var(--card-bg); font-weight: 700; color: var(--text-soft); white-space: nowrap; }
+    
+    .sticky-col { position: sticky; left: 0; background: var(--card-bg) !important; z-index: 2; text-align: left !important; font-weight: 700; box-shadow: 2px 0 5px rgba(0,0,0,0.2); min-width: 160px; vertical-align: middle !important; }
+    
+    .cell-absent { color: var(--danger); font-weight: 600; background: rgba(239, 68, 68, 0.05); vertical-align: middle !important;}
+    .cell-present { font-size: 13px; line-height: 1.6; background: rgba(16, 185, 129, 0.02); }
+    .time-block { margin-bottom: 8px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+    
+    /* Interactive Badges */
+    .badge-container { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+    .status-badge { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; user-select: none; }
+    .status-badge:hover { filter: brightness(1.2); transform: scale(1.02); }
+    .badge-yes { background: var(--success-alpha); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-no { background: var(--danger-alpha); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-disabled { background: var(--card-border); color: var(--text-soft); cursor: not-allowed; }
+
   </style>
 </head>
 <body>
 
-  <div id="global-loader" class="glass-effect">
-    <div class="spinner"></div>
-    <p>Authenticating Connection...</p>
-  </div>
+  <div id="global-loader" class="glass-effect"><div class="spinner"></div><p>Connecting to secure database...</p></div>
+  <div id="toast" class="glass-effect"><div id="toast-icon"></div><div id="toast-msg"></div></div>
 
-  <div id="toast" class="glass-effect">
-    <div id="toast-icon"></div>
-    <div id="toast-msg"></div>
-  </div>
-
+  <!-- LOGIN SCREEN -->
   <div id="login-screen">
-    <img src="logo.png" alt="RJ Mobile Logo" style="height: 64px; width: auto; margin-bottom: 20px; border-radius: 12px; object-fit: contain;" onerror="this.style.display='none'" />
-    <h2>Welcome Back</h2>
-    <p>Sign in to access your admin portal.</p>
-    <input type="email" id="email-input" class="input-field" placeholder="Enter your email" />
-    
-    <div class="password-wrapper">
-      <input type="password" id="password-input" class="input-field" placeholder="Enter password" />
-      <button id="toggle-password-btn" class="toggle-password" type="button" title="Show/Hide Password">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-      </button>
-    </div>
-
-    <label class="checkbox-row"><input type="checkbox" id="remember-me" checked> Keep me signed in</label>
+    <h2>Admin Portal</h2>
+    <p>Sign in to view attendance records.</p>
+    <input type="email" id="email-input" class="input-field" placeholder="director@rjmobile.com" />
+    <input type="password" id="password-input" class="input-field" placeholder="Enter password" />
     <button id="login-btn">Secure Login</button>
     <div id="error-msg">Authentication failed.</div>
   </div>
 
+  <!-- DASHBOARD -->
   <div id="dashboard">
     <div class="header glass-effect">
-      <div class="brand-text" style="display: flex; flex-direction: row; align-items: center; gap: 16px;">
-        <img src="logo.png" alt="RJ Mobile" style="height: 48px; border-radius: 10px;" onerror="this.style.display='none'" />
-        <div>
-          <div class="name">RJ Mobile <span class="role-badge">ADMIN</span></div>
-          <div style="font-size: 13px; font-weight: 600; color: var(--text-soft); margin-top: 4px;">Management Dashboard</div>
-        </div>
-      </div>
-      <div class="header-controls">
-        <button id="theme-toggle" title="Toggle Theme">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        </button>
+      <div class="brand-title">RJ Mobile HQ</div>
+      <div>
+        <button id="theme-toggle" class="btn-secondary">Toggle Theme</button>
         <button id="logout-btn" class="btn-secondary">Log Out</button>
       </div>
     </div>
 
-    <div class="tab-controls">
-      <button class="tab-btn active" id="tab-dashboard">Dashboard & Reports</button>
-      <button class="tab-btn" id="tab-register">Register New Face</button>
-    </div>
-
-    <div id="view-dashboard">
-      <div class="controls-wrapper glass-effect">
-        <div class="filter-bar">
-          <div class="filter-group">
-            <label>Start Date</label>
-            <input type="text" id="filter-start" class="filter-input" placeholder="Select Start Date">
-          </div>
-          <div class="filter-group">
-            <label>End Date</label>
-            <input type="text" id="filter-end" class="filter-input" placeholder="Select End Date">
-          </div>
-          <div class="filter-group">
-            <label>Branch Station</label>
-            <select id="filter-branch" class="filter-input">
-              <option value="All">All Branches</option>
-              <option value="Murlipura, 1 Number">Murlipura, 1 Number</option>
-              <option value="VKI, 17 Number">VKI, 17 Number</option>
-              <option value="VKI, Lohamandi">VKI, Lohamandi</option>
-              <option value="Shastri Nagar">Shastri Nagar</option>
-              <option value="Murlipura, 6 Number">Murlipura, 6 Number</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Staff Search</label>
-            <input type="text" id="filter-staff" class="filter-input" placeholder="Type a name...">
-          </div>
-          <button id="btn-reset-filters" class="btn-secondary" style="height: 48px;">Reset</button>
-        </div>
-      </div>
-
-      <div class="metrics-row">
-        <div class="metric-card">
-          <div class="metric-title">Loaded Records</div>
-          <div class="metric-value" id="metric-total">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Unique Staff Present</div>
-          <div class="metric-value" id="metric-staff">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Most Active Branch</div>
-          <div class="metric-value" id="metric-branch" style="font-size: 24px; padding-top: 8px;">-</div>
-        </div>
-      </div>
-
-      <div class="stats-card">
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Action</th>
-                <th>Employee Identity</th>
-                <th>Branch Station</th>
-                <th>Date & Time</th>
-                <th>Uniform Check</th>
-              </tr>
-            </thead>
-            <tbody id="report-tbody">
-              <tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">Loading database records...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="load-more-container">
-            <button id="btn-load-more" class="btn-load">Load Older Records</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="view-register" style="display: none;">
-      <div class="camera-wrapper">
-        <div style="margin-bottom: 24px; text-align: center;">
-          <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">Add New Face Profile</h2>
-          <p style="color: var(--text-soft); font-size: 14px;">Scan an employee's face geometry and link it to their name securely.</p>
-        </div>
-        <div id="video-container">
-          <video id="video" autoplay playsinline muted></video>
-          <div id="status-overlay">Initializing AI Models...</div>
-        </div>
-        <div class="form-group">
-          <label>Employee Full Name</label>
-          <input type="text" id="staff-name-input" class="filter-input" placeholder="Enter staff name to register" autocomplete="off" style="font-size: 16px; padding: 16px;" />
-        </div>
-        <button id="btn-register" class="btn-primary" style="width: 100%; padding: 18px; font-size: 16px;" disabled>
-          Scan & Save Face
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Review Modal Overlay -->
-  <div id="review-modal" class="modal-overlay">
-    <div class="modal-card">
-      <h2 style="font-size: 20px; font-weight: 800; margin-bottom: -10px;">Audit Uniform</h2>
-      <p style="color: var(--text-soft); font-size: 14px;">Verify the requirements. Saving will permanently delete this photo to save storage space.</p>
-      
-      <img id="modal-image-preview" src="" class="modal-img" alt="Staff Capture" />
-      
-      <div class="modal-checkboxes">
-        <label class="check-wrap"><input type="checkbox" id="check-tshirt"> RJ T-Shirt Present</label>
-        <label class="check-wrap"><input type="checkbox" id="check-idcard"> ID Card Present</label>
+    <!-- STAFF MATRIX SECTION -->
+    <div id="staff-matrix-section" class="admin-section">
+      <div class="section-header">
+        <h2>Staff Attendance Matrix</h2>
+        <p>Last 7 Days Overview. Click on T-Shirt or ID badges to toggle Yes/No.</p>
       </div>
       
-      <div style="display: flex; gap: 12px; margin-top: 10px;">
-        <button id="btn-cancel-review" class="btn-secondary" style="flex: 1;">Cancel</button>
-        <button id="btn-save-review" class="btn-primary" style="flex: 1; background: var(--success);">Save & Delete Photo</button>
+      <div class="table-container">
+        <table id="matrix-table">
+          <thead>
+            <tr id="matrix-header-row">
+              <th class="sticky-col">Staff Name</th>
+              <!-- Javascript will inject the dates here -->
+            </tr>
+          </thead>
+          <tbody id="matrix-body">
+            <!-- Javascript will inject the staff rows here -->
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, startAfter, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
+    // Your Firebase Config
     const firebaseConfig = { 
       apiKey: "AIzaSyD3nTvimIC_Tnc10x8yivnMlVFsZWyjKwE",
       authDomain: "staff-bcb17.firebaseapp.com",
@@ -294,351 +151,173 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    let allLogs = [];
-    let lastVisibleDoc = null; 
-    const LOAD_LIMIT = 20;     
+    function displayToast(msg, statusType = "success") {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.className = "glass-effect show";
+      setTimeout(() => { toast.className = "glass-effect"; }, 3000);
+    }
 
-    const tbody = document.getElementById('report-tbody');
-    let startPicker, endPicker;
-    let currentReviewLogId = null; 
-    let isAppInitialized = false;
-
+    // Auth Logic
     onAuthStateChanged(auth, (user) => {
       document.getElementById('global-loader').style.display = 'none';
       if (user) {
         document.getElementById('login-screen').style.display = 'none';
-        
-        // BUG FIX: Changed from 'flex' to 'block' to fix the squeezed row layout
-        document.getElementById('dashboard').style.display = 'block'; 
-        
-        if (!isAppInitialized) {
-            initFilters();
-            fetchDatabaseLogs();
-            isAppInitialized = true;
-        }
+        document.getElementById('dashboard').style.display = 'flex';
+        loadStaffMatrix();
       } else {
         document.getElementById('login-screen').style.display = 'block';
         document.getElementById('dashboard').style.display = 'none';
       }
     });
 
-    document.getElementById('password-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') document.getElementById('login-btn').click(); });
-    
-    document.getElementById('toggle-password-btn').addEventListener('click', (e) => {
-      const input = document.getElementById('password-input');
-      const btn = e.currentTarget;
-      if(input.type === 'password') {
-        input.type = 'text';
-        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
-      } else {
-        input.type = 'password';
-        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-      }
-    });
-
     document.getElementById('login-btn').addEventListener('click', async () => {
-      const e = document.getElementById('email-input').value;
-      const p = document.getElementById('password-input').value;
-      const r = document.getElementById('remember-me').checked;
-      const msg = document.getElementById('error-msg');
-      try { 
-        msg.style.display = 'none'; 
-        await setPersistence(auth, r ? browserLocalPersistence : browserSessionPersistence); 
-        await signInWithEmailAndPassword(auth, e, p); 
-      } 
-      catch (err) { 
-        msg.style.display = 'block'; 
-        msg.innerText = err.message; 
-      }
+      const e = document.getElementById('email-input').value, p = document.getElementById('password-input').value, msg = document.getElementById('error-msg');
+      try { msg.style.display = 'none'; await signInWithEmailAndPassword(auth, e, p); } 
+      catch (err) { msg.style.display = 'block'; msg.innerText = err.message; }
     });
+    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        signOut(auth);
-    });
-
-    function initFilters() {
-      startPicker = flatpickr("#filter-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", onChange: applyLocalFilters });
-      endPicker = flatpickr("#filter-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", onChange: applyLocalFilters });
-      document.getElementById('filter-branch').addEventListener('change', applyLocalFilters);
-      document.getElementById('filter-staff').addEventListener('input', applyLocalFilters);
-      document.getElementById('btn-reset-filters').addEventListener('click', () => {
-        startPicker.clear(); endPicker.clear();
-        document.getElementById('filter-branch').value = "All";
-        document.getElementById('filter-staff').value = "";
-        applyLocalFilters();
-      });
-    }
-
-    function displayToast(msg, statusType = "success") {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-msg').innerText = msg;
-      
-      const icon = document.getElementById('toast-icon');
-      if (statusType === "success") {
-        icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
-      } else {
-        icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
-      }
-
-      toast.className = "show";
-      setTimeout(() => { toast.className = ""; }, 4000);
-    }
-
-    document.getElementById('tab-dashboard').addEventListener('click', () => {
-      document.getElementById('view-dashboard').style.display = 'block';
-      document.getElementById('view-register').style.display = 'none';
-      document.getElementById('tab-dashboard').className = "tab-btn active";
-      document.getElementById('tab-register').className = "tab-btn";
-    });
-
-    document.getElementById('tab-register').addEventListener('click', () => {
-      document.getElementById('view-dashboard').style.display = 'none';
-      document.getElementById('view-register').style.display = 'block';
-      document.getElementById('tab-dashboard').className = "tab-btn";
-      document.getElementById('tab-register').className = "tab-btn active";
-      startCamera(); initializeAI();
-    });
-
-    async function fetchDatabaseLogs(loadMore = false) {
-      if (!loadMore) {
-        allLogs = [];
-        lastVisibleDoc = null;
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">Fetching records...</td></tr>';
-      }
-
-      const btnLoad = document.getElementById('btn-load-more');
-      btnLoad.innerText = "Loading...";
-      btnLoad.disabled = true;
-
-      try {
-        let q = query(collection(db, "attendance_logs"), orderBy("timestamp", "desc"), limit(LOAD_LIMIT));
-        if (loadMore && lastVisibleDoc) {
-           q = query(collection(db, "attendance_logs"), orderBy("timestamp", "desc"), startAfter(lastVisibleDoc), limit(LOAD_LIMIT));
-        }
-
-        const snapshot = await getDocs(q);
-        
-        if (snapshot.empty && !loadMore) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px;">No records found.</td></tr>';
-          btnLoad.style.display = 'none';
-          return;
-        }
-
-        if (snapshot.empty && loadMore) {
-           btnLoad.innerText = "All records loaded";
-           return;
-        }
-
-        lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
-        snapshot.forEach(doc => { allLogs.push({ id: doc.id, ...doc.data() }); });
-
-        btnLoad.innerText = "Load Older Records";
-        btnLoad.disabled = false;
-        btnLoad.style.display = 'inline-block';
-
-        applyLocalFilters();
-
-      } catch (error) {
-        console.error(error);
-        displayToast("Error fetching database logs.", "error");
-      }
-    }
-
-    document.getElementById('btn-load-more').addEventListener('click', () => fetchDatabaseLogs(true));
-
-    function applyLocalFilters() {
-      const sDate = document.getElementById('filter-start').value;
-      const eDate = document.getElementById('filter-end').value;
-      const branch = document.getElementById('filter-branch').value;
-      const staffQuery = document.getElementById('filter-staff').value.toLowerCase();
-
-      let sMs = 0, eMs = Infinity;
-      if(sDate) sMs = new Date(sDate).getTime();
-      if(eDate) { const d = new Date(eDate); d.setTime(d.getTime() + 86400000); eMs = d.getTime(); }
-
-      const filtered = allLogs.filter(log => {
-        if (branch !== "All" && log.branch !== branch) return false;
-        if (staffQuery && (!log.employee_name || !log.employee_name.toLowerCase().includes(staffQuery))) return false;
-        if (log.timestamp) {
-          const t = log.timestamp.toDate().getTime();
-          if (sDate && t < sMs) return false;
-          if (eDate && t >= eMs) return false;
-        }
-        return true;
-      });
-
-      renderDashboard(filtered);
-    }
-
-    function renderDashboard(data) {
-      document.getElementById('metric-total').innerText = data.length;
-      const uniqueStaff = new Set();
-      const branchCounts = {};
-      
-      data.forEach(log => {
-        if (log.employee_name) uniqueStaff.add(log.employee_name);
-        if (log.branch) branchCounts[log.branch] = (branchCounts[log.branch] || 0) + 1;
-      });
-      document.getElementById('metric-staff').innerText = uniqueStaff.size;
-      document.getElementById('metric-branch').innerText = Object.keys(branchCounts).sort((a,b) => branchCounts[b] - branchCounts[a])[0] || "-";
-
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px;">No matching records in loaded batch.</td></tr>';
-        return;
-      }
-
-      let rowsHTML = "";
-      data.forEach(log => { 
-        const isClockIn = log.action === 'Clock In';
-        const formattedTime = log.timestamp ? log.timestamp.toDate().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : "N/A";
-        
-        let uniformHTML = '';
-        if (log.uniform_reviewed) {
-            uniformHTML = `<div style="font-size: 13px; line-height: 1.5;">Shirt: ${log.uniform_tshirt ? '✅' : '❌'}<br>ID: ${log.uniform_idcard ? '✅' : '❌'}</div>`;
-        } else if (log.photo_capture && log.photo_capture.length > 500) {
-            uniformHTML = `<button class="btn-review" data-id="${log.id}">Review Photo</button>`;
-        } else {
-            uniformHTML = `<span style="color: var(--text-soft); font-size: 12px;">No Evidence</span>`;
-        }
-        
-        rowsHTML += `
-          <tr>
-            <td><span class="badge ${isClockIn ? 'badge-in' : 'badge-out'}">${log.action}</span></td>
-            <td><strong>${log.employee_name || "Unknown"}</strong></td>
-            <td style="color: var(--text-soft); font-size: 14px;">${log.branch || "-"}</td>
-            <td style="color: var(--text-soft); font-size: 14px;">${formattedTime}</td>
-            <td>${uniformHTML}</td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = rowsHTML;
-    }
-
-    // --- UNIFORM REVIEW LOGIC ---
-    document.getElementById('report-tbody').addEventListener('click', (e) => {
-      if (e.target.classList.contains('btn-review')) {
-         const docId = e.target.dataset.id;
-         openReviewModal(docId);
-      }
-    });
-
-    function openReviewModal(id) {
-      currentReviewLogId = id;
-      const logData = allLogs.find(log => log.id === id);
-      
-      if (logData && logData.photo_capture) {
-         document.getElementById('modal-image-preview').src = logData.photo_capture;
-         document.getElementById('check-tshirt').checked = false; 
-         document.getElementById('check-idcard').checked = false;
-         document.getElementById('review-modal').classList.add('active');
-      }
-    }
-
-    document.getElementById('btn-cancel-review').addEventListener('click', () => {
-      document.getElementById('review-modal').classList.remove('active');
-      currentReviewLogId = null;
-    });
-
-    document.getElementById('btn-save-review').addEventListener('click', async () => {
-      if (!currentReviewLogId) return;
-      
-      const isTshirt = document.getElementById('check-tshirt').checked;
-      const isIdCard = document.getElementById('check-idcard').checked;
-      const btn = document.getElementById('btn-save-review');
-      
-      btn.innerText = "Saving...";
-      btn.disabled = true;
-
-      try {
-        await updateDoc(doc(db, "attendance_logs", currentReviewLogId), {
-          uniform_reviewed: true,
-          uniform_tshirt: isTshirt,
-          uniform_idcard: isIdCard,
-          photo_capture: "" 
-        });
-
-        const logIndex = allLogs.findIndex(log => log.id === currentReviewLogId);
-        if (logIndex !== -1) {
-            allLogs[logIndex].uniform_reviewed = true;
-            allLogs[logIndex].uniform_tshirt = isTshirt;
-            allLogs[logIndex].uniform_idcard = isIdCard;
-            allLogs[logIndex].photo_capture = "";
-        }
-
-        displayToast("Uniform audited and photo deleted!", "success");
-        document.getElementById('review-modal').classList.remove('active');
-        applyLocalFilters(); 
-
-      } catch (err) {
-        console.error(err);
-        displayToast("Error saving review.", "error");
-      }
-      
-      btn.innerText = "Save & Delete Photo";
-      btn.disabled = false;
-    });
-
-    // --- REGISTRATION LOGIC ---
-    let isProcessingReg = false;
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-        document.getElementById('video').srcObject = stream;
-      } catch (err) { document.getElementById('status-overlay').innerText = "Camera Denied"; }
-    }
-
-    async function initializeAI() {
-      try {
-        await faceapi.nets.ssdMobilenetv1.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models');
-        document.getElementById('status-overlay').innerText = "Ready for Registration";
-        document.getElementById('status-overlay').style.background = "var(--success)";
-        document.getElementById('btn-register').disabled = false;
-      } catch (err) { }
-    }
-
-    document.getElementById('btn-register').addEventListener('click', async () => {
-      if (isProcessingReg) return;
-      const enteredName = document.getElementById('staff-name-input').value.trim();
-      if (!enteredName) { displayToast("Type a name first.", "error"); return; }
-
-      isProcessingReg = true;
-      document.getElementById('btn-register').innerHTML = "Checking...";
-
-      try {
-        const docRef = doc(db, "registered_faces", enteredName);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          displayToast(`"${enteredName}" already registered!`, "error");
-          isProcessingReg = false; document.getElementById('btn-register').innerHTML = "Scan & Save Face"; return; 
-        }
-
-        const detection = await faceapi.detectSingleFace(document.getElementById('video')).withFaceLandmarks().withFaceDescriptor();
-
-        if (!detection) {
-          displayToast("No face detected! Look at camera.", "error");
-          isProcessingReg = false; document.getElementById('btn-register').innerHTML = "Scan & Save Face"; return;
-        }
-
-        await setDoc(docRef, { employee_name: enteredName, descriptor: Array.from(detection.descriptor), last_updated: new Date() });
-        displayToast(`Registered ${enteredName}!`, "success");
-        document.getElementById('staff-name-input').value = ""; 
-
-      } catch (err) { displayToast("Database Error.", "error"); }
-      isProcessingReg = false; document.getElementById('btn-register').innerHTML = "Scan & Save Face";
-    });
-
-    const themeBtn = document.getElementById('theme-toggle');
-    themeBtn.addEventListener('click', () => {
+    // Theme Logic
+    document.getElementById('theme-toggle').addEventListener('click', () => {
       const isLight = document.documentElement.classList.toggle('light-theme');
-      localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
-      document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
+      localStorage.setItem('rj_admin_theme', isLight ? 'light' : 'dark');
     });
-    
-    if (localStorage.getItem('rj_theme') === 'light') {
-        document.getElementById('flatpickr-theme').href = 'https://npmcdn.com/flatpickr/dist/themes/light.css';
+
+    // --- MATRIX LOGIC ---
+    async function loadStaffMatrix() {
+      const matrixHeader = document.getElementById('matrix-header-row');
+      const matrixBody = document.getElementById('matrix-body');
+      
+      // 1. Generate the last 7 dates
+      const dates = [];
+      for (let i = 6; i >= 0; i--) {
+        let d = new Date();
+        d.setDate(d.getDate() - i);
+        dates.push(d.toDateString()); // e.g. "Wed Aug 14 2024"
+      }
+
+      matrixHeader.innerHTML = '<th class="sticky-col">Staff Name</th>';
+      dates.forEach(date => {
+        // Just show the Day and Month (e.g. "Wed Aug 14")
+        matrixHeader.innerHTML += `<th>${date.substring(0, 10)}</th>`;
+      });
+
+      // 2. Fetch all logs from Firebase
+      matrixBody.innerHTML = '<tr><td colspan="8">Loading data...</td></tr>';
+      const logsSnapshot = await getDocs(collection(db, "attendance_logs"));
+      const allLogs = [];
+      const uniqueNames = new Set();
+
+      logsSnapshot.forEach(doc => {
+        const data = doc.data();
+        allLogs.push({ id: doc.id, data: data });
+        if(data.employee_name) uniqueNames.add(data.employee_name);
+      });
+
+      // 3. Sort staff alphabetically
+      const sortedStaff = Array.from(uniqueNames).sort();
+      matrixBody.innerHTML = '';
+
+      // 4. Build the matrix rows
+      sortedStaff.forEach(staffName => {
+        let rowHTML = `<tr><td class="sticky-col">${staffName}</td>`;
+        
+        dates.forEach(dateStr => {
+          // Find logs for this person on this exact date
+          const daysLogs = allLogs.filter(log => 
+            log.data.employee_name === staffName && 
+            log.data.timestamp.toDate().toDateString() === dateStr
+          );
+
+          if (daysLogs.length === 0) {
+            rowHTML += `<td class="cell-absent">Absent</td>`;
+          } else {
+            // Get In and Out times
+            const clockIns = daysLogs.filter(l => l.data.action === "Clock In").sort((a,b) => a.data.timestamp - b.data.timestamp);
+            const clockOuts = daysLogs.filter(l => l.data.action === "Clock Out").sort((a,b) => b.data.timestamp - a.data.timestamp);
+            
+            let timeIn = "--:--";
+            let timeOut = "--:--";
+            let clockInDocId = null;
+            let hasTshirt = false;
+            let hasIdCard = false;
+
+            if (clockIns.length > 0) {
+              timeIn = clockIns[0].data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+              clockInDocId = clockIns[0].id; // We attach the metadata to the Clock In document
+              hasTshirt = clockIns[0].data.tshirt || false;
+              hasIdCard = clockIns[0].data.id_card || false;
+            }
+            if (clockOuts.length > 0) {
+              timeOut = clockOuts[0].data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+
+            // Create the cell with clickable badges. 
+            // If there is no Clock In record for some reason, disable the buttons.
+            if (clockInDocId) {
+              rowHTML += `
+                <td class="cell-present">
+                  <div class="time-block">
+                    In: <strong>${timeIn}</strong><br>
+                    Out: <strong>${timeOut}</strong>
+                  </div>
+                  <div class="badge-container">
+                    <div class="status-badge toggle-badge ${hasTshirt ? 'badge-yes' : 'badge-no'}" data-doc="${clockInDocId}" data-field="tshirt" data-state="${hasTshirt}">
+                      T-Shirt: ${hasTshirt ? 'Yes' : 'No'}
+                    </div>
+                    <div class="status-badge toggle-badge ${hasIdCard ? 'badge-yes' : 'badge-no'}" data-doc="${clockInDocId}" data-field="id_card" data-state="${hasIdCard}">
+                      ID Card: ${hasIdCard ? 'Yes' : 'No'}
+                    </div>
+                  </div>
+                </td>
+              `;
+            } else {
+               rowHTML += `
+                <td class="cell-present">
+                  <div class="time-block">Out only: <strong>${timeOut}</strong></div>
+                  <div class="badge-container"><div class="status-badge badge-disabled">Missing Clock In</div></div>
+                </td>
+              `;
+            }
+          }
+        });
+        
+        rowHTML += `</tr>`;
+        matrixBody.innerHTML += rowHTML;
+      });
+
+      // 5. Attach Event Listeners to the new badges so they save to Firebase when clicked
+      document.querySelectorAll('.toggle-badge').forEach(badge => {
+        badge.addEventListener('click', async (e) => {
+          const docId = e.target.getAttribute('data-doc');
+          const field = e.target.getAttribute('data-field');
+          const currentState = e.target.getAttribute('data-state') === 'true';
+          const newState = !currentState; // Flip the state
+
+          // Visually update immediately for the user
+          e.target.setAttribute('data-state', newState.toString());
+          if (newState) {
+            e.target.classList.replace('badge-no', 'badge-yes');
+            e.target.innerText = `${field === 'tshirt' ? 'T-Shirt' : 'ID Card'}: Yes`;
+          } else {
+            e.target.classList.replace('badge-yes', 'badge-no');
+            e.target.innerText = `${field === 'tshirt' ? 'T-Shirt' : 'ID Card'}: No`;
+          }
+
+          // Save to Firebase Firestore
+          try {
+            const logRef = doc(db, "attendance_logs", docId);
+            await updateDoc(logRef, {
+              [field]: newState
+            });
+            displayToast("Record updated successfully");
+          } catch (error) {
+            console.error("Error updating document: ", error);
+            displayToast("Error saving to database", "error");
+          }
+        });
+      });
     }
   </script>
 </body>
