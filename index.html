@@ -38,21 +38,18 @@
     h1, h2, h3, .name, .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; }
     .glass-effect { background: var(--card-bg-alpha); backdrop-filter: blur(16px); border: 1px solid var(--card-border); }
 
-    /* Core UI Elements */
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;}
     .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
     .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
     .btn-secondary:hover { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     
-    /* Login & Loaders */
     #global-loader { position: fixed; inset: 0; background: rgba(var(--bg-base), 0.9); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
     .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     #login-screen { display: none; max-width: 400px; margin: 10vh auto; background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); }
-    .input-field { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; }
+    .input-field { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; cursor: pointer; }
     .input-field:focus { border-color: var(--primary); }
     
-    /* Dashboard & Header */
     #dashboard { display: none; max-width: 1300px; margin: 0 auto; }
     .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: 20px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -62,10 +59,12 @@
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
     .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); }
     
-    /* Dropdowns */
+    /* FIXED Dropdowns */
     .dropdown { position: relative; display: inline-block; }
-    .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 240px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; padding: 12px; z-index: 100; box-shadow: var(--shadow-soft); }
-    .dropdown.show .dropdown-content { display: block; animation: dropIn 0.2s; }
+    .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 240px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; z-index: 1000; box-shadow: var(--shadow-soft); }
+    
+    /* This class is exactly what the JavaScript toggles to make it visible */
+    .dropdown-content.show { display: block; animation: dropIn 0.2s; }
     @keyframes dropIn { from {opacity:0; transform: translateY(-10px);} to {opacity:1; transform:translateY(0);} }
     
     .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; border-radius: 10px; transition: 0.2s; }
@@ -73,7 +72,7 @@
 
     /* Multi-select Checkboxes */
     .multi-select-actions { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
-    .multi-select-actions button { flex: 1; padding: 6px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; }
+    .multi-select-actions button { flex: 1; padding: 8px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
     .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary); }
     .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; }
     .check-wrap:hover { background: var(--input-bg); }
@@ -171,20 +170,35 @@
     <div class="filter-bar">
       <div class="filter-group">
         <label>Start Date</label>
-        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 150px; padding: 10px;" placeholder="Start Date" />
+        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 140px; padding: 10px;" placeholder="Start Date" />
       </div>
       <div class="filter-group">
         <label>End Date</label>
-        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 150px; padding: 10px;" placeholder="End Date" />
+        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 140px; padding: 10px;" placeholder="End Date" />
       </div>
       
+      <!-- NEW: Branch Filter -->
+      <div class="filter-group">
+        <label>Branch Station</label>
+        <select id="global-branch" class="input-field" style="margin: 0; width: 200px; padding: 10px;">
+          <option value="All">All Branches</option>
+          <option value="Murlipura, 1 Number">Murlipura, 1 Number</option>
+          <option value="VKI, 17 Number">VKI, 17 Number</option>
+          <option value="VKI, Lohamandi">VKI, Lohamandi</option>
+          <option value="Shastri Nagar">Shastri Nagar</option>
+          <option value="Murlipura, 6 Number">Murlipura, 6 Number</option>
+          <option value="Murlipura, 1 Number (Testing Mode)">Testing Mode</option>
+        </select>
+      </div>
+
+      <!-- Staff Filter Dropdown -->
       <div class="filter-group dropdown" id="staff-filter-dropdown">
         <label>Filter Staff</label>
         <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 220px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="staff-btn-text">All Staff Selected</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
-        <!-- Ensure this content stays open when clicked inside -->
+        <!-- The dropdown box that opens -->
         <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="staff-dropdown-box">
           <div class="multi-select-actions">
             <button id="btn-select-all">Select All</button>
@@ -260,7 +274,7 @@
     <!-- VIEW 2: ABSENTS & EXCEPTIONS -->
     <div id="view-absent" class="app-view" style="display: none;">
       <h2 style="font-size: 20px; margin-bottom: 8px;">Action Center</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px;">Manage missing staff and approve leaves for the selected date range.</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px;">Manage missing staff and approve leaves for the selected filters.</p>
       
       <div class="table-card">
         <div class="table-responsive">
@@ -335,7 +349,7 @@
       
       <div style="display: flex; gap: 12px;">
         <button id="btn-cancel-review" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
-        <button id="btn-save-review" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save & Delete Photo</button>
+        <button id="btn-save-review" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save & Delete</button>
       </div>
     </div>
   </div>
@@ -345,7 +359,7 @@
     import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-    // --- FIREBASE CONFIG FIXED ---
+    // --- FIREBASE CONFIG (Connected to staff-bcb17) ---
     const firebaseConfig = { 
       apiKey: "AIzaSyD3nTvimIC_Tnc10x8yivnMlVFsZWyjKwE",
       authDomain: "staff-bcb17.firebaseapp.com",
@@ -428,6 +442,9 @@
         onChange: (dates) => { if(dates[0]){ endDate = dates[0]; processGlobalData(); } }
       });
 
+      // Branch Filter Listener
+      document.getElementById('global-branch').addEventListener('change', processGlobalData);
+
       // Staff Filter Rendering
       renderStaffFilter();
 
@@ -438,14 +455,32 @@
         document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
       });
 
-      // Dropdowns - Keep Staff filter open when clicking inside it!
-      document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); });
-      document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('#staff-filter-dropdown .dropdown-content').classList.toggle('show'); });
-      document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); // PREVENTS AUTO-CLOSE
+      // Fixed Dropdown Logic - uses classList.toggle correctly!
+      document.getElementById('export-btn').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        document.querySelector('.export-menu').classList.toggle('show'); 
+      });
+      
+      document.getElementById('staff-filter-btn').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        document.getElementById('staff-dropdown-box').classList.toggle('show'); 
+      });
+      
+      // Prevents the staff filter from closing when clicking checkboxes inside it
+      document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+      }); 
 
+      // Closes dropdowns if clicking anywhere else on the screen
       window.addEventListener('click', (e) => { 
-        if(!e.target.closest('#export-dropdown')) document.querySelector('.export-menu').classList.remove('show'); 
-        if(!e.target.closest('#staff-filter-dropdown')) document.querySelector('#staff-filter-dropdown .dropdown-content').classList.remove('show'); 
+        if(!e.target.closest('#export-dropdown')) {
+          const exportMenu = document.querySelector('.export-menu');
+          if(exportMenu) exportMenu.classList.remove('show'); 
+        }
+        if(!e.target.closest('#staff-filter-dropdown')) {
+          const staffBox = document.getElementById('staff-dropdown-box');
+          if(staffBox) staffBox.classList.remove('show'); 
+        }
       });
 
       // Tabs
@@ -528,14 +563,25 @@
 
       const dateArray = getDatesInRange();
       const filteredStaff = masterStaffList.filter(name => selectedStaff.has(name));
+      const selectedBranch = document.getElementById('global-branch').value;
 
       dateArray.forEach(targetDate => {
         const dateStr = targetDate.toDateString();
         
         filteredStaff.forEach(name => {
-          const dayLogs = allLogs.filter(log => log.timestamp && log.employee_name === name && log.timestamp.toDate().toDateString() === dateStr);
+          let dayLogs = allLogs.filter(log => log.timestamp && log.employee_name === name && log.timestamp.toDate().toDateString() === dateStr);
           dayLogs.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
           
+          // --- NEW BRANCH FILTER LOGIC ---
+          // If viewing a specific branch, and the person worked at a DIFFERENT branch, skip them entirely for this view
+          if (selectedBranch !== "All") {
+            const workedElsewhere = dayLogs.length > 0 && dayLogs.every(l => l.branch !== selectedBranch);
+            if (workedElsewhere) return; // They are present, but at another branch. Do not show them as absent here.
+            
+            // Filter to only show punches for the selected branch
+            dayLogs = dayLogs.filter(l => l.branch === selectedBranch);
+          }
+
           const clockIns = dayLogs.filter(l => l.action === 'Clock In');
           const clockOuts = dayLogs.filter(l => l.action === 'Clock Out');
 
@@ -549,7 +595,7 @@
             let firstIn = firstInLog ? firstInLog.timestamp.toDate() : null;
             let lastOut = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1].timestamp.toDate() : null;
             
-            // Extract Photo Info for the Uniform Audit!
+            // Extract Photo Info for the Uniform Audit
             let logIdForPhoto = firstInLog ? firstInLog.id : null;
             let photoBase64 = firstInLog ? firstInLog.photo_capture : null;
             let uniformReviewed = firstInLog ? firstInLog.uniform_reviewed : false;
@@ -563,12 +609,21 @@
               }
             }
 
-            let totalMs = 0; let formattedHours = "--"; 
+            let totalMs = 0; let formattedHours = "--"; let varianceBadge = "";
             if (firstIn && lastOut) {
               totalMs = lastOut.getTime() - firstIn.getTime();
               const hrs = Math.floor(totalMs / 3600000);
               const mins = Math.floor((totalMs % 3600000) / 60000);
               formattedHours = `${hrs}h ${mins}m`;
+
+              const standardMs = 12 * 3600000;
+              if (totalMs > standardMs + 1800000) { 
+                 const otHrs = ((totalMs - standardMs) / 3600000).toFixed(1);
+                 varianceBadge = `<span class="badge bg-green">+${otHrs}h OT</span>`;
+              } else if (totalMs < standardMs - 1800000) {
+                 const shHrs = ((standardMs - totalMs) / 3600000).toFixed(1);
+                 varianceBadge = `<span class="badge bg-red">-${shHrs}h Short</span>`;
+              }
             }
 
             let isLate = false;
@@ -580,7 +635,7 @@
             const branches = [...new Set(dayLogs.map(l => l.branch))].join(' → ');
 
             processedData.push({
-              date: targetDate, name, firstIn, lastOut, formattedHours, isLate, branches, hasException,
+              date: targetDate, name, firstIn, lastOut, formattedHours, varianceBadge, isLate, branches, hasException,
               logIdForPhoto, photoBase64, uniformReviewed, uniformTshirt, uniformIdcard
             });
           } else {
@@ -620,11 +675,11 @@
         // Determine the Uniform column HTML
         let uniformHtml = '';
         if (d.uniformReviewed) {
-           uniformHtml = `<div style="font-size: 12px; line-height: 1.6;">Shirt: ${d.uniformTshirt ? '✅' : '❌'}<br>ID Card: ${d.uniformIdcard ? '✅' : '❌'}</div>`;
+           uniformHtml = `<div style="font-size: 12px; line-height: 1.6;">Shirt: ${d.uniformTshirt ? '✅' : '❌'}<br>ID: ${d.uniformIdcard ? '✅' : '❌'}</div>`;
         } else if (d.photoBase64 && d.photoBase64.length > 500) {
            uniformHtml = `<button class="btn-review" data-logid="${d.logIdForPhoto}">Audit Photo</button>`;
         } else {
-           uniformHtml = `<span style="font-size:12px; color:var(--text-soft)">No Photo Taken</span>`;
+           uniformHtml = `<span style="font-size:12px; color:var(--text-soft)">No Photo</span>`;
         }
 
         const displayDate = d.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
@@ -697,7 +752,7 @@
 
       } catch (err) { alert("Error saving review."); }
       
-      btn.innerText = "Save & Delete Photo"; btn.disabled = false;
+      btn.innerText = "Save & Delete"; btn.disabled = false;
     });
 
     // --- ABSENT TABLE LOGIC ---
@@ -789,6 +844,36 @@
         body.innerHTML += row;
       });
     }
+
+    // --- EXPORT LOGIC ---
+    document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault(); const type = e.target.getAttribute('data-export');
+        const headers = ["Date", "Staff Name", "First In", "Last Out", "Total Hours", "Status"];
+        const rows = processedData.map(d => [d.date.toLocaleDateString(), d.name, d.firstIn?d.firstIn.toLocaleTimeString():'N/A', d.lastOut?d.lastOut.toLocaleTimeString():'N/A', d.formattedHours, d.isLate?"Late":(d.hasException?d.hasException:"On Time")]);
+
+        if (type === 'csv') {
+          if (rows.length === 0) { alert("No data to export"); return; }
+          let csv = headers.join(",") + "\n" + rows.map(r => `"${r.join('","')}"`).join("\n");
+          const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `RJ_Data.csv`; a.click();
+        } else if (type === 'pdf') {
+          const element = document.getElementById('export-container');
+          html2pdf().set({ margin: 10, filename: `RJ_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+        } else if (type === 'xls') {
+           if (rows.length === 0) { alert("No data to export"); return; }
+           let tableStr = '<table><tr>'; headers.forEach(h => tableStr += `<th>${h}</th>`); tableStr += '</tr>';
+           rows.forEach(r => { tableStr += '<tr>'; r.forEach(cell => tableStr += `<td>${cell}</td>`); tableStr += '</tr>'; });
+           tableStr += '</table>';
+           const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${tableStr}</body></html>`;
+           const a = document.createElement("a"); a.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); a.download = `RJ_Data.xls`; a.click();
+        } else if (type === 'copy') {
+           if (rows.length === 0) { alert("No data to copy"); return; }
+           let clipboardTxt = headers.join("\t") + "\n";
+           rows.forEach(r => { clipboardTxt += r.join('\t') + "\n"; });
+           navigator.clipboard.writeText(clipboardTxt).then(() => alert("Copied to clipboard!"));
+        }
+      });
+    });
   </script>
 </body>
 </html>
