@@ -114,8 +114,13 @@
     .action-link { color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; margin-right: 12px; }
     .action-link:hover { color: var(--primary-hover); }
 
+    /* Uniform Photo Review */
+    .btn-review { background: var(--primary-alpha); color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.2s; white-space: nowrap; }
+    .btn-review:hover { background: var(--primary); color: #fff; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .modal-card { background: var(--card-bg); padding: 32px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid var(--card-border); }
+    .modal-card { background: var(--card-bg); padding: 32px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px;}
+    .modal-img { width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 12px; border: 1px solid var(--card-border); background: #000; }
+    .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); }
   </style>
 </head>
 <body>
@@ -179,7 +184,8 @@
           <span id="staff-btn-text">All Staff Selected</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
-        <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;">
+        <!-- Ensure this content stays open when clicked inside -->
+        <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="staff-dropdown-box">
           <div class="multi-select-actions">
             <button id="btn-select-all">Select All</button>
             <button id="btn-deselect-all">Deselect All</button>
@@ -238,8 +244,8 @@
                   <th>Date</th>
                   <th>Staff Member</th>
                   <th>Shift Timeline</th>
-                  <th>Total Hours</th>
                   <th>Status / Branches</th>
+                  <th>Uniform Check</th>
                 </tr>
               </thead>
               <tbody id="master-tbody">
@@ -312,12 +318,34 @@
     </div>
   </div>
 
+  <!-- Uniform Review Modal -->
+  <div id="review-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 800;">Audit Uniform</h2>
+        <p style="color: var(--text-soft); font-size: 13px; margin-top: 4px;">Verify requirements. Saving will delete the photo to save space.</p>
+      </div>
+      
+      <img id="modal-image-preview" src="" class="modal-img" alt="Staff Capture" />
+      
+      <div class="modal-checkboxes">
+        <label class="check-wrap"><input type="checkbox" id="check-tshirt"> RJ T-Shirt Present</label>
+        <label class="check-wrap"><input type="checkbox" id="check-idcard"> ID Card Present</label>
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button id="btn-cancel-review" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-review" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save & Delete Photo</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
-    // --- FIREBASE CONFIG FIXED: Connected to staff-bcb17 ---
+    // --- FIREBASE CONFIG FIXED ---
     const firebaseConfig = { 
       apiKey: "AIzaSyD3nTvimIC_Tnc10x8yivnMlVFsZWyjKwE",
       authDomain: "staff-bcb17.firebaseapp.com",
@@ -345,8 +373,11 @@
     // Data processed for tables
     let processedData = []; 
     let missingData = [];
+    
+    // Modal states
     let activeExceptionName = null;
     let activeExceptionDate = null;
+    let currentReviewLogId = null;
 
     // --- INITIALIZATION & AUTH ---
     onAuthStateChanged(auth, (user) => {
@@ -407,9 +438,11 @@
         document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
       });
 
-      // Dropdown toggles
+      // Dropdowns - Keep Staff filter open when clicking inside it!
       document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); });
       document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('#staff-filter-dropdown .dropdown-content').classList.toggle('show'); });
+      document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); // PREVENTS AUTO-CLOSE
+
       window.addEventListener('click', (e) => { 
         if(!e.target.closest('#export-dropdown')) document.querySelector('.export-menu').classList.remove('show'); 
         if(!e.target.closest('#staff-filter-dropdown')) document.querySelector('#staff-filter-dropdown .dropdown-content').classList.remove('show'); 
@@ -496,29 +529,33 @@
       const dateArray = getDatesInRange();
       const filteredStaff = masterStaffList.filter(name => selectedStaff.has(name));
 
-      // Loop over every day in the selected range
       dateArray.forEach(targetDate => {
         const dateStr = targetDate.toDateString();
         
         filteredStaff.forEach(name => {
-          // Get logs for this person on this specific day
           const dayLogs = allLogs.filter(log => log.timestamp && log.employee_name === name && log.timestamp.toDate().toDateString() === dateStr);
           dayLogs.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
           
           const clockIns = dayLogs.filter(l => l.action === 'Clock In');
           const clockOuts = dayLogs.filter(l => l.action === 'Clock Out');
 
-          // Check for exceptions (Approved Leave, Sick, etc.)
           const excKey = `${name}_${targetDate.toISOString().split('T')[0]}`;
           const hasException = exceptionsData[excKey] ? exceptionsData[excKey].reason : null;
 
           if (clockIns.length > 0 || clockOuts.length > 0 || hasException) {
-            // THEY ARE PRESENT (or have a managed exception acting as a record)
             totalPresent += hasException ? 0 : 1; 
             
-            let firstIn = clockIns.length > 0 ? clockIns[0].timestamp.toDate() : null;
+            let firstInLog = clockIns.length > 0 ? clockIns[0] : null;
+            let firstIn = firstInLog ? firstInLog.timestamp.toDate() : null;
             let lastOut = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1].timestamp.toDate() : null;
             
+            // Extract Photo Info for the Uniform Audit!
+            let logIdForPhoto = firstInLog ? firstInLog.id : null;
+            let photoBase64 = firstInLog ? firstInLog.photo_capture : null;
+            let uniformReviewed = firstInLog ? firstInLog.uniform_reviewed : false;
+            let uniformTshirt = firstInLog ? firstInLog.uniform_tshirt : false;
+            let uniformIdcard = firstInLog ? firstInLog.uniform_idcard : false;
+
             if (firstIn && !lastOut) {
               const now = new Date();
               if (targetDate.toDateString() !== now.toDateString()) {
@@ -526,21 +563,12 @@
               }
             }
 
-            let totalMs = 0; let formattedHours = "--"; let varianceBadge = "";
+            let totalMs = 0; let formattedHours = "--"; 
             if (firstIn && lastOut) {
               totalMs = lastOut.getTime() - firstIn.getTime();
               const hrs = Math.floor(totalMs / 3600000);
               const mins = Math.floor((totalMs % 3600000) / 60000);
               formattedHours = `${hrs}h ${mins}m`;
-
-              const standardMs = 12 * 3600000;
-              if (totalMs > standardMs + 1800000) { 
-                 const otHrs = ((totalMs - standardMs) / 3600000).toFixed(1);
-                 varianceBadge = `<span class="badge bg-green">+${otHrs}h OT</span>`;
-              } else if (totalMs < standardMs - 1800000) {
-                 const shHrs = ((standardMs - totalMs) / 3600000).toFixed(1);
-                 varianceBadge = `<span class="badge bg-red">-${shHrs}h Short</span>`;
-              }
             }
 
             let isLate = false;
@@ -552,17 +580,16 @@
             const branches = [...new Set(dayLogs.map(l => l.branch))].join(' → ');
 
             processedData.push({
-              date: targetDate, name, firstIn, lastOut, formattedHours, varianceBadge, isLate, branches, hasException
+              date: targetDate, name, firstIn, lastOut, formattedHours, isLate, branches, hasException,
+              logIdForPhoto, photoBase64, uniformReviewed, uniformTshirt, uniformIdcard
             });
           } else {
-             // THEY ARE COMPLETELY MISSING THIS DAY
              totalMissing++;
              missingData.push({ date: targetDate, name: name });
           }
         });
       });
 
-      // Sort data so most recent dates are on top
       processedData.sort((a,b) => b.date - a.date);
       missingData.sort((a,b) => b.date - a.date);
 
@@ -590,19 +617,90 @@
         else if (d.isLate) statusHtml = `<span class="badge bg-orange">Late Arrival</span>`;
         else statusHtml = `<span class="badge bg-green">On Time</span>`;
 
+        // Determine the Uniform column HTML
+        let uniformHtml = '';
+        if (d.uniformReviewed) {
+           uniformHtml = `<div style="font-size: 12px; line-height: 1.6;">Shirt: ${d.uniformTshirt ? '✅' : '❌'}<br>ID Card: ${d.uniformIdcard ? '✅' : '❌'}</div>`;
+        } else if (d.photoBase64 && d.photoBase64.length > 500) {
+           uniformHtml = `<button class="btn-review" data-logid="${d.logIdForPhoto}">Audit Photo</button>`;
+        } else {
+           uniformHtml = `<span style="font-size:12px; color:var(--text-soft)">No Photo Taken</span>`;
+        }
+
         const displayDate = d.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
 
         html += `<tr>
           <td style="color:var(--text-soft)">${displayDate}</td>
           <td><strong>${d.name}</strong></td>
           <td><span style="color:var(--text-soft)">In:</span> ${inStr} <br><span style="color:var(--text-soft)">Out:</span> ${outStr}</td>
-          <td><strong>${d.formattedHours}</strong> ${d.varianceBadge}</td>
           <td>${statusHtml} <br><span style="font-size:12px; color:var(--text-soft)">${d.branches || "-"}</span></td>
+          <td>${uniformHtml}</td>
         </tr>`;
       });
       tb.innerHTML = html;
+
+      // Attach event listeners for the Review buttons
+      document.querySelectorAll('.btn-review').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const logId = e.target.getAttribute('data-logid');
+          openReviewModal(logId);
+        });
+      });
     }
 
+    // --- UNIFORM REVIEW MODAL LOGIC ---
+    function openReviewModal(logId) {
+      currentReviewLogId = logId;
+      const logData = allLogs.find(log => log.id === logId);
+      
+      if (logData && logData.photo_capture) {
+         document.getElementById('modal-image-preview').src = logData.photo_capture;
+         document.getElementById('check-tshirt').checked = false; 
+         document.getElementById('check-idcard').checked = false;
+         document.getElementById('review-modal').style.display = 'flex';
+      }
+    }
+
+    document.getElementById('btn-cancel-review').addEventListener('click', () => {
+      document.getElementById('review-modal').style.display = 'none';
+      currentReviewLogId = null;
+    });
+
+    document.getElementById('btn-save-review').addEventListener('click', async () => {
+      if (!currentReviewLogId) return;
+      
+      const isTshirt = document.getElementById('check-tshirt').checked;
+      const isIdCard = document.getElementById('check-idcard').checked;
+      const btn = document.getElementById('btn-save-review');
+      
+      btn.innerText = "Saving..."; btn.disabled = true;
+
+      try {
+        await updateDoc(doc(db, "attendance_logs", currentReviewLogId), {
+          uniform_reviewed: true,
+          uniform_tshirt: isTshirt,
+          uniform_idcard: isIdCard,
+          photo_capture: "" // Delete base64 string to save DB space
+        });
+
+        // Update local array so we don't have to fetch all data again
+        const logIndex = allLogs.findIndex(log => log.id === currentReviewLogId);
+        if (logIndex !== -1) {
+            allLogs[logIndex].uniform_reviewed = true;
+            allLogs[logIndex].uniform_tshirt = isTshirt;
+            allLogs[logIndex].uniform_idcard = isIdCard;
+            allLogs[logIndex].photo_capture = "";
+        }
+
+        document.getElementById('review-modal').style.display = 'none';
+        processGlobalData(); // Re-render the tables to show the checkmarks
+
+      } catch (err) { alert("Error saving review."); }
+      
+      btn.innerText = "Save & Delete Photo"; btn.disabled = false;
+    });
+
+    // --- ABSENT TABLE LOGIC ---
     function renderAbsentTable() {
       const tb = document.getElementById('absent-tbody');
       if(missingData.length === 0) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in this date range.</td></tr>'; return; }
@@ -691,37 +789,6 @@
         body.innerHTML += row;
       });
     }
-
-    // --- EXPORT LOGIC ---
-    document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault(); const type = e.target.getAttribute('data-export');
-        const headers = ["Date", "Staff Name", "First In", "Last Out", "Total Hours", "Status"];
-        const rows = processedData.map(d => [d.date.toLocaleDateString(), d.name, d.firstIn?d.firstIn.toLocaleTimeString():'N/A', d.lastOut?d.lastOut.toLocaleTimeString():'N/A', d.formattedHours, d.isLate?"Late":(d.hasException?d.hasException:"On Time")]);
-
-        if (type === 'csv') {
-          if (rows.length === 0) { alert("No data to export"); return; }
-          let csv = headers.join(",") + "\n" + rows.map(r => `"${r.join('","')}"`).join("\n");
-          const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `RJ_Data.csv`; a.click();
-        } else if (type === 'pdf') {
-          const element = document.getElementById('export-container');
-          html2pdf().set({ margin: 10, filename: `RJ_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
-        } else if (type === 'xls') {
-           if (rows.length === 0) { alert("No data to export"); return; }
-           let tableStr = '<table><tr>'; headers.forEach(h => tableStr += `<th>${h}</th>`); tableStr += '</tr>';
-           rows.forEach(r => { tableStr += '<tr>'; r.forEach(cell => tableStr += `<td>${cell}</td>`); tableStr += '</tr>'; });
-           tableStr += '</table>';
-           const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${tableStr}</body></html>`;
-           const a = document.createElement("a"); a.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); a.download = `RJ_Data.xls`; a.click();
-        } else if (type === 'copy') {
-           if (rows.length === 0) { alert("No data to copy"); return; }
-           let clipboardTxt = headers.join("\t") + "\n";
-           rows.forEach(r => { clipboardTxt += r.join('\t') + "\n"; });
-           navigator.clipboard.writeText(clipboardTxt).then(() => alert("Copied to clipboard!"));
-        }
-      });
-    });
-
   </script>
 </body>
 </html>
