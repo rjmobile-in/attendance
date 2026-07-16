@@ -38,34 +38,54 @@
     h1, h2, h3, .name, .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; }
     .glass-effect { background: var(--card-bg-alpha); backdrop-filter: blur(16px); border: 1px solid var(--card-border); }
 
+    /* Core UI Elements */
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;}
     .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-    .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
     .btn-secondary:hover { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     
+    /* Login & Loaders */
     #global-loader { position: fixed; inset: 0; background: rgba(var(--bg-base), 0.9); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
     .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     #login-screen { display: none; max-width: 400px; margin: 10vh auto; background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); }
-    .input-field { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; }
+    .input-field { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; }
     .input-field:focus { border-color: var(--primary); }
     
+    /* Dashboard & Header */
     #dashboard { display: none; max-width: 1300px; margin: 0 auto; }
-    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: 20px; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: 20px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; }
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .global-search { padding: 10px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); outline: none; width: 250px; }
     
+    /* Global Filter Bar */
+    .filter-bar { display: flex; align-items: center; gap: 16px; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); }
+    
+    /* Dropdowns */
     .dropdown { position: relative; display: inline-block; }
-    .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 200px; border-radius: 16px; overflow: hidden; padding: 8px; z-index: 100; box-shadow: var(--shadow-soft); }
+    .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 240px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; padding: 12px; z-index: 100; box-shadow: var(--shadow-soft); }
     .dropdown.show .dropdown-content { display: block; animation: dropIn 0.2s; }
-    .dropdown-content a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; border-radius: 10px; }
-    .dropdown-content a:hover { background-color: var(--primary-alpha); color: var(--primary); }
     @keyframes dropIn { from {opacity:0; transform: translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+    
+    .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; border-radius: 10px; transition: 0.2s; }
+    .dropdown-content.export-menu a:hover { background-color: var(--primary-alpha); color: var(--primary); }
 
+    /* Multi-select Checkboxes */
+    .multi-select-actions { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
+    .multi-select-actions button { flex: 1; padding: 6px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; }
+    .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary); }
+    .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; }
+    .check-wrap:hover { background: var(--input-bg); }
+    .check-wrap input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+    .staff-list-container { max-height: 250px; overflow-y: auto; }
+
+    /* Tabs */
     .tab-controls { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 24px; overflow-x: auto; }
     .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 24px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
     .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
+    /* Draggable Workspace */
     .sortable-ghost { opacity: 0.4; background: var(--primary-alpha); border: 1px dashed var(--primary); }
     .sortable-drag { cursor: grabbing !important; }
     .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px; }
@@ -77,12 +97,14 @@
     .drag-handle { color: var(--text-soft); opacity: 0.5; }
     .widget-card:hover .drag-handle { opacity: 1; color: var(--primary); }
 
+    /* Tables */
     .table-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 24px; }
     .table-responsive { overflow-x: auto; max-height: 600px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th { position: sticky; top: 0; background: var(--input-bg); color: var(--text-soft); font-weight: 700; font-size: 12px; text-transform: uppercase; padding: 16px 20px; border-bottom: 1px solid var(--card-border); z-index: 10; }
     td { padding: 16px 20px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
     
+    /* Badges & Tags */
     .badge { padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-block; }
     .bg-green { background: var(--success-alpha); color: var(--success); }
     .bg-red { background: var(--danger-alpha); color: var(--danger); }
@@ -106,8 +128,8 @@
     <h2>RJ Mobile Admin</h2>
     <p style="color: var(--text-soft); margin-bottom: 24px;">Secure management access.</p>
     <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
-    <input type="password" id="password-input" class="input-field" placeholder="Password" />
-    <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">Log In</button>
+    <input type="password" id="password-input" class="input-field" placeholder="Password" style="margin-bottom: 0;" />
+    <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px;">Log In</button>
     <div id="error-msg" style="color: var(--danger); margin-top: 12px; display: none;">Error</div>
   </div>
 
@@ -123,23 +145,49 @@
         </div>
       </div>
       <div class="header-controls">
-        <input type="text" id="global-search" class="global-search" placeholder="Search staff name..." />
-        
         <div class="dropdown" id="export-dropdown">
           <button id="export-btn" class="btn-primary">
             Export <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </button>
-          <div class="dropdown-content glass-effect">
+          <div class="dropdown-content export-menu glass-effect">
             <a href="#" data-export="copy">📋 Copy Table</a>
             <a href="#" data-export="pdf">📄 Download PDF</a>
             <a href="#" data-export="csv">📊 Download CSV</a>
             <a href="#" data-export="xls">📈 Download Excel</a>
           </div>
         </div>
+        <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Reset Layout</button>
+        <button id="theme-toggle" class="btn-secondary" title="Toggle Theme">🌓</button>
+        <button id="logout-btn" class="btn-secondary">Log Out</button>
+      </div>
+    </div>
 
-        <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲</button>
-        <button id="theme-toggle" class="btn-secondary">🌓</button>
-        <button id="logout-btn" class="btn-secondary">Out</button>
+    <!-- GLOBAL FILTERS -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>Start Date</label>
+        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 150px; padding: 10px;" placeholder="Start Date" />
+      </div>
+      <div class="filter-group">
+        <label>End Date</label>
+        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 150px; padding: 10px;" placeholder="End Date" />
+      </div>
+      
+      <div class="filter-group dropdown" id="staff-filter-dropdown">
+        <label>Filter Staff</label>
+        <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 220px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+          <span id="staff-btn-text">All Staff Selected</span> 
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;">
+          <div class="multi-select-actions">
+            <button id="btn-select-all">Select All</button>
+            <button id="btn-deselect-all">Deselect All</button>
+          </div>
+          <div class="staff-list-container" id="staff-checkboxes">
+            <!-- Checkboxes generated by JS -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -148,23 +196,17 @@
       <button class="tab-btn active" data-view="view-overview">Overview & Logs</button>
       <button class="tab-btn" data-view="view-absent">Absents & Exceptions</button>
       <button class="tab-btn" data-view="view-matrix">Attendance Matrix</button>
-      <button class="tab-btn" data-view="view-registry">Staff Registry</button>
     </div>
 
     <!-- VIEW 1: OVERVIEW & STITCHED LOGS -->
     <div id="view-overview" class="app-view">
-      <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
-        <input type="text" id="filter-date" class="input-field" style="width: 200px; margin: 0;" placeholder="Select Date" />
-        <span style="color: var(--text-soft); font-size: 13px;">Standard Shift: 10:00 AM - 10:00 PM</span>
-      </div>
-
       <!-- Draggable Workspace Container -->
       <div id="export-container">
         <div class="widget-grid" id="draggable-widgets">
           <!-- Widget 1 -->
           <div class="widget-card" data-id="w-present">
             <div class="widget-header">
-              <span class="widget-title">Staff Present</span>
+              <span class="widget-title">Total Staff Shifts Logged</span>
               <span class="drag-handle">⣿</span>
             </div>
             <div class="metric-value" id="metric-present">0</div>
@@ -172,7 +214,7 @@
           <!-- Widget 2 -->
           <div class="widget-card" data-id="w-late">
             <div class="widget-header">
-              <span class="widget-title">Late Arrivals (>10AM)</span>
+              <span class="widget-title">Total Late Arrivals</span>
               <span class="drag-handle">⣿</span>
             </div>
             <div class="metric-value" id="metric-late" style="color: var(--warning);">0</div>
@@ -180,7 +222,7 @@
           <!-- Widget 3 -->
           <div class="widget-card" data-id="w-absent">
             <div class="widget-header">
-              <span class="widget-title">Total Absent</span>
+              <span class="widget-title">Total Missed Shifts</span>
               <span class="drag-handle">⣿</span>
             </div>
             <div class="metric-value" id="metric-absent" style="color: var(--danger);">0</div>
@@ -193,6 +235,7 @@
             <table id="master-table">
               <thead>
                 <tr>
+                  <th>Date</th>
                   <th>Staff Member</th>
                   <th>Shift Timeline</th>
                   <th>Total Hours</th>
@@ -200,7 +243,7 @@
                 </tr>
               </thead>
               <tbody id="master-tbody">
-                <tr><td colspan="4" style="text-align: center;">Loading data...</td></tr>
+                <tr><td colspan="5" style="text-align: center;">Loading data...</td></tr>
               </tbody>
             </table>
           </div>
@@ -211,13 +254,14 @@
     <!-- VIEW 2: ABSENTS & EXCEPTIONS -->
     <div id="view-absent" class="app-view" style="display: none;">
       <h2 style="font-size: 20px; margin-bottom: 8px;">Action Center</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px;">Manage missing staff and approve leaves for the selected date.</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px;">Manage missing staff and approve leaves for the selected date range.</p>
       
       <div class="table-card">
         <div class="table-responsive">
           <table id="absent-table">
             <thead>
               <tr>
+                <th>Date</th>
                 <th>Missing Staff</th>
                 <th>Current Status</th>
                 <th>Admin Actions</th>
@@ -233,10 +277,7 @@
     <div id="view-matrix" class="app-view" style="display: none;">
       <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
         <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Attendance Matrix</h2>
-        <span style="color: var(--text-soft);">Past</span>
-        <input type="number" id="matrix-days-input" class="input-field" value="7" min="1" max="60" style="width: 80px; margin: 0; padding: 8px;">
-        <span style="color: var(--text-soft);">days</span>
-        <button id="btn-generate-matrix" class="btn-secondary" style="padding: 8px 16px;">Update View</button>
+        <span style="color: var(--text-soft);">Showing dates from current global filter.</span>
       </div>
 
       <div class="table-card">
@@ -246,22 +287,6 @@
             <tbody id="matrix-body"></tbody>
           </table>
         </div>
-      </div>
-    </div>
-
-    <!-- VIEW 4: REGISTRY -->
-    <div id="view-registry" class="app-view" style="display: none;">
-      <div style="max-width: 500px; margin: 0 auto; background: var(--card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--card-border);">
-        <h2 style="margin-bottom: 16px;">Add New Staff Member</h2>
-        <p style="color: var(--text-soft); font-size: 13px; margin-bottom: 20px;">Use the camera to take a profile picture, or just save their name directly to the database.</p>
-        
-        <div style="width:100%; aspect-ratio:3/4; background:#000; border-radius:12px; overflow:hidden; margin-bottom:16px;">
-          <!-- FIXED: Removed transform:scaleX(-1) so camera is not inverted -->
-          <video id="reg-video" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
-        </div>
-        <input type="text" id="reg-name" class="input-field" placeholder="Full Employee Name" />
-        <button id="btn-register" class="btn-primary" style="width: 100%; justify-content: center;">Save Name to Database</button>
-        <div id="reg-status" style="text-align: center; margin-top: 10px; color: var(--success); font-size: 13px;"></div>
       </div>
     </div>
   </div>
@@ -281,7 +306,7 @@
       </select>
 
       <div style="display: flex; gap: 12px; margin-top: 16px;">
-        <button id="btn-cancel-exc" class="btn-secondary" style="flex: 1;">Cancel</button>
+        <button id="btn-cancel-exc" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
         <button id="btn-save-exc" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Record</button>
       </div>
     </div>
@@ -309,10 +334,19 @@
     // Hardcoded List for testing
     let masterStaffList = ["Name 1", "Name 2", "Name 3", "Name 4", "Name 5", "Name 6", "Name 7", "Name 8"];
     let allLogs = [];
-    let processedData = []; 
     let exceptionsData = {}; 
-    let selectedDate = new Date();
+    
+    // Global State
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate() - 6); // Default: Last 7 days
+    let endDate = new Date();
+    let selectedStaff = new Set(masterStaffList);
+    
+    // Data processed for tables
+    let processedData = []; 
+    let missingData = [];
     let activeExceptionName = null;
+    let activeExceptionDate = null;
 
     // --- INITIALIZATION & AUTH ---
     onAuthStateChanged(auth, (user) => {
@@ -320,7 +354,7 @@
       if (user) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-        initWorkspace();
+        initUI();
         fetchMasterData();
       } else {
         document.getElementById('login-screen').style.display = 'block';
@@ -338,63 +372,99 @@
     });
     document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-    // --- DRAGGABLE WORKSPACE (SortableJS) ---
-    function initWorkspace() {
+    // --- INIT UI SETTINGS ---
+    function initUI() {
+      // Draggable Widgets
       const grid = document.getElementById('draggable-widgets');
-      const sortable = Sortable.create(grid, {
-        handle: '.drag-handle',
-        animation: 150,
-        ghostClass: 'sortable-ghost',
+      Sortable.create(grid, {
+        handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
         store: {
-          get: (sortable) => {
-            const order = localStorage.getItem('rj_widget_order');
-            return order ? order.split('|') : [];
-          },
-          set: (sortable) => {
-            const order = sortable.toArray();
-            localStorage.setItem('rj_widget_order', order.join('|'));
-          }
+          get: (s) => { const order = localStorage.getItem('rj_widget_order'); return order ? order.split('|') : []; },
+          set: (s) => { localStorage.setItem('rj_widget_order', s.toArray().join('|')); }
         }
       });
       document.getElementById('reset-layout-btn').addEventListener('click', () => {
-        localStorage.removeItem('rj_widget_order');
-        location.reload();
+        localStorage.removeItem('rj_widget_order'); location.reload();
       });
 
-      // Date Picker
-      flatpickr("#filter-date", { 
-        defaultDate: "today", dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
-        onChange: (selectedDates) => { 
-          selectedDate = selectedDates[0]; 
-          processDailyData(); 
-        }
+      // Date Pickers (allow typing)
+      flatpickr("#global-start", { 
+        defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", allowInput: true,
+        onChange: (dates) => { if(dates[0]){ startDate = dates[0]; processGlobalData(); } }
+      });
+      flatpickr("#global-end", { 
+        defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", allowInput: true,
+        onChange: (dates) => { if(dates[0]){ endDate = dates[0]; processGlobalData(); } }
+      });
+
+      // Staff Filter Rendering
+      renderStaffFilter();
+
+      // Theme toggle
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const isLight = document.documentElement.classList.toggle('light-theme');
+        localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
+        document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
+      });
+
+      // Dropdown toggles
+      document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); });
+      document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('#staff-filter-dropdown .dropdown-content').classList.toggle('show'); });
+      window.addEventListener('click', (e) => { 
+        if(!e.target.closest('#export-dropdown')) document.querySelector('.export-menu').classList.remove('show'); 
+        if(!e.target.closest('#staff-filter-dropdown')) document.querySelector('#staff-filter-dropdown .dropdown-content').classList.remove('show'); 
+      });
+
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
+          document.getElementById(e.target.getAttribute('data-view')).style.display = 'block';
+          if(e.target.getAttribute('data-view') === 'view-matrix') generateMatrix();
+        });
       });
     }
 
-    // --- THEME & TABS ---
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      const isLight = document.documentElement.classList.toggle('light-theme');
-      localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
-      document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
-    });
-    
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
-        document.getElementById(e.target.getAttribute('data-view')).style.display = 'block';
-        
-        if(e.target.getAttribute('data-view') === 'view-registry') startCameraOnly();
-        if(e.target.getAttribute('data-view') === 'view-matrix') generateMatrix();
-      });
-    });
+    // --- STAFF FILTER LOGIC ---
+    function renderStaffFilter() {
+      const container = document.getElementById('staff-checkboxes');
+      container.innerHTML = masterStaffList.map(name => 
+        `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" checked> ${name}</label>`
+      ).join('');
 
-    document.getElementById('btn-generate-matrix').addEventListener('click', generateMatrix);
+      document.querySelectorAll('.staff-cb').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          if(e.target.checked) selectedStaff.add(e.target.value);
+          else selectedStaff.delete(e.target.value);
+          updateStaffBtnText();
+          processGlobalData();
+        });
+      });
+
+      document.getElementById('btn-select-all').addEventListener('click', () => {
+        document.querySelectorAll('.staff-cb').forEach(cb => cb.checked = true);
+        selectedStaff = new Set(masterStaffList);
+        updateStaffBtnText(); processGlobalData();
+      });
+
+      document.getElementById('btn-deselect-all').addEventListener('click', () => {
+        document.querySelectorAll('.staff-cb').forEach(cb => cb.checked = false);
+        selectedStaff.clear();
+        updateStaffBtnText(); processGlobalData();
+      });
+    }
+
+    function updateStaffBtnText() {
+      const btn = document.getElementById('staff-btn-text');
+      if(selectedStaff.size === masterStaffList.length) btn.innerText = "All Staff Selected";
+      else if(selectedStaff.size === 0) btn.innerText = "No Staff Selected";
+      else btn.innerText = `${selectedStaff.size} Selected`;
+    }
 
     // --- DATA FETCHING ---
     async function fetchMasterData() {
-      // Overriding the DB fetch for registered faces since we are using hardcoded masterStaffList
       const excSnap = await getDocs(collection(db, "attendance_exceptions"));
       excSnap.forEach(doc => { exceptionsData[doc.id] = doc.data(); });
 
@@ -402,103 +472,113 @@
       const logsSnap = await getDocs(collection(db, "attendance_logs"));
       logsSnap.forEach(doc => allLogs.push({id: doc.id, ...doc.data()}));
       
-      processDailyData();
-      if(document.getElementById('view-matrix').style.display === 'block') generateMatrix();
+      processGlobalData();
     }
 
-    // --- DATA PROCESSING (10 AM to 10 PM Logic) ---
-    function processDailyData() {
-      const targetDateStr = selectedDate.toDateString();
-      const dailyLogs = allLogs.filter(log => log.timestamp && log.timestamp.toDate().toDateString() === targetDateStr);
-      
-      const employeeGroups = {};
-      masterStaffList.forEach(name => { employeeGroups[name] = { logs: [], firstIn: null, lastOut: null }; });
-      
-      dailyLogs.forEach(log => {
-        const name = log.employee_name;
-        if(!employeeGroups[name]) employeeGroups[name] = { logs: [], firstIn: null, lastOut: null };
-        employeeGroups[name].logs.push(log);
+    // --- GET DATE ARRAY ---
+    function getDatesInRange() {
+      const dateArray = [];
+      let curr = new Date(startDate); curr.setHours(0,0,0,0);
+      let end = new Date(endDate); end.setHours(0,0,0,0);
+      while(curr <= end) {
+        dateArray.push(new Date(curr));
+        curr.setDate(curr.getDate() + 1);
+      }
+      return dateArray;
+    }
+
+    // --- DATA PROCESSING LOGIC ---
+    function processGlobalData() {
+      processedData = [];
+      missingData = [];
+      let totalPresent = 0, totalLate = 0, totalMissing = 0;
+
+      const dateArray = getDatesInRange();
+      const filteredStaff = masterStaffList.filter(name => selectedStaff.has(name));
+
+      // Loop over every day in the selected range
+      dateArray.forEach(targetDate => {
+        const dateStr = targetDate.toDateString();
+        
+        filteredStaff.forEach(name => {
+          // Get logs for this person on this specific day
+          const dayLogs = allLogs.filter(log => log.timestamp && log.employee_name === name && log.timestamp.toDate().toDateString() === dateStr);
+          dayLogs.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
+          
+          const clockIns = dayLogs.filter(l => l.action === 'Clock In');
+          const clockOuts = dayLogs.filter(l => l.action === 'Clock Out');
+
+          // Check for exceptions (Approved Leave, Sick, etc.)
+          const excKey = `${name}_${targetDate.toISOString().split('T')[0]}`;
+          const hasException = exceptionsData[excKey] ? exceptionsData[excKey].reason : null;
+
+          if (clockIns.length > 0 || clockOuts.length > 0 || hasException) {
+            // THEY ARE PRESENT (or have a managed exception acting as a record)
+            totalPresent += hasException ? 0 : 1; 
+            
+            let firstIn = clockIns.length > 0 ? clockIns[0].timestamp.toDate() : null;
+            let lastOut = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1].timestamp.toDate() : null;
+            
+            if (firstIn && !lastOut) {
+              const now = new Date();
+              if (targetDate.toDateString() !== now.toDateString()) {
+                 lastOut = new Date(firstIn); lastOut.setHours(22, 0, 0, 0); 
+              }
+            }
+
+            let totalMs = 0; let formattedHours = "--"; let varianceBadge = "";
+            if (firstIn && lastOut) {
+              totalMs = lastOut.getTime() - firstIn.getTime();
+              const hrs = Math.floor(totalMs / 3600000);
+              const mins = Math.floor((totalMs % 3600000) / 60000);
+              formattedHours = `${hrs}h ${mins}m`;
+
+              const standardMs = 12 * 3600000;
+              if (totalMs > standardMs + 1800000) { 
+                 const otHrs = ((totalMs - standardMs) / 3600000).toFixed(1);
+                 varianceBadge = `<span class="badge bg-green">+${otHrs}h OT</span>`;
+              } else if (totalMs < standardMs - 1800000) {
+                 const shHrs = ((standardMs - totalMs) / 3600000).toFixed(1);
+                 varianceBadge = `<span class="badge bg-red">-${shHrs}h Short</span>`;
+              }
+            }
+
+            let isLate = false;
+            if (firstIn) {
+              const targetStart = new Date(firstIn); targetStart.setHours(10, 15, 0, 0); 
+              if (firstIn > targetStart) { isLate = true; totalLate++; }
+            }
+
+            const branches = [...new Set(dayLogs.map(l => l.branch))].join(' → ');
+
+            processedData.push({
+              date: targetDate, name, firstIn, lastOut, formattedHours, varianceBadge, isLate, branches, hasException
+            });
+          } else {
+             // THEY ARE COMPLETELY MISSING THIS DAY
+             totalMissing++;
+             missingData.push({ date: targetDate, name: name });
+          }
+        });
       });
 
-      processedData = [];
-      let totalPresent = 0, totalLate = 0;
-
-      const searchFilter = document.getElementById('global-search').value.toLowerCase();
-
-      for (const [name, data] of Object.entries(employeeGroups)) {
-        if (searchFilter && !name.toLowerCase().includes(searchFilter)) continue;
-
-        data.logs.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
-        const clockIns = data.logs.filter(l => l.action === 'Clock In');
-        const clockOuts = data.logs.filter(l => l.action === 'Clock Out');
-
-        const excKey = `${name}_${selectedDate.toISOString().split('T')[0]}`;
-        const hasException = exceptionsData[excKey] ? exceptionsData[excKey].reason : null;
-
-        if (clockIns.length > 0 || clockOuts.length > 0 || hasException) {
-          totalPresent += hasException ? 0 : 1; 
-          
-          let firstIn = clockIns.length > 0 ? clockIns[0].timestamp.toDate() : null;
-          let lastOut = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1].timestamp.toDate() : null;
-          
-          if (firstIn && !lastOut) {
-            const now = new Date();
-            if (selectedDate.toDateString() !== now.toDateString()) {
-               lastOut = new Date(firstIn);
-               lastOut.setHours(22, 0, 0, 0); 
-            }
-          }
-
-          let totalMs = 0; let formattedHours = "--"; let varianceBadge = "";
-          if (firstIn && lastOut) {
-            totalMs = lastOut.getTime() - firstIn.getTime();
-            const hrs = Math.floor(totalMs / 3600000);
-            const mins = Math.floor((totalMs % 3600000) / 60000);
-            formattedHours = `${hrs}h ${mins}m`;
-
-            const standardMs = 12 * 3600000;
-            if (totalMs > standardMs + 1800000) { 
-               const otHrs = ((totalMs - standardMs) / 3600000).toFixed(1);
-               varianceBadge = `<span class="badge bg-green">+${otHrs}h OT</span>`;
-            } else if (totalMs < standardMs - 1800000) {
-               const shHrs = ((standardMs - totalMs) / 3600000).toFixed(1);
-               varianceBadge = `<span class="badge bg-red">-${shHrs}h Short</span>`;
-            }
-          }
-
-          let isLate = false;
-          if (firstIn) {
-            const targetStart = new Date(firstIn); targetStart.setHours(10, 15, 0, 0); 
-            if (firstIn > targetStart) { isLate = true; totalLate++; }
-          }
-
-          const branches = [...new Set(data.logs.map(l => l.branch))].join(' → ');
-
-          processedData.push({
-            name, firstIn, lastOut, formattedHours, varianceBadge, isLate, branches, hasException
-          });
-        }
-      }
+      // Sort data so most recent dates are on top
+      processedData.sort((a,b) => b.date - a.date);
+      missingData.sort((a,b) => b.date - a.date);
 
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
-      
-      const missingStaff = masterStaffList.filter(name => !processedData.some(d => d.name === name));
-      document.getElementById('metric-absent').innerText = missingStaff.length;
+      document.getElementById('metric-absent').innerText = totalMissing;
 
       renderMasterTable();
-      renderAbsentTable(missingStaff);
-    }
-
-    document.getElementById('global-search').addEventListener('input', () => {
-      processDailyData();
+      renderAbsentTable();
       if(document.getElementById('view-matrix').style.display === 'block') generateMatrix();
-    });
+    }
 
     // --- RENDERING TABLES ---
     function renderMasterTable() {
       const tb = document.getElementById('master-tbody');
-      if(processedData.length === 0) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;">No data available.</td></tr>'; return; }
+      if(processedData.length === 0) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;">No data available for selected filters.</td></tr>'; return; }
       
       let html = '';
       processedData.forEach(d => {
@@ -510,7 +590,10 @@
         else if (d.isLate) statusHtml = `<span class="badge bg-orange">Late Arrival</span>`;
         else statusHtml = `<span class="badge bg-green">On Time</span>`;
 
+        const displayDate = d.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
+
         html += `<tr>
+          <td style="color:var(--text-soft)">${displayDate}</td>
           <td><strong>${d.name}</strong></td>
           <td><span style="color:var(--text-soft)">In:</span> ${inStr} <br><span style="color:var(--text-soft)">Out:</span> ${outStr}</td>
           <td><strong>${d.formattedHours}</strong> ${d.varianceBadge}</td>
@@ -520,38 +603,33 @@
       tb.innerHTML = html;
     }
 
-    function renderAbsentTable(missingStaff) {
+    function renderAbsentTable() {
       const tb = document.getElementById('absent-tbody');
-      if(missingStaff.length === 0) { tb.innerHTML = '<tr><td colspan="3" style="text-align:center;">No data available (Everyone present).</td></tr>'; return; }
-      
-      const searchFilter = document.getElementById('global-search').value.toLowerCase();
+      if(missingData.length === 0) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in this date range.</td></tr>'; return; }
       
       let html = '';
-      missingStaff.forEach(name => {
-        if (searchFilter && !name.toLowerCase().includes(searchFilter)) return;
-
-        const excKey = `${name}_${selectedDate.toISOString().split('T')[0]}`;
+      missingData.forEach(d => {
+        const excKey = `${d.name}_${d.date.toISOString().split('T')[0]}`;
         const hasException = exceptionsData[excKey] ? exceptionsData[excKey].reason : null;
-        
-        let statusHtml = hasException ? `<span class="badge bg-orange">${hasException}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
+        const statusHtml = hasException ? `<span class="badge bg-orange">${hasException}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
+        const displayDate = d.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
 
         html += `<tr>
-          <td><strong>${name}</strong></td>
+          <td style="color:var(--text-soft)">${displayDate}</td>
+          <td><strong>${d.name}</strong></td>
           <td>${statusHtml}</td>
           <td>
-            <a class="action-link btn-manage-exc" data-name="${name}">Manage Exception</a>
+            <a class="action-link btn-manage-exc" data-name="${d.name}" data-date="${d.date.toISOString()}">Manage Exception</a>
           </td>
         </tr>`;
       });
-      
-      if(html === '') html = '<tr><td colspan="3" style="text-align:center;">No matching data.</td></tr>';
-      
       tb.innerHTML = html;
 
       document.querySelectorAll('.btn-manage-exc').forEach(btn => {
         btn.addEventListener('click', (e) => {
           activeExceptionName = e.target.getAttribute('data-name');
-          document.getElementById('exc-subtitle').innerText = `Update record for ${activeExceptionName} on ${selectedDate.toDateString()}`;
+          activeExceptionDate = new Date(e.target.getAttribute('data-date'));
+          document.getElementById('exc-subtitle').innerText = `Update record for ${activeExceptionName} on ${activeExceptionDate.toLocaleDateString()}`;
           document.getElementById('exception-modal').style.display = 'flex';
         });
       });
@@ -562,43 +640,36 @@
     
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
       const reason = document.getElementById('exc-reason').value;
-      const excKey = `${activeExceptionName}_${selectedDate.toISOString().split('T')[0]}`;
+      const dateString = activeExceptionDate.toISOString().split('T')[0];
+      const excKey = `${activeExceptionName}_${dateString}`;
       
       try {
-        await setDoc(doc(db, "attendance_exceptions", excKey), { name: activeExceptionName, date: selectedDate.toISOString().split('T')[0], reason: reason });
+        await setDoc(doc(db, "attendance_exceptions", excKey), { name: activeExceptionName, date: dateString, reason: reason });
         exceptionsData[excKey] = { reason: reason }; // Update local cache
         document.getElementById('exception-modal').style.display = 'none';
-        processDailyData(); 
-        if(document.getElementById('view-matrix').style.display === 'block') generateMatrix();
+        processGlobalData(); 
       } catch(err) { alert("Failed to save exception."); }
     });
 
-
     // --- ATTENDANCE MATRIX ---
     function generateMatrix() {
-      const daysInput = parseInt(document.getElementById('matrix-days-input').value) || 7;
       const header = document.getElementById('matrix-header');
       const body = document.getElementById('matrix-body');
       
-      if(masterStaffList.length === 0) {
-          body.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No data available.</td></tr>';
+      const filteredStaff = masterStaffList.filter(name => selectedStaff.has(name));
+      if(filteredStaff.length === 0) {
+          body.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No staff selected.</td></tr>';
           return;
       }
       
-      const dates = [];
-      for(let i=daysInput-1; i>=0; i--) { let d = new Date(); d.setDate(d.getDate()-i); dates.push(d); }
+      const dates = getDatesInRange();
+      // Reverse dates for Matrix so left-most is newest
+      dates.reverse();
       
       header.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dates.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
       
-      const searchFilter = document.getElementById('global-search').value.toLowerCase();
-
       body.innerHTML = '';
-      let renderedRows = 0;
-
-      masterStaffList.forEach(name => {
-        if (searchFilter && !name.toLowerCase().includes(searchFilter)) return;
-        renderedRows++;
-
+      filteredStaff.forEach(name => {
         let row = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10;">${name}</td>`;
         
         dates.forEach(date => {
@@ -619,41 +690,29 @@
         row += '</tr>';
         body.innerHTML += row;
       });
-
-      if(renderedRows === 0) {
-        body.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No data available for search query.</td></tr>';
-      }
     }
 
     // --- EXPORT LOGIC ---
-    document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('.dropdown-content').classList.toggle('show'); });
-    window.addEventListener('click', () => { document.querySelector('.dropdown-content').classList.remove('show'); });
-    
-    document.querySelectorAll('.dropdown-content a').forEach(item => {
+    document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault(); const type = e.target.getAttribute('data-export');
-        const headers = ["Staff Name", "First In", "Last Out", "Total Hours", "Status"];
-        const rows = processedData.map(d => [d.name, d.firstIn?d.firstIn.toLocaleTimeString():'N/A', d.lastOut?d.lastOut.toLocaleTimeString():'N/A', d.formattedHours, d.isLate?"Late":(d.hasException?d.hasException:"On Time")]);
+        const headers = ["Date", "Staff Name", "First In", "Last Out", "Total Hours", "Status"];
+        const rows = processedData.map(d => [d.date.toLocaleDateString(), d.name, d.firstIn?d.firstIn.toLocaleTimeString():'N/A', d.lastOut?d.lastOut.toLocaleTimeString():'N/A', d.formattedHours, d.isLate?"Late":(d.hasException?d.hasException:"On Time")]);
 
         if (type === 'csv') {
           if (rows.length === 0) { alert("No data to export"); return; }
           let csv = headers.join(",") + "\n" + rows.map(r => `"${r.join('","')}"`).join("\n");
-          const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `RJ_Attendance_${selectedDate.toDateString()}.csv`; a.click();
+          const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = `RJ_Data.csv`; a.click();
         } else if (type === 'pdf') {
           const element = document.getElementById('export-container');
-          html2pdf().set({ margin: 10, filename: `RJ_Report_${selectedDate.toDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
+          html2pdf().set({ margin: 10, filename: `RJ_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(element).save();
         } else if (type === 'xls') {
            if (rows.length === 0) { alert("No data to export"); return; }
-           let tableStr = '<table><tr>';
-           headers.forEach(h => tableStr += `<th>${h}</th>`);
-           tableStr += '</tr>';
+           let tableStr = '<table><tr>'; headers.forEach(h => tableStr += `<th>${h}</th>`); tableStr += '</tr>';
            rows.forEach(r => { tableStr += '<tr>'; r.forEach(cell => tableStr += `<td>${cell}</td>`); tableStr += '</tr>'; });
            tableStr += '</table>';
-           const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body>${tableStr}</body></html>`;
-           const a = document.createElement("a");
-           a.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template)));
-           a.download = `RJ_Attendance_${selectedDate.toDateString()}.xls`;
-           a.click();
+           const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${tableStr}</body></html>`;
+           const a = document.createElement("a"); a.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); a.download = `RJ_Data.xls`; a.click();
         } else if (type === 'copy') {
            if (rows.length === 0) { alert("No data to copy"); return; }
            let clipboardTxt = headers.join("\t") + "\n";
@@ -661,34 +720,6 @@
            navigator.clipboard.writeText(clipboardTxt).then(() => alert("Copied to clipboard!"));
         }
       });
-    });
-
-    // --- STAFF REGISTRY LOGIC (No AI required) ---
-    async function startCameraOnly() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById('reg-video').srcObject = stream;
-      } catch (err) { }
-    }
-    
-    document.getElementById('btn-register').addEventListener('click', async () => {
-      const name = document.getElementById('reg-name').value;
-      if(!name) { alert("Enter a name!"); return; }
-      
-      document.getElementById('reg-status').style.color = "var(--text-soft)";
-      document.getElementById('reg-status').innerText = "Saving staff member...";
-      
-      try {
-        // Save just the name directly to the database without any heavy AI processing
-        await setDoc(doc(db, "registered_faces", name), { employee_name: name, last_updated: new Date() });
-        document.getElementById('reg-status').style.color = "var(--success)";
-        document.getElementById('reg-status').innerText = `Successfully added: ${name}`;
-        document.getElementById('reg-name').value = '';
-        fetchMasterData(); // Refresh the data list
-      } catch (err) {
-        document.getElementById('reg-status').style.color = "var(--danger)";
-        document.getElementById('reg-status').innerText = "Failed to save.";
-      }
     });
 
   </script>
