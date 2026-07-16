@@ -679,14 +679,22 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         document.getElementById('reg-video').srcObject = stream;
-        document.getElementById('reg-status').innerText = "Loading AI Models...";
+        document.getElementById('reg-status').innerText = "Loading Local AI Models...";
+        
+        // Define the local path to your new models folder
+        const LOCAL_MODEL_URL = './models'; 
+        
         await Promise.all([
-          faceapi.nets.ssdMobilenetv1.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
-          faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
-          faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
+          faceapi.nets.ssdMobilenetv1.loadFromUri(LOCAL_MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(LOCAL_MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(LOCAL_MODEL_URL)
         ]);
+        
         document.getElementById('reg-status').innerText = "Ready to Scan.";
-      } catch (err) { document.getElementById('reg-status').innerText = "Camera Error."; }
+      } catch (err) { 
+        document.getElementById('reg-status').innerText = "Camera Error."; 
+        console.error(err);
+      }
     }
     
     document.getElementById('btn-register').addEventListener('click', async () => {
