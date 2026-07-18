@@ -638,37 +638,81 @@
       if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); }
     });
 
-    // --- SUPABASE AUTHENTICATION ---
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
+    // --- SUPABASE AUTHENTICATION (Accessories Style Robust Login) ---
+    let isAppInitialized = false;
+
+    async function checkUser() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      handleAuthChange(session?.user);
+    }
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      handleAuthChange(session?.user);
+    });
+
+    async function handleAuthChange(user) {
+      const loader = document.getElementById('global-loader');
+      if (user) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-        await initialMetadataLoad();
-        setupRealtimeSync();
+        
+        if (!isAppInitialized) {
+          isAppInitialized = true;
+          loader.style.display = 'flex'; // Show loader while fetching initial data
+          await initialMetadataLoad();
+          setupRealtimeSync();
+          loader.style.display = 'none'; // Hide loader after data is ready
+        }
       } else {
-        document.getElementById('global-loader').style.display = 'none';
+        loader.style.display = 'none';
         document.getElementById('login-screen').style.display = 'block';
         document.getElementById('dashboard').style.display = 'none';
       }
-    });
+    }
+
+    // Call checkUser on page load
+    checkUser();
 
     document.getElementById('login-btn').addEventListener('click', async () => {
-      document.getElementById('error-msg').style.display = 'none';
-      document.getElementById('global-loader').style.display = 'flex';
-      
-      const email = document.getElementById('email-input').value;
+      const btn = document.getElementById('login-btn');
+      const errorMsg = document.getElementById('error-msg');
+      const loader = document.getElementById('global-loader');
+
+      // Reset errors and disable button to prevent double-clicks
+      errorMsg.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = "Authenticating...";
+      loader.style.display = 'flex';
+
+      const email = document.getElementById('email-input').value.trim();
       const password = document.getElementById('password-input').value;
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      
-      if (error) {
-        document.getElementById('global-loader').style.display = 'none';
-        document.getElementById('error-msg').style.display = 'block';
-        document.getElementById('error-msg').innerText = error.message;
+
+      if (!email || !password) {
+        loader.style.display = 'none';
+        errorMsg.style.display = 'block';
+        errorMsg.innerText = "Please enter both Email and Password.";
+        btn.disabled = false;
+        btn.innerText = "Log In";
+        return;
       }
+
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        loader.style.display = 'none';
+        errorMsg.style.display = 'block';
+        errorMsg.innerText = error.message;
+        
+        // Re-enable button so user can try again
+        btn.disabled = false;
+        btn.innerText = "Log In";
+      }
+      // If successful, onAuthStateChange takes over.
     });
 
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      supabaseClient.auth.signOut();
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      isAppInitialized = false;
+      await supabaseClient.auth.signOut();
     });
 
     // --- INITIALIZATION & CACHE ---
@@ -704,7 +748,6 @@
         branchSelect.value = savedSettings.branch;
       }
 
-      document.getElementById('global-loader').style.display = 'none';
       await fetchLogsFromDatabase();
     }
 
