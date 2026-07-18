@@ -246,18 +246,6 @@
     <!-- Global Filter Bar -->
     <div class="filter-bar">
       
-      <!-- Date Presets Dropdown -->
-      <div class="filter-group">
-        <label>Date Range</label>
-        <select id="quick-date-preset" class="input-field" style="margin: 0; width: 140px; padding: 10px;">
-          <option value="today" selected>Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="last_week">Last 7 Days</option>
-          <option value="last_month">Last 30 Days</option>
-          <option value="custom">Custom Range</option>
-        </select>
-      </div>
-
       <div class="filter-group">
         <label>Start Date</label>
         <input type="text" id="global-start" class="input-field" style="margin: 0; width: 120px; padding: 10px;" placeholder="Start Date" />
@@ -652,40 +640,15 @@
     let fpStart = flatpickr("#global-start", { 
       defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
       onChange: (dates) => { 
-          if(dates[0]) { startDate = dates[0]; document.getElementById('quick-date-preset').value = 'custom'; } 
+          if(dates[0]) { startDate = dates[0]; } 
       }
     });
     
     let fpEnd = flatpickr("#global-end", { 
       defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
       onChange: (dates) => { 
-          if(dates[0]) { endDate = dates[0]; document.getElementById('quick-date-preset').value = 'custom'; } 
+          if(dates[0]) { endDate = dates[0]; } 
       }
-    });
-
-    document.getElementById('quick-date-preset').addEventListener('change', (e) => {
-        const val = e.target.value;
-        const now = new Date();
-        let sDate = new Date();
-        let eDate = new Date();
-
-        if (val === 'yesterday') {
-            sDate.setDate(now.getDate() - 1);
-            eDate.setDate(now.getDate() - 1);
-        } else if (val === 'last_week') {
-            sDate.setDate(now.getDate() - 7);
-        } else if (val === 'last_month') {
-            sDate.setDate(now.getDate() - 30);
-        }
-        // If 'today', sDate and eDate are naturally today.
-
-        if (val !== 'custom') {
-            startDate = sDate;
-            endDate = eDate;
-            fpStart.setDate(sDate);
-            fpEnd.setDate(eDate);
-            fetchLogsFromDatabase(false);
-        }
     });
 
     // PAGINATION
