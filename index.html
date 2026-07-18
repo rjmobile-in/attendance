@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RJ Mobile | Admin Portal</title>
+  <title>RJ Mobile | Attendance Admin Portal</title>
   
   <script>
     if (localStorage.getItem('rj_theme') === 'light') { 
@@ -15,13 +15,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Libraries: HTML2PDF, SortableJS, Flatpickr, Supabase -->
+  <!-- Libraries: HTML2PDF, SortableJS, Flatpickr -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     /* Reset & Theme Variables */
@@ -190,7 +189,7 @@
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <img src="logo.png" alt="RJ Mobile Logo" style="height: 64px; object-fit: contain; margin-bottom: 16px;" onerror="this.style.display='none'">
-    <h2>RJ Mobile Admin</h2>
+    <h2>Attendance Admin</h2>
     <p style="color: var(--text-soft); margin-bottom: 24px;">Secure management access.</p>
     
     <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
@@ -209,11 +208,10 @@
         <img src="logo.png" alt="RJ Logo" style="height: 40px; object-fit: contain;" onerror="this.style.display='none'">
         <div>
           <div class="name" style="font-size: 20px;">RJ Mobile <span class="badge bg-green" style="margin-left: 8px;">ADMIN</span></div>
-          <div style="font-size: 12px; color: var(--text-soft); margin-top: 4px;">Operational Command Center</div>
+          <div style="font-size: 12px; color: var(--text-soft); margin-top: 4px;">Attendance Command Center</div>
         </div>
       </div>
       <div class="header-controls">
-        <!-- Feature 1: Live Auto-Sync Toggle -->
         <div class="switch-wrap">
           Auto-Sync
           <label class="switch" title="Enable Live Sync">
@@ -234,7 +232,6 @@
           </div>
         </div>
         
-        <!-- Feature 2: Save Settings Button -->
         <button id="save-settings-btn" class="btn-secondary">💾 Save Settings</button>
         <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
         <button id="theme-toggle" class="btn-secondary" title="Toggle Theme">🌓</button>
@@ -269,7 +266,6 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="staff-dropdown-box">
-          <!-- Feature 4: Searchable Staff Filter -->
           <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 8px; padding: 8px; font-size: 13px;">
           <div class="multi-select-actions">
             <button id="btn-select-all">Select All</button>
@@ -287,7 +283,6 @@
     <!-- Navigation Tabs -->
     <div class="tab-controls">
       <button class="tab-btn active" data-view="view-overview">Overview & Logs</button>
-      <!-- Feature 5: Action Required Badge -->
       <button class="tab-btn" data-view="view-absent">Absents & Exceptions <span id="absent-badge" class="badge bg-red" style="display:none; padding: 2px 6px; margin-left: 6px;">0</span></button>
       <button class="tab-btn" data-view="view-matrix">Attendance Matrix</button>
       <button class="tab-btn" data-view="view-settings">System Settings</button>
@@ -297,7 +292,6 @@
     <div id="view-overview" class="app-view">
       <div id="export-container">
         
-        <!-- Draggable Widgets -->
         <div class="widget-grid" id="draggable-widgets">
           <div class="widget-card" data-id="w-present">
             <div class="widget-header">
@@ -322,14 +316,12 @@
           </div>
         </div>
 
-        <!-- Feature 6: Sub-Tabs Analytics -->
         <div class="sub-tabs">
           <button class="sub-tab-btn active" data-filter="all">All Logs</button>
           <button class="sub-tab-btn" data-filter="late">Late Arrivals Only</button>
           <button class="sub-tab-btn" data-filter="short">Short Hours (< 10h)</button>
         </div>
 
-        <!-- Master Data Table -->
         <div class="table-card">
           <div class="table-responsive">
             <table id="master-table">
@@ -347,7 +339,6 @@
               </tbody>
             </table>
           </div>
-          <!-- Feature 3: Pagination Controls -->
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card-bg); border-top: 1px solid var(--card-border);">
             <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 50</button>
             <span id="page-indicator" style="color: var(--text-soft); font-size: 13px; font-weight: 600;">Page 1</span>
@@ -406,7 +397,6 @@
       <p style="color: var(--text-soft); margin-bottom: 24px;">Add or remove Staff and Branches. Changes apply to the terminal instantly.</p>
       
       <div class="settings-grid">
-        <!-- Staff Panel -->
         <div class="settings-panel">
           <h3 style="margin-bottom: 12px;">Staff Directory</h3>
           <div style="display:flex; gap:8px;">
@@ -418,16 +408,13 @@
           </table>
         </div>
 
-        <!-- Branches Panel (FIXED: Added Password Field) -->
         <div class="settings-panel">
           <h3 style="margin-bottom: 12px;">Branch Configuration</h3>
           <div style="display:flex; flex-direction: column; gap:12px;">
             <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name (e.g. Murlipura)" style="margin:0;">
             <input type="email" id="new-branch-email" class="input-field" placeholder="Terminal Login Email" style="margin:0;">
-            <!-- THIS WAS MISSING IN YOUR ORIGINAL CODE: -->
             <input type="text" id="new-branch-pass" class="input-field" placeholder="Terminal Password (e.g. 123456)" style="margin:0;">
             <input type="text" id="new-branch-ip" class="input-field" placeholder="Allowed Wi-Fi IP (Leave blank for no lock)" style="margin:0;">
-            
             <button id="add-branch-btn" class="btn-primary" style="justify-content:center;">Register Branch</button>
           </div>
           <table style="margin-top:20px;">
@@ -441,12 +428,10 @@
   </div> <!-- End Dashboard -->
 
   <!-- MODALS -->
-  <!-- Exception Modal -->
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manage Exception</h2>
       <p style="color: var(--text-soft); margin-bottom: 20px;" id="exc-subtitle">Update record</p>
-      
       <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Reason</label>
       <select id="exc-reason" class="input-field" style="margin-top: 8px;">
         <option value="Approved Leave">Approved Paid Leave</option>
@@ -454,7 +439,6 @@
         <option value="On Field Duty">On Field Duty / Errand</option>
         <option value="Unexcused Absence">Unexcused Absence</option>
       </select>
-
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-exc" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
         <button id="btn-save-exc" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Record</button>
@@ -462,21 +446,17 @@
     </div>
   </div>
 
-  <!-- Uniform Review Modal -->
   <div id="review-modal" class="modal-overlay">
     <div class="modal-card">
       <div>
         <h2 style="font-size: 20px; font-weight: 800;">Audit Uniform</h2>
-        <p style="color: var(--text-soft); font-size: 13px; margin-top: 4px;">Verify requirements. (Photo will auto-delete after 7 days).</p>
+        <p style="color: var(--text-soft); font-size: 13px; margin-top: 4px;">Verify requirements.</p>
       </div>
-      
       <img id="modal-image-preview" src="" class="modal-img" alt="Staff Capture" />
-      
       <div class="modal-checkboxes">
         <label class="check-wrap"><input type="checkbox" id="check-tshirt"> RJ T-Shirt Present</label>
         <label class="check-wrap"><input type="checkbox" id="check-idcard"> ID Card Present</label>
       </div>
-      
       <div style="display: flex; gap: 12px;">
         <button id="btn-cancel-review" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
         <button id="btn-save-review" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Audit</button>
@@ -484,11 +464,13 @@
     </div>
   </div>
 
-  <script>
-    // --- SUPABASE CREDENTIALS DIRECTLY INTEGRATED & FIXED VARIABLE SHADOWING ---
+  <!-- EXACT ES MODULE SCRIPT IMPORT -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlenVtYXB6bHNqbmtpdHh2c3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTY2NjUsImV4cCI6MjA5OTkzMjY2NX0.IVUZVjZUuiM9qTcKAIIxJth_zSIGJUWTaubUV4Fy0_Y';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- GLOBAL STATE ---
     let masterStaffList = [];
@@ -501,46 +483,38 @@
     let endDate = new Date();
     let selectedStaff = new Set();
     
-    // Pagination & Sub-tabs state
     let currentPage = 0;
     const pageSize = 50;
     let totalRecords = 0;
     let activeSubTab = 'all';
 
-    // Modal tracking & Sync
     let activeExceptionName = null;
     let activeExceptionDate = null;
     let currentReviewLogId = null;
     let realtimeSubscription = null;
+    let isAppInitialized = false;
 
-    // --- FEATURE 7: CUSTOM TOASTS ---
+    // --- CUSTOM TOASTS ---
     function showToast(message, type = 'primary') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
       toast.innerText = message;
       container.appendChild(toast);
-      
-      // Trigger animation
       setTimeout(() => { toast.classList.add('show'); }, 10);
-      
-      // Remove
       setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300); // Wait for transition
+        setTimeout(() => toast.remove(), 300); 
       }, 3000);
     }
 
-    // --- UI INITIALIZATION & EVENT LISTENERS ---
-    
-    // Theme Toggle
+    // --- UI INITIALIZATION ---
     document.getElementById('theme-toggle').addEventListener('click', () => {
       const isLight = document.documentElement.classList.toggle('light-theme');
       localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
       document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
     });
 
-    // Feature 2: Save Settings Cache
     document.getElementById('save-settings-btn').addEventListener('click', () => {
       const branch = document.getElementById('global-branch').value;
       const sync = document.getElementById('sync-toggle').checked;
@@ -548,7 +522,6 @@
       showToast("Settings saved to session cache!", "success");
     });
 
-    // Feature 1: Setup Realtime Sync
     function setupRealtimeSync() {
       const isSyncOn = document.getElementById('sync-toggle').checked;
       if (isSyncOn && !realtimeSubscription) {
@@ -556,7 +529,7 @@
           .channel('public:attendance_logs')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, payload => {
             showToast("Live data update detected. Syncing...", "primary");
-            fetchLogsFromDatabase(true); // true to prevent resetting page to 0
+            fetchLogsFromDatabase(true); 
           })
           .subscribe();
       } else if (!isSyncOn && realtimeSubscription) {
@@ -566,7 +539,6 @@
     }
     document.getElementById('sync-toggle').addEventListener('change', setupRealtimeSync);
 
-    // Draggable Widgets Setup
     Sortable.create(document.getElementById('draggable-widgets'), {
       handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
       store: {
@@ -578,7 +550,6 @@
       localStorage.removeItem('rj_widget_order'); location.reload(); 
     });
 
-    // Tab Navigation
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -593,17 +564,15 @@
       });
     });
 
-    // Feature 6: Sub-Tabs Analytics
     document.querySelectorAll('.sub-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         activeSubTab = e.target.getAttribute('data-filter');
-        renderMasterTable(); // Re-render table with new sub-tab filter
+        renderMasterTable(); 
       });
     });
 
-    // Custom Dropdown Handling
     document.getElementById('export-btn').addEventListener('click', (e) => { 
       e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); 
     });
@@ -623,7 +592,6 @@
       }
     });
 
-    // Date Pickers Initialization
     flatpickr("#global-start", { 
       defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
       onChange: (dates) => { if(dates[0]) startDate = dates[0]; }
@@ -633,7 +601,6 @@
       onChange: (dates) => { if(dates[0]) endDate = dates[0]; }
     });
 
-    // Feature 3: Pagination Event Listeners
     document.getElementById('prev-page-btn').addEventListener('click', () => {
       if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); }
     });
@@ -641,9 +608,9 @@
       if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); }
     });
 
-    // --- SUPABASE AUTHENTICATION (Accessories Style Robust Login) ---
-    let isAppInitialized = false;
-
+    // ==========================================
+    // AUTHENTICATION ENGINE (CRASH-FREE)
+    // ==========================================
     async function checkUser() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       handleAuthChange(session?.user);
@@ -655,25 +622,35 @@
 
     async function handleAuthChange(user) {
       const loader = document.getElementById('global-loader');
+      
+      // GUARANTEED HIDE ON EVERY AUTH CHANGE (Just like Accessories Admin[cite: 4])
+      loader.style.display = 'none';
+
       if (user) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         
         if (!isAppInitialized) {
           isAppInitialized = true;
-          loader.style.display = 'flex'; // Show loader while fetching initial data
-          await initialMetadataLoad();
-          setupRealtimeSync();
-          loader.style.display = 'none'; // Hide loader after data is ready
+          loader.style.display = 'flex'; // Show loader for data fetching
+          try {
+              await initialMetadataLoad();
+              setupRealtimeSync();
+          } catch (err) {
+              console.error("Data Initialization Error:", err);
+              showToast("Failed to load some data. Refresh page.", "error");
+          } finally {
+              // ENSURE LOADER HIDES EVEN IF JS CRASHES
+              loader.style.display = 'none'; 
+          }
         }
       } else {
-        loader.style.display = 'none';
         document.getElementById('login-screen').style.display = 'block';
         document.getElementById('dashboard').style.display = 'none';
+        isAppInitialized = false;
       }
     }
 
-    // Call checkUser on page load
     checkUser();
 
     document.getElementById('login-btn').addEventListener('click', async () => {
@@ -681,7 +658,6 @@
       const errorMsg = document.getElementById('error-msg');
       const loader = document.getElementById('global-loader');
 
-      // Reset errors and disable button to prevent double-clicks
       errorMsg.style.display = 'none';
       btn.disabled = true;
       btn.innerText = "Authenticating...";
@@ -705,33 +681,31 @@
         loader.style.display = 'none';
         errorMsg.style.display = 'block';
         errorMsg.innerText = error.message;
-        
-        // Re-enable button so user can try again
         btn.disabled = false;
         btn.innerText = "Log In";
       }
-      // If successful, onAuthStateChange takes over.
     });
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
-      isAppInitialized = false;
+      document.getElementById('global-loader').style.display = 'flex';
       await supabaseClient.auth.signOut();
     });
 
-    // --- INITIALIZATION & CACHE ---
+    // ==========================================
+    // INITIALIZATION & CACHE FIX
+    // ==========================================
     async function initialMetadataLoad() {
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
       
-      // Implement Lazy Background Delete of old photos
       await executeLazyPhotoDelete();
       
-      // 1. SABSE PEHLE STAFF LIST FETCH KARO (Taki cache ko naam mil sakein)
+      // 1. FETCH STAFF FIRST
       const { data: staffData } = await supabaseClient.from('staff_directory').select('name').order('name');
       masterStaffList = (staffData || []).map(s => s.name);
       selectedStaff = new Set(masterStaffList);
       renderStaffFilterCheckboxes();
 
-      // 2. BRANCH LIST FETCH KARO
+      // 2. FETCH BRANCHES
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('branch_name').order('branch_name');
       const branchSelect = document.getElementById('global-branch');
       branchSelect.innerHTML = '<option value="All">All Branches</option>';
@@ -739,7 +713,7 @@
         branchSelect.innerHTML += `<option value="${b.branch_name}">${b.branch_name}</option>`;
       });
 
-      // Apply Saved Settings 
+      // 3. APPLY SETTINGS
       const savedSettings = JSON.parse(localStorage.getItem('rj_settings') || '{}');
       if (savedSettings.sync !== undefined) {
         document.getElementById('sync-toggle').checked = savedSettings.sync;
@@ -748,14 +722,13 @@
         branchSelect.value = savedSettings.branch;
       }
 
-      // 3. AB CACHE LOAD KARO (Kyunki ab system ko staff ke naam pata hain)
+      // 4. LOAD CACHE NOW (Staff names exist, no crash)
       loadFromCache();
 
-      // 4. USKE BAAD FRESH DATA FETCH KARO
+      // 5. FETCH NEW LOGS
       await fetchLogsFromDatabase();
     }
 
-    // Feature 8 Implementation: Cache Loading
     function loadFromCache() {
       try {
         const cachedLogs = localStorage.getItem('rj_cached_logs');
@@ -763,7 +736,7 @@
         if (cachedLogs && cachedExceptions) {
           dbLogs = JSON.parse(cachedLogs);
           exceptionsData = JSON.parse(cachedExceptions);
-          processStitchedData(); // Render immediately before fresh network fetch
+          processStitchedData(); 
         }
       } catch(e) { console.error("Cache load error", e); }
     }
@@ -776,12 +749,9 @@
           .update({ photo_capture: null })
           .eq('uniform_reviewed', true)
           .lte('timestamp', cutoffDate.toISOString());
-      } catch (err) {
-        console.error("Silent background delete error", err);
-      }
+      } catch (err) { }
     }
 
-    // --- DYNAMIC STAFF FILTER ---
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
       container.innerHTML = masterStaffList.map(name => 
@@ -799,14 +769,14 @@
       document.getElementById('btn-select-all').addEventListener('click', () => {
         document.querySelectorAll('.staff-cb').forEach(cb => { cb.checked = true; cb.parentElement.style.display = 'flex'; }); 
         selectedStaff = new Set(masterStaffList); 
-        document.getElementById('staff-search').value = ''; // clear search
+        document.getElementById('staff-search').value = ''; 
         updateStaffButtonText();
       });
       
       document.getElementById('btn-deselect-all').addEventListener('click', () => {
         document.querySelectorAll('.staff-cb').forEach(cb => { cb.checked = false; cb.parentElement.style.display = 'flex'; }); 
         selectedStaff.clear(); 
-        document.getElementById('staff-search').value = ''; // clear search
+        document.getElementById('staff-search').value = ''; 
         updateStaffButtonText();
       });
       
@@ -819,35 +789,29 @@
       else btn.innerText = `${selectedStaff.size} Selected`;
     }
 
-    // Feature 4: Searchable Staff Filter Logic
     document.getElementById('staff-search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       document.querySelectorAll('.staff-cb').forEach(cb => {
         const label = cb.parentElement;
-        if (cb.value.toLowerCase().includes(term)) {
-          label.style.display = 'flex';
-        } else {
-          label.style.display = 'none';
-        }
+        if (cb.value.toLowerCase().includes(term)) { label.style.display = 'flex'; } 
+        else { label.style.display = 'none'; }
       });
     });
 
-    // --- CORE DATA FETCHING ---
     document.getElementById('refresh-data-btn').addEventListener('click', () => {
-      fetchLogsFromDatabase(false); // false means reset pagination to 0
+      fetchLogsFromDatabase(false); 
     });
 
     async function fetchLogsFromDatabase(keepPage = false) {
       document.getElementById('master-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center">Fetching records from Database...</td></tr>';
       
-      if (!keepPage) currentPage = 0; // Reset page on new filter apply
+      if (!keepPage) currentPage = 0; 
 
       const startISO = new Date(startDate).toISOString();
       const endObj = new Date(endDate); 
       endObj.setHours(23, 59, 59);
       const endISO = endObj.toISOString();
 
-      // Feature 3: Fetch Logs with Pagination (.range limit 50)
       const { data: logsData, error: logsError, count } = await supabaseClient
         .from('attendance_logs')
         .select('*', { count: 'exact' })
@@ -859,13 +823,11 @@
       dbLogs = logsData || [];
       totalRecords = count || 0;
 
-      // Update Pagination UI
       const totalPages = Math.ceil(totalRecords / pageSize) || 1;
       document.getElementById('page-indicator').innerText = `Page ${currentPage + 1} of ${totalPages}`;
       document.getElementById('prev-page-btn').disabled = currentPage === 0;
       document.getElementById('next-page-btn').disabled = (currentPage + 1) * pageSize >= totalRecords;
 
-      // Fetch Exceptions for the exact date range
       const startOnlyDate = startISO.split('T')[0];
       const endOnlyDate = endISO.split('T')[0];
       const { data: excData } = await supabaseClient
@@ -879,15 +841,12 @@
         exceptionsData[`${e.employee_name}_${e.date}`] = { reason: e.reason };
       });
 
-      // Feature 8: Update Cache
       localStorage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
       localStorage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
 
       processStitchedData();
     }
 
-    // --- DATA PROCESSING & STITCHING ---
-    // Modified to prevent False Absents: Only generate dates based on what is present in the current paginated fetch
     function getDatesArrayFromFetchedLogs() {
       if (dbLogs.length === 0) return [];
       const datesSet = new Set();
@@ -900,7 +859,6 @@
       missingData = [];
       let totalPresent = 0, totalLate = 0, totalMissing = 0;
       
-      // Calculate missing/present ONLY for dates loaded in this paginated chunk
       const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
       const selectedBranch = document.getElementById('global-branch').value;
@@ -910,14 +868,12 @@
         const isoDateStr = targetDate.toISOString().split('T')[0];
 
         filteredStaffNames.forEach(staffName => {
-          
           let dailyLogs = dbLogs.filter(log => log.employee_name === staffName && new Date(log.timestamp).toDateString() === dateStringMatch);
           dailyLogs.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-          // Branch Filter Logic
           if (selectedBranch !== "All") {
             const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => l.branch !== selectedBranch);
-            if (workedElsewhere) return; // Do not show as absent, they are present at another branch
+            if (workedElsewhere) return; 
             dailyLogs = dailyLogs.filter(l => l.branch === selectedBranch);
           }
 
@@ -951,19 +907,12 @@
             }
 
             processedData.push({
-              date: targetDate, 
-              name: staffName, 
-              firstIn: firstInTime, 
-              lastOut: lastOutTime, 
-              formattedHours: formattedHours, 
-              isLate: isLateArrival, 
+              date: targetDate, name: staffName, firstIn: firstInTime, lastOut: lastOutTime, 
+              formattedHours: formattedHours, isLate: isLateArrival, 
               branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
-              hasException: exceptionReason, 
-              logIdForPhoto: firstInLog?.id, 
-              photoBase64: firstInLog?.photo_capture, 
-              uniformReviewed: firstInLog?.uniform_reviewed,
-              uTshirt: firstInLog?.uniform_tshirt, 
-              uIdcard: firstInLog?.uniform_idcard
+              hasException: exceptionReason, logIdForPhoto: firstInLog?.id, 
+              photoBase64: firstInLog?.photo_capture, uniformReviewed: firstInLog?.uniform_reviewed,
+              uTshirt: firstInLog?.uniform_tshirt, uIdcard: firstInLog?.uniform_idcard
             });
             
           } else {
@@ -973,52 +922,42 @@
         });
       });
 
-      processedData.sort((a,b) => b.date - a.date);
-      missingData.sort((a,b) => b.date - a.date);
+      processedData.sort((a,b) => b.date - a.date); missingData.sort((a,b) => b.date - a.date);
 
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
       document.getElementById('metric-absent').innerText = totalMissing;
 
-      // Feature 5: Action Required Badge Update
       let unexcusedCount = 0;
       missingData.forEach(row => {
         const isoDate = row.date.toISOString().split('T')[0];
         if (!exceptionsData[`${row.name}_${isoDate}`]) unexcusedCount++;
       });
       const badge = document.getElementById('absent-badge');
-      if(unexcusedCount > 0) {
-        badge.innerText = unexcusedCount;
-        badge.style.display = 'inline-block';
-      } else {
-        badge.style.display = 'none';
-      }
+      if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } 
+      else { badge.style.display = 'none'; }
 
       renderMasterTable(); 
       renderAbsentTable();
       if (document.getElementById('view-matrix').style.display === 'block') generateMatrix();
     }
 
-    // --- TABLE RENDERING ---
     function renderMasterTable() {
       const tbody = document.getElementById('master-tbody');
       
-      // Feature 6 logic: Filter processed data based on Sub-Tabs
       let dataToRender = processedData;
-      if (activeSubTab === 'late') {
-        dataToRender = processedData.filter(row => row.isLate);
-      } else if (activeSubTab === 'short') {
+      if (activeSubTab === 'late') { dataToRender = processedData.filter(row => row.isLate); } 
+      else if (activeSubTab === 'short') {
         dataToRender = processedData.filter(row => {
           if (row.firstIn && row.lastOut && row.firstIn.getTime() !== row.lastOut.getTime()) {
-            return (row.lastOut - row.firstIn) < (10 * 3600000); // Less than 10 hours
+            return (row.lastOut - row.firstIn) < (10 * 3600000); 
           }
           return false;
         });
       }
 
       if (dataToRender.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters for this page.</td></tr>'; 
-        return; 
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters for this page.</td></tr>'; return; 
       }
       
       let htmlOutput = '';
@@ -1053,7 +992,6 @@
       tbody.innerHTML = htmlOutput;
     }
 
-    // --- MODALS (REVIEW & EXCEPTION) ---
     window.openReviewModal = function(logId) {
       currentReviewLogId = logId;
       const exactLog = dbLogs.find(l => l.id === logId);
@@ -1065,16 +1003,13 @@
       }
     };
     
-    document.getElementById('btn-cancel-review').addEventListener('click', () => {
-      document.getElementById('review-modal').style.display = 'none';
-    });
+    document.getElementById('btn-cancel-review').addEventListener('click', () => { document.getElementById('review-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-review').addEventListener('click', async () => {
       const isTshirtPresent = document.getElementById('check-tshirt').checked; 
       const isIdCardPresent = document.getElementById('check-idcard').checked;
       const saveBtn = document.getElementById('btn-save-review'); 
-      saveBtn.innerText = "Saving..."; 
-      saveBtn.disabled = true;
+      saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
 
       try {
         await supabaseClient.from('attendance_logs')
@@ -1083,99 +1018,61 @@
         
         const logIndex = dbLogs.findIndex(l => l.id === currentReviewLogId);
         if(logIndex !== -1) { 
-          dbLogs[logIndex].uniform_reviewed = true; 
-          dbLogs[logIndex].uniform_tshirt = isTshirtPresent; 
-          dbLogs[logIndex].uniform_idcard = isIdCardPresent; 
+          dbLogs[logIndex].uniform_reviewed = true; dbLogs[logIndex].uniform_tshirt = isTshirtPresent; dbLogs[logIndex].uniform_idcard = isIdCardPresent; 
         }
 
-        document.getElementById('review-modal').style.display = 'none'; 
-        processStitchedData(); 
-        showToast("Audit saved successfully", "success");
-      } catch (err) {
-        showToast("Failed to save audit.", "error");
-      }
-      
-      saveBtn.innerText = "Save Audit"; 
-      saveBtn.disabled = false;
+        document.getElementById('review-modal').style.display = 'none'; processStitchedData(); showToast("Audit saved successfully", "success");
+      } catch (err) { showToast("Failed to save audit.", "error"); }
+      saveBtn.innerText = "Save Audit"; saveBtn.disabled = false;
     });
 
-    // --- ABSENTS LOGIC ---
     function renderAbsentTable() {
       const tbody = document.getElementById('absent-tbody');
-      if (missingData.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in currently loaded data.</td></tr>'; 
-        return; 
-      }
+      if (missingData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in currently loaded data.</td></tr>'; return; }
       
       tbody.innerHTML = missingData.map(row => {
         const isoDate = row.date.toISOString().split('T')[0];
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
         
         const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
-        const statusHTML = existingExc 
-          ? `<span class="badge bg-orange">${existingExc}</span>` 
-          : `<span class="badge bg-red">Unexcused Absence</span>`;
+        const statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
           
-        return `<tr>
-          <td style="color:var(--text-soft)">${displayDate}</td>
-          <td><strong>${row.name}</strong></td>
-          <td>${statusHTML}</td>
-          <td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}')">Manage Exception</a></td>
-        </tr>`;
+        return `<tr><td style="color:var(--text-soft)">${displayDate}</td><td><strong>${row.name}</strong></td><td>${statusHTML}</td><td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}')">Manage Exception</a></td></tr>`;
       }).join('');
     }
 
     window.openExceptionModal = function(staffName, isoDateString) {
-      activeExceptionName = staffName; 
-      activeExceptionDate = isoDateString;
-      
+      activeExceptionName = staffName; activeExceptionDate = isoDateString;
       document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString}`;
       document.getElementById('exception-modal').style.display = 'flex';
     };
     
-    document.getElementById('btn-cancel-exc').addEventListener('click', () => {
-      document.getElementById('exception-modal').style.display = 'none';
-    });
+    document.getElementById('btn-cancel-exc').addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
       const reasonVal = document.getElementById('exc-reason').value;
       try {
-        await supabaseClient.from('attendance_exceptions').upsert({ 
-          employee_name: activeExceptionName, date: activeExceptionDate, reason: reasonVal 
-        }, { onConflict: 'employee_name, date' }); 
-        
+        await supabaseClient.from('attendance_exceptions').upsert({ employee_name: activeExceptionName, date: activeExceptionDate, reason: reasonVal }, { onConflict: 'employee_name, date' }); 
         exceptionsData[`${activeExceptionName}_${activeExceptionDate}`] = { reason: reasonVal };
-        document.getElementById('exception-modal').style.display = 'none'; 
-        processStitchedData(); 
-        showToast("Exception updated", "success");
-      } catch (err) {
-        showToast("Failed to save Exception.", "error");
-      }
+        document.getElementById('exception-modal').style.display = 'none'; processStitchedData(); showToast("Exception updated", "success");
+      } catch (err) { showToast("Failed to save Exception.", "error"); }
     });
 
-    // --- ATTENDANCE MATRIX ---
     function generateMatrix() {
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
       
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
-      if (filteredStaffNames.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No staff selected.</td></tr>';
-        return;
-      }
+      if (filteredStaffNames.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center;">No staff selected.</td></tr>'; return; }
       
       const dateList = getDatesArrayFromFetchedLogs();
-      
-      headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + 
-        dateList.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
+      headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
         
       tableBody.innerHTML = filteredStaffNames.map(staffName => {
         let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10;">${staffName}</td>`;
         
         dateList.forEach(dateObj => {
-          const dateStringMatch = dateObj.toDateString(); 
-          const isoDateStr = dateObj.toISOString().split('T')[0];
-          
+          const dateStringMatch = dateObj.toDateString(); const isoDateStr = dateObj.toISOString().split('T')[0];
           const dailyLogs = dbLogs.filter(l => l.employee_name === staffName && new Date(l.timestamp).toDateString() === dateStringMatch);
           
           if(dailyLogs.length === 0) {
@@ -1191,127 +1088,80 @@
       }).join('');
     }
 
-    // --- SYSTEM SETTINGS CRUD (FIXED BRANCH SAVE LOGIC) ---
     async function loadSettingsData() {
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
       
       const staffTbody = document.getElementById('staff-settings-list');
-      staffTbody.innerHTML = (staffData || []).map(s => 
-        `<tr>
-          <td>${s.name}</td>
-          <td style="text-align:right"><button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button></td>
-        </tr>`
-      ).join('');
+      staffTbody.innerHTML = (staffData || []).map(s => `<tr><td>${s.name}</td><td style="text-align:right"><button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button></td></tr>`).join('');
       
       const branchTbody = document.getElementById('branch-settings-list');
-      branchTbody.innerHTML = (branchesData || []).map(b => 
-        `<tr>
-          <td>
-            <strong>${b.branch_name}</strong><br>
-            <span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span>
-          </td>
-          <td style="text-align:right"><button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button></td>
-        </tr>`
-      ).join('');
+      branchTbody.innerHTML = (branchesData || []).map(b => `<tr><td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td><td style="text-align:right"><button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button></td></tr>`).join('');
     }
     
     document.getElementById('add-staff-btn').addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-staff-name').value; 
       if(nameVal) { 
         await supabaseClient.from('staff_directory').insert([{ name: nameVal }]); 
-        document.getElementById('new-staff-name').value = ''; 
-        loadSettingsData(); 
-        showToast("Staff added successfully", "success");
+        document.getElementById('new-staff-name').value = ''; loadSettingsData(); showToast("Staff added successfully", "success");
       }
     });
     
-    // THE FIX: ADDED PASSWORD EXTRACTION AND VALIDATION
     document.getElementById('add-branch-btn').addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-branch-name').value;
       const emailVal = document.getElementById('new-branch-email').value;
-      const passVal = document.getElementById('new-branch-pass').value; // Get Password
+      const passVal = document.getElementById('new-branch-pass').value; 
       const ipVal = document.getElementById('new-branch-ip').value; 
       
       if(nameVal && emailVal && passVal) { 
-        await supabaseClient.from('branches_directory').insert([{ 
-            branch_name: nameVal, 
-            email: emailVal, 
-            password: passVal, // Insert Password
-            ip_address: ipVal 
-        }]); 
-        document.getElementById('new-branch-name').value = ''; 
-        document.getElementById('new-branch-email').value = ''; 
-        document.getElementById('new-branch-pass').value = ''; 
-        document.getElementById('new-branch-ip').value = ''; 
-        loadSettingsData(); 
-        showToast("Branch registered successfully", "success");
-      } else {
-        showToast("Branch Name, Email, and Password are mandatory.", "error");
-      }
+        await supabaseClient.from('branches_directory').insert([{ branch_name: nameVal, email: emailVal, password: passVal, ip_address: ipVal }]); 
+        document.getElementById('new-branch-name').value = ''; document.getElementById('new-branch-email').value = ''; 
+        document.getElementById('new-branch-pass').value = ''; document.getElementById('new-branch-ip').value = ''; 
+        loadSettingsData(); showToast("Branch registered successfully", "success");
+      } else { showToast("Branch Name, Email, and Password are mandatory.", "error"); }
     });
 
     window.deleteStaffItem = async (rowId) => { 
       if(confirm("Are you sure you want to remove this staff member?")) {
-        await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
-        loadSettingsData(); 
-        showToast("Staff removed", "primary");
+        await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary");
       }
     };
     
     window.deleteBranchItem = async (rowId) => { 
       if(confirm("Are you sure you want to remove this branch? Terminal access will break if email is used.")) {
-        await supabaseClient.from('branches_directory').delete().eq('id', rowId); 
-        loadSettingsData(); 
-        showToast("Branch removed", "primary");
+        await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Branch removed", "primary");
       }
     };
 
-    // --- DATA EXPORTS ---
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault(); 
         const exportType = e.target.getAttribute('data-export');
         const columnHeaders = ["Date", "Staff Name", "First In", "Last Out", "Total Hours", "Status", "Branch List"];
         
-        // Export currently viewed subset based on Sub-Tab filter
         let dataToExport = processedData;
         if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate);
         if (activeSubTab === 'short') dataToExport = processedData.filter(r => (r.lastOut - r.firstIn) < 36000000);
 
         const exportRows = dataToExport.map(d => [
-          d.date.toLocaleDateString(), 
-          d.name, 
-          d.firstIn ? d.firstIn.toLocaleTimeString() : 'N/A', 
-          d.lastOut ? d.lastOut.toLocaleTimeString() : 'N/A', 
-          d.formattedHours, 
-          d.isLate ? "Late" : (d.hasException ? d.hasException : "On Time"),
-          d.branches || "-"
+          d.date.toLocaleDateString(), d.name, d.firstIn ? d.firstIn.toLocaleTimeString() : 'N/A', 
+          d.lastOut ? d.lastOut.toLocaleTimeString() : 'N/A', d.formattedHours, 
+          d.isLate ? "Late" : (d.hasException ? d.hasException : "On Time"), d.branches || "-"
         ]);
 
         if (exportType === 'csv') {
           if (exportRows.length === 0) return showToast("No data available to export.", "error");
           let csvString = columnHeaders.join(",") + "\n" + exportRows.map(r => `"${r.join('","')}"`).join("\n");
-          const anchor = document.createElement("a"); 
-          anchor.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csvString); 
-          anchor.download = `RJ_Mobile_Report.csv`; 
-          anchor.click();
-        
+          const anchor = document.createElement("a"); anchor.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csvString); anchor.download = `RJ_Mobile_Report.csv`; anchor.click();
         } else if (exportType === 'pdf') {
           const containerTarget = document.getElementById('export-container');
           html2pdf().set({ margin: 10, filename: `RJ_Mobile_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(containerTarget).save();
-        
         } else if (exportType === 'xls') {
            if (exportRows.length === 0) return showToast("No data available to export.", "error");
            let htmlTableString = '<table><tr>' + columnHeaders.map(h => `<th>${h}</th>`).join('') + '</tr>';
            htmlTableString += exportRows.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') + '</table>';
-           
            const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${htmlTableString}</body></html>`;
-           const anchor = document.createElement("a"); 
-           anchor.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); 
-           anchor.download = `RJ_Mobile_Report.xls`; 
-           anchor.click();
-        
+           const anchor = document.createElement("a"); anchor.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); anchor.download = `RJ_Mobile_Report.xls`; anchor.click();
         } else if (exportType === 'copy') {
            if (exportRows.length === 0) return showToast("No data available to copy.", "error");
            const clipboardText = columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
