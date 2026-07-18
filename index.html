@@ -1072,13 +1072,23 @@
         branchSelect.value = currentBranchSelection;
       }
 
-      masterStaffList = (staffData || []).map(s => s.name);
-      const newStaffSet = new Set();
-      masterStaffList.forEach(name => {
-          if (selectedStaff.has(name) || !selectedStaff.size) newStaffSet.add(name);
+      // 👇👇 YAHAN FIX KIYA GAYA HAI 👇👇
+      const fetchedStaffNames = (staffData || []).map(s => s.name);
+      fetchedStaffNames.forEach(name => {
+          // Naye staff ko automatically 'selected' list me daal do
+          if (!masterStaffList.includes(name)) {
+              selectedStaff.add(name);
+          }
       });
-      selectedStaff = newStaffSet;
+      masterStaffList = fetchedStaffNames;
+      
       renderStaffFilterCheckboxes();
+      
+      // Data ko instantly dashboard aur absent list me reflect karne ke liye
+      if(dbLogs.length > 0) {
+          processStitchedData(); 
+      }
+      // 👆👆 FIX KHATAM 👆👆
     }
     
     // --- STAFF ADD FUNCTION ADDED HERE ---
