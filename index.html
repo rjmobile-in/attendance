@@ -528,14 +528,26 @@
       showToast("Settings saved to session cache!", "success");
     });
 
+    // Naya variable debounce ke liye
+    let syncDebounceTimer = null;
+
     function setupRealtimeSync() {
       const isSyncOn = document.getElementById('sync-toggle').checked;
       if (isSyncOn && !realtimeSubscription) {
         realtimeSubscription = supabaseClient
           .channel('public:attendance_logs')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, payload => {
-            showToast("Live data update detected. Syncing...", "primary");
-            fetchLogsFromDatabase(true); 
+            
+            // 🔥 FIX: Debounce logic add kiya gaya hai
+            // Agar pehle se timer chal raha hai, toh usko cancel karo
+            if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+            
+            // Naya timer start karo (1000ms = 1 second)
+            syncDebounceTimer = setTimeout(() => {
+                showToast("Live data update detected. Syncing...", "primary");
+                fetchLogsFromDatabase(true); 
+            }, 1000); 
+
           })
           .subscribe();
       } else if (!isSyncOn && realtimeSubscription) {
