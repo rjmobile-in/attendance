@@ -1092,20 +1092,35 @@
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
       
+      // 1. Update Settings Menu Tables
       const staffTbody = document.getElementById('staff-settings-list');
       staffTbody.innerHTML = (staffData || []).map(s => `<tr><td>${s.name}</td><td style="text-align:right"><button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button></td></tr>`).join('');
       
       const branchTbody = document.getElementById('branch-settings-list');
       branchTbody.innerHTML = (branchesData || []).map(b => `<tr><td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td><td style="text-align:right"><button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button></td></tr>`).join('');
-    }
-    
-    document.getElementById('add-staff-btn').addEventListener('click', async () => { 
-      const nameVal = document.getElementById('new-staff-name').value; 
-      if(nameVal) { 
-        await supabaseClient.from('staff_directory').insert([{ name: nameVal }]); 
-        document.getElementById('new-staff-name').value = ''; loadSettingsData(); showToast("Staff added successfully", "success");
+
+      // 2. LIVE UPDATE - Main Branch Dropdown Filter
+      const branchSelect = document.getElementById('global-branch');
+      const currentBranchSelection = branchSelect.value;
+      branchSelect.innerHTML = '<option value="All">All Branches</option>';
+      (branchesData || []).forEach(b => {
+        branchSelect.innerHTML += `<option value="${b.branch_name}">${b.branch_name}</option>`;
+      });
+      // Selection maintain rakhne ke liye
+      if ([...branchSelect.options].some(o => o.value === currentBranchSelection)) {
+        branchSelect.value = currentBranchSelection;
       }
-    });
+
+      // 3. LIVE UPDATE - Staff Checkboxes
+      masterStaffList = (staffData || []).map(s => s.name);
+      const newStaffSet = new Set();
+      masterStaffList.forEach(name => {
+          // Naye staff ko by-default checked rakho
+          if (selectedStaff.has(name) || !selectedStaff.size) newStaffSet.add(name);
+      });
+      selectedStaff = newStaffSet;
+      renderStaffFilterCheckboxes();
+    }
     
     document.getElementById('add-branch-btn').addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-branch-name').value;
