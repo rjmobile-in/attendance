@@ -140,7 +140,7 @@
     .action-link { color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; margin-right: 12px; }
     .action-link:hover { color: var(--primary-hover); }
 
-    /* Settings UI (New) */
+    /* Settings UI */
     .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; }
     .settings-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; }
     .del-btn { color: var(--danger); cursor: pointer; font-weight: bold; background: var(--danger-alpha); border: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; }
@@ -427,7 +427,7 @@
   </div>
 
   <script>
-    // --- SUPABASE CREDENTIALS DIRECTLY INTEGRATED ---
+    // --- SUPABASE CREDENTIALS DIRECTLY INTEGRATED & FIXED VARIABLE SHADOWING ---
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlenVtYXB6bHNqbmtpdHh2c3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTY2NjUsImV4cCI6MjA5OTkzMjY2NX0.IVUZVjZUuiM9qTcKAIIxJth_zSIGJUWTaubUV4Fy0_Y';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -516,7 +516,7 @@
 
     // --- SUPABASE AUTHENTICATION ---
     
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
@@ -535,7 +535,7 @@
       const email = document.getElementById('email-input').value;
       const password = document.getElementById('password-input').value;
       
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       
       if (error) {
         document.getElementById('global-loader').style.display = 'none';
@@ -545,7 +545,7 @@
     });
 
     document.getElementById('logout-btn').addEventListener('click', () => {
-      supabase.auth.signOut();
+      supabaseClient.auth.signOut();
     });
 
     // --- INITIALIZATION & LAZY DELETE ---
@@ -557,13 +557,13 @@
       await executeLazyPhotoDelete();
       
       // Fetch Staff List from Supabase
-      const { data: staffData } = await supabase.from('staff_directory').select('name').order('name');
+      const { data: staffData } = await supabaseClient.from('staff_directory').select('name').order('name');
       masterStaffList = (staffData || []).map(s => s.name);
       selectedStaff = new Set(masterStaffList);
       renderStaffFilterCheckboxes();
 
       // Fetch Branch List from Supabase
-      const { data: branchesData } = await supabase.from('branches_directory').select('branch_name').order('branch_name');
+      const { data: branchesData } = await supabaseClient.from('branches_directory').select('branch_name').order('branch_name');
       const branchSelect = document.getElementById('global-branch');
       branchSelect.innerHTML = '<option value="All">All Branches</option>';
       (branchesData || []).forEach(b => {
@@ -572,18 +572,15 @@
 
       document.getElementById('global-loader').style.display = 'none';
       
-      // Wait for user to click "Apply & Fetch" instead of loading massive DB initially, 
-      // but we will do a first load to populate UI.
       await fetchLogsFromDatabase();
     }
 
     async function executeLazyPhotoDelete() {
-      // Deletes base64 string if the photo was reviewed AND is older than 7 days
       const cutoffDate = new Date(); 
       cutoffDate.setDate(cutoffDate.getDate() - 7);
       
       try {
-        await supabase.from('attendance_logs')
+        await supabaseClient.from('attendance_logs')
           .update({ photo_capture: null })
           .eq('uniform_reviewed', true)
           .lte('timestamp', cutoffDate.toISOString());
@@ -643,7 +640,7 @@
       const endISO = endObj.toISOString();
 
       // Fetch Logs for the exact date range
-      const { data: logsData, error: logsError } = await supabase
+      const { data: logsData, error: logsError } = await supabaseClient
         .from('attendance_logs')
         .select('*')
         .gte('timestamp', startISO)
@@ -655,7 +652,7 @@
       const startOnlyDate = startISO.split('T')[0];
       const endOnlyDate = endISO.split('T')[0];
       
-      const { data: excData } = await supabase
+      const { data: excData } = await supabaseClient
         .from('attendance_exceptions')
         .select('*')
         .gte('date', startOnlyDate)
@@ -721,7 +718,6 @@
             let firstInTime = firstInLog ? new Date(firstInLog.timestamp) : null;
             let lastOutTime = clockOuts.length > 0 ? new Date(clockOuts[clockOuts.length - 1].timestamp) : null;
 
-            // Auto-complete unfinished shift if not today
             if (firstInTime && !lastOutTime && dateStringMatch !== new Date().toDateString()) { 
               lastOutTime = new Date(firstInTime); 
               lastOutTime.setHours(22, 0, 0, 0); 
@@ -764,20 +760,16 @@
         });
       });
 
-      // Sort newest dates first
       processedData.sort((a,b) => b.date - a.date);
       missingData.sort((a,b) => b.date - a.date);
 
-      // Update Widgets
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
       document.getElementById('metric-absent').innerText = totalMissing;
 
-      // Render Tables
       renderMasterTable(); 
       renderAbsentTable();
       
-      // If Matrix view is currently active, re-generate it
       if (document.getElementById('view-matrix').style.display === 'block') {
         generateMatrix();
       }
@@ -802,7 +794,6 @@
           ? `<span class="badge bg-orange">${row.hasException}</span>` 
           : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
         
-        // Uniform Cell Construction
         let uniformHtml = '';
         if (row.uniformReviewed) {
            uniformHtml = `<div style="font-size: 12px; line-height:1.5;">Shirt: ${row.uTshirt?'✅':'❌'}<br>ID: ${row.uIdcard?'✅':'❌'}</div>`;
@@ -853,12 +844,10 @@
       saveBtn.disabled = true;
 
       try {
-        // Only updates status, DOES NOT set base64 to null (leaves that to the lazy delete cron)
-        await supabase.from('attendance_logs')
+        await supabaseClient.from('attendance_logs')
           .update({ uniform_reviewed: true, uniform_tshirt: isTshirtPresent, uniform_idcard: isIdCardPresent })
           .eq('id', currentReviewLogId);
         
-        // Update local array to instantly reflect on screen
         const logIndex = dbLogs.findIndex(l => l.id === currentReviewLogId);
         if(logIndex !== -1) { 
           dbLogs[logIndex].uniform_reviewed = true; 
@@ -867,7 +856,7 @@
         }
 
         document.getElementById('review-modal').style.display = 'none'; 
-        processStitchedData(); // Re-render table
+        processStitchedData(); 
 
       } catch (err) {
         alert("Failed to save audit.");
@@ -920,17 +909,16 @@
       const reasonVal = document.getElementById('exc-reason').value;
       
       try {
-        await supabase.from('attendance_exceptions').upsert({ 
+        await supabaseClient.from('attendance_exceptions').upsert({ 
           employee_name: activeExceptionName, 
           date: activeExceptionDate, 
           reason: reasonVal 
-        }, { onConflict: 'employee_name, date' }); // Requires UNIQUE constraint in DB
+        }, { onConflict: 'employee_name, date' }); 
         
-        // Update local object
         exceptionsData[`${activeExceptionName}_${activeExceptionDate}`] = { reason: reasonVal };
         
         document.getElementById('exception-modal').style.display = 'none'; 
-        processStitchedData(); // Refresh UI
+        processStitchedData(); 
       } catch (err) {
         alert("Failed to save Exception.");
       }
@@ -948,7 +936,6 @@
         return;
       }
       
-      // Reverse dates so newest is on the left
       const dateList = getDatesArray().reverse();
       
       headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + 
@@ -976,12 +963,11 @@
       }).join('');
     }
 
-    // --- SYSTEM SETTINGS CRUD (NEW) ---
+    // --- SYSTEM SETTINGS CRUD ---
 
     async function loadSettingsData() {
-      // Fetch fresh data
-      const { data: staffData } = await supabase.from('staff_directory').select('*').order('name');
-      const { data: branchesData } = await supabase.from('branches_directory').select('*').order('branch_name');
+      const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
+      const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
       
       const staffTbody = document.getElementById('staff-settings-list');
       staffTbody.innerHTML = (staffData || []).map(s => 
@@ -1006,9 +992,9 @@
     document.getElementById('add-staff-btn').addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-staff-name').value; 
       if(nameVal) { 
-        await supabase.from('staff_directory').insert([{ name: nameVal }]); 
+        await supabaseClient.from('staff_directory').insert([{ name: nameVal }]); 
         document.getElementById('new-staff-name').value = ''; 
-        loadSettingsData(); // Refresh grid
+        loadSettingsData(); 
       }
     });
     
@@ -1018,7 +1004,7 @@
       const ipVal = document.getElementById('new-branch-ip').value; 
       
       if(nameVal && emailVal) { 
-        await supabase.from('branches_directory').insert([{ branch_name: nameVal, email: emailVal, ip_address: ipVal }]); 
+        await supabaseClient.from('branches_directory').insert([{ branch_name: nameVal, email: emailVal, ip_address: ipVal }]); 
         document.getElementById('new-branch-name').value = ''; 
         document.getElementById('new-branch-email').value = ''; 
         document.getElementById('new-branch-ip').value = ''; 
@@ -1030,14 +1016,14 @@
 
     window.deleteStaffItem = async (rowId) => { 
       if(confirm("Are you sure you want to remove this staff member?")) {
-        await supabase.from('staff_directory').delete().eq('id', rowId); 
+        await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
         loadSettingsData(); 
       }
     };
     
     window.deleteBranchItem = async (rowId) => { 
       if(confirm("Are you sure you want to remove this branch? Terminal access will break if email is used.")) {
-        await supabase.from('branches_directory').delete().eq('id', rowId); 
+        await supabaseClient.from('branches_directory').delete().eq('id', rowId); 
         loadSettingsData(); 
       }
     };
