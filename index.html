@@ -442,7 +442,7 @@
     </div>
   </div>
 
-  <script type="module">
+<script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
@@ -469,6 +469,14 @@
     let currentReviewLogId = null;
     let realtimeSubscription = null;
     let isAppInitialized = false;
+
+    // 🔥 SAFE DATE FORMATTER (Timezone Issue Fix for India)
+    const toLocalISO = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     function showToast(message, type = 'primary') {
       const container = document.getElementById('toast-container');
@@ -716,10 +724,11 @@
       } catch (err) { }
     }
 
+    // 🔥 FIX 1: Filter Sync instantly updates Absent Table
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
       container.innerHTML = masterStaffList.map(name => 
-        `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" checked> <span>${name}</span></label>`
+        `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" ${selectedStaff.has(name) ? "checked" : ""}> <span>${name}</span></label>`
       ).join('');
       
       document.querySelectorAll('.staff-cb').forEach(cb => {
@@ -727,21 +736,24 @@
           if(e.target.checked) selectedStaff.add(e.target.value); 
           else selectedStaff.delete(e.target.value);
           updateStaffButtonText();
+          processStitchedData(); // Updates Absents instantly
         });
       });
       
       document.getElementById('btn-select-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { cb.checked = true; cb.parentElement.style.display = 'flex'; }); 
-        selectedStaff = new Set(masterStaffList); 
-        document.getElementById('staff-search').value = ''; 
+        document.querySelectorAll('.staff-cb').forEach(cb => { 
+            if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaff.add(cb.value); }
+        }); 
         updateStaffButtonText();
+        processStitchedData(); // Updates Absents instantly
       });
       
       document.getElementById('btn-deselect-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { cb.checked = false; cb.parentElement.style.display = 'flex'; }); 
-        selectedStaff.clear(); 
-        document.getElementById('staff-search').value = ''; 
+        document.querySelectorAll('.staff-cb').forEach(cb => { 
+            if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaff.delete(cb.value); }
+        }); 
         updateStaffButtonText();
+        processStitchedData(); // Updates Absents instantly
       });
       
       updateStaffButtonText();
@@ -792,8 +804,10 @@
       document.getElementById('prev-page-btn').disabled = currentPage === 0;
       document.getElementById('next-page-btn').disabled = (currentPage + 1) * pageSize >= totalRecords;
 
-      const startOnlyDate = startISO.split('T')[0];
-      const endOnlyDate = endISO.split('T')[0];
+      // Safe date formatter used
+      const startOnlyDate = toLocalISO(startDate);
+      const endOnlyDate = toLocalISO(endDate);
+      
       const { data: excData } = await supabaseClient
         .from('attendance_exceptions')
         .select('*')
@@ -811,11 +825,22 @@
       processStitchedData();
     }
 
+    // 🔥 FIX 2: Generate True Calendar Dates (So 'Absent' checks today even if no logs exist)
     function getDatesArrayFromFetchedLogs() {
-      if (dbLogs.length === 0) return [];
-      const datesSet = new Set();
-      dbLogs.forEach(log => { datesSet.add(new Date(log.timestamp).toDateString()); });
-      return Array.from(datesSet).map(d => new Date(d)).sort((a,b) => b - a);
+      const datesArray = [];
+      let curr = new Date(startDate);
+      curr.setHours(0,0,0,0);
+      let end = new Date(endDate);
+      end.setHours(23,59,59,999);
+      
+      let limit = new Date(); limit.setHours(23,59,59,999);
+      if (end > limit) end = limit; // Don't show absents for future days
+
+      while (curr <= end) {
+        datesArray.push(new Date(curr));
+        curr.setDate(curr.getDate() + 1);
+      }
+      return datesArray.sort((a,b) => b - a);
     }
 
     function processStitchedData() {
@@ -829,7 +854,7 @@
 
       dateArray.forEach(targetDate => {
         const dateStringMatch = targetDate.toDateString();
-        const isoDateStr = targetDate.toISOString().split('T')[0];
+        const isoDateStr = toLocalISO(targetDate); // Timezone safe format
 
         filteredStaffNames.forEach(staffName => {
           let dailyLogs = dbLogs.filter(log => log.employee_name === staffName && new Date(log.timestamp).toDateString() === dateStringMatch);
@@ -894,7 +919,7 @@
 
       let unexcusedCount = 0;
       missingData.forEach(row => {
-        const isoDate = row.date.toISOString().split('T')[0];
+        const isoDate = toLocalISO(row.date);
         if (!exceptionsData[`${row.name}_${isoDate}`]) unexcusedCount++;
       });
       const badge = document.getElementById('absent-badge');
@@ -995,7 +1020,7 @@
       if (missingData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in currently loaded data.</td></tr>'; return; }
       
       tbody.innerHTML = missingData.map(row => {
-        const isoDate = row.date.toISOString().split('T')[0];
+        const isoDate = toLocalISO(row.date);
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
         
         const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
@@ -1036,7 +1061,7 @@
         let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10;">${staffName}</td>`;
         
         dateList.forEach(dateObj => {
-          const dateStringMatch = dateObj.toDateString(); const isoDateStr = dateObj.toISOString().split('T')[0];
+          const dateStringMatch = dateObj.toDateString(); const isoDateStr = toLocalISO(dateObj);
           const dailyLogs = dbLogs.filter(l => l.employee_name === staffName && new Date(l.timestamp).toDateString() === dateStringMatch);
           
           if(dailyLogs.length === 0) {
@@ -1072,10 +1097,9 @@
         branchSelect.value = currentBranchSelection;
       }
 
-      // 👇👇 YAHAN FIX KIYA GAYA HAI 👇👇
+      // Automatically tick new staff so they appear everywhere
       const fetchedStaffNames = (staffData || []).map(s => s.name);
       fetchedStaffNames.forEach(name => {
-          // Naye staff ko automatically 'selected' list me daal do
           if (!masterStaffList.includes(name)) {
               selectedStaff.add(name);
           }
@@ -1083,15 +1107,9 @@
       masterStaffList = fetchedStaffNames;
       
       renderStaffFilterCheckboxes();
-      
-      // Data ko instantly dashboard aur absent list me reflect karne ke liye
-      if(dbLogs.length > 0) {
-          processStitchedData(); 
-      }
-      // 👆👆 FIX KHATAM 👆👆
+      processStitchedData(); // 🔥 Instantly pushes to Absent Table without refresh
     }
     
-    // --- STAFF ADD FUNCTION ADDED HERE ---
     document.getElementById('add-staff-btn').addEventListener('click', async () => {
       const nameVal = document.getElementById('new-staff-name').value.trim();
       
@@ -1102,7 +1120,6 @@
 
         try {
           const { error } = await supabaseClient.from('staff_directory').insert([{ name: nameVal }]);
-          
           if(error) throw error;
           
           document.getElementById('new-staff-name').value = ''; 
