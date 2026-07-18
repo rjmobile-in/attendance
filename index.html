@@ -101,12 +101,12 @@
     /* Dashboard Layout */
     #dashboard { display: none; max-width: 1300px; margin: 0 auto; }
     
-    /* 🔥 FIX 1: Added relative and z-index to header to fix Dropdown overlap issue */
+    /* Header Dropdown fix */
     .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: 20px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; position: relative; z-index: 50; }
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     
     /* Filters */
-    .filter-bar { display: flex; align-items: center; gap: 16px; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-bar { display: flex; align-items: center; gap: 12px; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 24px; flex-wrap: wrap; }
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
     .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); }
     
@@ -118,14 +118,16 @@
     .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; border-radius: 10px; transition: 0.2s; }
     .dropdown-content.export-menu a:hover { background-color: var(--primary-alpha); color: var(--primary); }
 
-    /* Multi-Select Staff */
+    /* Multi-Select */
     .multi-select-actions { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
     .multi-select-actions button { flex: 1; padding: 8px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
     .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary); }
     .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; }
     .check-wrap:hover { background: var(--input-bg); }
     .check-wrap input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
-    .staff-list-container { max-height: 250px; overflow-y: auto; }
+    .list-container { max-height: 250px; overflow-y: auto; padding-right: 4px; }
+    .list-container::-webkit-scrollbar { width: 4px; }
+    .list-container::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
 
     /* Tabs & Sub-Tabs */
     .tab-controls { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 24px; overflow-x: auto; }
@@ -243,27 +245,52 @@
 
     <!-- Global Filter Bar -->
     <div class="filter-bar">
+      
+      <!-- Date Presets Dropdown -->
+      <div class="filter-group">
+        <label>Date Range</label>
+        <select id="quick-date-preset" class="input-field" style="margin: 0; width: 140px; padding: 10px;">
+          <option value="today" selected>Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="last_week">Last 7 Days</option>
+          <option value="last_month">Last 30 Days</option>
+          <option value="custom">Custom Range</option>
+        </select>
+      </div>
+
       <div class="filter-group">
         <label>Start Date</label>
-        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 140px; padding: 10px;" placeholder="Start Date" />
+        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 120px; padding: 10px;" placeholder="Start Date" />
       </div>
       
       <div class="filter-group">
         <label>End Date</label>
-        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 140px; padding: 10px;" placeholder="End Date" />
+        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 120px; padding: 10px;" placeholder="End Date" />
       </div>
       
-      <div class="filter-group">
-        <label>Branch Filter</label>
-        <select id="global-branch" class="input-field" style="margin: 0; width: 200px; padding: 10px;">
-          <option value="All">All Branches</option>
-          <!-- Populated by JS -->
-        </select>
+      <!-- NEW: Multi-Select Branch Filter -->
+      <div class="filter-group dropdown" id="branch-filter-dropdown">
+        <label>Filter Branch</label>
+        <button id="branch-filter-btn" class="input-field" style="margin: 0; width: 190px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+          <span id="branch-btn-text">Loading...</span> 
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="branch-dropdown-box">
+          <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 8px; padding: 8px; font-size: 13px;">
+          <div class="multi-select-actions">
+            <button id="btn-select-all-branches">Select All</button>
+            <button id="btn-deselect-all-branches">Clear All</button>
+          </div>
+          <div class="list-container" id="branch-checkboxes">
+            <!-- Populated by JS -->
+          </div>
+        </div>
       </div>
 
+      <!-- Multi-Select Staff Filter -->
       <div class="filter-group dropdown" id="staff-filter-dropdown">
         <label>Filter Staff</label>
-        <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 220px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 190px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="staff-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -273,7 +300,7 @@
             <button id="btn-select-all">Select All</button>
             <button id="btn-deselect-all">Clear All</button>
           </div>
-          <div class="staff-list-container" id="staff-checkboxes">
+          <div class="list-container" id="staff-checkboxes">
             <!-- Populated by JS -->
           </div>
         </div>
@@ -474,14 +501,18 @@
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let masterStaffList = [];
+    let masterBranchList = [];
     let dbLogs = [];
     let exceptionsData = {}; 
     let processedData = []; 
     let missingData = [];
     
-    let startDate = new Date(); startDate.setDate(startDate.getDate() - 6);
+    // 🔥 Default dates set to TODAY
+    let startDate = new Date(); 
     let endDate = new Date();
+    
     let selectedStaff = new Set();
+    let selectedBranches = new Set();
     
     let currentPage = 0;
     const pageSize = 50;
@@ -494,7 +525,7 @@
     let realtimeSubscription = null;
     let isAppInitialized = false;
 
-    // 🔥 SAFE DATE FORMATTER (Timezone Issue Fix for India)
+    // SAFE DATE FORMATTER (Timezone Issue Fix for India)
     const toLocalISO = (d) => {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -522,32 +553,23 @@
     });
 
     document.getElementById('save-settings-btn').addEventListener('click', () => {
-      const branch = document.getElementById('global-branch').value;
       const sync = document.getElementById('sync-toggle').checked;
-      localStorage.setItem('rj_settings', JSON.stringify({ branch, sync }));
+      localStorage.setItem('rj_settings', JSON.stringify({ sync }));
       showToast("Settings saved to session cache!", "success");
     });
 
-    // Naya variable debounce ke liye
-    let syncDebounceTimer = null;
-
+    let lastSyncTime = 0;
     function setupRealtimeSync() {
       const isSyncOn = document.getElementById('sync-toggle').checked;
       if (isSyncOn && !realtimeSubscription) {
         realtimeSubscription = supabaseClient
           .channel('public:attendance_logs')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, payload => {
-            
-            // 🔥 FIX: Debounce logic add kiya gaya hai
-            // Agar pehle se timer chal raha hai, toh usko cancel karo
-            if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
-            
-            // Naya timer start karo (1000ms = 1 second)
-            syncDebounceTimer = setTimeout(() => {
-                showToast("Live data update detected. Syncing...", "primary");
+            const currentTime = Date.now();
+            if (currentTime - lastSyncTime > 2000) {
+                lastSyncTime = currentTime;
                 fetchLogsFromDatabase(true); 
-            }, 1000); 
-
+            }
           })
           .subscribe();
       } else if (!isSyncOn && realtimeSubscription) {
@@ -592,6 +614,10 @@
       });
     });
 
+    // -------------------------------------------------------------------
+    // DROPDOWNS & FILTER LOGIC (Staff, Branch, Date)
+    // -------------------------------------------------------------------
+
     document.getElementById('export-btn').addEventListener('click', (e) => { 
       e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); 
     });
@@ -599,8 +625,13 @@
     document.getElementById('staff-filter-btn').addEventListener('click', (e) => { 
       e.stopPropagation(); document.getElementById('staff-dropdown-box').classList.toggle('show'); 
     });
+
+    document.getElementById('branch-filter-btn').addEventListener('click', (e) => { 
+      e.stopPropagation(); document.getElementById('branch-dropdown-box').classList.toggle('show'); 
+    });
     
     document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
+    document.getElementById('branch-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
     
     window.addEventListener('click', (e) => { 
       if(!e.target.closest('#export-dropdown')) {
@@ -611,18 +642,53 @@
         const stBox = document.getElementById('staff-dropdown-box');
         if(stBox) stBox.classList.remove('show');
       }
+      if(!e.target.closest('#branch-filter-dropdown')) {
+        const brBox = document.getElementById('branch-dropdown-box');
+        if(brBox) brBox.classList.remove('show');
+      }
     });
 
-    flatpickr("#global-start", { 
+    // DATE PRESET LOGIC
+    let fpStart = flatpickr("#global-start", { 
       defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
-      onChange: (dates) => { if(dates[0]) startDate = dates[0]; }
+      onChange: (dates) => { 
+          if(dates[0]) { startDate = dates[0]; document.getElementById('quick-date-preset').value = 'custom'; } 
+      }
     });
     
-    flatpickr("#global-end", { 
+    let fpEnd = flatpickr("#global-end", { 
       defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
-      onChange: (dates) => { if(dates[0]) endDate = dates[0]; }
+      onChange: (dates) => { 
+          if(dates[0]) { endDate = dates[0]; document.getElementById('quick-date-preset').value = 'custom'; } 
+      }
     });
 
+    document.getElementById('quick-date-preset').addEventListener('change', (e) => {
+        const val = e.target.value;
+        const now = new Date();
+        let sDate = new Date();
+        let eDate = new Date();
+
+        if (val === 'yesterday') {
+            sDate.setDate(now.getDate() - 1);
+            eDate.setDate(now.getDate() - 1);
+        } else if (val === 'last_week') {
+            sDate.setDate(now.getDate() - 7);
+        } else if (val === 'last_month') {
+            sDate.setDate(now.getDate() - 30);
+        }
+        // If 'today', sDate and eDate are naturally today.
+
+        if (val !== 'custom') {
+            startDate = sDate;
+            endDate = eDate;
+            fpStart.setDate(sDate);
+            fpEnd.setDate(eDate);
+            fetchLogsFromDatabase(false);
+        }
+    });
+
+    // PAGINATION
     document.getElementById('prev-page-btn').addEventListener('click', () => {
       if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); }
     });
@@ -630,6 +696,11 @@
     document.getElementById('next-page-btn').addEventListener('click', () => {
       if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); }
     });
+
+
+    // -------------------------------------------------------------------
+    // AUTHENTICATION
+    // -------------------------------------------------------------------
 
     async function checkUser() {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -708,6 +779,10 @@
       await supabaseClient.auth.signOut();
     });
 
+    // -------------------------------------------------------------------
+    // INITIALIZATION & DATA FETCHING
+    // -------------------------------------------------------------------
+
     async function initialMetadataLoad() {
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
       
@@ -719,18 +794,13 @@
       renderStaffFilterCheckboxes();
 
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('branch_name').order('branch_name');
-      const branchSelect = document.getElementById('global-branch');
-      branchSelect.innerHTML = '<option value="All">All Branches</option>';
-      (branchesData || []).forEach(b => {
-        branchSelect.innerHTML += `<option value="${b.branch_name}">${b.branch_name}</option>`;
-      });
+      masterBranchList = (branchesData || []).map(b => b.branch_name);
+      selectedBranches = new Set(masterBranchList);
+      renderBranchFilterCheckboxes();
 
       const savedSettings = JSON.parse(localStorage.getItem('rj_settings') || '{}');
       if (savedSettings.sync !== undefined) {
         document.getElementById('sync-toggle').checked = savedSettings.sync;
-      }
-      if (savedSettings.branch && [...branchSelect.options].some(o => o.value === savedSettings.branch)) {
-        branchSelect.value = savedSettings.branch;
       }
 
       loadFromCache();
@@ -760,7 +830,8 @@
       } catch (err) { }
     }
 
-    // Filter Sync instantly updates Absent Table
+
+    // STAFF FILTER SYNC
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
       container.innerHTML = masterStaffList.map(name => 
@@ -797,7 +868,7 @@
 
     function updateStaffButtonText() {
       const btn = document.getElementById('staff-btn-text');
-      if(selectedStaff.size === masterStaffList.length) btn.innerText = "All Staff Selected";
+      if(selectedStaff.size === masterStaffList.length && masterStaffList.length > 0) btn.innerText = "All Staff Selected";
       else btn.innerText = `${selectedStaff.size} Selected`;
     }
 
@@ -809,6 +880,57 @@
         else { label.style.display = 'none'; }
       });
     });
+
+    // BRANCH FILTER SYNC
+    function renderBranchFilterCheckboxes() {
+      const container = document.getElementById('branch-checkboxes');
+      container.innerHTML = masterBranchList.map(name => 
+        `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${name}" ${selectedBranches.has(name) ? "checked" : ""}> <span>${name}</span></label>`
+      ).join('');
+      
+      document.querySelectorAll('.branch-cb').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          if(e.target.checked) selectedBranches.add(e.target.value); 
+          else selectedBranches.delete(e.target.value);
+          updateBranchButtonText();
+          processStitchedData(); 
+        });
+      });
+      
+      document.getElementById('btn-select-all-branches').addEventListener('click', () => {
+        document.querySelectorAll('.branch-cb').forEach(cb => { 
+            if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranches.add(cb.value); }
+        }); 
+        updateBranchButtonText();
+        processStitchedData(); 
+      });
+      
+      document.getElementById('btn-deselect-all-branches').addEventListener('click', () => {
+        document.querySelectorAll('.branch-cb').forEach(cb => { 
+            if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranches.delete(cb.value); }
+        }); 
+        updateBranchButtonText();
+        processStitchedData(); 
+      });
+      
+      updateBranchButtonText();
+    }
+
+    function updateBranchButtonText() {
+      const btn = document.getElementById('branch-btn-text');
+      if(selectedBranches.size === masterBranchList.length && masterBranchList.length > 0) btn.innerText = "All Branches Selected";
+      else btn.innerText = `${selectedBranches.size} Selected`;
+    }
+
+    document.getElementById('branch-search').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.branch-cb').forEach(cb => {
+        const label = cb.parentElement;
+        if (cb.value.toLowerCase().includes(term)) { label.style.display = 'flex'; } 
+        else { label.style.display = 'none'; }
+      });
+    });
+
 
     document.getElementById('refresh-data-btn').addEventListener('click', () => {
       fetchLogsFromDatabase(false); 
@@ -840,7 +962,6 @@
       document.getElementById('prev-page-btn').disabled = currentPage === 0;
       document.getElementById('next-page-btn').disabled = (currentPage + 1) * pageSize >= totalRecords;
 
-      // Safe date formatter used
       const startOnlyDate = toLocalISO(startDate);
       const endOnlyDate = toLocalISO(endDate);
       
@@ -886,7 +1007,6 @@
       
       const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
-      const selectedBranch = document.getElementById('global-branch').value;
 
       dateArray.forEach(targetDate => {
         const dateStringMatch = targetDate.toDateString();
@@ -896,10 +1016,11 @@
           let dailyLogs = dbLogs.filter(log => log.employee_name === staffName && new Date(log.timestamp).toDateString() === dateStringMatch);
           dailyLogs.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-          if (selectedBranch !== "All") {
-            const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => l.branch !== selectedBranch);
-            if (workedElsewhere) return; 
-            dailyLogs = dailyLogs.filter(l => l.branch === selectedBranch);
+          // Multi-Select Branch Filtering Check
+          if (selectedBranches.size !== masterBranchList.length) {
+            const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => !selectedBranches.has(l.branch));
+            if (workedElsewhere) return; // Ignore if they didn't work at a selected branch
+            dailyLogs = dailyLogs.filter(l => selectedBranches.has(l.branch));
           }
 
           const clockIns = dailyLogs.filter(l => l.action === 'Clock In');
@@ -1074,7 +1195,6 @@
     
     document.getElementById('btn-cancel-exc').addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
     
-    // 🔥 FIX 2: Prevent duplicate "Save Record" clicks
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
       const reasonVal = document.getElementById('exc-reason').value;
       const saveBtn = document.getElementById('btn-save-exc');
@@ -1136,17 +1256,15 @@
       const branchTbody = document.getElementById('branch-settings-list');
       branchTbody.innerHTML = (branchesData || []).map(b => `<tr><td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td><td style="text-align:right"><button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button></td></tr>`).join('');
 
-      const branchSelect = document.getElementById('global-branch');
-      const currentBranchSelection = branchSelect.value;
-      branchSelect.innerHTML = '<option value="All">All Branches</option>';
-      (branchesData || []).forEach(b => {
-        branchSelect.innerHTML += `<option value="${b.branch_name}">${b.branch_name}</option>`;
+      const fetchedBranchNames = (branchesData || []).map(b => b.branch_name);
+      fetchedBranchNames.forEach(name => {
+          if (!masterBranchList.includes(name)) {
+              selectedBranches.add(name);
+          }
       });
-      if ([...branchSelect.options].some(o => o.value === currentBranchSelection)) {
-        branchSelect.value = currentBranchSelection;
-      }
+      masterBranchList = fetchedBranchNames;
+      renderBranchFilterCheckboxes();
 
-      // Automatically tick new staff so they appear everywhere
       const fetchedStaffNames = (staffData || []).map(s => s.name);
       fetchedStaffNames.forEach(name => {
           if (!masterStaffList.includes(name)) {
@@ -1154,8 +1272,8 @@
           }
       });
       masterStaffList = fetchedStaffNames;
-      
       renderStaffFilterCheckboxes();
+      
       processStitchedData(); 
     }
     
@@ -1212,7 +1330,6 @@
       }
     };
 
-    // 🔥 FIX 3: Export dropdown now Auto-Closes on click
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault(); 
