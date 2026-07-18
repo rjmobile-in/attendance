@@ -722,19 +722,16 @@
     async function initialMetadataLoad() {
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
       
-      // Feature 8: Data Loading Cache
-      loadFromCache();
-
       // Implement Lazy Background Delete of old photos
       await executeLazyPhotoDelete();
       
-      // Fetch Staff List from Supabase
+      // 1. SABSE PEHLE STAFF LIST FETCH KARO (Taki cache ko naam mil sakein)
       const { data: staffData } = await supabaseClient.from('staff_directory').select('name').order('name');
       masterStaffList = (staffData || []).map(s => s.name);
       selectedStaff = new Set(masterStaffList);
       renderStaffFilterCheckboxes();
 
-      // Fetch Branch List from Supabase
+      // 2. BRANCH LIST FETCH KARO
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('branch_name').order('branch_name');
       const branchSelect = document.getElementById('global-branch');
       branchSelect.innerHTML = '<option value="All">All Branches</option>';
@@ -742,7 +739,7 @@
         branchSelect.innerHTML += `<option value="${b.branch_name}">${b.branch_name}</option>`;
       });
 
-      // Apply Saved Settings (Feature 2 continued)
+      // Apply Saved Settings 
       const savedSettings = JSON.parse(localStorage.getItem('rj_settings') || '{}');
       if (savedSettings.sync !== undefined) {
         document.getElementById('sync-toggle').checked = savedSettings.sync;
@@ -751,6 +748,10 @@
         branchSelect.value = savedSettings.branch;
       }
 
+      // 3. AB CACHE LOAD KARO (Kyunki ab system ko staff ke naam pata hain)
+      loadFromCache();
+
+      // 4. USKE BAAD FRESH DATA FETCH KARO
       await fetchLogsFromDatabase();
     }
 
