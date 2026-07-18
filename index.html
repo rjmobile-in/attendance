@@ -67,9 +67,28 @@
     /* Buttons */
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;}
     .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-secondary:hover { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
+    .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
     
+    /* Toggle Switch (Auto-Sync) */
+    .switch-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-soft); }
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--card-border); transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--success); }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    /* Custom Toasts */
+    #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+    .toast { padding: 12px 24px; border-radius: 10px; color: #fff; font-weight: 600; box-shadow: var(--shadow-soft); opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); font-size: 14px; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-primary { background: var(--primary); }
+    .toast-success { background: var(--success); }
+    .toast-error { background: var(--danger); }
+
     /* Loaders */
     #global-loader { position: fixed; inset: 0; background: rgba(var(--bg-base), 0.9); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
     .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
@@ -107,10 +126,15 @@
     .check-wrap input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
     .staff-list-container { max-height: 250px; overflow-y: auto; }
 
-    /* Tabs */
+    /* Tabs & Sub-Tabs */
     .tab-controls { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 24px; overflow-x: auto; }
-    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 24px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 24px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; }
     .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    
+    .sub-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; }
+    .sub-tab-btn { background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-soft); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .sub-tab-btn:hover { color: var(--text-main); }
+    .sub-tab-btn.active { background: var(--primary-alpha); color: var(--primary); border-color: var(--primary); }
 
     /* Draggable Widgets */
     .sortable-ghost { opacity: 0.4; background: var(--primary-alpha); border: 1px dashed var(--primary); }
@@ -160,6 +184,9 @@
   <!-- Loading State -->
   <div id="global-loader"><div class="spinner"></div><p id="loader-msg" style="color:var(--text-soft); font-weight: 600;">Authenticating...</p></div>
 
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <img src="logo.png" alt="RJ Mobile Logo" style="height: 64px; object-fit: contain; margin-bottom: 16px;" onerror="this.style.display='none'">
@@ -186,6 +213,15 @@
         </div>
       </div>
       <div class="header-controls">
+        <!-- Feature 1: Live Auto-Sync Toggle -->
+        <div class="switch-wrap">
+          Auto-Sync
+          <label class="switch" title="Enable Live Sync">
+            <input type="checkbox" id="sync-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        
         <div class="dropdown" id="export-dropdown">
           <button id="export-btn" class="btn-primary">
             Export <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
@@ -197,7 +233,10 @@
             <a href="#" data-export="xls">📈 Download Excel</a>
           </div>
         </div>
-        <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Reset Layout</button>
+        
+        <!-- Feature 2: Save Settings Button -->
+        <button id="save-settings-btn" class="btn-secondary">💾 Save Settings</button>
+        <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
         <button id="theme-toggle" class="btn-secondary" title="Toggle Theme">🌓</button>
         <button id="logout-btn" class="btn-secondary">Log Out</button>
       </div>
@@ -230,9 +269,11 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="staff-dropdown-box">
+          <!-- Feature 4: Searchable Staff Filter -->
+          <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 8px; padding: 8px; font-size: 13px;">
           <div class="multi-select-actions">
             <button id="btn-select-all">Select All</button>
-            <button id="btn-deselect-all">Deselect All</button>
+            <button id="btn-deselect-all">Clear All</button>
           </div>
           <div class="staff-list-container" id="staff-checkboxes">
             <!-- Populated by JS -->
@@ -246,7 +287,8 @@
     <!-- Navigation Tabs -->
     <div class="tab-controls">
       <button class="tab-btn active" data-view="view-overview">Overview & Logs</button>
-      <button class="tab-btn" data-view="view-absent">Absents & Exceptions</button>
+      <!-- Feature 5: Action Required Badge -->
+      <button class="tab-btn" data-view="view-absent">Absents & Exceptions <span id="absent-badge" class="badge bg-red" style="display:none; padding: 2px 6px; margin-left: 6px;">0</span></button>
       <button class="tab-btn" data-view="view-matrix">Attendance Matrix</button>
       <button class="tab-btn" data-view="view-settings">System Settings</button>
     </div>
@@ -280,6 +322,13 @@
           </div>
         </div>
 
+        <!-- Feature 6: Sub-Tabs Analytics -->
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" data-filter="all">All Logs</button>
+          <button class="sub-tab-btn" data-filter="late">Late Arrivals Only</button>
+          <button class="sub-tab-btn" data-filter="short">Short Hours (< 10h)</button>
+        </div>
+
         <!-- Master Data Table -->
         <div class="table-card">
           <div class="table-responsive">
@@ -294,9 +343,15 @@
                 </tr>
               </thead>
               <tbody id="master-tbody">
-                <tr><td colspan="5" style="text-align: center;">Click "Apply & Fetch Logs" to load data for selected dates.</td></tr>
+                <tr><td colspan="5" style="text-align: center;">Loading data...</td></tr>
               </tbody>
             </table>
+          </div>
+          <!-- Feature 3: Pagination Controls -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--card-bg); border-top: 1px solid var(--card-border);">
+            <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 50</button>
+            <span id="page-indicator" style="color: var(--text-soft); font-size: 13px; font-weight: 600;">Page 1</span>
+            <button id="next-page-btn" class="btn-secondary" disabled>Next 50 →</button>
           </div>
         </div>
       </div>
@@ -330,7 +385,7 @@
     <div id="view-matrix" class="app-view" style="display: none;">
       <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
         <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Attendance Matrix</h2>
-        <span style="color: var(--text-soft);">Showing dates from current global filter.</span>
+        <span style="color: var(--text-soft);">Showing dates derived from currently loaded logs.</span>
       </div>
 
       <div class="table-card">
@@ -439,14 +494,39 @@
     let processedData = []; 
     let missingData = [];
     
-    let startDate = new Date(); startDate.setDate(startDate.getDate() - 6); // Default 7 days
+    let startDate = new Date(); startDate.setDate(startDate.getDate() - 6);
     let endDate = new Date();
     let selectedStaff = new Set();
     
-    // Modal tracking
+    // Pagination & Sub-tabs state
+    let currentPage = 0;
+    const pageSize = 50;
+    let totalRecords = 0;
+    let activeSubTab = 'all';
+
+    // Modal tracking & Sync
     let activeExceptionName = null;
     let activeExceptionDate = null;
     let currentReviewLogId = null;
+    let realtimeSubscription = null;
+
+    // --- FEATURE 7: CUSTOM TOASTS ---
+    function showToast(message, type = 'primary') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerText = message;
+      container.appendChild(toast);
+      
+      // Trigger animation
+      setTimeout(() => { toast.classList.add('show'); }, 10);
+      
+      // Remove
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300); // Wait for transition
+      }, 3000);
+    }
 
     // --- UI INITIALIZATION & EVENT LISTENERS ---
     
@@ -456,6 +536,32 @@
       localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
       document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
     });
+
+    // Feature 2: Save Settings Cache
+    document.getElementById('save-settings-btn').addEventListener('click', () => {
+      const branch = document.getElementById('global-branch').value;
+      const sync = document.getElementById('sync-toggle').checked;
+      localStorage.setItem('rj_settings', JSON.stringify({ branch, sync }));
+      showToast("Settings saved to session cache!", "success");
+    });
+
+    // Feature 1: Setup Realtime Sync
+    function setupRealtimeSync() {
+      const isSyncOn = document.getElementById('sync-toggle').checked;
+      if (isSyncOn && !realtimeSubscription) {
+        realtimeSubscription = supabaseClient
+          .channel('public:attendance_logs')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, payload => {
+            showToast("Live data update detected. Syncing...", "primary");
+            fetchLogsFromDatabase(true); // true to prevent resetting page to 0
+          })
+          .subscribe();
+      } else if (!isSyncOn && realtimeSubscription) {
+        supabaseClient.removeChannel(realtimeSubscription);
+        realtimeSubscription = null;
+      }
+    }
+    document.getElementById('sync-toggle').addEventListener('change', setupRealtimeSync);
 
     // Draggable Widgets Setup
     Sortable.create(document.getElementById('draggable-widgets'), {
@@ -473,14 +579,24 @@
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
+        e.currentTarget.classList.add('active');
         document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
         
-        const viewId = e.target.getAttribute('data-view');
+        const viewId = e.currentTarget.getAttribute('data-view');
         document.getElementById(viewId).style.display = 'block';
         
         if (viewId === 'view-matrix') generateMatrix();
         if (viewId === 'view-settings') loadSettingsData();
+      });
+    });
+
+    // Feature 6: Sub-Tabs Analytics
+    document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeSubTab = e.target.getAttribute('data-filter');
+        renderMasterTable(); // Re-render table with new sub-tab filter
       });
     });
 
@@ -514,13 +630,21 @@
       onChange: (dates) => { if(dates[0]) endDate = dates[0]; }
     });
 
+    // Feature 3: Pagination Event Listeners
+    document.getElementById('prev-page-btn').addEventListener('click', () => {
+      if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); }
+    });
+    document.getElementById('next-page-btn').addEventListener('click', () => {
+      if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); }
+    });
+
     // --- SUPABASE AUTHENTICATION ---
-    
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         await initialMetadataLoad();
+        setupRealtimeSync();
       } else {
         document.getElementById('global-loader').style.display = 'none';
         document.getElementById('login-screen').style.display = 'block';
@@ -534,7 +658,6 @@
       
       const email = document.getElementById('email-input').value;
       const password = document.getElementById('password-input').value;
-      
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       
       if (error) {
@@ -548,12 +671,14 @@
       supabaseClient.auth.signOut();
     });
 
-    // --- INITIALIZATION & LAZY DELETE ---
-
+    // --- INITIALIZATION & CACHE ---
     async function initialMetadataLoad() {
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
       
-      // Feature 4: Lazy Background Delete of old photos
+      // Feature 8: Data Loading Cache
+      loadFromCache();
+
+      // Implement Lazy Background Delete of old photos
       await executeLazyPhotoDelete();
       
       // Fetch Staff List from Supabase
@@ -570,15 +695,35 @@
         branchSelect.innerHTML += `<option value="${b.branch_name}">${b.branch_name}</option>`;
       });
 
+      // Apply Saved Settings (Feature 2 continued)
+      const savedSettings = JSON.parse(localStorage.getItem('rj_settings') || '{}');
+      if (savedSettings.sync !== undefined) {
+        document.getElementById('sync-toggle').checked = savedSettings.sync;
+      }
+      if (savedSettings.branch && [...branchSelect.options].some(o => o.value === savedSettings.branch)) {
+        branchSelect.value = savedSettings.branch;
+      }
+
       document.getElementById('global-loader').style.display = 'none';
-      
       await fetchLogsFromDatabase();
+    }
+
+    // Feature 8 Implementation: Cache Loading
+    function loadFromCache() {
+      try {
+        const cachedLogs = localStorage.getItem('rj_cached_logs');
+        const cachedExceptions = localStorage.getItem('rj_cached_exceptions');
+        if (cachedLogs && cachedExceptions) {
+          dbLogs = JSON.parse(cachedLogs);
+          exceptionsData = JSON.parse(cachedExceptions);
+          processStitchedData(); // Render immediately before fresh network fetch
+        }
+      } catch(e) { console.error("Cache load error", e); }
     }
 
     async function executeLazyPhotoDelete() {
       const cutoffDate = new Date(); 
       cutoffDate.setDate(cutoffDate.getDate() - 7);
-      
       try {
         await supabaseClient.from('attendance_logs')
           .update({ photo_capture: null })
@@ -590,11 +735,10 @@
     }
 
     // --- DYNAMIC STAFF FILTER ---
-
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
       container.innerHTML = masterStaffList.map(name => 
-        `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" checked> ${name}</label>`
+        `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" checked> <span>${name}</span></label>`
       ).join('');
       
       document.querySelectorAll('.staff-cb').forEach(cb => {
@@ -606,14 +750,16 @@
       });
       
       document.getElementById('btn-select-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => cb.checked = true); 
+        document.querySelectorAll('.staff-cb').forEach(cb => { cb.checked = true; cb.parentElement.style.display = 'flex'; }); 
         selectedStaff = new Set(masterStaffList); 
+        document.getElementById('staff-search').value = ''; // clear search
         updateStaffButtonText();
       });
       
       document.getElementById('btn-deselect-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => cb.checked = false); 
+        document.querySelectorAll('.staff-cb').forEach(cb => { cb.checked = false; cb.parentElement.style.display = 'flex'; }); 
         selectedStaff.clear(); 
+        document.getElementById('staff-search').value = ''; // clear search
         updateStaffButtonText();
       });
       
@@ -626,32 +772,55 @@
       else btn.innerText = `${selectedStaff.size} Selected`;
     }
 
-    // --- CORE DATA FETCHING ---
-    
-    document.getElementById('refresh-data-btn').addEventListener('click', fetchLogsFromDatabase);
+    // Feature 4: Searchable Staff Filter Logic
+    document.getElementById('staff-search').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.staff-cb').forEach(cb => {
+        const label = cb.parentElement;
+        if (cb.value.toLowerCase().includes(term)) {
+          label.style.display = 'flex';
+        } else {
+          label.style.display = 'none';
+        }
+      });
+    });
 
-    async function fetchLogsFromDatabase() {
+    // --- CORE DATA FETCHING ---
+    document.getElementById('refresh-data-btn').addEventListener('click', () => {
+      fetchLogsFromDatabase(false); // false means reset pagination to 0
+    });
+
+    async function fetchLogsFromDatabase(keepPage = false) {
       document.getElementById('master-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center">Fetching records from Database...</td></tr>';
       
+      if (!keepPage) currentPage = 0; // Reset page on new filter apply
+
       const startISO = new Date(startDate).toISOString();
-      
       const endObj = new Date(endDate); 
       endObj.setHours(23, 59, 59);
       const endISO = endObj.toISOString();
 
-      // Fetch Logs for the exact date range
-      const { data: logsData, error: logsError } = await supabaseClient
+      // Feature 3: Fetch Logs with Pagination (.range limit 50)
+      const { data: logsData, error: logsError, count } = await supabaseClient
         .from('attendance_logs')
-        .select('*')
+        .select('*', { count: 'exact' })
         .gte('timestamp', startISO)
-        .lte('timestamp', endISO);
+        .lte('timestamp', endISO)
+        .order('timestamp', { ascending: false })
+        .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
         
       dbLogs = logsData || [];
+      totalRecords = count || 0;
+
+      // Update Pagination UI
+      const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+      document.getElementById('page-indicator').innerText = `Page ${currentPage + 1} of ${totalPages}`;
+      document.getElementById('prev-page-btn').disabled = currentPage === 0;
+      document.getElementById('next-page-btn').disabled = (currentPage + 1) * pageSize >= totalRecords;
 
       // Fetch Exceptions for the exact date range
       const startOnlyDate = startISO.split('T')[0];
       const endOnlyDate = endISO.split('T')[0];
-      
       const { data: excData } = await supabaseClient
         .from('attendance_exceptions')
         .select('*')
@@ -663,21 +832,20 @@
         exceptionsData[`${e.employee_name}_${e.date}`] = { reason: e.reason };
       });
 
+      // Feature 8: Update Cache
+      localStorage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
+      localStorage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
+
       processStitchedData();
     }
 
     // --- DATA PROCESSING & STITCHING ---
-    
-    function getDatesArray() {
-      const arr = []; 
-      let curr = new Date(startDate); curr.setHours(0,0,0,0); 
-      let end = new Date(endDate); end.setHours(0,0,0,0);
-      
-      while(curr <= end) { 
-        arr.push(new Date(curr)); 
-        curr.setDate(curr.getDate() + 1); 
-      } 
-      return arr;
+    // Modified to prevent False Absents: Only generate dates based on what is present in the current paginated fetch
+    function getDatesArrayFromFetchedLogs() {
+      if (dbLogs.length === 0) return [];
+      const datesSet = new Set();
+      dbLogs.forEach(log => { datesSet.add(new Date(log.timestamp).toDateString()); });
+      return Array.from(datesSet).map(d => new Date(d)).sort((a,b) => b - a);
     }
 
     function processStitchedData() {
@@ -685,7 +853,8 @@
       missingData = [];
       let totalPresent = 0, totalLate = 0, totalMissing = 0;
       
-      const dateArray = getDatesArray();
+      // Calculate missing/present ONLY for dates loaded in this paginated chunk
+      const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
       const selectedBranch = document.getElementById('global-branch').value;
 
@@ -702,13 +871,11 @@
           if (selectedBranch !== "All") {
             const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => l.branch !== selectedBranch);
             if (workedElsewhere) return; // Do not show as absent, they are present at another branch
-            
             dailyLogs = dailyLogs.filter(l => l.branch === selectedBranch);
           }
 
           const clockIns = dailyLogs.filter(l => l.action === 'Clock In');
           const clockOuts = dailyLogs.filter(l => l.action === 'Clock Out');
-          
           const exceptionReason = exceptionsData[`${staffName}_${isoDateStr}`] ? exceptionsData[`${staffName}_${isoDateStr}`].reason : null;
 
           if (clockIns.length > 0 || clockOuts.length > 0 || exceptionReason) {
@@ -745,7 +912,6 @@
               isLate: isLateArrival, 
               branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
               hasException: exceptionReason, 
-              
               logIdForPhoto: firstInLog?.id, 
               photoBase64: firstInLog?.photo_capture, 
               uniformReviewed: firstInLog?.uniform_reviewed,
@@ -767,26 +933,49 @@
       document.getElementById('metric-late').innerText = totalLate;
       document.getElementById('metric-absent').innerText = totalMissing;
 
+      // Feature 5: Action Required Badge Update
+      let unexcusedCount = 0;
+      missingData.forEach(row => {
+        const isoDate = row.date.toISOString().split('T')[0];
+        if (!exceptionsData[`${row.name}_${isoDate}`]) unexcusedCount++;
+      });
+      const badge = document.getElementById('absent-badge');
+      if(unexcusedCount > 0) {
+        badge.innerText = unexcusedCount;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+
       renderMasterTable(); 
       renderAbsentTable();
-      
-      if (document.getElementById('view-matrix').style.display === 'block') {
-        generateMatrix();
-      }
+      if (document.getElementById('view-matrix').style.display === 'block') generateMatrix();
     }
 
     // --- TABLE RENDERING ---
-
     function renderMasterTable() {
       const tbody = document.getElementById('master-tbody');
-      if (processedData.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters.</td></tr>'; 
+      
+      // Feature 6 logic: Filter processed data based on Sub-Tabs
+      let dataToRender = processedData;
+      if (activeSubTab === 'late') {
+        dataToRender = processedData.filter(row => row.isLate);
+      } else if (activeSubTab === 'short') {
+        dataToRender = processedData.filter(row => {
+          if (row.firstIn && row.lastOut && row.firstIn.getTime() !== row.lastOut.getTime()) {
+            return (row.lastOut - row.firstIn) < (10 * 3600000); // Less than 10 hours
+          }
+          return false;
+        });
+      }
+
+      if (dataToRender.length === 0) { 
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters for this page.</td></tr>'; 
         return; 
       }
       
       let htmlOutput = '';
-      
-      processedData.forEach(row => {
+      dataToRender.forEach(row => {
         const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '<span style="color:var(--danger)">Missing</span>';
         const outStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : 'Active';
         
@@ -818,11 +1007,9 @@
     }
 
     // --- MODALS (REVIEW & EXCEPTION) ---
-
     window.openReviewModal = function(logId) {
       currentReviewLogId = logId;
       const exactLog = dbLogs.find(l => l.id === logId);
-      
       if (exactLog && exactLog.photo_capture) {
          document.getElementById('modal-image-preview').src = exactLog.photo_capture;
          document.getElementById('check-tshirt').checked = false; 
@@ -838,7 +1025,6 @@
     document.getElementById('btn-save-review').addEventListener('click', async () => {
       const isTshirtPresent = document.getElementById('check-tshirt').checked; 
       const isIdCardPresent = document.getElementById('check-idcard').checked;
-      
       const saveBtn = document.getElementById('btn-save-review'); 
       saveBtn.innerText = "Saving..."; 
       saveBtn.disabled = true;
@@ -857,9 +1043,9 @@
 
         document.getElementById('review-modal').style.display = 'none'; 
         processStitchedData(); 
-
+        showToast("Audit saved successfully", "success");
       } catch (err) {
-        alert("Failed to save audit.");
+        showToast("Failed to save audit.", "error");
       }
       
       saveBtn.innerText = "Save Audit"; 
@@ -867,11 +1053,10 @@
     });
 
     // --- ABSENTS LOGIC ---
-    
     function renderAbsentTable() {
       const tbody = document.getElementById('absent-tbody');
       if (missingData.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in this date range.</td></tr>'; 
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in currently loaded data.</td></tr>'; 
         return; 
       }
       
@@ -907,25 +1092,21 @@
     
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
       const reasonVal = document.getElementById('exc-reason').value;
-      
       try {
         await supabaseClient.from('attendance_exceptions').upsert({ 
-          employee_name: activeExceptionName, 
-          date: activeExceptionDate, 
-          reason: reasonVal 
+          employee_name: activeExceptionName, date: activeExceptionDate, reason: reasonVal 
         }, { onConflict: 'employee_name, date' }); 
         
         exceptionsData[`${activeExceptionName}_${activeExceptionDate}`] = { reason: reasonVal };
-        
         document.getElementById('exception-modal').style.display = 'none'; 
         processStitchedData(); 
+        showToast("Exception updated", "success");
       } catch (err) {
-        alert("Failed to save Exception.");
+        showToast("Failed to save Exception.", "error");
       }
     });
 
     // --- ATTENDANCE MATRIX ---
-
     function generateMatrix() {
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
@@ -936,7 +1117,7 @@
         return;
       }
       
-      const dateList = getDatesArray().reverse();
+      const dateList = getDatesArrayFromFetchedLogs();
       
       headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + 
         dateList.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
@@ -964,7 +1145,6 @@
     }
 
     // --- SYSTEM SETTINGS CRUD ---
-
     async function loadSettingsData() {
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
@@ -995,6 +1175,7 @@
         await supabaseClient.from('staff_directory').insert([{ name: nameVal }]); 
         document.getElementById('new-staff-name').value = ''; 
         loadSettingsData(); 
+        showToast("Staff added successfully", "success");
       }
     });
     
@@ -1009,8 +1190,9 @@
         document.getElementById('new-branch-email').value = ''; 
         document.getElementById('new-branch-ip').value = ''; 
         loadSettingsData(); 
+        showToast("Branch registered successfully", "success");
       } else {
-        alert("Branch Name and Email are mandatory.");
+        showToast("Branch Name and Email are mandatory.", "error");
       }
     });
 
@@ -1018,6 +1200,7 @@
       if(confirm("Are you sure you want to remove this staff member?")) {
         await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
         loadSettingsData(); 
+        showToast("Staff removed", "primary");
       }
     };
     
@@ -1025,19 +1208,23 @@
       if(confirm("Are you sure you want to remove this branch? Terminal access will break if email is used.")) {
         await supabaseClient.from('branches_directory').delete().eq('id', rowId); 
         loadSettingsData(); 
+        showToast("Branch removed", "primary");
       }
     };
 
     // --- DATA EXPORTS ---
-
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault(); 
         const exportType = e.target.getAttribute('data-export');
-        
         const columnHeaders = ["Date", "Staff Name", "First In", "Last Out", "Total Hours", "Status", "Branch List"];
         
-        const exportRows = processedData.map(d => [
+        // Export currently viewed subset based on Sub-Tab filter
+        let dataToExport = processedData;
+        if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate);
+        if (activeSubTab === 'short') dataToExport = processedData.filter(r => (r.lastOut - r.firstIn) < 36000000);
+
+        const exportRows = dataToExport.map(d => [
           d.date.toLocaleDateString(), 
           d.name, 
           d.firstIn ? d.firstIn.toLocaleTimeString() : 'N/A', 
@@ -1048,7 +1235,7 @@
         ]);
 
         if (exportType === 'csv') {
-          if (exportRows.length === 0) return alert("No data available to export.");
+          if (exportRows.length === 0) return showToast("No data available to export.", "error");
           let csvString = columnHeaders.join(",") + "\n" + exportRows.map(r => `"${r.join('","')}"`).join("\n");
           const anchor = document.createElement("a"); 
           anchor.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csvString); 
@@ -1060,7 +1247,7 @@
           html2pdf().set({ margin: 10, filename: `RJ_Mobile_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(containerTarget).save();
         
         } else if (exportType === 'xls') {
-           if (exportRows.length === 0) return alert("No data available to export.");
+           if (exportRows.length === 0) return showToast("No data available to export.", "error");
            let htmlTableString = '<table><tr>' + columnHeaders.map(h => `<th>${h}</th>`).join('') + '</tr>';
            htmlTableString += exportRows.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') + '</table>';
            
@@ -1071,9 +1258,9 @@
            anchor.click();
         
         } else if (exportType === 'copy') {
-           if (exportRows.length === 0) return alert("No data available to copy.");
+           if (exportRows.length === 0) return showToast("No data available to copy.", "error");
            const clipboardText = columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
-           navigator.clipboard.writeText(clipboardText).then(() => alert("Copied to clipboard!"));
+           navigator.clipboard.writeText(clipboardText).then(() => showToast("Table copied to clipboard!", "success"));
         }
       });
     });
