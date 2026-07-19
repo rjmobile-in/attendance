@@ -848,14 +848,20 @@
     
     function toggleDropdown(targetId) {
         const boxes = ['export-menu', 'staff-dropdown-box', 'branch-dropdown-box', 'role-dropdown-box'];
+        
+        // 1. Close all other boxes
         boxes.forEach(id => {
             if (id !== targetId) {
                 const el = document.getElementById(id) || document.querySelector('.' + id);
                 if (el) el.classList.remove('show');
             }
         });
-        const target = document.getElementById(targetId) || document.querySelector('.' + targetId);
-        if(target) target.classList.toggle('show');
+        
+        // 2. ADDED FIX: Only try to find the target if a targetId actually exists
+        if (targetId) {
+            const target = document.getElementById(targetId) || document.querySelector('.' + targetId);
+            if(target) target.classList.toggle('show');
+        }
     }
 
     document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('export-menu'); });
