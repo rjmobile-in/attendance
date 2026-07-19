@@ -1777,25 +1777,37 @@
         const ip = document.getElementById('edit-branch-ip').value;
 
         if(name && email && pass) {
-            const btn = document.getElementById('btn-save-edit-branch'); btn.innerText = "Saving..."; btn.disabled = true;
+            const btn = document.getElementById('btn-save-edit-branch'); 
+            btn.innerText = "Saving..."; 
+            btn.disabled = true;
             try {
-                // 1. Extract the error object
-                const { error } = await supabaseClient.from('branches_directory').update({
+                // Notice the .select() at the end. This forces Supabase to return the modified row.
+                const { data, error } = await supabaseClient.from('branches_directory').update({
                     branch_name: name, email: email, password: pass, ip_address: ip || null
-                }).eq('id', id);
+                }).eq('id', id).select();
+
+                // 1. Catch missing columns or database errors
+                if (error) throw error;
                 
-                // 2. Force the catch block to run if Supabase rejected it
-                if (error) throw error; 
+                // 2. Catch RLS Policy Silent Blocks (0 rows updated)
+                if (!data || data.length === 0) {
+                    throw new Error("Update blocked by RLS policies.");
+                }
 
                 document.getElementById('edit-branch-modal').style.display = 'none';
                 loadSettingsData();
                 showToast("Branch updated", "success");
             } catch(e) { 
-                // 3. Show the ACTUAL error message from the database
+                // This will finally show you exactly why it's failing!
                 showToast("DB Error: " + (e.message || "Failed to update branch"), "error"); 
             }
-            finally { btn.innerText = "Save Changes"; btn.disabled = false; }
-        } else { showToast("Name, Email, Password are required", "error"); }
+            finally { 
+                btn.innerText = "Save Changes"; 
+                btn.disabled = false; 
+            }
+        } else { 
+            showToast("Name, Email, Password are required", "error"); 
+        }
     });
 
     window.deleteBranchItem = async (rowId) => { 
