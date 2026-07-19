@@ -99,6 +99,7 @@
     #login-screen { display: none; max-width: 400px; margin: 10vh auto; background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); }
     .input-field { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; cursor: pointer; }
     .input-field:focus { border-color: var(--primary); }
+    select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px auto; }
     
     /* Dashboard Layout */
     #dashboard { display: none; max-width: 1400px; margin: 0 auto; }
@@ -183,13 +184,15 @@
     .settings-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; }
     .del-btn { color: var(--danger); cursor: pointer; font-weight: bold; background: var(--danger-alpha); border: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; }
     .del-btn:hover { background: var(--danger); color: white; }
+    .edit-btn { color: var(--primary); cursor: pointer; font-weight: bold; background: var(--primary-alpha); border: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; margin-right: 6px; }
+    .edit-btn:hover { background: var(--primary); color: white; }
     .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: 6px; margin-top: 4px; display: inline-block; }
 
     /* Modals */
     .btn-review { background: var(--primary-alpha); color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.2s; white-space: nowrap; }
     .btn-review:hover { background: var(--primary); color: #fff; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-    .modal-card { background: var(--card-bg); padding: 32px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px;}
+    .modal-card { background: var(--card-bg); padding: 32px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto;}
     .modal-img { width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 12px; border: 1px solid var(--card-border); background: #000; }
     .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); }
   </style>
@@ -237,7 +240,7 @@
         </div>
         
         <div class="dropdown" id="export-dropdown">
-          <button id="export-btn" class="btn-primary">
+          <button id="export-btn" class="btn-primary" data-target="export-menu">
             Export <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
           </button>
           <div class="dropdown-content export-menu glass-effect">
@@ -271,11 +274,12 @@
       <!-- Multi-Select Role Filter -->
       <div class="filter-group dropdown" id="role-filter-dropdown">
         <label>Filter Role</label>
-        <button id="role-filter-btn" class="input-field" style="margin: 0; width: 150px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 150px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="role-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="role-dropdown-box">
+          <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 8px; padding: 8px; font-size: 13px;">
           <div class="multi-select-actions">
             <button id="btn-select-all-roles">Select All</button>
             <button id="btn-deselect-all-roles">Clear All</button>
@@ -289,7 +293,7 @@
       <!-- Multi-Select Branch Filter -->
       <div class="filter-group dropdown" id="branch-filter-dropdown">
         <label>Filter Branch</label>
-        <button id="branch-filter-btn" class="input-field" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="branch-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -307,7 +311,7 @@
       <!-- Multi-Select Staff Filter -->
       <div class="filter-group dropdown" id="staff-filter-dropdown">
         <label>Filter Staff</label>
-        <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="staff-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -484,12 +488,27 @@
       <p style="color: var(--text-soft); margin-bottom: 24px;">Changes apply immediately.</p>
       
       <div class="settings-grid">
+        <!-- Roles Setup -->
+        <div class="settings-panel">
+          <h3 style="margin-bottom: 12px;">Role Configuration</h3>
+          <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px;">Manage designations to assign to your staff.</p>
+          <div style="display:flex; flex-direction: column; gap:12px;">
+            <input type="text" id="new-role-name" class="input-field" placeholder="New Role Name (e.g. Manager)" style="margin:0;">
+            <button id="add-role-btn" class="btn-primary" style="justify-content:center;">Create Role</button>
+          </div>
+          <table style="margin-top:20px;">
+            <tbody id="role-settings-list"></tbody>
+          </table>
+        </div>
+
         <!-- Staff Setup -->
         <div class="settings-panel" style="grid-column: 1 / -1;">
           <h3 style="margin-bottom: 12px;">Staff Directory & Custom Shifts</h3>
           <div style="display:flex; gap:8px; flex-wrap: wrap; background: var(--input-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border);">
             <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
-            <input type="text" id="new-staff-role" class="input-field" placeholder="Role Tag (e.g. Salesman)" style="margin:0; flex: 1.5; min-width: 120px;">
+            <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
+              <option value="">-- Select Role --</option>
+            </select>
             <input type="time" id="new-staff-start" class="input-field" title="Custom Shift Start (Leave blank for default)" style="margin:0; flex: 1; min-width: 100px;">
             <input type="time" id="new-staff-end" class="input-field" title="Custom Shift End (Leave blank for default)" style="margin:0; flex: 1; min-width: 100px;">
             <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Add Staff</button>
@@ -500,6 +519,7 @@
           </table>
         </div>
 
+        <!-- Shift Defaults -->
         <div class="settings-panel">
           <h3 style="margin-bottom: 12px;">Global Shift Time Defaults</h3>
           <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px;">Used to calculate OT/Shortages if a staff member has no custom shift set.</p>
@@ -512,6 +532,7 @@
           </div>
         </div>
 
+        <!-- Branch Setup -->
         <div class="settings-panel">
           <h3 style="margin-bottom: 12px;">Branch Configuration</h3>
           <div style="display:flex; flex-direction: column; gap:12px;">
@@ -531,6 +552,71 @@
   </div> <!-- End Dashboard -->
 
   <!-- MODALS -->
+
+  <!-- Edit Staff Modal -->
+  <div id="edit-staff-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Edit Staff Details</h2>
+      <input type="hidden" id="edit-staff-id">
+      
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Full Name</label>
+      <input type="text" id="edit-staff-name" class="input-field" style="margin-top: 8px;">
+      
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Assign Role</label>
+      <select id="edit-staff-role" class="input-field" style="margin-top: 8px;"></select>
+      
+      <div style="display: flex; gap: 12px;">
+        <div style="flex: 1;">
+          <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Shift Start</label>
+          <input type="time" id="edit-staff-start" class="input-field" style="margin-top: 8px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Shift End</label>
+          <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-edit-staff" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-edit-staff" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Role Modal -->
+  <div id="edit-role-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Edit Role</h2>
+      <input type="hidden" id="edit-role-id">
+      <input type="hidden" id="edit-role-oldname">
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Role Name</label>
+      <input type="text" id="edit-role-name" class="input-field" style="margin-top: 8px;">
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-edit-role" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-edit-role" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Branch Modal -->
+  <div id="edit-branch-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Edit Branch</h2>
+      <input type="hidden" id="edit-branch-id">
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Branch Name</label>
+      <input type="text" id="edit-branch-name" class="input-field" style="margin-top: 8px;">
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Login Email</label>
+      <input type="email" id="edit-branch-email" class="input-field" style="margin-top: 8px;">
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Terminal Password</label>
+      <input type="text" id="edit-branch-pass" class="input-field" style="margin-top: 8px;">
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">IP Lock (Optional)</label>
+      <input type="text" id="edit-branch-ip" class="input-field" style="margin-top: 8px;">
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-edit-branch" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-edit-branch" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Edit Shift Time Modal -->
   <div id="edit-time-modal" class="modal-overlay">
     <div class="modal-card">
@@ -622,6 +708,7 @@
     let masterStaffList = [];
     let masterBranchList = [];
     let masterRoleList = [];
+    let dbRoles = []; // Stores the full role objects {id, role_name}
     let staffConfig = {}; // Stores role, shift_start, shift_end by name
     let dbLogs = [];
     let exceptionsData = {}; 
@@ -755,23 +842,36 @@
     });
 
     // -------------------------------------------------------------------
-    // DROPDOWNS & FILTER LOGIC
+    // DROPDOWNS & FILTER LOGIC (With Mutual Exclusivity)
     // -------------------------------------------------------------------
+    
+    function toggleDropdown(targetId) {
+        const boxes = ['export-menu', 'staff-dropdown-box', 'branch-dropdown-box', 'role-dropdown-box'];
+        boxes.forEach(id => {
+            if (id !== targetId) {
+                const el = document.getElementById(id) || document.querySelector('.' + id);
+                if (el) el.classList.remove('show');
+            }
+        });
+        const target = document.getElementById(targetId) || document.querySelector('.' + targetId);
+        if(target) target.classList.toggle('show');
+    }
 
-    document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); });
-    document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('staff-dropdown-box').classList.toggle('show'); });
-    document.getElementById('branch-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('branch-dropdown-box').classList.toggle('show'); });
-    document.getElementById('role-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('role-dropdown-box').classList.toggle('show'); });
+    document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('export-menu'); });
+    document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('staff-dropdown-box'); });
+    document.getElementById('branch-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('branch-dropdown-box'); });
+    document.getElementById('role-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('role-dropdown-box'); });
     
     document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
     document.getElementById('branch-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
     document.getElementById('role-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); });
     
     window.addEventListener('click', (e) => { 
-      if(!e.target.closest('#export-dropdown')) document.querySelector('.export-menu')?.classList.remove('show');
-      if(!e.target.closest('#staff-filter-dropdown')) document.getElementById('staff-dropdown-box')?.classList.remove('show');
-      if(!e.target.closest('#branch-filter-dropdown')) document.getElementById('branch-dropdown-box')?.classList.remove('show');
-      if(!e.target.closest('#role-filter-dropdown')) document.getElementById('role-dropdown-box')?.classList.remove('show');
+      // Close all if clicked outside of any dropdown container
+      const isDropdownClick = e.target.closest('.dropdown') || e.target.closest('.dropdown-content');
+      if (!isDropdownClick) {
+          toggleDropdown(''); // passing empty closes all
+      }
     });
 
     // Flatpickr Init
@@ -851,21 +951,33 @@
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
       await executeLazyPhotoDelete();
       
+      // Load explicitly defined Roles
+      try {
+          const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
+          dbRoles = roleData || [];
+          masterRoleList = dbRoles.map(r => r.role_name);
+      } catch (err) {
+          console.warn("roles_directory table might not exist yet.");
+      }
+
+      // Load Staff and auto-populate roles if they exist in staff but not in explicitly defined roles (backwards compatibility)
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       masterStaffList = (staffData || []).map(s => s.name);
       selectedStaff = new Set(masterStaffList);
       
-      const roles = new Set();
+      const distinctRolesSet = new Set(masterRoleList);
       (staffData || []).forEach(s => {
-          staffConfig[s.name] = { 
-              role: s.role || 'Unassigned', 
-              shiftStart: s.shift_start || null, 
-              shiftEnd: s.shift_end || null 
-          };
-          roles.add(s.role || 'Unassigned');
+        staffConfig[s.name] = { 
+            role: s.role || 'Unassigned', 
+            shiftStart: s.shift_start || null, 
+            shiftEnd: s.shift_end || null 
+        };
+        if(s.role) distinctRolesSet.add(s.role);
       });
-      masterRoleList = Array.from(roles);
+      masterRoleList = Array.from(distinctRolesSet);
       selectedRoles = new Set(masterRoleList);
+      
+      populateRoleDropdowns(); // Update UI Select boxes
       
       // Populate Schedule Leave Staff Dropdown
       const schedSelect = document.getElementById('sched-staff');
@@ -884,6 +996,12 @@
 
       loadFromCache();
       await fetchLogsFromDatabase();
+    }
+    
+    function populateRoleDropdowns() {
+        const opts = '<option value="">-- Select Role --</option>' + masterRoleList.map(r => `<option value="${r}">${r}</option>`).join('');
+        document.getElementById('new-staff-role').innerHTML = opts;
+        document.getElementById('edit-staff-role').innerHTML = opts;
     }
 
     function loadFromCache() {
@@ -918,11 +1036,11 @@
       });
       
       document.getElementById('btn-select-all-roles').addEventListener('click', () => {
-        document.querySelectorAll('.role-cb').forEach(cb => { cb.checked = true; selectedRoles.add(cb.value); }); 
+        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedRoles.add(cb.value); } }); 
         updateRoleButtonText(); processStitchedData(); 
       });
       document.getElementById('btn-deselect-all-roles').addEventListener('click', () => {
-        document.querySelectorAll('.role-cb').forEach(cb => { cb.checked = false; selectedRoles.delete(cb.value); }); 
+        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedRoles.delete(cb.value); } }); 
         updateRoleButtonText(); processStitchedData(); 
       });
       updateRoleButtonText();
@@ -933,6 +1051,11 @@
       if(selectedRoles.size === masterRoleList.length && masterRoleList.length > 0) btn.innerText = "All Roles";
       else btn.innerText = `${selectedRoles.size} Selected`;
     }
+
+    document.getElementById('role-search').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.role-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
+    });
 
     // Staff Filter Sync
     function renderStaffFilterCheckboxes() {
@@ -1252,7 +1375,7 @@
                if(editLogOutId) {
                    await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso }).eq('id', editLogOutId);
                } else {
-                   // Insert new clock out if it was originally missing (22:00 auto-fill)
+                   // Insert new clock out if it was originally missing
                    await supabaseClient.from('attendance_logs').insert([{
                        employee_name: activeEditStaff, action: 'Clock Out', branch: 'Admin Edited', timestamp: newOutIso
                    }]);
@@ -1443,23 +1566,46 @@
     }
 
     // -------------------------------------------------------------------
-    // VIEW 4: SYSTEM SETTINGS
+    // VIEW 4: SYSTEM SETTINGS (CRUD with Edits)
     // -------------------------------------------------------------------
     async function loadSettingsData() {
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
+      const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name').catch(() => ({data: []}));
       
+      // Render Roles
+      const roleTbody = document.getElementById('role-settings-list');
+      roleTbody.innerHTML = (rolesData || dbRoles).map(r => `<tr>
+          <td><strong>${r.role_name}</strong></td>
+          <td style="text-align:right">
+            <button class="edit-btn" onclick="openEditRole('${r.id}', '${r.role_name}')">Edit</button>
+            <button class="del-btn" onclick="deleteRoleItem('${r.id}')">Remove</button>
+          </td>
+      </tr>`).join('');
+
+      // Render Staff
       const staffTbody = document.getElementById('staff-settings-list');
       staffTbody.innerHTML = (staffData || []).map(s => `<tr>
           <td><strong>${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
           <td><span style="font-size:12px; color:var(--text-soft)">${s.shift_start ? `${s.shift_start} - ${s.shift_end}` : 'Global Default'}</span></td>
-          <td style="text-align:right"><button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button></td>
+          <td style="text-align:right">
+            <button class="edit-btn" onclick="openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${s.shift_start || ''}', '${s.shift_end || ''}')">Edit</button>
+            <button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button>
+          </td>
       </tr>`).join('');
       
+      // Render Branches
       const branchTbody = document.getElementById('branch-settings-list');
-      branchTbody.innerHTML = (branchesData || []).map(b => `<tr><td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td><td style="text-align:right"><button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button></td></tr>`).join('');
+      branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
+          <td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td>
+          <td style="text-align:right">
+            <button class="edit-btn" onclick="openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}', '${b.ip_address || ''}')">Edit</button>
+            <button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button>
+          </td>
+      </tr>`).join('');
     }
     
+    // Global Shifts
     document.getElementById('save-global-shift-btn').addEventListener('click', () => {
         const st = document.getElementById('global-shift-start').value;
         const en = document.getElementById('global-shift-end').value;
@@ -1470,14 +1616,63 @@
             processStitchedData(); // recalculate targets
         }
     });
+
+    // ROLES CRUD
+    document.getElementById('add-role-btn').addEventListener('click', async () => {
+      const roleName = document.getElementById('new-role-name').value.trim();
+      if(roleName) {
+        const btn = document.getElementById('add-role-btn'); btn.innerText = "Adding..."; btn.disabled = true;
+        try {
+          await supabaseClient.from('roles_directory').insert([{ role_name: roleName }]);
+          document.getElementById('new-role-name').value = '';
+          await initialMetadataLoad(); // refresh filters and dropdowns
+          loadSettingsData();
+          showToast("Role created successfully", "success");
+        } catch (err) { showToast("Failed to create role. Make sure table exists.", "error"); }
+        finally { btn.innerText = "Create Role"; btn.disabled = false; }
+      } else { showToast("Enter a role name.", "error"); }
+    });
+
+    window.openEditRole = (id, currentName) => {
+      document.getElementById('edit-role-id').value = id;
+      document.getElementById('edit-role-oldname').value = currentName;
+      document.getElementById('edit-role-name').value = currentName;
+      document.getElementById('edit-role-modal').style.display = 'flex';
+    };
+    document.getElementById('btn-cancel-edit-role').addEventListener('click', () => document.getElementById('edit-role-modal').style.display = 'none');
+    document.getElementById('btn-save-edit-role').addEventListener('click', async () => {
+      const id = document.getElementById('edit-role-id').value;
+      const oldName = document.getElementById('edit-role-oldname').value;
+      const newName = document.getElementById('edit-role-name').value.trim();
+      
+      if(newName && newName !== oldName) {
+        const btn = document.getElementById('btn-save-edit-role'); btn.innerText = "Saving..."; btn.disabled = true;
+        try {
+          // Update Role
+          await supabaseClient.from('roles_directory').update({ role_name: newName }).eq('id', id);
+          // Cascade update to staff table (so they don't lose their role tag)
+          await supabaseClient.from('staff_directory').update({ role: newName }).eq('role', oldName);
+          
+          document.getElementById('edit-role-modal').style.display = 'none';
+          await initialMetadataLoad();
+          loadSettingsData();
+          showToast("Role updated everywhere", "success");
+        } catch(e) { showToast("Failed to update role", "error"); }
+        finally { btn.innerText = "Save Changes"; btn.disabled = false; }
+      } else { document.getElementById('edit-role-modal').style.display = 'none'; }
+    });
+    window.deleteRoleItem = async (rowId) => { 
+      if(confirm("Remove this role? It will not remove it from existing staff automatically.")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
+    };
     
+    // STAFF CRUD
     document.getElementById('add-staff-btn').addEventListener('click', async () => {
       const nameVal = document.getElementById('new-staff-name').value.trim();
-      const roleVal = document.getElementById('new-staff-role').value.trim() || null;
+      const roleVal = document.getElementById('new-staff-role').value || null;
       let startVal = document.getElementById('new-staff-start').value || null;
       let endVal = document.getElementById('new-staff-end').value || null;
       
-      if(startVal && startVal.length === 5) startVal += ':00'; // Ensure time format
+      if(startVal && startVal.length === 5) startVal += ':00';
       if(endVal && endVal.length === 5) endVal += ':00';
 
       if(nameVal) {
@@ -1491,7 +1686,7 @@
           document.getElementById('new-staff-name').value = ''; document.getElementById('new-staff-role').value = '';
           document.getElementById('new-staff-start').value = ''; document.getElementById('new-staff-end').value = '';
           
-          await initialMetadataLoad(); // Refresh metadata to update caches and filters
+          await initialMetadataLoad(); 
           loadSettingsData(); 
           showToast("Staff added successfully", "success");
         } catch (err) { showToast("Failed to add staff.", "error"); } 
@@ -1499,6 +1694,44 @@
       } else { showToast("Please enter a staff name.", "error"); }
     });
 
+    window.openEditStaff = (id, name, role, start, end) => {
+        document.getElementById('edit-staff-id').value = id;
+        document.getElementById('edit-staff-name').value = name;
+        document.getElementById('edit-staff-role').value = role || '';
+        document.getElementById('edit-staff-start').value = start || '';
+        document.getElementById('edit-staff-end').value = end || '';
+        document.getElementById('edit-staff-modal').style.display = 'flex';
+    };
+    document.getElementById('btn-cancel-edit-staff').addEventListener('click', () => document.getElementById('edit-staff-modal').style.display = 'none');
+    document.getElementById('btn-save-edit-staff').addEventListener('click', async () => {
+        const id = document.getElementById('edit-staff-id').value;
+        const name = document.getElementById('edit-staff-name').value.trim();
+        const role = document.getElementById('edit-staff-role').value || null;
+        let start = document.getElementById('edit-staff-start').value || null;
+        let end = document.getElementById('edit-staff-end').value || null;
+
+        if(start && start.length === 5) start += ':00';
+        if(end && end.length === 5) end += ':00';
+
+        if(name) {
+            const btn = document.getElementById('btn-save-edit-staff'); btn.innerText = "Saving..."; btn.disabled = true;
+            try {
+                await supabaseClient.from('staff_directory').update({
+                    name: name, role: role, shift_start: start, shift_end: end
+                }).eq('id', id);
+                document.getElementById('edit-staff-modal').style.display = 'none';
+                await initialMetadataLoad();
+                loadSettingsData();
+                showToast("Staff details updated", "success");
+            } catch(e) { showToast("Failed to update staff", "error"); }
+            finally { btn.innerText = "Save Changes"; btn.disabled = false; }
+        } else { showToast("Name is required", "error"); }
+    });
+    window.deleteStaffItem = async (rowId) => { 
+      if(confirm("Remove this staff member?")) { await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary"); }
+    };
+
+    // BRANCH CRUD
     document.getElementById('add-branch-btn').addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-branch-name').value;
       const emailVal = document.getElementById('new-branch-email').value;
@@ -1513,9 +1746,36 @@
       } else { showToast("Branch Name, Email, and Password are mandatory.", "error"); }
     });
 
-    window.deleteStaffItem = async (rowId) => { 
-      if(confirm("Remove this staff member?")) { await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary"); }
+    window.openEditBranch = (id, name, email, pass, ip) => {
+        document.getElementById('edit-branch-id').value = id;
+        document.getElementById('edit-branch-name').value = name;
+        document.getElementById('edit-branch-email').value = email;
+        document.getElementById('edit-branch-pass').value = pass || '';
+        document.getElementById('edit-branch-ip').value = ip || '';
+        document.getElementById('edit-branch-modal').style.display = 'flex';
     };
+    document.getElementById('btn-cancel-edit-branch').addEventListener('click', () => document.getElementById('edit-branch-modal').style.display = 'none');
+    document.getElementById('btn-save-edit-branch').addEventListener('click', async () => {
+        const id = document.getElementById('edit-branch-id').value;
+        const name = document.getElementById('edit-branch-name').value;
+        const email = document.getElementById('edit-branch-email').value;
+        const pass = document.getElementById('edit-branch-pass').value;
+        const ip = document.getElementById('edit-branch-ip').value;
+
+        if(name && email && pass) {
+            const btn = document.getElementById('btn-save-edit-branch'); btn.innerText = "Saving..."; btn.disabled = true;
+            try {
+                await supabaseClient.from('branches_directory').update({
+                    branch_name: name, email: email, password: pass, ip_address: ip
+                }).eq('id', id);
+                document.getElementById('edit-branch-modal').style.display = 'none';
+                loadSettingsData();
+                showToast("Branch updated", "success");
+            } catch(e) { showToast("Failed to update branch", "error"); }
+            finally { btn.innerText = "Save Changes"; btn.disabled = false; }
+        } else { showToast("Name, Email, Password are required", "error"); }
+    });
+
     window.deleteBranchItem = async (rowId) => { 
       if(confirm("Remove this branch? Terminal access will break if email is used.")) { await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Branch removed", "primary"); }
     };
