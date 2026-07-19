@@ -70,6 +70,8 @@
     .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
     .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .icon-btn { background: transparent; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; transition: 0.2s; padding: 4px; border-radius: 6px; }
+    .icon-btn:hover { opacity: 1; background: var(--input-bg); }
     
     /* Toggle Switch (Auto-Sync) */
     .switch-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-soft); }
@@ -99,7 +101,7 @@
     .input-field:focus { border-color: var(--primary); }
     
     /* Dashboard Layout */
-    #dashboard { display: none; max-width: 1300px; margin: 0 auto; }
+    #dashboard { display: none; max-width: 1400px; margin: 0 auto; }
     
     /* Header Dropdown fix */
     .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: 20px; margin-bottom: 16px; flex-wrap: wrap; gap: 16px; position: relative; z-index: 50; }
@@ -158,11 +160,20 @@
     th { position: sticky; top: 0; background: var(--input-bg); color: var(--text-soft); font-weight: 700; font-size: 12px; text-transform: uppercase; padding: 16px 20px; border-bottom: 1px solid var(--card-border); z-index: 10; }
     td { padding: 16px 20px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
     
+    /* Audit Gallery */
+    .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; padding: 16px; }
+    .audit-card { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+    .audit-img-wrap { width: 100%; height: 200px; background: #000; position: relative; }
+    .audit-img { width: 100%; height: 100%; object-fit: cover; }
+    .audit-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 8px; font-weight: bold; }
+    .audit-details { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    
     /* Badges & Actions */
     .badge { padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-block; }
     .bg-green { background: var(--success-alpha); color: var(--success); }
     .bg-red { background: var(--danger-alpha); color: var(--danger); }
     .bg-orange { background: var(--warning-alpha); color: var(--warning); }
+    .bg-blue { background: var(--primary-alpha); color: var(--primary); }
     .bg-gray { background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border); }
     .action-link { color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; margin-right: 12px; }
     .action-link:hover { color: var(--primary-hover); }
@@ -172,6 +183,7 @@
     .settings-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; }
     .del-btn { color: var(--danger); cursor: pointer; font-weight: bold; background: var(--danger-alpha); border: none; padding: 6px 12px; border-radius: 6px; transition: 0.2s; }
     .del-btn:hover { background: var(--danger); color: white; }
+    .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: 6px; margin-top: 4px; display: inline-block; }
 
     /* Modals */
     .btn-review { background: var(--primary-alpha); color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.2s; white-space: nowrap; }
@@ -236,7 +248,7 @@
           </div>
         </div>
         
-        <button id="save-settings-btn" class="btn-secondary">💾 Save Settings</button>
+        <button id="save-settings-btn" class="btn-secondary">💾 Save Layout</button>
         <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
         <button id="theme-toggle" class="btn-secondary" title="Toggle Theme">🌓</button>
         <button id="logout-btn" class="btn-secondary">Log Out</button>
@@ -256,10 +268,28 @@
         <input type="text" id="global-end" class="input-field" style="margin: 0; width: 120px; padding: 10px;" placeholder="End Date" />
       </div>
       
-      <!-- NEW: Multi-Select Branch Filter -->
+      <!-- Multi-Select Role Filter -->
+      <div class="filter-group dropdown" id="role-filter-dropdown">
+        <label>Filter Role</label>
+        <button id="role-filter-btn" class="input-field" style="margin: 0; width: 150px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+          <span id="role-btn-text">Loading...</span> 
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="dropdown-content" style="top: calc(100% + 4px); right: auto; left: 0;" id="role-dropdown-box">
+          <div class="multi-select-actions">
+            <button id="btn-select-all-roles">Select All</button>
+            <button id="btn-deselect-all-roles">Clear All</button>
+          </div>
+          <div class="list-container" id="role-checkboxes">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Select Branch Filter -->
       <div class="filter-group dropdown" id="branch-filter-dropdown">
         <label>Filter Branch</label>
-        <button id="branch-filter-btn" class="input-field" style="margin: 0; width: 190px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="branch-filter-btn" class="input-field" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="branch-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -270,7 +300,6 @@
             <button id="btn-deselect-all-branches">Clear All</button>
           </div>
           <div class="list-container" id="branch-checkboxes">
-            <!-- Populated by JS -->
           </div>
         </div>
       </div>
@@ -278,7 +307,7 @@
       <!-- Multi-Select Staff Filter -->
       <div class="filter-group dropdown" id="staff-filter-dropdown">
         <label>Filter Staff</label>
-        <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 190px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="staff-filter-btn" class="input-field" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="staff-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -289,7 +318,6 @@
             <button id="btn-deselect-all">Clear All</button>
           </div>
           <div class="list-container" id="staff-checkboxes">
-            <!-- Populated by JS -->
           </div>
         </div>
       </div>
@@ -300,7 +328,8 @@
     <!-- Navigation Tabs -->
     <div class="tab-controls">
       <button class="tab-btn active" data-view="view-overview">Overview & Logs</button>
-      <button class="tab-btn" data-view="view-absent">Absents & Exceptions <span id="absent-badge" class="badge bg-red" style="display:none; padding: 2px 6px; margin-left: 6px;">0</span></button>
+      <button class="tab-btn" data-view="view-stats">Staff Stats (Payroll Prep)</button>
+      <button class="tab-btn" data-view="view-absent">Action Center <span id="absent-badge" class="badge bg-red" style="display:none; padding: 2px 6px; margin-left: 6px;">0</span></button>
       <button class="tab-btn" data-view="view-matrix">Attendance Matrix</button>
       <button class="tab-btn" data-view="view-settings">System Settings</button>
     </div>
@@ -334,19 +363,20 @@
         </div>
 
         <div class="sub-tabs">
-          <button class="sub-tab-btn active" data-filter="all">All Logs</button>
-          <button class="sub-tab-btn" data-filter="late">Late Arrivals Only</button>
-          <button class="sub-tab-btn" data-filter="short">Short Hours (< 10h)</button>
+          <button class="sub-tab-btn active" data-filter="all">Table: All Logs</button>
+          <button class="sub-tab-btn" data-filter="late">Table: Late Arrivals Only</button>
+          <button class="sub-tab-btn" data-filter="gallery">📸 Photo Audit Gallery</button>
         </div>
 
-        <div class="table-card">
+        <!-- Dynamic Content Area based on Sub Tab -->
+        <div class="table-card" id="master-table-container">
           <div class="table-responsive">
             <table id="master-table">
               <thead>
                 <tr>
                   <th>Date</th>
                   <th>Staff Member</th>
-                  <th>Shift Timeline</th>
+                  <th>Shift Timeline & Hours</th>
                   <th>Status / Branches</th>
                   <th>Uniform Check</th>
                 </tr>
@@ -362,13 +392,53 @@
             <button id="next-page-btn" class="btn-secondary" disabled>Next 50 →</button>
           </div>
         </div>
+
+        <div class="table-card" id="audit-gallery-container" style="display: none; background: transparent; border: none;">
+          <div class="audit-grid" id="audit-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- VIEW 2: ABSENTS & EXCEPTIONS -->
+    <!-- VIEW: STAFF STATS (PAYROLL) -->
+    <div id="view-stats" class="app-view" style="display: none;">
+      <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+        <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Staff Stats & Payroll Prep</h2>
+        <span style="color: var(--text-soft);">Aggregated metrics for the selected date range.</span>
+      </div>
+
+      <div class="table-card" id="stats-export-container">
+        <div class="table-responsive">
+          <table id="stats-table">
+            <thead>
+              <tr>
+                <th>Staff Name</th>
+                <th>Role</th>
+                <th>Days Present</th>
+                <th>Total Hours</th>
+                <th>Target vs Actual</th>
+                <th>Infractions (Late/Shirt/ID)</th>
+              </tr>
+            </thead>
+            <tbody id="stats-tbody">
+              <tr><td colspan="6" style="text-align: center;">No data loaded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: ACTION CENTER -->
     <div id="view-absent" class="app-view" style="display: none;">
-      <h2 style="font-size: 20px; margin-bottom: 8px;">Action Center</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px;">Manage missing staff and approve leaves for the selected filters.</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h2 style="font-size: 20px; margin-bottom: 8px;">Action Center</h2>
+          <p style="color: var(--text-soft); margin: 0;">Manage missing staff and schedule future leaves.</p>
+        </div>
+        <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Future Leave</button>
+      </div>
       
       <div class="table-card">
         <div class="table-responsive">
@@ -410,19 +480,36 @@
 
     <!-- VIEW 4: SYSTEM SETTINGS -->
     <div id="view-settings" class="app-view" style="display: none;">
-      <h2 style="font-size: 20px; margin-bottom: 8px;">Database Management</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px;">Add or remove Staff and Branches. Changes apply to the terminal instantly.</p>
+      <h2 style="font-size: 20px; margin-bottom: 8px;">Database & System Preferences</h2>
+      <p style="color: var(--text-soft); margin-bottom: 24px;">Changes apply immediately.</p>
       
       <div class="settings-grid">
-        <div class="settings-panel">
-          <h3 style="margin-bottom: 12px;">Staff Directory</h3>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name (Spaces allowed)" style="margin:0;">
-            <button id="add-staff-btn" class="btn-primary">Add Staff</button>
+        <!-- Staff Setup -->
+        <div class="settings-panel" style="grid-column: 1 / -1;">
+          <h3 style="margin-bottom: 12px;">Staff Directory & Custom Shifts</h3>
+          <div style="display:flex; gap:8px; flex-wrap: wrap; background: var(--input-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+            <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
+            <input type="text" id="new-staff-role" class="input-field" placeholder="Role Tag (e.g. Salesman)" style="margin:0; flex: 1.5; min-width: 120px;">
+            <input type="time" id="new-staff-start" class="input-field" title="Custom Shift Start (Leave blank for default)" style="margin:0; flex: 1; min-width: 100px;">
+            <input type="time" id="new-staff-end" class="input-field" title="Custom Shift End (Leave blank for default)" style="margin:0; flex: 1; min-width: 100px;">
+            <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Add Staff</button>
           </div>
           <table style="margin-top:20px;">
+            <thead><tr><th>Staff Details</th><th>Custom Shift Time</th><th style="text-align: right;">Action</th></tr></thead>
             <tbody id="staff-settings-list"></tbody>
           </table>
+        </div>
+
+        <div class="settings-panel">
+          <h3 style="margin-bottom: 12px;">Global Shift Time Defaults</h3>
+          <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px;">Used to calculate OT/Shortages if a staff member has no custom shift set.</p>
+          <div style="display:flex; flex-direction: column; gap:12px;">
+            <label style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Default Start Time</label>
+            <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
+            <label style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Default End Time</label>
+            <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
+            <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center;">Update Defaults</button>
+          </div>
         </div>
 
         <div class="settings-panel">
@@ -431,11 +518,10 @@
             <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name (e.g. Murlipura)" style="margin:0;">
             <input type="email" id="new-branch-email" class="input-field" placeholder="Terminal Login Email" style="margin:0;">
             <input type="text" id="new-branch-pass" class="input-field" placeholder="Terminal Password (e.g. 123456)" style="margin:0;">
-            <input type="text" id="new-branch-ip" class="input-field" placeholder="Allowed Wi-Fi IP (Leave blank for no lock)" style="margin:0;">
+            <input type="text" id="new-branch-ip" class="input-field" placeholder="Allowed Wi-Fi IP (Optional)" style="margin:0;">
             <button id="add-branch-btn" class="btn-primary" style="justify-content:center;">Register Branch</button>
           </div>
           <table style="margin-top:20px;">
-            <thead><tr><th>Branch Details</th><th style="text-align: right;">Action</th></tr></thead>
             <tbody id="branch-settings-list"></tbody>
           </table>
         </div>
@@ -445,6 +531,66 @@
   </div> <!-- End Dashboard -->
 
   <!-- MODALS -->
+  <!-- Edit Shift Time Modal -->
+  <div id="edit-time-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Edit Shift Timeline</h2>
+      <p style="color: var(--text-soft); margin-bottom: 20px;" id="edit-time-subtitle">Updating record</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Clock In Time</label>
+          <input type="time" id="edit-time-in" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Clock Out Time</label>
+          <input type="time" id="edit-time-out" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-edit-time" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-edit-time" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Timeline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule Leave Modal -->
+  <div id="schedule-leave-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Schedule Future Leave</h2>
+      <p style="color: var(--text-soft); margin-bottom: 20px;">Mark upcoming dates as an approved exception.</p>
+      
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Staff</label>
+      <select id="sched-staff" class="input-field" style="margin-top: 8px;"></select>
+
+      <div style="display: flex; gap: 12px;">
+        <div style="flex: 1;">
+          <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Start Date</label>
+          <input type="text" id="sched-start" class="input-field" style="margin-top: 8px; padding: 10px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">End Date</label>
+          <input type="text" id="sched-end" class="input-field" style="margin-top: 8px; padding: 10px;">
+        </div>
+      </div>
+
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Reason</label>
+      <select id="sched-reason" class="input-field" style="margin-top: 8px;">
+        <option value="Approved Leave">Approved Paid Leave</option>
+        <option value="Sick Leave">Sick Leave</option>
+        <option value="On Field Duty">On Field Duty / Errand</option>
+        <option value="Unexcused Absence">Unexcused Absence</option>
+      </select>
+
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-sched" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-sched" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Confirm Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exception Modal (Past) -->
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manage Exception</h2>
@@ -463,57 +609,48 @@
     </div>
   </div>
 
-  <div id="review-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div>
-        <h2 style="font-size: 20px; font-weight: 800;">Audit Uniform</h2>
-        <p style="color: var(--text-soft); font-size: 13px; margin-top: 4px;">Verify requirements.</p>
-      </div>
-      <img id="modal-image-preview" src="" class="modal-img" alt="Staff Capture" />
-      <div class="modal-checkboxes">
-        <label class="check-wrap"><input type="checkbox" id="check-tshirt"> RJ T-Shirt Present</label>
-        <label class="check-wrap"><input type="checkbox" id="check-idcard"> ID Card Present</label>
-      </div>
-      <div style="display: flex; gap: 12px;">
-        <button id="btn-cancel-review" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
-        <button id="btn-save-review" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Audit</button>
-      </div>
-    </div>
-  </div>
-
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlenVtYXB6bHNqbmtpdHh2c3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTY2NjUsImV4cCI6MjA5OTkzMjY2NX0.IVUZVjZUuiM9qTcKAIIxJth_zSIGJUWTaubUV4Fy0_Y';
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: {
-        storageKey: 'rj_admin_terminal_auth',
-      }
+      auth: { storageKey: 'rj_admin_terminal_auth' }
     });
 
+    // Data Stores
     let masterStaffList = [];
     let masterBranchList = [];
+    let masterRoleList = [];
+    let staffConfig = {}; // Stores role, shift_start, shift_end by name
     let dbLogs = [];
     let exceptionsData = {}; 
     let processedData = []; 
     let missingData = [];
+    let statsData = [];
     
-    // 🔥 Default dates set to TODAY
+    // Global Configuration
+    let globalShiftStart = localStorage.getItem('rj_shift_start') || "10:00";
+    let globalShiftEnd = localStorage.getItem('rj_shift_end') || "19:00";
+    
+    // Default dates (Today)
     let startDate = new Date(); 
     let endDate = new Date();
     
+    // Filter State
     let selectedStaff = new Set();
     let selectedBranches = new Set();
+    let selectedRoles = new Set();
     
+    // Pagination & UI State
     let currentPage = 0;
     const pageSize = 50;
     let totalRecords = 0;
     let activeSubTab = 'all';
 
-    let activeExceptionName = null;
-    let activeExceptionDate = null;
-    let currentReviewLogId = null;
+    // Edit State Modals
+    let activeExceptionName = null, activeExceptionDate = null;
+    let activeEditDateStr = null, activeEditStaff = null, editLogInId = null, editLogOutId = null;
     let realtimeSubscription = null;
     let isAppInitialized = false;
 
@@ -538,6 +675,7 @@
       }, 3000);
     }
 
+    // UI Event Listeners
     document.getElementById('theme-toggle').addEventListener('click', () => {
       const isLight = document.documentElement.classList.toggle('light-theme');
       localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
@@ -547,7 +685,7 @@
     document.getElementById('save-settings-btn').addEventListener('click', () => {
       const sync = document.getElementById('sync-toggle').checked;
       localStorage.setItem('rj_settings', JSON.stringify({ sync }));
-      showToast("Settings saved to session cache!", "success");
+      showToast("Layout/Sync settings saved!", "success");
     });
 
     let lastSyncTime = 0;
@@ -594,6 +732,7 @@
         
         if (viewId === 'view-matrix') generateMatrix();
         if (viewId === 'view-settings') loadSettingsData();
+        if (viewId === 'view-stats') renderStaffStats();
       });
     });
 
@@ -602,81 +741,57 @@
         document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         activeSubTab = e.target.getAttribute('data-filter');
-        renderMasterTable(); 
+        
+        if (activeSubTab === 'gallery') {
+            document.getElementById('master-table-container').style.display = 'none';
+            document.getElementById('audit-gallery-container').style.display = 'block';
+            renderAuditGallery();
+        } else {
+            document.getElementById('master-table-container').style.display = 'block';
+            document.getElementById('audit-gallery-container').style.display = 'none';
+            renderMasterTable(); 
+        }
       });
     });
 
     // -------------------------------------------------------------------
-    // DROPDOWNS & FILTER LOGIC (Staff, Branch, Date)
+    // DROPDOWNS & FILTER LOGIC
     // -------------------------------------------------------------------
 
-    document.getElementById('export-btn').addEventListener('click', (e) => { 
-      e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); 
-    });
-    
-    document.getElementById('staff-filter-btn').addEventListener('click', (e) => { 
-      e.stopPropagation(); document.getElementById('staff-dropdown-box').classList.toggle('show'); 
-    });
-
-    document.getElementById('branch-filter-btn').addEventListener('click', (e) => { 
-      e.stopPropagation(); document.getElementById('branch-dropdown-box').classList.toggle('show'); 
-    });
+    document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); document.querySelector('.export-menu').classList.toggle('show'); });
+    document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('staff-dropdown-box').classList.toggle('show'); });
+    document.getElementById('branch-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('branch-dropdown-box').classList.toggle('show'); });
+    document.getElementById('role-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('role-dropdown-box').classList.toggle('show'); });
     
     document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
     document.getElementById('branch-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
+    document.getElementById('role-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); });
     
     window.addEventListener('click', (e) => { 
-      if(!e.target.closest('#export-dropdown')) {
-        const exMenu = document.querySelector('.export-menu');
-        if(exMenu) exMenu.classList.remove('show');
-      }
-      if(!e.target.closest('#staff-filter-dropdown')) {
-        const stBox = document.getElementById('staff-dropdown-box');
-        if(stBox) stBox.classList.remove('show');
-      }
-      if(!e.target.closest('#branch-filter-dropdown')) {
-        const brBox = document.getElementById('branch-dropdown-box');
-        if(brBox) brBox.classList.remove('show');
-      }
+      if(!e.target.closest('#export-dropdown')) document.querySelector('.export-menu')?.classList.remove('show');
+      if(!e.target.closest('#staff-filter-dropdown')) document.getElementById('staff-dropdown-box')?.classList.remove('show');
+      if(!e.target.closest('#branch-filter-dropdown')) document.getElementById('branch-dropdown-box')?.classList.remove('show');
+      if(!e.target.closest('#role-filter-dropdown')) document.getElementById('role-dropdown-box')?.classList.remove('show');
     });
 
-    // DATE PRESET LOGIC
-    let fpStart = flatpickr("#global-start", { 
-      defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
-      onChange: (dates) => { 
-          if(dates[0]) { startDate = dates[0]; } 
-      }
-    });
+    // Flatpickr Init
+    flatpickr("#global-start", { defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) startDate = dates[0]; } });
+    flatpickr("#global-end", { defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) endDate = dates[0]; } });
     
-    let fpEnd = flatpickr("#global-end", { 
-      defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y",
-      onChange: (dates) => { 
-          if(dates[0]) { endDate = dates[0]; } 
-      }
-    });
+    const schedStartFP = flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    const schedEndFP = flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
 
-    // PAGINATION
-    document.getElementById('prev-page-btn').addEventListener('click', () => {
-      if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); }
-    });
-    
-    document.getElementById('next-page-btn').addEventListener('click', () => {
-      if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); }
-    });
-
+    document.getElementById('prev-page-btn').addEventListener('click', () => { if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); } });
+    document.getElementById('next-page-btn').addEventListener('click', () => { if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); } });
 
     // -------------------------------------------------------------------
     // AUTHENTICATION
     // -------------------------------------------------------------------
-
     async function checkUser() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       handleAuthChange(session?.user);
     }
-
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      handleAuthChange(session?.user);
-    });
+    supabaseClient.auth.onAuthStateChange((event, session) => handleAuthChange(session?.user));
 
     async function handleAuthChange(user) {
       const loader = document.getElementById('global-loader');
@@ -690,6 +805,8 @@
           isAppInitialized = true;
           loader.style.display = 'flex';
           try {
+              document.getElementById('global-shift-start').value = globalShiftStart;
+              document.getElementById('global-shift-end').value = globalShiftEnd;
               await initialMetadataLoad();
               setupRealtimeSync();
           } catch (err) {
@@ -712,63 +829,58 @@
       const btn = document.getElementById('login-btn');
       const errorMsg = document.getElementById('error-msg');
       const loader = document.getElementById('global-loader');
-
-      errorMsg.style.display = 'none';
-      btn.disabled = true;
-      btn.innerText = "Authenticating...";
-      loader.style.display = 'flex';
+      errorMsg.style.display = 'none'; btn.disabled = true; btn.innerText = "Authenticating..."; loader.style.display = 'flex';
 
       const email = document.getElementById('email-input').value.trim();
       const password = document.getElementById('password-input').value;
-
       if (!email || !password) {
-        loader.style.display = 'none';
-        errorMsg.style.display = 'block';
-        errorMsg.innerText = "Please enter both Email and Password.";
-        btn.disabled = false;
-        btn.innerText = "Log In";
-        return;
+        loader.style.display = 'none'; errorMsg.style.display = 'block'; errorMsg.innerText = "Please enter both Email and Password."; btn.disabled = false; btn.innerText = "Log In"; return;
       }
-
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
       if (error) {
-        loader.style.display = 'none';
-        errorMsg.style.display = 'block';
-        errorMsg.innerText = error.message;
-        btn.disabled = false;
-        btn.innerText = "Log In";
+        loader.style.display = 'none'; errorMsg.style.display = 'block'; errorMsg.innerText = error.message; btn.disabled = false; btn.innerText = "Log In";
       }
     });
 
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-      document.getElementById('global-loader').style.display = 'flex';
-      await supabaseClient.auth.signOut();
-    });
+    document.getElementById('logout-btn').addEventListener('click', async () => { document.getElementById('global-loader').style.display = 'flex'; await supabaseClient.auth.signOut(); });
 
     // -------------------------------------------------------------------
     // INITIALIZATION & DATA FETCHING
     // -------------------------------------------------------------------
-
     async function initialMetadataLoad() {
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
-      
       await executeLazyPhotoDelete();
       
-      const { data: staffData } = await supabaseClient.from('staff_directory').select('name').order('name');
+      const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       masterStaffList = (staffData || []).map(s => s.name);
       selectedStaff = new Set(masterStaffList);
-      renderStaffFilterCheckboxes();
+      
+      const roles = new Set();
+      (staffData || []).forEach(s => {
+          staffConfig[s.name] = { 
+              role: s.role || 'Unassigned', 
+              shiftStart: s.shift_start || null, 
+              shiftEnd: s.shift_end || null 
+          };
+          roles.add(s.role || 'Unassigned');
+      });
+      masterRoleList = Array.from(roles);
+      selectedRoles = new Set(masterRoleList);
+      
+      // Populate Schedule Leave Staff Dropdown
+      const schedSelect = document.getElementById('sched-staff');
+      schedSelect.innerHTML = masterStaffList.map(name => `<option value="${name}">${name}</option>`).join('');
 
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('branch_name').order('branch_name');
       masterBranchList = (branchesData || []).map(b => b.branch_name);
       selectedBranches = new Set(masterBranchList);
+      
+      renderStaffFilterCheckboxes();
       renderBranchFilterCheckboxes();
+      renderRoleFilterCheckboxes();
 
       const savedSettings = JSON.parse(localStorage.getItem('rj_settings') || '{}');
-      if (savedSettings.sync !== undefined) {
-        document.getElementById('sync-toggle').checked = savedSettings.sync;
-      }
+      if (savedSettings.sync !== undefined) document.getElementById('sync-toggle').checked = savedSettings.sync;
 
       loadFromCache();
       await fetchLogsFromDatabase();
@@ -783,53 +895,65 @@
           exceptionsData = JSON.parse(cachedExceptions);
           processStitchedData(); 
         }
-      } catch(e) { console.error("Cache load error", e); }
+      } catch(e) {}
     }
 
     async function executeLazyPhotoDelete() {
-      const cutoffDate = new Date(); 
-      cutoffDate.setDate(cutoffDate.getDate() - 7);
+      const cutoffDate = new Date(); cutoffDate.setDate(cutoffDate.getDate() - 7);
       try {
-        await supabaseClient.from('attendance_logs')
-          .update({ photo_capture: null })
-          .eq('uniform_reviewed', true)
-          .lte('timestamp', cutoffDate.toISOString());
+        await supabaseClient.from('attendance_logs').update({ photo_capture: null }).eq('uniform_reviewed', true).lte('timestamp', cutoffDate.toISOString());
       } catch (err) { }
     }
 
+    // Role Filter Sync
+    function renderRoleFilterCheckboxes() {
+      const container = document.getElementById('role-checkboxes');
+      container.innerHTML = masterRoleList.map(name => `<label class="check-wrap"><input type="checkbox" class="role-cb" value="${name}" ${selectedRoles.has(name) ? "checked" : ""}> <span>${name}</span></label>`).join('');
+      
+      document.querySelectorAll('.role-cb').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          if(e.target.checked) selectedRoles.add(e.target.value); else selectedRoles.delete(e.target.value);
+          updateRoleButtonText(); processStitchedData(); 
+        });
+      });
+      
+      document.getElementById('btn-select-all-roles').addEventListener('click', () => {
+        document.querySelectorAll('.role-cb').forEach(cb => { cb.checked = true; selectedRoles.add(cb.value); }); 
+        updateRoleButtonText(); processStitchedData(); 
+      });
+      document.getElementById('btn-deselect-all-roles').addEventListener('click', () => {
+        document.querySelectorAll('.role-cb').forEach(cb => { cb.checked = false; selectedRoles.delete(cb.value); }); 
+        updateRoleButtonText(); processStitchedData(); 
+      });
+      updateRoleButtonText();
+    }
+    
+    function updateRoleButtonText() {
+      const btn = document.getElementById('role-btn-text');
+      if(selectedRoles.size === masterRoleList.length && masterRoleList.length > 0) btn.innerText = "All Roles";
+      else btn.innerText = `${selectedRoles.size} Selected`;
+    }
 
-    // STAFF FILTER SYNC
+    // Staff Filter Sync
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
-      container.innerHTML = masterStaffList.map(name => 
-        `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" ${selectedStaff.has(name) ? "checked" : ""}> <span>${name}</span></label>`
-      ).join('');
+      container.innerHTML = masterStaffList.map(name => `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" ${selectedStaff.has(name) ? "checked" : ""}> <span>${name}</span></label>`).join('');
       
       document.querySelectorAll('.staff-cb').forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedStaff.add(e.target.value); 
-          else selectedStaff.delete(e.target.value);
-          updateStaffButtonText();
-          processStitchedData(); 
+          if(e.target.checked) selectedStaff.add(e.target.value); else selectedStaff.delete(e.target.value);
+          updateStaffButtonText(); processStitchedData(); 
         });
       });
       
       document.getElementById('btn-select-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { 
-            if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaff.add(cb.value); }
-        }); 
-        updateStaffButtonText();
-        processStitchedData(); 
+        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaff.add(cb.value); } }); 
+        updateStaffButtonText(); processStitchedData(); 
       });
-      
       document.getElementById('btn-deselect-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { 
-            if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaff.delete(cb.value); }
-        }); 
-        updateStaffButtonText();
-        processStitchedData(); 
+        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaff.delete(cb.value); } }); 
+        updateStaffButtonText(); processStitchedData(); 
       });
-      
       updateStaffButtonText();
     }
 
@@ -838,48 +962,31 @@
       if(selectedStaff.size === masterStaffList.length && masterStaffList.length > 0) btn.innerText = "All Staff Selected";
       else btn.innerText = `${selectedStaff.size} Selected`;
     }
-
     document.getElementById('staff-search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.staff-cb').forEach(cb => {
-        const label = cb.parentElement;
-        if (cb.value.toLowerCase().includes(term)) { label.style.display = 'flex'; } 
-        else { label.style.display = 'none'; }
-      });
+      document.querySelectorAll('.staff-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
     });
 
-    // BRANCH FILTER SYNC
+    // Branch Filter Sync
     function renderBranchFilterCheckboxes() {
       const container = document.getElementById('branch-checkboxes');
-      container.innerHTML = masterBranchList.map(name => 
-        `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${name}" ${selectedBranches.has(name) ? "checked" : ""}> <span>${name}</span></label>`
-      ).join('');
+      container.innerHTML = masterBranchList.map(name => `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${name}" ${selectedBranches.has(name) ? "checked" : ""}> <span>${name}</span></label>`).join('');
       
       document.querySelectorAll('.branch-cb').forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedBranches.add(e.target.value); 
-          else selectedBranches.delete(e.target.value);
-          updateBranchButtonText();
-          processStitchedData(); 
+          if(e.target.checked) selectedBranches.add(e.target.value); else selectedBranches.delete(e.target.value);
+          updateBranchButtonText(); processStitchedData(); 
         });
       });
       
       document.getElementById('btn-select-all-branches').addEventListener('click', () => {
-        document.querySelectorAll('.branch-cb').forEach(cb => { 
-            if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranches.add(cb.value); }
-        }); 
-        updateBranchButtonText();
-        processStitchedData(); 
+        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranches.add(cb.value); } }); 
+        updateBranchButtonText(); processStitchedData(); 
       });
-      
       document.getElementById('btn-deselect-all-branches').addEventListener('click', () => {
-        document.querySelectorAll('.branch-cb').forEach(cb => { 
-            if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranches.delete(cb.value); }
-        }); 
-        updateBranchButtonText();
-        processStitchedData(); 
+        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranches.delete(cb.value); } }); 
+        updateBranchButtonText(); processStitchedData(); 
       });
-      
       updateBranchButtonText();
     }
 
@@ -888,38 +995,24 @@
       if(selectedBranches.size === masterBranchList.length && masterBranchList.length > 0) btn.innerText = "All Branches Selected";
       else btn.innerText = `${selectedBranches.size} Selected`;
     }
-
     document.getElementById('branch-search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.branch-cb').forEach(cb => {
-        const label = cb.parentElement;
-        if (cb.value.toLowerCase().includes(term)) { label.style.display = 'flex'; } 
-        else { label.style.display = 'none'; }
-      });
+      document.querySelectorAll('.branch-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
     });
 
-
-    document.getElementById('refresh-data-btn').addEventListener('click', () => {
-      fetchLogsFromDatabase(false); 
-    });
+    document.getElementById('refresh-data-btn').addEventListener('click', () => { fetchLogsFromDatabase(false); });
 
     async function fetchLogsFromDatabase(keepPage = false) {
       document.getElementById('master-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center">Fetching records from Database...</td></tr>';
-      
       if (!keepPage) currentPage = 0; 
 
       const startISO = new Date(startDate).toISOString();
-      const endObj = new Date(endDate); 
-      endObj.setHours(23, 59, 59);
-      const endISO = endObj.toISOString();
+      const endObj = new Date(endDate); endObj.setHours(23, 59, 59); const endISO = endObj.toISOString();
 
-      const { data: logsData, error: logsError, count } = await supabaseClient
-        .from('attendance_logs')
-        .select('*', { count: 'exact' })
-        .gte('timestamp', startISO)
-        .lte('timestamp', endISO)
-        .order('timestamp', { ascending: false })
-        .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
+      const { data: logsData, count } = await supabaseClient
+        .from('attendance_logs').select('*', { count: 'exact' })
+        .gte('timestamp', startISO).lte('timestamp', endISO)
+        .order('timestamp', { ascending: false }).range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
         
       dbLogs = logsData || [];
       totalRecords = count || 0;
@@ -929,19 +1022,12 @@
       document.getElementById('prev-page-btn').disabled = currentPage === 0;
       document.getElementById('next-page-btn').disabled = (currentPage + 1) * pageSize >= totalRecords;
 
-      const startOnlyDate = toLocalISO(startDate);
-      const endOnlyDate = toLocalISO(endDate);
-      
       const { data: excData } = await supabaseClient
-        .from('attendance_exceptions')
-        .select('*')
-        .gte('date', startOnlyDate)
-        .lte('date', endOnlyDate);
+        .from('attendance_exceptions').select('*')
+        .gte('date', toLocalISO(startDate)).lte('date', toLocalISO(endDate));
         
       exceptionsData = {};
-      (excData || []).forEach(e => {
-        exceptionsData[`${e.employee_name}_${e.date}`] = { reason: e.reason };
-      });
+      (excData || []).forEach(e => { exceptionsData[`${e.employee_name}_${e.date}`] = { reason: e.reason }; });
 
       localStorage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
       localStorage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
@@ -949,44 +1035,62 @@
       processStitchedData();
     }
 
-    // Generate True Calendar Dates
     function getDatesArrayFromFetchedLogs() {
       const datesArray = [];
-      let curr = new Date(startDate);
-      curr.setHours(0,0,0,0);
-      let end = new Date(endDate);
-      end.setHours(23,59,59,999);
-      
+      let curr = new Date(startDate); curr.setHours(0,0,0,0);
+      let end = new Date(endDate); end.setHours(23,59,59,999);
       let limit = new Date(); limit.setHours(23,59,59,999);
       if (end > limit) end = limit; 
-
-      while (curr <= end) {
-        datesArray.push(new Date(curr));
-        curr.setDate(curr.getDate() + 1);
-      }
+      while (curr <= end) { datesArray.push(new Date(curr)); curr.setDate(curr.getDate() + 1); }
       return datesArray.sort((a,b) => b - a);
+    }
+    
+    function parseTimeStrToDate(timeStr, baseDate) {
+        if(!timeStr) return null;
+        const [hours, minutes] = timeStr.split(':');
+        let d = new Date(baseDate);
+        d.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        return d;
     }
 
     function processStitchedData() {
-      processedData = []; 
-      missingData = [];
+      processedData = []; missingData = []; statsData = [];
       let totalPresent = 0, totalLate = 0, totalMissing = 0;
       
       const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
+
+      // Stats tracking object
+      let staffStatsTracker = {};
+      filteredStaffNames.forEach(name => {
+         staffStatsTracker[name] = { 
+             name: name, role: staffConfig[name]?.role || 'Unassigned', 
+             daysPresent: 0, totalHoursDec: 0, lateCount: 0, missedShirt: 0, missedId: 0,
+             dailyTargetHours: 0
+         };
+         
+         // Calculate daily target for this staff
+         let shiftStartStr = staffConfig[name]?.shiftStart || globalShiftStart;
+         let shiftEndStr = staffConfig[name]?.shiftEnd || globalShiftEnd;
+         let tStart = parseTimeStrToDate(shiftStartStr, new Date());
+         let tEnd = parseTimeStrToDate(shiftEndStr, new Date());
+         if(tStart && tEnd) staffStatsTracker[name].dailyTargetHours = (tEnd - tStart) / 3600000;
+      });
 
       dateArray.forEach(targetDate => {
         const dateStringMatch = targetDate.toDateString();
         const isoDateStr = toLocalISO(targetDate); 
 
         filteredStaffNames.forEach(staffName => {
+          let staffRole = staffConfig[staffName]?.role || 'Unassigned';
+          if (!selectedRoles.has(staffRole)) return; // Filter by Role
+
           let dailyLogs = dbLogs.filter(log => log.employee_name === staffName && new Date(log.timestamp).toDateString() === dateStringMatch);
           dailyLogs.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-          // Multi-Select Branch Filtering Check
           if (selectedBranches.size !== masterBranchList.length) {
             const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => !selectedBranches.has(l.branch));
-            if (workedElsewhere) return; // Ignore if they didn't work at a selected branch
+            if (workedElsewhere) return; 
             dailyLogs = dailyLogs.filter(l => selectedBranches.has(l.branch));
           }
 
@@ -998,147 +1102,250 @@
             totalPresent += exceptionReason ? 0 : 1;
             
             let firstInLog = clockIns.length > 0 ? clockIns[0] : null;
+            let lastOutLog = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1] : null;
             let firstInTime = firstInLog ? new Date(firstInLog.timestamp) : null;
-            let lastOutTime = clockOuts.length > 0 ? new Date(clockOuts[clockOuts.length - 1].timestamp) : null;
+            let lastOutTime = lastOutLog ? new Date(lastOutLog.timestamp) : null;
 
             if (firstInTime && !lastOutTime && dateStringMatch !== new Date().toDateString()) { 
-              lastOutTime = new Date(firstInTime); 
-              lastOutTime.setHours(22, 0, 0, 0); 
+              lastOutTime = new Date(firstInTime); lastOutTime.setHours(22, 0, 0, 0); 
             }
             
-            let formattedHours = "--"; 
+            let formattedHours = "--", totalHoursFloat = 0; 
             let isLateArrival = false;
             
             if (firstInTime && lastOutTime) {
               const diffMs = lastOutTime - firstInTime; 
               formattedHours = `${Math.floor(diffMs/3600000)}h ${Math.floor((diffMs%3600000)/60000)}m`;
+              totalHoursFloat = diffMs/3600000;
             }
             
             if (firstInTime) { 
-              const targetTime = new Date(firstInTime); targetTime.setHours(10, 15, 0, 0); 
-              if (firstInTime > targetTime) { isLateArrival = true; totalLate++; } 
+              let shiftStartStr = staffConfig[staffName]?.shiftStart || globalShiftStart;
+              let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
+              expectedIn.setMinutes(expectedIn.getMinutes() + 15); // 15 min grace
+              if (firstInTime > expectedIn) { isLateArrival = true; totalLate++; } 
             }
 
             processedData.push({
-              date: targetDate, name: staffName, firstIn: firstInTime, lastOut: lastOutTime, 
+              date: targetDate, name: staffName, role: staffRole, firstIn: firstInTime, lastOut: lastOutTime, 
               formattedHours: formattedHours, isLate: isLateArrival, 
               branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
               hasException: exceptionReason, logIdForPhoto: firstInLog?.id, 
+              firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
               photoBase64: firstInLog?.photo_capture, uniformReviewed: firstInLog?.uniform_reviewed,
               uTshirt: firstInLog?.uniform_tshirt, uIdcard: firstInLog?.uniform_idcard
             });
             
+            // Update Stats Tracking (Only if they actually worked, not just an exception)
+            if(!exceptionReason && firstInTime) {
+                staffStatsTracker[staffName].daysPresent++;
+                staffStatsTracker[staffName].totalHoursDec += totalHoursFloat;
+                if(isLateArrival) staffStatsTracker[staffName].lateCount++;
+                if(firstInLog?.uniform_reviewed) {
+                    if(firstInLog.uniform_tshirt === false) staffStatsTracker[staffName].missedShirt++;
+                    if(firstInLog.uniform_idcard === false) staffStatsTracker[staffName].missedId++;
+                }
+            }
+            
           } else {
-            totalMissing++; 
-            missingData.push({ date: targetDate, name: staffName });
+            totalMissing++; missingData.push({ date: targetDate, name: staffName });
           }
         });
       });
 
       processedData.sort((a,b) => b.date - a.date); missingData.sort((a,b) => b.date - a.date);
+      statsData = Object.values(staffStatsTracker).filter(s => s.daysPresent > 0 || exceptionsData[s.name]);
 
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
       document.getElementById('metric-absent').innerText = totalMissing;
 
       let unexcusedCount = 0;
-      missingData.forEach(row => {
-        const isoDate = toLocalISO(row.date);
-        if (!exceptionsData[`${row.name}_${isoDate}`]) unexcusedCount++;
-      });
+      missingData.forEach(row => { if (!exceptionsData[`${row.name}_${toLocalISO(row.date)}`]) unexcusedCount++; });
       const badge = document.getElementById('absent-badge');
-      if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } 
-      else { badge.style.display = 'none'; }
+      if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
 
-      renderMasterTable(); 
+      if (document.getElementById('view-overview').style.display === 'block') {
+          if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
+      }
       renderAbsentTable();
       if (document.getElementById('view-matrix').style.display === 'block') generateMatrix();
+      if (document.getElementById('view-stats').style.display === 'block') renderStaffStats();
     }
 
     function renderMasterTable() {
       const tbody = document.getElementById('master-tbody');
-      
       let dataToRender = processedData;
       if (activeSubTab === 'late') { dataToRender = processedData.filter(row => row.isLate); } 
-      else if (activeSubTab === 'short') {
-        dataToRender = processedData.filter(row => {
-          if (row.firstIn && row.lastOut && row.firstIn.getTime() !== row.lastOut.getTime()) {
-            return (row.lastOut - row.firstIn) < (10 * 3600000); 
-          }
-          return false;
-        });
-      }
-
-      if (dataToRender.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters for this page.</td></tr>'; return; 
-      }
       
-      let htmlOutput = '';
-      dataToRender.forEach(row => {
+      if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters.</td></tr>'; return; }
+      
+      tbody.innerHTML = dataToRender.map(row => {
         const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '<span style="color:var(--danger)">Missing</span>';
         const outStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : 'Active';
-        
-        let statusBadge = row.hasException 
-          ? `<span class="badge bg-orange">${row.hasException}</span>` 
-          : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
+        let statusBadge = row.hasException ? `<span class="badge bg-orange">${row.hasException}</span>` : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
         
         let uniformHtml = '';
         if (row.uniformReviewed) {
            uniformHtml = `<div style="font-size: 12px; line-height:1.5;">Shirt: ${row.uTshirt?'✅':'❌'}<br>ID: ${row.uIdcard?'✅':'❌'}</div>`;
         } else if (row.photoBase64 && row.photoBase64.length > 100) {
-           uniformHtml = `<button class="btn-review" onclick="openReviewModal('${row.logIdForPhoto}')">Audit Photo</button>`;
+           uniformHtml = `<span class="badge bg-gray">Pending Review</span>`; // Gallery handles actual review
         } else {
            uniformHtml = `<span style="font-size:12px; color:var(--text-soft)">No Photo / Deleted</span>`;
         }
 
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
+        const isoDate = toLocalISO(row.date);
 
-        htmlOutput += `<tr>
+        return `<tr>
           <td style="color:var(--text-soft)">${displayDate}</td>
-          <td><strong>${row.name}</strong></td>
-          <td><span style="color:var(--text-soft)">In:</span> ${inStr} <br><span style="color:var(--text-soft)">Out:</span> ${outStr}</td>
+          <td><strong>${row.name}</strong><br><span class="role-tag">${row.role}</span></td>
+          <td>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><span style="color:var(--text-soft)">In:</span> ${inStr} <br><span style="color:var(--text-soft)">Out:</span> ${outStr}</div>
+                <div style="text-align:right">
+                    <span style="font-weight:700; color:var(--primary); font-size:16px;">${row.formattedHours}</span><br>
+                    <button class="icon-btn" onclick="openEditTimeModal('${row.name}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" title="Edit Shift Time">✏️ Edit Time</button>
+                </div>
+            </div>
+          </td>
           <td>${statusBadge} <br><span style="font-size:12px; color:var(--text-soft)">${row.branches || "-"}</span></td>
           <td>${uniformHtml}</td>
         </tr>`;
-      });
-      
-      tbody.innerHTML = htmlOutput;
+      }).join('');
     }
 
-    window.openReviewModal = function(logId) {
-      currentReviewLogId = logId;
-      const exactLog = dbLogs.find(l => l.id === logId);
-      if (exactLog && exactLog.photo_capture) {
-         document.getElementById('modal-image-preview').src = exactLog.photo_capture;
-         document.getElementById('check-tshirt').checked = false; 
-         document.getElementById('check-idcard').checked = false;
-         document.getElementById('review-modal').style.display = 'flex';
-      }
-    };
-    
-    document.getElementById('btn-cancel-review').addEventListener('click', () => { document.getElementById('review-modal').style.display = 'none'; });
-    
-    document.getElementById('btn-save-review').addEventListener('click', async () => {
-      const isTshirtPresent = document.getElementById('check-tshirt').checked; 
-      const isIdCardPresent = document.getElementById('check-idcard').checked;
-      const saveBtn = document.getElementById('btn-save-review'); 
-      saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
+    // -------------------------------------------------------------------
+    // FEATURE: Edit Shift Timeline
+    // -------------------------------------------------------------------
+    window.openEditTimeModal = function(staffName, isoDateStr, inId, outId, inIso, outIso) {
+      activeEditStaff = staffName; activeEditDateStr = isoDateStr; editLogInId = inId; editLogOutId = outId;
+      document.getElementById('edit-time-subtitle').innerText = `Editing ${staffName} on ${isoDateStr}`;
+      
+      const toTimeString = (iso) => {
+          if(!iso) return '';
+          let d = new Date(iso);
+          return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      };
+      
+      document.getElementById('edit-time-in').value = toTimeString(inIso);
+      document.getElementById('edit-time-out').value = toTimeString(outIso);
+      
+      document.getElementById('edit-time-modal').style.display = 'flex';
+    }
 
-      try {
-        await supabaseClient.from('attendance_logs')
-          .update({ uniform_reviewed: true, uniform_tshirt: isTshirtPresent, uniform_idcard: isIdCardPresent })
-          .eq('id', currentReviewLogId);
-        
-        const logIndex = dbLogs.findIndex(l => l.id === currentReviewLogId);
-        if(logIndex !== -1) { 
-          dbLogs[logIndex].uniform_reviewed = true; dbLogs[logIndex].uniform_tshirt = isTshirtPresent; dbLogs[logIndex].uniform_idcard = isIdCardPresent; 
-        }
+    document.getElementById('btn-cancel-edit-time').addEventListener('click', () => { document.getElementById('edit-time-modal').style.display = 'none'; });
+    
+    document.getElementById('btn-save-edit-time').addEventListener('click', async () => {
+       const inVal = document.getElementById('edit-time-in').value;
+       const outVal = document.getElementById('edit-time-out').value;
+       const btn = document.getElementById('btn-save-edit-time');
+       btn.innerText = "Saving..."; btn.disabled = true;
 
-        document.getElementById('review-modal').style.display = 'none'; processStitchedData(); showToast("Audit saved successfully", "success");
-      } catch (err) { showToast("Failed to save audit.", "error"); }
-      saveBtn.innerText = "Save Audit"; saveBtn.disabled = false;
+       try {
+           if(inVal && editLogInId) {
+               const newInIso = new Date(`${activeEditDateStr}T${inVal}:00`).toISOString();
+               await supabaseClient.from('attendance_logs').update({ timestamp: newInIso }).eq('id', editLogInId);
+           }
+           if(outVal) {
+               const newOutIso = new Date(`${activeEditDateStr}T${outVal}:00`).toISOString();
+               if(editLogOutId) {
+                   await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso }).eq('id', editLogOutId);
+               } else {
+                   // Insert new clock out if it was originally missing (22:00 auto-fill)
+                   await supabaseClient.from('attendance_logs').insert([{
+                       employee_name: activeEditStaff, action: 'Clock Out', branch: 'Admin Edited', timestamp: newOutIso
+                   }]);
+               }
+           }
+           document.getElementById('edit-time-modal').style.display = 'none';
+           fetchLogsFromDatabase(true); 
+           showToast("Shift timeline updated!", "success");
+       } catch (err) {
+           showToast("Failed to update timeline.", "error");
+       } finally {
+           btn.innerText = "Save Timeline"; btn.disabled = false;
+       }
     });
 
+    // -------------------------------------------------------------------
+    // FEATURE: Dedicated Audit Gallery
+    // -------------------------------------------------------------------
+    function renderAuditGallery() {
+        const grid = document.getElementById('audit-grid');
+        const unreviewedLogs = processedData.filter(r => r.photoBase64 && r.photoBase64.length > 100 && !r.uniformReviewed);
+        
+        if(unreviewedLogs.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--text-soft)">All photos audited for current filter! 🎉</div>';
+            return;
+        }
+
+        grid.innerHTML = unreviewedLogs.map(r => `
+            <div class="audit-card">
+                <div class="audit-img-wrap">
+                    <img src="${r.photoBase64}" class="audit-img" alt="Staff">
+                    <div class="audit-badge">${r.date.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>
+                </div>
+                <div class="audit-details">
+                    <div><strong>${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft)">${r.branches}</span></div>
+                    <label class="check-wrap" style="padding:4px; font-size:12px;"><input type="checkbox" id="tshirt-${r.logIdForPhoto}"> RJ T-Shirt</label>
+                    <label class="check-wrap" style="padding:4px; font-size:12px;"><input type="checkbox" id="idcard-${r.logIdForPhoto}"> ID Card</label>
+                    <button class="btn-primary" style="margin-top:auto; justify-content:center; padding:6px;" onclick="saveQuickAudit('${r.logIdForPhoto}')">Approve</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.saveQuickAudit = async function(logId) {
+        const tshirt = document.getElementById(`tshirt-${logId}`).checked;
+        const idcard = document.getElementById(`idcard-${logId}`).checked;
+        try {
+            await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
+            
+            // Update local cache to reflect instantly
+            const logIndex = dbLogs.findIndex(l => l.id === logId);
+            if(logIndex !== -1) { dbLogs[logIndex].uniform_reviewed = true; dbLogs[logIndex].uniform_tshirt = tshirt; dbLogs[logIndex].uniform_idcard = idcard; }
+            processStitchedData();
+            showToast("Audit Saved", "success");
+        } catch(e) { showToast("Error saving audit", "error"); }
+    }
+
+    // -------------------------------------------------------------------
+    // FEATURE: Staff Stats & Payroll Prep
+    // -------------------------------------------------------------------
+    function renderStaffStats() {
+        const tbody = document.getElementById('stats-tbody');
+        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No data available.</td></tr>'; return; }
+        
+        tbody.innerHTML = statsData.map(s => {
+            const expectedTotal = s.daysPresent * s.dailyTargetHours;
+            const diff = s.totalHoursDec - expectedTotal;
+            let otHtml = '';
+            if (s.daysPresent > 0) {
+                if (diff > 0.5) otHtml = `<span class="badge bg-green">OT: +${diff.toFixed(1)}h</span>`;
+                else if (diff < -0.5) otHtml = `<span class="badge bg-red">Short: ${diff.toFixed(1)}h</span>`;
+                else otHtml = `<span class="badge bg-gray">Balanced</span>`;
+            } else otHtml = `-`;
+
+            let infractions = [];
+            if(s.lateCount > 0) infractions.push(`<span style="color:var(--warning)">Lates: ${s.lateCount}</span>`);
+            if(s.missedShirt > 0) infractions.push(`<span style="color:var(--danger)">No Shirt: ${s.missedShirt}</span>`);
+            if(s.missedId > 0) infractions.push(`<span style="color:var(--danger)">No ID: ${s.missedId}</span>`);
+
+            return `<tr>
+                <td><strong>${s.name}</strong></td>
+                <td><span class="role-tag">${s.role}</span></td>
+                <td style="font-size:16px; font-weight:700;">${s.daysPresent}</td>
+                <td style="font-size:16px; font-weight:700; color:var(--primary);">${s.totalHoursDec.toFixed(1)}h</td>
+                <td>${otHtml} <br><span style="font-size:11px; color:var(--text-soft)">Target: ${expectedTotal.toFixed(1)}h</span></td>
+                <td style="font-size:12px; font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // -------------------------------------------------------------------
+    // VIEW 2: Action Center (Future Leave)
+    // -------------------------------------------------------------------
     function renderAbsentTable() {
       const tbody = document.getElementById('absent-tbody');
       if (missingData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No missing staff in currently loaded data.</td></tr>'; return; }
@@ -1146,7 +1353,6 @@
       tbody.innerHTML = missingData.map(row => {
         const isoDate = toLocalISO(row.date);
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
-        
         const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
         const statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
           
@@ -1159,30 +1365,53 @@
       document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString}`;
       document.getElementById('exception-modal').style.display = 'flex';
     };
-    
     document.getElementById('btn-cancel-exc').addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
       const reasonVal = document.getElementById('exc-reason').value;
-      const saveBtn = document.getElementById('btn-save-exc');
-      
-      saveBtn.innerText = "Saving...";
-      saveBtn.disabled = true;
+      const saveBtn = document.getElementById('btn-save-exc'); saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
 
       try {
         await supabaseClient.from('attendance_exceptions').upsert({ employee_name: activeExceptionName, date: activeExceptionDate, reason: reasonVal }, { onConflict: 'employee_name, date' }); 
         exceptionsData[`${activeExceptionName}_${activeExceptionDate}`] = { reason: reasonVal };
-        document.getElementById('exception-modal').style.display = 'none'; 
-        processStitchedData(); 
-        showToast("Exception updated", "success");
-      } catch (err) { 
-        showToast("Failed to save Exception.", "error"); 
-      } finally {
-        saveBtn.innerText = "Save Record";
-        saveBtn.disabled = false;
-      }
+        document.getElementById('exception-modal').style.display = 'none'; processStitchedData(); showToast("Exception updated", "success");
+      } catch (err) { showToast("Failed to save Exception.", "error"); } 
+      finally { saveBtn.innerText = "Save Record"; saveBtn.disabled = false; }
     });
 
+    document.getElementById('btn-open-schedule-leave').addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'flex'; });
+    document.getElementById('btn-cancel-sched').addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'none'; });
+    
+    document.getElementById('btn-save-sched').addEventListener('click', async () => {
+       const staff = document.getElementById('sched-staff').value;
+       const dStart = document.getElementById('sched-start').value;
+       const dEnd = document.getElementById('sched-end').value;
+       const reason = document.getElementById('sched-reason').value;
+       
+       if(!staff || !dStart || !dEnd) return showToast("Select staff and date range", "error");
+       
+       const btn = document.getElementById('btn-save-sched');
+       btn.innerText = "Processing..."; btn.disabled = true;
+       
+       let curr = new Date(dStart); let end = new Date(dEnd);
+       let inserts = [];
+       while(curr <= end) {
+           inserts.push({ employee_name: staff, date: toLocalISO(curr), reason: reason });
+           curr.setDate(curr.getDate() + 1);
+       }
+
+       try {
+           await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'employee_name, date' });
+           document.getElementById('schedule-leave-modal').style.display = 'none';
+           fetchLogsFromDatabase(true);
+           showToast(`Scheduled leave for ${inserts.length} days!`, "success");
+       } catch(e) { showToast("Failed to schedule leave", "error"); }
+       finally { btn.innerText = "Confirm Schedule"; btn.disabled = false; }
+    });
+
+    // -------------------------------------------------------------------
+    // VIEW 3: STAFF MATRIX
+    // -------------------------------------------------------------------
     function generateMatrix() {
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
@@ -1213,62 +1442,61 @@
       }).join('');
     }
 
+    // -------------------------------------------------------------------
+    // VIEW 4: SYSTEM SETTINGS
+    // -------------------------------------------------------------------
     async function loadSettingsData() {
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
       
       const staffTbody = document.getElementById('staff-settings-list');
-      staffTbody.innerHTML = (staffData || []).map(s => `<tr><td>${s.name}</td><td style="text-align:right"><button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button></td></tr>`).join('');
+      staffTbody.innerHTML = (staffData || []).map(s => `<tr>
+          <td><strong>${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
+          <td><span style="font-size:12px; color:var(--text-soft)">${s.shift_start ? `${s.shift_start} - ${s.shift_end}` : 'Global Default'}</span></td>
+          <td style="text-align:right"><button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button></td>
+      </tr>`).join('');
       
       const branchTbody = document.getElementById('branch-settings-list');
       branchTbody.innerHTML = (branchesData || []).map(b => `<tr><td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td><td style="text-align:right"><button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button></td></tr>`).join('');
-
-      const fetchedBranchNames = (branchesData || []).map(b => b.branch_name);
-      fetchedBranchNames.forEach(name => {
-          if (!masterBranchList.includes(name)) {
-              selectedBranches.add(name);
-          }
-      });
-      masterBranchList = fetchedBranchNames;
-      renderBranchFilterCheckboxes();
-
-      const fetchedStaffNames = (staffData || []).map(s => s.name);
-      fetchedStaffNames.forEach(name => {
-          if (!masterStaffList.includes(name)) {
-              selectedStaff.add(name);
-          }
-      });
-      masterStaffList = fetchedStaffNames;
-      renderStaffFilterCheckboxes();
-      
-      processStitchedData(); 
     }
+    
+    document.getElementById('save-global-shift-btn').addEventListener('click', () => {
+        const st = document.getElementById('global-shift-start').value;
+        const en = document.getElementById('global-shift-end').value;
+        if(st && en) {
+            globalShiftStart = st; globalShiftEnd = en;
+            localStorage.setItem('rj_shift_start', st); localStorage.setItem('rj_shift_end', en);
+            showToast("Global defaults updated!", "success");
+            processStitchedData(); // recalculate targets
+        }
+    });
     
     document.getElementById('add-staff-btn').addEventListener('click', async () => {
       const nameVal = document.getElementById('new-staff-name').value.trim();
+      const roleVal = document.getElementById('new-staff-role').value.trim() || null;
+      let startVal = document.getElementById('new-staff-start').value || null;
+      let endVal = document.getElementById('new-staff-end').value || null;
       
-      if(nameVal) {
-        const btn = document.getElementById('add-staff-btn');
-        btn.innerText = "Adding...";
-        btn.disabled = true;
+      if(startVal && startVal.length === 5) startVal += ':00'; // Ensure time format
+      if(endVal && endVal.length === 5) endVal += ':00';
 
+      if(nameVal) {
+        const btn = document.getElementById('add-staff-btn'); btn.innerText = "Adding..."; btn.disabled = true;
         try {
-          const { error } = await supabaseClient.from('staff_directory').insert([{ name: nameVal }]);
+          const { error } = await supabaseClient.from('staff_directory').insert([{ 
+              name: nameVal, role: roleVal, shift_start: startVal, shift_end: endVal 
+          }]);
           if(error) throw error;
           
-          document.getElementById('new-staff-name').value = ''; 
+          document.getElementById('new-staff-name').value = ''; document.getElementById('new-staff-role').value = '';
+          document.getElementById('new-staff-start').value = ''; document.getElementById('new-staff-end').value = '';
+          
+          await initialMetadataLoad(); // Refresh metadata to update caches and filters
           loadSettingsData(); 
           showToast("Staff added successfully", "success");
-        } catch (err) {
-          console.error(err);
-          showToast("Failed to add staff.", "error");
-        } finally {
-          btn.innerText = "Add Staff";
-          btn.disabled = false;
-        }
-      } else {
-        showToast("Please enter a staff name.", "error");
-      }
+        } catch (err) { showToast("Failed to add staff.", "error"); } 
+        finally { btn.innerText = "Add Staff"; btn.disabled = false; }
+      } else { showToast("Please enter a staff name.", "error"); }
     });
 
     document.getElementById('add-branch-btn').addEventListener('click', async () => { 
@@ -1286,51 +1514,60 @@
     });
 
     window.deleteStaffItem = async (rowId) => { 
-      if(confirm("Are you sure you want to remove this staff member?")) {
-        await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary");
-      }
+      if(confirm("Remove this staff member?")) { await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary"); }
     };
-    
     window.deleteBranchItem = async (rowId) => { 
-      if(confirm("Are you sure you want to remove this branch? Terminal access will break if email is used.")) {
-        await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Branch removed", "primary");
-      }
+      if(confirm("Remove this branch? Terminal access will break if email is used.")) { await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Branch removed", "primary"); }
     };
 
+    // -------------------------------------------------------------------
+    // EXPORT
+    // -------------------------------------------------------------------
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
       item.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        
-        document.querySelector('.export-menu').classList.remove('show');
-        
+        e.preventDefault(); document.querySelector('.export-menu').classList.remove('show');
         const exportType = e.target.getAttribute('data-export');
-        const columnHeaders = ["Date", "Staff Name", "First In", "Last Out", "Total Hours", "Status", "Branch List"];
         
-        let dataToExport = processedData;
-        if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate);
-        if (activeSubTab === 'short') dataToExport = processedData.filter(r => (r.lastOut - r.firstIn) < 36000000);
+        const isStatsView = document.getElementById('view-stats').style.display === 'block';
+        
+        if (exportType === 'pdf') {
+          const targetId = isStatsView ? 'stats-export-container' : 'export-container';
+          html2pdf().set({ margin: 10, filename: `RJ_Mobile_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(document.getElementById(targetId)).save();
+          return;
+        }
 
-        const exportRows = dataToExport.map(d => [
-          d.date.toLocaleDateString(), d.name, d.firstIn ? d.firstIn.toLocaleTimeString() : 'N/A', 
-          d.lastOut ? d.lastOut.toLocaleTimeString() : 'N/A', d.formattedHours, 
-          d.isLate ? "Late" : (d.hasException ? d.hasException : "On Time"), d.branches || "-"
-        ]);
+        let columnHeaders, exportRows;
+        
+        if (isStatsView) {
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Total Hours", "OT/Shortage", "Lates", "Missed Shirt", "Missed ID"];
+            exportRows = statsData.map(s => [
+                s.name, s.role, s.daysPresent, s.totalHoursDec.toFixed(2), 
+                (s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2),
+                s.lateCount, s.missedShirt, s.missedId
+            ]);
+        } else {
+            columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Status", "Branch List"];
+            let dataToExport = processedData;
+            if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate);
+            exportRows = dataToExport.map(d => [
+              d.date.toLocaleDateString(), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString() : 'N/A', 
+              d.lastOut ? d.lastOut.toLocaleTimeString() : 'N/A', d.formattedHours, 
+              d.isLate ? "Late" : (d.hasException ? d.hasException : "On Time"), d.branches || "-"
+            ]);
+        }
 
         if (exportType === 'csv') {
-          if (exportRows.length === 0) return showToast("No data available to export.", "error");
+          if (exportRows.length === 0) return showToast("No data to export.", "error");
           let csvString = columnHeaders.join(",") + "\n" + exportRows.map(r => `"${r.join('","')}"`).join("\n");
           const anchor = document.createElement("a"); anchor.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csvString); anchor.download = `RJ_Mobile_Report.csv`; anchor.click();
-        } else if (exportType === 'pdf') {
-          const containerTarget = document.getElementById('export-container');
-          html2pdf().set({ margin: 10, filename: `RJ_Mobile_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(containerTarget).save();
         } else if (exportType === 'xls') {
-           if (exportRows.length === 0) return showToast("No data available to export.", "error");
+           if (exportRows.length === 0) return showToast("No data to export.", "error");
            let htmlTableString = '<table><tr>' + columnHeaders.map(h => `<th>${h}</th>`).join('') + '</tr>';
            htmlTableString += exportRows.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') + '</table>';
            const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${htmlTableString}</body></html>`;
            const anchor = document.createElement("a"); anchor.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); anchor.download = `RJ_Mobile_Report.xls`; anchor.click();
         } else if (exportType === 'copy') {
-           if (exportRows.length === 0) return showToast("No data available to copy.", "error");
+           if (exportRows.length === 0) return showToast("No data to copy.", "error");
            const clipboardText = columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
            navigator.clipboard.writeText(clipboardText).then(() => showToast("Table copied to clipboard!", "success"));
         }
