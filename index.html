@@ -721,8 +721,9 @@
     let globalShiftEnd = localStorage.getItem('rj_shift_end') || "19:00";
     
     // Default dates (Today)
-    let startDate = new Date(); 
     let endDate = new Date();
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate() - 7); // Subtracts 7 days
     
     // Filter State
     let selectedStaff = new Set();
