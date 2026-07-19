@@ -1569,40 +1569,47 @@
     // VIEW 4: SYSTEM SETTINGS (CRUD with Edits)
     // -------------------------------------------------------------------
     async function loadSettingsData() {
+      // Yaha se .catch() hata diya gaya hai jisse error nahi aayega
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
-      const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name').catch(() => ({data: []}));
+      const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
       
       // Render Roles
       const roleTbody = document.getElementById('role-settings-list');
-      roleTbody.innerHTML = (rolesData || dbRoles).map(r => `<tr>
-          <td><strong>${r.role_name}</strong></td>
-          <td style="text-align:right">
-            <button class="edit-btn" onclick="openEditRole('${r.id}', '${r.role_name}')">Edit</button>
-            <button class="del-btn" onclick="deleteRoleItem('${r.id}')">Remove</button>
-          </td>
-      </tr>`).join('');
+      if (roleTbody) {
+          roleTbody.innerHTML = (rolesData || dbRoles || []).map(r => `<tr>
+              <td><strong>${r.role_name}</strong></td>
+              <td style="text-align:right; white-space:nowrap;">
+                <button class="edit-btn" onclick="openEditRole('${r.id}', '${r.role_name}')">Edit</button>
+                <button class="del-btn" onclick="deleteRoleItem('${r.id}')">Remove</button>
+              </td>
+          </tr>`).join('');
+      }
 
       // Render Staff
       const staffTbody = document.getElementById('staff-settings-list');
-      staffTbody.innerHTML = (staffData || []).map(s => `<tr>
-          <td><strong>${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
-          <td><span style="font-size:12px; color:var(--text-soft)">${s.shift_start ? `${s.shift_start} - ${s.shift_end}` : 'Global Default'}</span></td>
-          <td style="text-align:right">
-            <button class="edit-btn" onclick="openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${s.shift_start || ''}', '${s.shift_end || ''}')">Edit</button>
-            <button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button>
-          </td>
-      </tr>`).join('');
+      if (staffTbody) {
+          staffTbody.innerHTML = (staffData || []).map(s => `<tr>
+              <td><strong>${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
+              <td><span style="font-size:12px; color:var(--text-soft)">${s.shift_start ? `${s.shift_start} - ${s.shift_end}` : 'Global Default'}</span></td>
+              <td style="text-align:right; white-space:nowrap;">
+                <button class="edit-btn" onclick="openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${s.shift_start || ''}', '${s.shift_end || ''}')">Edit</button>
+                <button class="del-btn" onclick="deleteStaffItem('${s.id}')">Remove</button>
+              </td>
+          </tr>`).join('');
+      }
       
       // Render Branches
       const branchTbody = document.getElementById('branch-settings-list');
-      branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
-          <td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td>
-          <td style="text-align:right">
-            <button class="edit-btn" onclick="openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}', '${b.ip_address || ''}')">Edit</button>
-            <button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button>
-          </td>
-      </tr>`).join('');
+      if (branchTbody) {
+          branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
+              <td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td>
+              <td style="text-align:right; white-space:nowrap;">
+                <button class="edit-btn" onclick="openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}', '${b.ip_address || ''}')">Edit</button>
+                <button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button>
+              </td>
+          </tr>`).join('');
+      }
     }
     
     // Global Shifts
