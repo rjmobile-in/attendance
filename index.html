@@ -501,6 +501,19 @@
           </table>
         </div>
 
+        <!-- Leave Reasons Setup -->
+        <div class="settings-panel">
+          <h3 style="margin-bottom: 12px;">Leave Reasons Configuration</h3>
+          <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px;">Manage reasons for absences and leaves.</p>
+          <div style="display:flex; flex-direction: column; gap:12px;">
+            <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Half Day)" style="margin:0;">
+            <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
+          </div>
+          <table style="margin-top:20px;">
+            <tbody id="reason-settings-list"></tbody>
+          </table>
+        </div>
+
         <!-- Staff Setup -->
         <div class="settings-panel" style="grid-column: 1 / -1;">
           <h3 style="margin-bottom: 12px;">Staff Directory & Custom Shifts</h3>
@@ -597,6 +610,20 @@
     </div>
   </div>
 
+  <!-- Edit Reason Modal -->
+  <div id="edit-reason-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Edit Leave Reason</h2>
+      <input type="hidden" id="edit-reason-id">
+      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Reason Name</label>
+      <input type="text" id="edit-reason-name" class="input-field" style="margin-top: 8px;">
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-edit-reason" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
+        <button id="btn-save-edit-reason" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Edit Branch Modal -->
   <div id="edit-branch-modal" class="modal-overlay">
     <div class="modal-card">
@@ -662,12 +689,8 @@
       </div>
 
       <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Reason</label>
-      <select id="sched-reason" class="input-field" style="margin-top: 8px;">
-        <option value="Approved Leave">Approved Paid Leave</option>
-        <option value="Sick Leave">Sick Leave</option>
-        <option value="On Field Duty">On Field Duty / Errand</option>
-        <option value="Unexcused Absence">Unexcused Absence</option>
-      </select>
+      <select id="sched-reason" class="input-field" style="margin-top: 8px;"></select>
+      <input type="text" id="sched-reason-custom" class="input-field" placeholder="Type custom reason..." style="margin-top: 8px; display: none;">
 
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-sched" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
@@ -682,12 +705,9 @@
       <h2 style="margin-bottom: 8px;">Manage Exception</h2>
       <p style="color: var(--text-soft); margin-bottom: 20px;" id="exc-subtitle">Update record</p>
       <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Reason</label>
-      <select id="exc-reason" class="input-field" style="margin-top: 8px;">
-        <option value="Approved Leave">Approved Paid Leave</option>
-        <option value="Sick Leave">Sick Leave</option>
-        <option value="On Field Duty">On Field Duty / Errand</option>
-        <option value="Unexcused Absence">Unexcused Absence</option>
-      </select>
+      <select id="exc-reason" class="input-field" style="margin-top: 8px;"></select>
+      <input type="text" id="exc-reason-custom" class="input-field" placeholder="Type custom reason..." style="margin-top: 8px; display: none;">
+      
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-exc" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
         <button id="btn-save-exc" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Record</button>
@@ -709,6 +729,7 @@
     let masterBranchList = [];
     let masterRoleList = [];
     let dbRoles = []; // Stores the full role objects {id, role_name}
+    let dbReasons = []; // Stores leave reasons
     let staffConfig = {}; // Stores role, shift_start, shift_end by name
     let dbLogs = [];
     let exceptionsData = {}; 
@@ -796,6 +817,14 @@
       }
     }
     document.getElementById('sync-toggle').addEventListener('change', setupRealtimeSync);
+
+    // Custom Reason Toggle Visibility
+    document.getElementById('sched-reason').addEventListener('change', (e) => {
+      document.getElementById('sched-reason-custom').style.display = e.target.value === 'Custom' ? 'block' : 'none';
+    });
+    document.getElementById('exc-reason').addEventListener('change', (e) => {
+      document.getElementById('exc-reason-custom').style.display = e.target.value === 'Custom' ? 'block' : 'none';
+    });
 
     Sortable.create(document.getElementById('draggable-widgets'), {
       handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
@@ -967,6 +996,15 @@
           console.warn("roles_directory table might not exist yet.");
       }
 
+      // Load explicitly defined Leave Reasons
+      try {
+          const { data: reasonData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
+          dbReasons = reasonData || [];
+      } catch (err) {
+          console.warn("leave_reasons table might not exist yet.");
+      }
+      populateReasonDropdowns();
+
       // Load Staff and auto-populate roles if they exist in staff but not in explicitly defined roles (backwards compatibility)
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       masterStaffList = (staffData || []).map(s => s.name);
@@ -1009,6 +1047,12 @@
         const opts = '<option value="">-- Select Role --</option>' + masterRoleList.map(r => `<option value="${r}">${r}</option>`).join('');
         document.getElementById('new-staff-role').innerHTML = opts;
         document.getElementById('edit-staff-role').innerHTML = opts;
+    }
+
+    function populateReasonDropdowns() {
+        const opts = dbReasons.map(r => `<option value="${r.reason_name}">${r.reason_name}</option>`).join('') + '<option value="Custom" style="font-weight:bold; color:var(--primary);">-- Type Custom Reason --</option>';
+        document.getElementById('sched-reason').innerHTML = opts;
+        document.getElementById('exc-reason').innerHTML = opts;
     }
 
     function loadFromCache() {
@@ -1493,12 +1537,23 @@
     window.openExceptionModal = function(staffName, isoDateString) {
       activeExceptionName = staffName; activeExceptionDate = isoDateString;
       document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString}`;
+      
+      // Reset reason dropdown and custom field visibility
+      document.getElementById('exc-reason').value = dbReasons.length > 0 ? dbReasons[0].reason_name : '';
+      document.getElementById('exc-reason-custom').style.display = 'none';
+      document.getElementById('exc-reason-custom').value = '';
+
       document.getElementById('exception-modal').style.display = 'flex';
     };
     document.getElementById('btn-cancel-exc').addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
-      const reasonVal = document.getElementById('exc-reason').value;
+      let reasonVal = document.getElementById('exc-reason').value;
+      if (reasonVal === 'Custom') {
+          reasonVal = document.getElementById('exc-reason-custom').value.trim();
+          if(!reasonVal) return showToast("Please enter a custom reason", "error");
+      }
+      
       const saveBtn = document.getElementById('btn-save-exc'); saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
 
       try {
@@ -1509,14 +1564,24 @@
       finally { saveBtn.innerText = "Save Record"; saveBtn.disabled = false; }
     });
 
-    document.getElementById('btn-open-schedule-leave').addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'flex'; });
+    document.getElementById('btn-open-schedule-leave').addEventListener('click', () => { 
+        document.getElementById('sched-reason').value = dbReasons.length > 0 ? dbReasons[0].reason_name : '';
+        document.getElementById('sched-reason-custom').style.display = 'none';
+        document.getElementById('sched-reason-custom').value = '';
+        document.getElementById('schedule-leave-modal').style.display = 'flex'; 
+    });
     document.getElementById('btn-cancel-sched').addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-sched').addEventListener('click', async () => {
        const staff = document.getElementById('sched-staff').value;
        const dStart = document.getElementById('sched-start').value;
        const dEnd = document.getElementById('sched-end').value;
-       const reason = document.getElementById('sched-reason').value;
+       let reason = document.getElementById('sched-reason').value;
+       
+       if (reason === 'Custom') {
+           reason = document.getElementById('sched-reason-custom').value.trim();
+           if(!reason) return showToast("Please enter a custom reason", "error");
+       }
        
        if(!staff || !dStart || !dEnd) return showToast("Select staff and date range", "error");
        
@@ -1576,10 +1641,10 @@
     // VIEW 4: SYSTEM SETTINGS (CRUD with Edits)
     // -------------------------------------------------------------------
     async function loadSettingsData() {
-      // Yaha se .catch() hata diya gaya hai jisse error nahi aayega
       const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
       const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
       const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
+      const { data: reasonsData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
       
       // Render Roles
       const roleTbody = document.getElementById('role-settings-list');
@@ -1589,6 +1654,18 @@
               <td style="text-align:right; white-space:nowrap;">
                 <button class="edit-btn" onclick="openEditRole('${r.id}', '${r.role_name}')">Edit</button>
                 <button class="del-btn" onclick="deleteRoleItem('${r.id}')">Remove</button>
+              </td>
+          </tr>`).join('');
+      }
+
+      // Render Reasons
+      const reasonTbody = document.getElementById('reason-settings-list');
+      if (reasonTbody) {
+          reasonTbody.innerHTML = (reasonsData || dbReasons || []).map(r => `<tr>
+              <td><strong>${r.reason_name}</strong></td>
+              <td style="text-align:right; white-space:nowrap;">
+                <button class="edit-btn" onclick="openEditReason('${r.id}', '${r.reason_name}')">Edit</button>
+                <button class="del-btn" onclick="deleteReasonItem('${r.id}')">Remove</button>
               </td>
           </tr>`).join('');
       }
@@ -1677,6 +1754,56 @@
     });
     window.deleteRoleItem = async (rowId) => { 
       if(confirm("Remove this role? It will not remove it from existing staff automatically.")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
+    };
+
+    // LEAVE REASONS CRUD
+    document.getElementById('add-reason-btn').addEventListener('click', async () => {
+        const name = document.getElementById('new-reason-name').value.trim();
+        if(name) {
+            const btn = document.getElementById('add-reason-btn'); btn.innerText = "Adding..."; btn.disabled = true;
+            try {
+                await supabaseClient.from('leave_reasons').insert([{ reason_name: name }]);
+                document.getElementById('new-reason-name').value = '';
+                await initialMetadataLoad();
+                loadSettingsData();
+                showToast("Reason added successfully", "success");
+            } catch(e) { showToast("Failed to add reason", "error"); }
+            finally { btn.innerText = "Create Reason"; btn.disabled = false; }
+        } else { showToast("Enter a reason name.", "error"); }
+    });
+
+    window.openEditReason = (id, name) => {
+        document.getElementById('edit-reason-id').value = id;
+        document.getElementById('edit-reason-name').value = name;
+        document.getElementById('edit-reason-modal').style.display = 'flex';
+    };
+
+    document.getElementById('btn-cancel-edit-reason').addEventListener('click', () => document.getElementById('edit-reason-modal').style.display = 'none');
+
+    document.getElementById('btn-save-edit-reason').addEventListener('click', async () => {
+        const id = document.getElementById('edit-reason-id').value;
+        const newName = document.getElementById('edit-reason-name').value.trim();
+        
+        if(newName) {
+            const btn = document.getElementById('btn-save-edit-reason'); btn.innerText = "Saving..."; btn.disabled = true;
+            try {
+                await supabaseClient.from('leave_reasons').update({ reason_name: newName }).eq('id', id);
+                document.getElementById('edit-reason-modal').style.display = 'none';
+                await initialMetadataLoad();
+                loadSettingsData();
+                showToast("Reason updated", "success");
+            } catch(e) { showToast("Failed to update reason", "error"); }
+            finally { btn.innerText = "Save Changes"; btn.disabled = false; }
+        } else { document.getElementById('edit-reason-modal').style.display = 'none'; }
+    });
+
+    window.deleteReasonItem = async (rowId) => {
+        if(confirm("Remove this reason from the list?")) {
+            await supabaseClient.from('leave_reasons').delete().eq('id', rowId);
+            await initialMetadataLoad();
+            loadSettingsData();
+            showToast("Reason removed", "primary");
+        }
     };
     
     // STAFF CRUD
