@@ -20,6 +20,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,8 +69,10 @@
     .btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
     .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .icon-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; font-size: 16px; opacity: 0.6; transition: 0.2s; padding: 4px; border-radius: 6px; }
-    .icon-btn:hover { opacity: 1; background: var(--input-bg); }
+    
+    /* Edit Time Icon modified to gray text */
+    .icon-btn { background: transparent; border: none; color: var(--text-soft); cursor: pointer; font-size: 14px; opacity: 0.8; transition: 0.2s; padding: 4px 8px; border-radius: 6px; font-weight: 600;}
+    .icon-btn:hover { opacity: 1; background: var(--input-bg); color: var(--text-main); }
     
     .switch-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-soft); }
     .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
@@ -102,6 +106,7 @@
     .filter-bar { display: flex; align-items: center; gap: 12px; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; margin-bottom: 24px; flex-wrap: wrap; }
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
     .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); }
+    .time-filter-wrap { display: flex; gap: 4px; align-items: center; }
     
     .dropdown { position: relative; display: inline-block; }
     .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 240px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; z-index: 1000; box-shadow: var(--shadow-soft); }
@@ -170,12 +175,15 @@
     .edit-btn:hover { background: var(--primary); color: white; }
     .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: 6px; margin-top: 4px; display: inline-block; }
 
-    .btn-review { background: var(--primary-alpha); color: var(--primary); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.2s; white-space: nowrap; }
-    .btn-review:hover { background: var(--primary); color: #fff; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .modal-card { background: var(--card-bg); padding: 32px; border-radius: 24px; width: 100%; max-width: 450px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto;}
     .modal-img { width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 12px; border: 1px solid var(--card-border); background: #000; }
     .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border); }
+
+    .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px;}
+    .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; }
+    .chart-card h3 { font-size: 14px; margin-bottom: 16px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; }
+    .chart-container { position: relative; height: 300px; width: 100%; }
   </style>
 </head>
 <body>
@@ -234,21 +242,40 @@
       </div>
     </div>
 
+    <!-- Increased Filter Box Widths -->
     <div class="filter-bar">
       
       <div class="filter-group">
         <label>Start Date</label>
-        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 120px; padding: 10px;" placeholder="Start Date" />
+        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 130px; padding: 10px;" placeholder="Start Date" />
       </div>
       
       <div class="filter-group">
         <label>End Date</label>
-        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 120px; padding: 10px;" placeholder="End Date" />
+        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 130px; padding: 10px;" placeholder="End Date" />
+      </div>
+
+      <div class="filter-group">
+        <label>Clock-In Between</label>
+        <div class="time-filter-wrap">
+          <input type="time" id="filter-in-start" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock In Start" />
+          <span style="color:var(--text-soft);">-</span>
+          <input type="time" id="filter-in-end" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock In End" />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Clock-Out Between</label>
+        <div class="time-filter-wrap">
+          <input type="time" id="filter-out-start" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock Out Start" />
+          <span style="color:var(--text-soft);">-</span>
+          <input type="time" id="filter-out-end" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock Out End" />
+        </div>
       </div>
       
       <div class="filter-group dropdown" id="role-filter-dropdown">
         <label>Filter Role</label>
-        <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 150px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="role-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -265,7 +292,7 @@
 
       <div class="filter-group dropdown" id="branch-filter-dropdown">
         <label>Filter Branch</label>
-        <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 220px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="branch-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -282,7 +309,7 @@
 
       <div class="filter-group dropdown" id="staff-filter-dropdown">
         <label>Filter Staff</label>
-        <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
+        <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 180px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg);">
           <span id="staff-btn-text">Loading...</span> 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
         </button>
@@ -296,13 +323,12 @@
           </div>
         </div>
       </div>
-
-      <button id="refresh-data-btn" class="btn-primary" style="height: 42px; margin-bottom: 2px;">Apply & Fetch Logs</button>
     </div>
 
     <div class="tab-controls">
       <button class="tab-btn active" data-view="view-overview">Overview & Logs</button>
       <button class="tab-btn" data-view="view-stats">Staff Stats</button>
+      <button class="tab-btn" data-view="view-analysis">Deep Analysis</button>
       <button class="tab-btn" data-view="view-absent">Action Center <span id="absent-badge" class="badge bg-red" style="display:none; padding: 2px 6px; margin-left: 6px;">0</span></button>
       <button class="tab-btn" data-view="view-matrix">Attendance Matrix</button>
       <button class="tab-btn" data-view="view-settings">System Settings</button>
@@ -388,17 +414,47 @@
                 <th>Staff Name</th>
                 <th>Role</th>
                 <th>Days Present</th>
+                <th>Avg In & Out</th>
                 <th>Total Hours</th>
                 <th>Target vs Actual</th>
                 <th>Infractions (Late/Shirt/ID)</th>
               </tr>
             </thead>
             <tbody id="stats-tbody">
-              <tr><td colspan="6" style="text-align: center;">No data loaded.</td></tr>
+              <tr><td colspan="7" style="text-align: center;">No data loaded.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
+    </div>
+    
+    <div id="view-analysis" class="app-view" style="display: none;">
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+          <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Deep Analysis Dashboard</h2>
+          <span style="color: var(--text-soft);">Visual insights based on current filters.</span>
+        </div>
+        
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>Attendance Trend</h3>
+                <div class="chart-container"><canvas id="trendChart"></canvas></div>
+            </div>
+            
+            <div class="chart-card">
+                <h3>Arrival Analysis (Target vs Actual)</h3>
+                <div class="chart-container"><canvas id="arrivalChart"></canvas></div>
+            </div>
+            
+            <div class="chart-card">
+                <h3>Top Latecomers</h3>
+                <div class="chart-container"><canvas id="lateChart"></canvas></div>
+            </div>
+            
+            <div class="chart-card">
+                <h3>Role Distribution (Present)</h3>
+                <div class="chart-container"><canvas id="roleChart"></canvas></div>
+            </div>
+        </div>
     </div>
 
     <div id="view-absent" class="app-view" style="display: none;">
@@ -495,13 +551,13 @@
 
         <div class="settings-panel">
           <h3 style="margin-bottom: 12px;">Global Shift Time Defaults</h3>
-          <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px;">Used to calculate OT/Shortages if a staff member has no custom shift set.</p>
+          <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 12px;">Used to calculate OT/Shortages. Saves directly to database.</p>
           <div style="display:flex; flex-direction: column; gap:12px;">
             <label style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Default Start Time</label>
             <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
             <label style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Default End Time</label>
             <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
-            <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center;">Update Defaults</button>
+            <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center;">Save to Database</button>
           </div>
         </div>
 
@@ -703,8 +759,8 @@
     let missingData = [];
     let statsData = [];
     
-    let globalShiftStart = localStorage.getItem('rj_shift_start') || "10:00";
-    let globalShiftEnd = localStorage.getItem('rj_shift_end') || "19:00";
+    let globalShiftStart = "10:00";
+    let globalShiftEnd = "19:00";
     
     let endDate = new Date();
     let startDate = new Date();
@@ -723,6 +779,10 @@
     let activeEditDateStr = null, activeEditStaff = null, editLogInId = null, editLogOutId = null;
     let realtimeSubscription = null;
     let isAppInitialized = false;
+    
+    window.myCharts = {};
+    Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim() || '#a1a1aa';
+    Chart.defaults.font.family = "'Inter', sans-serif";
 
     const toLocalISO = (d) => {
         const year = d.getFullYear();
@@ -791,6 +851,8 @@
       const isLight = document.documentElement.classList.toggle('light-theme');
       localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
       document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
+      Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim();
+      renderAnalysisDashboard();
     });
 
     document.getElementById('save-settings-btn').addEventListener('click', () => {
@@ -848,9 +910,13 @@
         const viewId = e.currentTarget.getAttribute('data-view');
         document.getElementById(viewId).style.display = 'block';
         
+        if (viewId === 'view-overview') {
+            if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
+        }
         if (viewId === 'view-matrix') generateMatrix();
         if (viewId === 'view-settings') loadSettingsData();
         if (viewId === 'view-stats') renderStaffStats();
+        if (viewId === 'view-analysis') renderAnalysisDashboard();
       });
     });
 
@@ -904,11 +970,16 @@
       }
     });
 
-    flatpickr("#global-start", { defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) startDate = dates[0]; } });
-    flatpickr("#global-end", { defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) endDate = dates[0]; } });
+    flatpickr("#global-start", { defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) { startDate = dates[0]; fetchLogsFromDatabase(false); } } });
+    flatpickr("#global-end", { defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) { endDate = dates[0]; fetchLogsFromDatabase(false); } } });
     
     const schedStartFP = flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     const schedEndFP = flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    
+    document.getElementById('filter-in-start').addEventListener('change', processStitchedData);
+    document.getElementById('filter-in-end').addEventListener('change', processStitchedData);
+    document.getElementById('filter-out-start').addEventListener('change', processStitchedData);
+    document.getElementById('filter-out-end').addEventListener('change', processStitchedData);
 
     document.getElementById('prev-page-btn').addEventListener('click', () => { if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); } });
     document.getElementById('next-page-btn').addEventListener('click', () => { if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); } });
@@ -931,8 +1002,6 @@
           isAppInitialized = true;
           loader.style.display = 'flex';
           try {
-              document.getElementById('global-shift-start').value = globalShiftStart;
-              document.getElementById('global-shift-end').value = globalShiftEnd;
               await initialMetadataLoad();
               setupRealtimeSync();
           } catch (err) {
@@ -973,6 +1042,18 @@
     async function initialMetadataLoad() {
       document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
       await executeLazyPhotoDelete();
+
+      try {
+          const { data } = await supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').single();
+          if (data && data.setting_value) {
+              globalShiftStart = data.setting_value.start || "10:00";
+              globalShiftEnd = data.setting_value.end || "19:00";
+          }
+      } catch(e) {
+          console.warn("system_settings table might not exist or no global shift set.");
+      }
+      document.getElementById('global-shift-start').value = globalShiftStart;
+      document.getElementById('global-shift-end').value = globalShiftEnd;
       
       try {
           const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
@@ -1154,8 +1235,6 @@
       document.querySelectorAll('.branch-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
     });
 
-    document.getElementById('refresh-data-btn').addEventListener('click', () => { fetchLogsFromDatabase(false); });
-
     async function fetchLogsFromDatabase(keepPage = false) {
       document.getElementById('master-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center">Fetching records from Database...</td></tr>';
       if (!keepPage) currentPage = 0; 
@@ -1206,6 +1285,19 @@
         d.setHours(parseInt(hours), parseInt(minutes), 0, 0);
         return d;
     }
+    
+    function formatMinsTo24h(totalMins) {
+        if(isNaN(totalMins) || totalMins === 0) return "--";
+        let h = Math.floor(totalMins / 60) % 24;
+        let m = Math.floor(totalMins % 60);
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+    
+    function timeToMinutes(timeStr) {
+       if(!timeStr) return null;
+       let [h, m] = timeStr.split(':');
+       return parseInt(h) * 60 + parseInt(m);
+    }
 
     function processStitchedData() {
       processedData = []; missingData = []; statsData = [];
@@ -1213,13 +1305,21 @@
       
       const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
+      
+      let inStartStr = document.getElementById('filter-in-start').value;
+      let inEndStr = document.getElementById('filter-in-end').value;
+      let outStartStr = document.getElementById('filter-out-start').value;
+      let outEndStr = document.getElementById('filter-out-end').value;
+      
+      let inMinStart = timeToMinutes(inStartStr) || 0; let inMinEnd = timeToMinutes(inEndStr) || 1440;
+      let outMinStart = timeToMinutes(outStartStr) || 0; let outMinEnd = timeToMinutes(outEndStr) || 1440;
 
       let staffStatsTracker = {};
       filteredStaffNames.forEach(name => {
          staffStatsTracker[name] = { 
              name: name, role: staffConfig[name]?.role || 'Unassigned', 
              daysPresent: 0, totalHoursDec: 0, lateCount: 0, missedShirt: 0, missedId: 0,
-             dailyTargetHours: 0
+             dailyTargetHours: 0, sumInMins: 0, sumOutMins: 0, daysOut: 0
          };
          
          let shiftStartStr = staffConfig[name]?.shiftStart || globalShiftStart;
@@ -1251,12 +1351,22 @@
           const exceptionReason = exceptionsData[`${staffName}_${isoDateStr}`] ? exceptionsData[`${staffName}_${isoDateStr}`].reason : null;
 
           if (clockIns.length > 0 || clockOuts.length > 0 || exceptionReason) {
-            totalPresent += exceptionReason ? 0 : 1;
             
             let firstInLog = clockIns.length > 0 ? clockIns[0] : null;
             let lastOutLog = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1] : null;
             let firstInTime = firstInLog ? new Date(firstInLog.timestamp) : null;
             let lastOutTime = lastOutLog ? new Date(lastOutLog.timestamp) : null;
+            
+            if (firstInTime && (inStartStr || inEndStr)) {
+                let minsIn = firstInTime.getHours() * 60 + firstInTime.getMinutes();
+                if (minsIn < inMinStart || minsIn > inMinEnd) return; 
+            }
+            if (lastOutTime && (outStartStr || outEndStr)) {
+                let minsOut = lastOutTime.getHours() * 60 + lastOutTime.getMinutes();
+                if (minsOut < outMinStart || minsOut > outMinEnd) return; 
+            }
+            
+            totalPresent += exceptionReason ? 0 : 1;
 
             if (firstInTime && !lastOutTime && dateStringMatch !== new Date().toDateString()) { 
               lastOutTime = new Date(firstInTime); lastOutTime.setHours(22, 0, 0, 0); 
@@ -1264,6 +1374,7 @@
             
             let formattedHours = "--", totalHoursFloat = 0; 
             let isLateArrival = false;
+            let diffFromTargetMs = 0;
             
             if (firstInTime && lastOutTime) {
               const diffMs = lastOutTime - firstInTime; 
@@ -1274,13 +1385,14 @@
             if (firstInTime) { 
               let shiftStartStr = staffConfig[staffName]?.shiftStart || globalShiftStart;
               let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
+              diffFromTargetMs = firstInTime - expectedIn;
               expectedIn.setMinutes(expectedIn.getMinutes() + 15);
               if (firstInTime > expectedIn) { isLateArrival = true; totalLate++; } 
             }
 
             processedData.push({
               date: targetDate, name: staffName, role: staffRole, firstIn: firstInTime, lastOut: lastOutTime, 
-              formattedHours: formattedHours, isLate: isLateArrival, 
+              formattedHours: formattedHours, isLate: isLateArrival, diffFromTargetMs: diffFromTargetMs,
               branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
               hasException: exceptionReason, logIdForPhoto: firstInLog?.id, 
               firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
@@ -1293,6 +1405,11 @@
             if(!exceptionReason && firstInTime) {
                 staffStatsTracker[staffName].daysPresent++;
                 staffStatsTracker[staffName].totalHoursDec += totalHoursFloat;
+                staffStatsTracker[staffName].sumInMins += (firstInTime.getHours() * 60 + firstInTime.getMinutes());
+                if(lastOutTime) {
+                    staffStatsTracker[staffName].daysOut++;
+                    staffStatsTracker[staffName].sumOutMins += (lastOutTime.getHours() * 60 + lastOutTime.getMinutes());
+                }
                 if(isLateArrival) staffStatsTracker[staffName].lateCount++;
                 if(firstInLog?.uniform_reviewed) {
                     if(firstInLog.uniform_tshirt === false) staffStatsTracker[staffName].missedShirt++;
@@ -1301,7 +1418,9 @@
             }
             
           } else {
-            totalMissing++; missingData.push({ date: targetDate, name: staffName });
+            if (!inStartStr && !inEndStr && !outStartStr && !outEndStr) {
+                totalMissing++; missingData.push({ date: targetDate, name: staffName });
+            }
           }
         });
       });
@@ -1318,12 +1437,13 @@
       const badge = document.getElementById('absent-badge');
       if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
 
-      if (document.getElementById('view-overview').style.display === 'block') {
+      if (document.getElementById('view-overview').style.display !== 'none') {
           if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
       }
       renderAbsentTable();
-      if (document.getElementById('view-matrix').style.display === 'block') generateMatrix();
-      if (document.getElementById('view-stats').style.display === 'block') renderStaffStats();
+      if (document.getElementById('view-matrix').style.display !== 'none') generateMatrix();
+      if (document.getElementById('view-stats').style.display !== 'none') renderStaffStats();
+      if (document.getElementById('view-analysis').style.display !== 'none') renderAnalysisDashboard();
     }
 
     function renderMasterTable() {
@@ -1334,16 +1454,16 @@
       if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No records match your filters.</td></tr>'; return; }
       
       tbody.innerHTML = dataToRender.map(row => {
-        const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '<span style="color:var(--danger)">Missing</span>';
-        const outStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : 'Active';
+        const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '<span style="color:var(--danger)">Missing</span>';
+        const outStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'Active';
         let statusBadge = row.hasException ? `<span class="badge bg-orange">${row.hasException}</span>` : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
         
         let inPhotoHTML = `<span class="badge bg-gray">Missing</span>`;
         if (row.inPhoto) {
             if (row.inReviewed) {
                 inPhotoHTML = `<div style="font-size:12px; font-weight:600;">
-                    <span style="color: ${row.uTshirt ? 'var(--success)' : 'var(--danger)'}">Shirt: ${row.uTshirt ? 'Yes' : 'No'}</span><br>
-                    <span style="color: ${row.uIdcard ? 'var(--success)' : 'var(--danger)'}">ID: ${row.uIdcard ? 'Yes' : 'No'}</span>
+                    <span style="color:var(--text-soft)">Shirt:</span> <span style="color: ${row.uTshirt ? 'var(--success)' : 'var(--danger)'}">${row.uTshirt ? 'Yes' : 'No'}</span><br>
+                    <span style="color:var(--text-soft)">ID:</span> <span style="color: ${row.uIdcard ? 'var(--success)' : 'var(--danger)'}">${row.uIdcard ? 'Yes' : 'No'}</span>
                 </div>`;
             } else {
                 inPhotoHTML = `<div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
@@ -1357,8 +1477,8 @@
         if (row.outPhoto) {
             if (row.outReviewed) {
                 outPhotoHTML = `<div style="font-size:12px; font-weight:600;">
-                    <span style="color: ${row.outUTshirt ? 'var(--success)' : 'var(--danger)'}">Shirt: ${row.outUTshirt ? 'Yes' : 'No'}</span><br>
-                    <span style="color: ${row.outUIdcard ? 'var(--success)' : 'var(--danger)'}">ID: ${row.outUIdcard ? 'Yes' : 'No'}</span>
+                    <span style="color:var(--text-soft)">Shirt:</span> <span style="color: ${row.outUTshirt ? 'var(--success)' : 'var(--danger)'}">${row.outUTshirt ? 'Yes' : 'No'}</span><br>
+                    <span style="color:var(--text-soft)">ID:</span> <span style="color: ${row.outUIdcard ? 'var(--success)' : 'var(--danger)'}">${row.outUIdcard ? 'Yes' : 'No'}</span>
                 </div>`;
             } else {
                 outPhotoHTML = `<div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
@@ -1498,7 +1618,7 @@
 
     function renderStaffStats() {
         const tbody = document.getElementById('stats-tbody');
-        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No data available.</td></tr>'; return; }
+        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No data available.</td></tr>'; return; }
         
         tbody.innerHTML = statsData.map(s => {
             const expectedTotal = s.daysPresent * s.dailyTargetHours;
@@ -1509,6 +1629,9 @@
                 else if (diff < -0.5) otHtml = `<span class="badge bg-red">Short: ${diff.toFixed(1)}h</span>`;
                 else otHtml = `<span class="badge bg-gray">Balanced</span>`;
             } else otHtml = `-`;
+            
+            let avgIn = formatMinsTo24h(s.sumInMins / s.daysPresent);
+            let avgOut = formatMinsTo24h(s.sumOutMins / s.daysOut);
 
             let infractions = [];
             if(s.lateCount > 0) infractions.push(`<span style="color:var(--warning)">Lates: ${s.lateCount}</span>`);
@@ -1519,11 +1642,80 @@
                 <td><strong>${s.name}</strong></td>
                 <td><span class="role-tag">${s.role}</span></td>
                 <td style="font-size:16px; font-weight:700;">${s.daysPresent}</td>
+                <td><span style="font-size:12px; color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong>${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong>${avgOut}</strong></span></td>
                 <td style="font-size:16px; font-weight:700; color:var(--primary);">${s.totalHoursDec.toFixed(1)}h</td>
                 <td>${otHtml} <br><span style="font-size:11px; color:var(--text-soft)">Target: ${expectedTotal.toFixed(1)}h</span></td>
                 <td style="font-size:12px; font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
             </tr>`;
         }).join('');
+    }
+
+    function renderAnalysisDashboard() {
+        if(!processedData || processedData.length === 0) return;
+        const rootStyle = getComputedStyle(document.documentElement);
+        const primary = rootStyle.getPropertyValue('--primary').trim();
+        const success = rootStyle.getPropertyValue('--success').trim();
+        const danger = rootStyle.getPropertyValue('--danger').trim();
+        const warning = rootStyle.getPropertyValue('--warning').trim();
+        const textSoft = rootStyle.getPropertyValue('--text-soft').trim();
+        
+        const trendDates = [...new Set([...processedData, ...missingData].map(r => toLocalISO(r.date)))].sort();
+        const presentCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && !r.hasException).length);
+        const absentCounts = trendDates.map(d => missingData.filter(r => toLocalISO(r.date) === d).length);
+        const excCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && r.hasException).length);
+
+        if(window.myCharts['trend']) window.myCharts['trend'].destroy();
+        window.myCharts['trend'] = new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: { labels: trendDates.map(d => new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})), 
+                    datasets: [
+                        { label: 'Present', data: presentCounts, borderColor: success, backgroundColor: success, tension: 0.3 },
+                        { label: 'Absent', data: absentCounts, borderColor: danger, backgroundColor: danger, tension: 0.3 },
+                        { label: 'Excused', data: excCounts, borderColor: warning, backgroundColor: warning, tension: 0.3 }
+                    ]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        let earlyOver1Hr = 0; let earlyWithin1Hr = 0; let lateArr = 0;
+        processedData.forEach(r => {
+            if(!r.firstIn || r.hasException) return;
+            if (r.diffFromTargetMs < -3600000) earlyOver1Hr++;
+            else if (r.diffFromTargetMs >= -3600000 && r.diffFromTargetMs <= 0) earlyWithin1Hr++;
+            else if (r.diffFromTargetMs > 0) lateArr++;
+        });
+
+        if(window.myCharts['arrival']) window.myCharts['arrival'].destroy();
+        window.myCharts['arrival'] = new Chart(document.getElementById('arrivalChart'), {
+            type: 'doughnut',
+            data: { labels: ['> 1 Hr Early', '0-1 Hr Early', 'Late (After Shift Start)'], 
+                    datasets: [{ data: [earlyOver1Hr, earlyWithin1Hr, lateArr], backgroundColor: [primary, success, danger], borderWidth: 0 }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+        });
+
+        // FIXED: Only including people with lateCount > 0
+        const lateStats = [...statsData].filter(s => s.lateCount > 0).sort((a,b) => b.lateCount - a.lateCount).slice(0, 5);
+        if(window.myCharts['late']) window.myCharts['late'].destroy();
+        window.myCharts['late'] = new Chart(document.getElementById('lateChart'), {
+            type: 'bar',
+            data: { labels: lateStats.map(s => s.name.split(' ')[0]), 
+                    datasets: [{ label: 'Late Days', data: lateStats.map(s => s.lateCount), backgroundColor: warning, borderRadius: 6 }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        const roleCounts = {};
+        processedData.forEach(r => { if(!r.hasException && r.firstIn) { roleCounts[r.role] = (roleCounts[r.role] || 0) + 1; } });
+        
+        if(window.myCharts['role']) window.myCharts['role'].destroy();
+        window.myCharts['role'] = new Chart(document.getElementById('roleChart'), {
+            type: 'pie',
+            data: { labels: Object.keys(roleCounts), 
+                    datasets: [{ data: Object.values(roleCounts), backgroundColor: [primary, success, warning, '#8b5cf6', '#ec4899', '#14b8a6'], borderWidth: 0 }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        });
     }
 
     function renderAbsentTable() {
@@ -1631,7 +1823,7 @@
             rowStr += `<td>${hasExc ? `<span class="badge bg-orange" style="font-size:10px;">${hasExc.reason}</span>` : `<span class="badge bg-gray" style="font-size:10px;">No Record</span>`}</td>`;
           } else {
             const ins = dailyLogs.filter(l => l.action === 'Clock In').sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : 'N/A';
+            let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A';
             rowStr += `<td><span class="badge bg-green" style="font-size:10px;">In: ${inTimeStr}</span></td>`;
           }
         }); 
@@ -1691,14 +1883,28 @@
       }
     }
     
-    document.getElementById('save-global-shift-btn').addEventListener('click', () => {
+    document.getElementById('save-global-shift-btn').addEventListener('click', async () => {
         const st = document.getElementById('global-shift-start').value;
         const en = document.getElementById('global-shift-end').value;
         if(st && en) {
+            const btn = document.getElementById('save-global-shift-btn');
+            btn.innerText = "Saving to DB..."; btn.disabled = true;
             globalShiftStart = st; globalShiftEnd = en;
-            localStorage.setItem('rj_shift_start', st); localStorage.setItem('rj_shift_end', en);
-            showToast("Global defaults updated!", "success");
-            processStitchedData(); 
+            
+            try {
+                // Upsert to system_settings table
+                await supabaseClient.from('system_settings').upsert({ 
+                    setting_name: 'global_shift', 
+                    setting_value: { start: st, end: en } 
+                }, { onConflict: 'setting_name' });
+                
+                showToast("Global defaults saved to Database!", "success");
+                processStitchedData(); 
+            } catch(e) {
+                showToast("Failed to save. Ensure 'system_settings' table exists.", "error");
+            } finally {
+                btn.innerText = "Save to Database"; btn.disabled = false;
+            }
         }
     });
 
@@ -1941,9 +2147,9 @@
         let columnHeaders, exportRows;
         
         if (isStatsView) {
-            columnHeaders = ["Staff Name", "Role", "Days Present", "Total Hours", "OT/Shortage", "Lates", "Missed Shirt", "Missed ID"];
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "OT/Shortage", "Lates", "Missed Shirt", "Missed ID"];
             exportRows = statsData.map(s => [
-                s.name, s.role, s.daysPresent, s.totalHoursDec.toFixed(2), 
+                s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), s.totalHoursDec.toFixed(2), 
                 (s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2),
                 s.lateCount, s.missedShirt, s.missedId
             ]);
@@ -1952,8 +2158,8 @@
             let dataToExport = processedData;
             if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate);
             exportRows = dataToExport.map(d => [
-              d.date.toLocaleDateString(), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString() : 'N/A', 
-              d.lastOut ? d.lastOut.toLocaleTimeString() : 'N/A', d.formattedHours, 
+              d.date.toLocaleDateString(), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', 
+              d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', d.formattedHours, 
               d.isLate ? "Late" : (d.hasException ? d.hasException : "On Time"), d.branches || "-"
             ]);
         }
