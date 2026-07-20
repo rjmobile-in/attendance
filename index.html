@@ -382,11 +382,12 @@
                   <th>Staff Member</th>
                   <th>Shift Timeline & Hours</th>
                   <th>Status / Branches</th>
-                  <th>Uniform Check</th>
+                  <th>Check-In Photo</th>
+                  <th>Check-Out Photo</th>
                 </tr>
               </thead>
               <tbody id="master-tbody">
-                <tr><td colspan="5" style="text-align: center;">Loading data...</td></tr>
+                <tr><td colspan="6" style="text-align: center;">Loading data...</td></tr>
               </tbody>
             </table>
           </div>
@@ -715,6 +716,17 @@
     </div>
   </div>
 
+  <!-- Photo Viewer Modal (Added Safely) -->
+  <div id="photo-modal" class="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center;">
+        Audit Photo
+        <span style="color: var(--danger); cursor: pointer; font-size: 20px; font-weight: bold;" onclick="document.getElementById('photo-modal').style.display='none'">✕</span>
+      </h3>
+      <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo">
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -769,6 +781,12 @@
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
+    };
+
+    // Global Photo Modal Function
+    window.showImageModal = function(imageSrc) {
+      document.getElementById('modal-image-src').src = imageSrc;
+      document.getElementById('photo-modal').style.display = 'flex';
     };
 
     function showToast(message, type = 'primary') {
@@ -1177,7 +1195,7 @@
     document.getElementById('refresh-data-btn').addEventListener('click', () => { fetchLogsFromDatabase(false); });
 
     async function fetchLogsFromDatabase(keepPage = false) {
-      document.getElementById('master-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center">Fetching records from Database...</td></tr>';
+      document.getElementById('master-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center">Fetching records from Database...</td></tr>';
       if (!keepPage) currentPage = 0; 
 
       const startISO = new Date(startDate).toISOString();
@@ -1306,7 +1324,8 @@
               branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
               hasException: exceptionReason, logIdForPhoto: firstInLog?.id, 
               firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
-              photoBase64: firstInLog?.photo_capture, uniformReviewed: firstInLog?.uniform_reviewed,
+              inPhoto: firstInLog?.photo_capture, inReviewed: firstInLog?.uniform_reviewed,
+              outPhoto: lastOutLog?.photo_capture, outReviewed: lastOutLog?.uniform_reviewed,
               uTshirt: firstInLog?.uniform_tshirt, uIdcard: firstInLog?.uniform_idcard
             });
             
@@ -1352,21 +1371,20 @@
       let dataToRender = processedData;
       if (activeSubTab === 'late') { dataToRender = processedData.filter(row => row.isLate); } 
       
-      if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No records match your filters.</td></tr>'; return; }
+      if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No records match your filters.</td></tr>'; return; }
       
       tbody.innerHTML = dataToRender.map(row => {
         const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '<span style="color:var(--danger)">Missing</span>';
         const outStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : 'Active';
         let statusBadge = row.hasException ? `<span class="badge bg-orange">${row.hasException}</span>` : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
         
-        let uniformHtml = '';
-        if (row.uniformReviewed) {
-           uniformHtml = `<div style="font-size: 12px; line-height:1.5;">Shirt: ${row.uTshirt?'✅':'❌'}<br>ID: ${row.uIdcard?'✅':'❌'}</div>`;
-        } else if (row.photoBase64 && row.photoBase64.length > 100) {
-           uniformHtml = `<span class="badge bg-gray">Pending Review</span>`; // Gallery handles actual review
-        } else {
-           uniformHtml = `<span style="font-size:12px; color:var(--text-soft)">No Photo / Deleted</span>`;
-        }
+        const inPhotoHTML = row.inPhoto 
+          ? `<img src="${row.inPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="showImageModal('${row.inPhoto}')">` 
+          : `<span class="badge bg-gray">Missing</span>`;
+
+        const outPhotoHTML = row.outPhoto 
+          ? `<img src="${row.outPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="showImageModal('${row.outPhoto}')">` 
+          : `<span class="badge bg-gray">Missing</span>`;
 
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
         const isoDate = toLocalISO(row.date);
@@ -1384,7 +1402,8 @@
             </div>
           </td>
           <td>${statusBadge} <br><span style="font-size:12px; color:var(--text-soft)">${row.branches || "-"}</span></td>
-          <td>${uniformHtml}</td>
+          <td>${inPhotoHTML}</td>
+          <td>${outPhotoHTML}</td>
         </tr>`;
       }).join('');
     }
@@ -1447,27 +1466,42 @@
     // -------------------------------------------------------------------
     function renderAuditGallery() {
         const grid = document.getElementById('audit-grid');
-        const unreviewedLogs = processedData.filter(r => r.photoBase64 && r.photoBase64.length > 100 && !r.uniformReviewed);
-        
-        if(unreviewedLogs.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--text-soft)">All photos audited for current filter! 🎉</div>';
-            return;
-        }
+        let cardsHtml = '';
+        let photoCount = 0;
 
-        grid.innerHTML = unreviewedLogs.map(r => `
-            <div class="audit-card">
-                <div class="audit-img-wrap">
-                    <img src="${r.photoBase64}" class="audit-img" alt="Staff">
-                    <div class="audit-badge">${r.date.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>
+        processedData.forEach(r => {
+            const dateStr = r.date.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+            
+            const buildCard = (photo, logId, type, isReviewed) => {
+                if(!photo || photo.length < 100 || isReviewed) return '';
+                photoCount++;
+                const badgeColor = type === 'IN' ? 'var(--success)' : 'var(--danger)';
+                return `
+                <div class="audit-card">
+                    <div class="audit-img-wrap" onclick="showImageModal('${photo}')">
+                        <img src="${photo}" class="audit-img" alt="Audit Photo">
+                        <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid #fff;">${type}</span>
+                    </div>
+                    <div class="audit-details">
+                        <div><strong>${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft)">${r.branches}</span></div>
+                        <div style="font-size: 11px; color: var(--text-soft); margin-top: 2px;">${dateStr}</div>
+                        <label class="check-wrap" style="padding:4px; font-size:12px;"><input type="checkbox" id="tshirt-${logId}"> RJ T-Shirt</label>
+                        <label class="check-wrap" style="padding:4px; font-size:12px;"><input type="checkbox" id="idcard-${logId}"> ID Card</label>
+                        <button class="btn-primary" style="margin-top:auto; justify-content:center; padding:6px;" onclick="saveQuickAudit('${logId}')">Approve</button>
+                    </div>
                 </div>
-                <div class="audit-details">
-                    <div><strong>${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft)">${r.branches}</span></div>
-                    <label class="check-wrap" style="padding:4px; font-size:12px;"><input type="checkbox" id="tshirt-${r.logIdForPhoto}"> RJ T-Shirt</label>
-                    <label class="check-wrap" style="padding:4px; font-size:12px;"><input type="checkbox" id="idcard-${r.logIdForPhoto}"> ID Card</label>
-                    <button class="btn-primary" style="margin-top:auto; justify-content:center; padding:6px;" onclick="saveQuickAudit('${r.logIdForPhoto}')">Approve</button>
-                </div>
-            </div>
-        `).join('');
+                `;
+            };
+
+            cardsHtml += buildCard(r.inPhoto, r.firstInId, 'IN', r.inReviewed);
+            cardsHtml += buildCard(r.outPhoto, r.lastOutId, 'OUT', r.outReviewed);
+        });
+
+        if(photoCount === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color:var(--text-soft)">All photos audited for current filter! 🎉</div>';
+        } else {
+            grid.innerHTML = cardsHtml;
+        }
     }
 
     window.saveQuickAudit = async function(logId) {
@@ -1478,7 +1512,11 @@
             
             // Update local cache to reflect instantly
             const logIndex = dbLogs.findIndex(l => l.id === logId);
-            if(logIndex !== -1) { dbLogs[logIndex].uniform_reviewed = true; dbLogs[logIndex].uniform_tshirt = tshirt; dbLogs[logIndex].uniform_idcard = idcard; }
+            if(logIndex !== -1) { 
+                dbLogs[logIndex].uniform_reviewed = true; 
+                dbLogs[logIndex].uniform_tshirt = tshirt; 
+                dbLogs[logIndex].uniform_idcard = idcard; 
+            }
             processStitchedData();
             showToast("Audit Saved", "success");
         } catch(e) { showToast("Error saving audit", "error"); }
