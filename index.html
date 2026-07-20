@@ -416,12 +416,13 @@
                 <th>Days Present</th>
                 <th>Avg In & Out</th>
                 <th>Total Hours</th>
+                <th>Avg Hours</th> <!-- Naya Column -->
                 <th>Target vs Actual</th>
                 <th>Infractions (Late/Shirt/ID)</th>
               </tr>
             </thead>
             <tbody id="stats-tbody">
-              <tr><td colspan="7" style="text-align: center;">No data loaded.</td></tr>
+              <tr><td colspan="8" style="text-align: center;">No data loaded.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1618,7 +1619,8 @@
 
     function renderStaffStats() {
         const tbody = document.getElementById('stats-tbody');
-        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No data available.</td></tr>'; return; }
+        // Yahan colspan=8 kar diya hai kyunki column badh gaya hai
+        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>'; return; }
         
         tbody.innerHTML = statsData.map(s => {
             const expectedTotal = s.daysPresent * s.dailyTargetHours;
@@ -1632,6 +1634,9 @@
             
             let avgIn = formatMinsTo24h(s.sumInMins / s.daysPresent);
             let avgOut = formatMinsTo24h(s.sumOutMins / s.daysOut);
+            
+            // NAYA: Average Hours Calculation
+            let avgHours = s.daysPresent > 0 ? (s.totalHoursDec / s.daysPresent).toFixed(1) : "0.0";
 
             let infractions = [];
             if(s.lateCount > 0) infractions.push(`<span style="color:var(--warning)">Lates: ${s.lateCount}</span>`);
@@ -1644,12 +1649,12 @@
                 <td style="font-size:16px; font-weight:700;">${s.daysPresent}</td>
                 <td><span style="font-size:12px; color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong>${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong>${avgOut}</strong></span></td>
                 <td style="font-size:16px; font-weight:700; color:var(--primary);">${s.totalHoursDec.toFixed(1)}h</td>
+                <td style="font-size:16px; font-weight:700; color:var(--primary);">${avgHours}h</td>
                 <td>${otHtml} <br><span style="font-size:11px; color:var(--text-soft)">Target: ${expectedTotal.toFixed(1)}h</span></td>
                 <td style="font-size:12px; font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
             </tr>`;
         }).join('');
     }
-
     function renderAnalysisDashboard() {
         if(!processedData || processedData.length === 0) return;
         const rootStyle = getComputedStyle(document.documentElement);
@@ -2147,9 +2152,10 @@
         let columnHeaders, exportRows;
         
         if (isStatsView) {
-            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "OT/Shortage", "Lates", "Missed Shirt", "Missed ID"];
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Avg Hours", "OT/Shortage", "Lates", "Missed Shirt", "Missed ID"];
             exportRows = statsData.map(s => [
                 s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), s.totalHoursDec.toFixed(2), 
+                (s.daysPresent > 0 ? (s.totalHoursDec / s.daysPresent).toFixed(2) : "0.00"), // Naya Data
                 (s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2),
                 s.lateCount, s.missedShirt, s.missedId
             ]);
