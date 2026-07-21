@@ -644,7 +644,6 @@
       <input type="email" id="edit-branch-email" class="input-field" style="margin-top: 8px;">
       <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Terminal Password</label>
       <input type="text" id="edit-branch-pass" class="input-field" style="margin-top: 8px;">
-      <label style="font-size: 12px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">IP Lock (Optional)</label>
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-branch" class="btn-secondary" style="flex: 1; justify-content: center;">Cancel</button>
         <button id="btn-save-edit-branch" class="btn-primary" style="flex: 1; justify-content: center; background: var(--success);">Save Changes</button>
@@ -1877,9 +1876,9 @@
       const branchTbody = document.getElementById('branch-settings-list');
       if (branchTbody) {
           branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
-              <td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'} | IP Lock: ${b.ip_address || 'Unrestricted'}</span></td>
+              <td><strong>${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft)">Email: ${b.email} | Pass: ${b.password || 'N/A'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}', '${b.ip_address || ''}')">Edit</button>
+                <button class="edit-btn" onclick="openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}')">Edit</button>
                 <button class="del-btn" onclick="deleteBranchItem('${b.id}')">Remove</button>
               </td>
           </tr>`).join('');
@@ -2074,22 +2073,24 @@
       const nameVal = document.getElementById('new-branch-name').value;
       const emailVal = document.getElementById('new-branch-email').value;
       const passVal = document.getElementById('new-branch-pass').value; 
-      const ipVal = document.getElementById('new-branch-ip').value; 
       
       if(nameVal && emailVal && passVal) { 
         await supabaseClient.from('branches_directory').insert([{ branch_name: nameVal, email: emailVal, password: passVal }]); 
-        document.getElementById('new-branch-name').value = ''; document.getElementById('new-branch-email').value = ''; 
-        document.getElementById('new-branch-pass').value = ''; document.getElementById('new-branch-ip').value = ''; 
-        loadSettingsData(); showToast("Branch registered successfully", "success");
-      } else { showToast("Branch Name, Email, and Password are mandatory.", "error"); }
+        document.getElementById('new-branch-name').value = ''; 
+        document.getElementById('new-branch-email').value = ''; 
+        document.getElementById('new-branch-pass').value = ''; 
+        loadSettingsData(); 
+        showToast("Branch registered successfully", "success");
+      } else { 
+        showToast("Branch Name, Email, and Password are mandatory.", "error"); 
+      }
     });
 
-    window.openEditBranch = (id, name, email, pass, ip) => {
+    window.openEditBranch = (id, name, email, pass) => {
         document.getElementById('edit-branch-id').value = id;
         document.getElementById('edit-branch-name').value = name;
         document.getElementById('edit-branch-email').value = email;
         document.getElementById('edit-branch-pass').value = pass || '';
-        document.getElementById('edit-branch-ip').value = ip || '';
         document.getElementById('edit-branch-modal').style.display = 'flex';
     };
     document.getElementById('btn-cancel-edit-branch').addEventListener('click', () => document.getElementById('edit-branch-modal').style.display = 'none');
@@ -2098,7 +2099,6 @@
         const name = document.getElementById('edit-branch-name').value;
         const email = document.getElementById('edit-branch-email').value;
         const pass = document.getElementById('edit-branch-pass').value;
-        const ip = document.getElementById('edit-branch-ip').value;
 
         if(name && email && pass) {
             const btn = document.getElementById('btn-save-edit-branch'); 
