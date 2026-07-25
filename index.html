@@ -86,7 +86,7 @@
        2. TYPOGRAPHY & BUTTONS
        ========================================================= */
     .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: var(--shadow-sm); }
-    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
     
     .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
@@ -127,6 +127,7 @@
 
     #global-loader { position: fixed; inset: 0; background: var(--bg-base); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* =========================================================
        4. FORM INPUTS & DROPDOWNS
@@ -208,10 +209,13 @@
     tbody tr:hover td { background: var(--input-bg); }
     tbody tr:last-child td { border-bottom: none; }
 
+    /* Unified Pagination Footer */
+    .pagination-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 32px; }
+
     /* =========================================================
        7. SETTINGS PANELS & AUDIT GALLERY
        ========================================================= */
-    .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding: 24px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border); }
+    .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding: 24px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border); margin-bottom: 24px; }
     .audit-card { background: var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; box-shadow: var(--shadow-sm);}
     .audit-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
     .audit-img-wrap { width: 100%; height: 220px; background: #000; position: relative; overflow: hidden;}
@@ -239,7 +243,7 @@
     @keyframes slideUp { from { transform: translateY(20px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
     
     .modal-card h2, .modal-card h3 { color: var(--text-main); font-size: 20px; }
-    .modal-img { width: 100%; height: auto; max-height: 350px; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--bg-base); }
+    .modal-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--bg-base); }
     .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
 
     .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
@@ -450,12 +454,21 @@
               </div>
             </div>
 
-            <div class="sub-tabs">
-              <button class="sub-tab-btn active" data-filter="all">Table: All Logs</button>
-              <button class="sub-tab-btn" data-filter="late">Table: Late Arrivals Only</button>
-              <button class="sub-tab-btn" data-filter="gallery">📸 Photo Audit Gallery</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                <div class="sub-tabs" style="margin-bottom: 0;">
+                  <button class="sub-tab-btn active" data-filter="all">Table: All Logs</button>
+                  <button class="sub-tab-btn" data-filter="late">Table: Late Arrivals Only</button>
+                  <button class="sub-tab-btn" data-filter="gallery">📸 Photo Audit Gallery</button>
+                </div>
+                <!-- Gallery Specific Filter (Hidden initially) -->
+                <div id="gallery-filters" style="display: none; align-items: center;">
+                    <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
+                        <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
+                    </label>
+                </div>
             </div>
 
+            <!-- TABLE CONTAINER -->
             <div class="table-card" id="master-table-container">
               <div class="table-responsive">
                 <table id="master-table">
@@ -474,15 +487,18 @@
                   </tbody>
                 </table>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--bg-base); border-top: 1px solid var(--card-border);">
-                <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 50</button>
-                <span id="page-indicator" style="color: var(--text-soft); font-size: 13px; font-weight: 600;">Page 1</span>
-                <button id="next-page-btn" class="btn-secondary" disabled>Next 50 →</button>
-              </div>
             </div>
 
+            <!-- GALLERY CONTAINER -->
             <div id="audit-gallery-container" style="display: none;">
               <div class="audit-grid" id="audit-grid"></div>
+            </div>
+
+            <!-- UNIFIED PAGINATION FOOTER -->
+            <div class="pagination-footer">
+              <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 100</button>
+              <span id="page-indicator" style="color: var(--text-soft); font-size: 13px; font-weight: 600;">Page 1</span>
+              <button id="next-page-btn" class="btn-secondary" disabled>Next 100 →</button>
             </div>
 
           </div>
@@ -818,6 +834,7 @@
     </div>
   </div>
 
+  <!-- AUDIT MODAL (Now supports re-auditing) -->
   <div id="photo-modal" class="modal-overlay" onclick="this.style.display='none'">
     <div class="modal-card" onclick="event.stopPropagation()">
       <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
@@ -836,7 +853,6 @@
   </div>
 
   <script type="module">
-    // All original JavaScript strictly preserved to ensure backend connections work identically
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
@@ -868,10 +884,14 @@
     let selectedBranches = new Set();
     let selectedRoles = new Set();
     
+    // PAGINATION SETTINGS: Increased to 100 per page to match gallery needs
     let currentPage = 0;
-    const pageSize = 50;
+    const pageSize = 100;
     let totalRecords = 0;
     let activeSubTab = 'all';
+
+    // NEW GALLERY STATE: Default true so admins only see un-audited photos on entry
+    let showOnlyPendingPhotos = true;
 
     let activeExceptionName = null, activeExceptionDate = null;
     let activeEditDateStr = null, activeEditStaff = null, editLogInId = null, editLogOutId = null;
@@ -889,20 +909,20 @@
         return `${year}-${month}-${day}`;
     };
 
-    window.showImageModal = function(imageSrc) {
-      document.getElementById('modal-image-src').src = imageSrc;
-      document.getElementById('audit-controls').style.display = 'none';
-      document.getElementById('photo-modal').style.display = 'flex';
-    };
-
-    window.openAuditModal = function(imageSrc, logId) {
+    // Modified to support passing existing TShirt/ID states to the modal
+    window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked) {
         document.getElementById('modal-image-src').src = imageSrc;
         const controls = document.getElementById('audit-controls');
+        
         if(logId) {
             controls.style.display = 'flex';
-            document.getElementById('modal-tshirt').checked = false;
-            document.getElementById('modal-idcard').checked = false;
-            document.getElementById('btn-modal-audit-save').onclick = () => saveQuickAuditFromModal(logId);
+            // Parse string booleans incase they are stringified
+            document.getElementById('modal-tshirt').checked = (isTshirtChecked === true || isTshirtChecked === 'true');
+            document.getElementById('modal-idcard').checked = (isIdcardChecked === true || isIdcardChecked === 'true');
+            
+            const btn = document.getElementById('btn-modal-audit-save');
+            btn.innerText = "Approve & Save";
+            btn.onclick = () => saveQuickAuditFromModal(logId);
         } else {
             controls.style.display = 'none';
         }
@@ -914,6 +934,7 @@
         const idcard = document.getElementById('modal-idcard').checked;
         const btn = document.getElementById('btn-modal-audit-save');
         btn.innerText = "Saving..."; btn.disabled = true;
+        
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
             const logIndex = dbLogs.findIndex(l => l.id === logId);
@@ -1018,19 +1039,35 @@
       });
     });
 
+    // Gallery Filter Toggle Listener
+    document.getElementById('toggle-pending-photos').addEventListener('change', (e) => {
+        showOnlyPendingPhotos = e.target.checked;
+        renderAuditGallery();
+    });
+
     document.querySelectorAll('.sub-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         activeSubTab = e.target.getAttribute('data-filter');
         
+        const galleryFilters = document.getElementById('gallery-filters');
+        
         if (activeSubTab === 'gallery') {
             document.getElementById('master-table-container').style.display = 'none';
             document.getElementById('audit-gallery-container').style.display = 'block';
+            galleryFilters.style.display = 'flex';
+            
+            // Auto-force pending check when arriving at gallery
+            showOnlyPendingPhotos = true;
+            document.getElementById('toggle-pending-photos').checked = true;
+            
             renderAuditGallery();
         } else {
             document.getElementById('master-table-container').style.display = 'block';
             document.getElementById('audit-gallery-container').style.display = 'none';
+            galleryFilters.style.display = 'none';
+            
             renderMasterTable(); 
         }
       });
@@ -1229,11 +1266,22 @@
       } catch(e) {}
     }
 
+    // ==========================================
+    // 7-DAY AUDITED CLEANUP RULE (BASE64 DB PURGE)
+    // ==========================================
     async function executeLazyPhotoDelete() {
-      const cutoffDate = new Date(); cutoffDate.setDate(cutoffDate.getDate() - 7);
+      const cutoffDate = new Date(); 
+      cutoffDate.setDate(cutoffDate.getDate() - 7);
+      
       try {
-        await supabaseClient.from('attendance_logs').update({ photo_capture: null }).eq('uniform_reviewed', true).lte('timestamp', cutoffDate.toISOString());
-      } catch (err) { }
+        // Purge massive Base64 strings from rows older than 7 days ONLY if reviewed/audited.
+        await supabaseClient.from('attendance_logs')
+          .update({ photo_capture: null })
+          .eq('uniform_reviewed', true)
+          .lte('timestamp', cutoffDate.toISOString());
+      } catch (err) {
+        console.warn("Cleanup failed", err);
+      }
     }
 
     function renderRoleFilterCheckboxes() {
@@ -1556,32 +1604,34 @@
         const outStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'Active';
         let statusBadge = row.hasException ? `<span class="badge bg-orange">${row.hasException}</span>` : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
         
-        let inPhotoHTML = `<span class="badge bg-gray">Missing</span>`;
+        let inPhotoHTML = `<span class="badge bg-gray">Archived / Missing</span>`;
         if (row.inPhoto) {
             if (row.inReviewed) {
                 inPhotoHTML = `<div style="font-size:12px; font-weight:600;">
                     <span style="color:var(--text-soft)">Shirt:</span> <span style="color: ${row.uTshirt ? 'var(--success)' : 'var(--danger)'}">${row.uTshirt ? 'Yes' : 'No'}</span><br>
                     <span style="color:var(--text-soft)">ID:</span> <span style="color: ${row.uIdcard ? 'var(--success)' : 'var(--danger)'}">${row.uIdcard ? 'Yes' : 'No'}</span>
+                    <br><button class="icon-btn" style="padding:2px 0; margin-top:4px;" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', ${row.uTshirt}, ${row.uIdcard})">✏️ Edit</button>
                 </div>`;
             } else {
                 inPhotoHTML = `<div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
-                    <img src="${row.inPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="openAuditModal('${row.inPhoto}', '${row.firstInId}')">
-                    <span class="badge bg-orange" style="font-size:10px; cursor:pointer;" onclick="openAuditModal('${row.inPhoto}', '${row.firstInId}')">Needs Audit</span>
+                    <img src="${row.inPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', false, false)">
+                    <span class="badge bg-orange" style="font-size:10px; cursor:pointer;" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', false, false)">Needs Audit</span>
                 </div>`;
             }
         }
 
-        let outPhotoHTML = `<span class="badge bg-gray">Missing</span>`;
+        let outPhotoHTML = `<span class="badge bg-gray">Archived / Missing</span>`;
         if (row.outPhoto) {
             if (row.outReviewed) {
                 outPhotoHTML = `<div style="font-size:12px; font-weight:600;">
                     <span style="color:var(--text-soft)">Shirt:</span> <span style="color: ${row.outUTshirt ? 'var(--success)' : 'var(--danger)'}">${row.outUTshirt ? 'Yes' : 'No'}</span><br>
                     <span style="color:var(--text-soft)">ID:</span> <span style="color: ${row.outUIdcard ? 'var(--success)' : 'var(--danger)'}">${row.outUIdcard ? 'Yes' : 'No'}</span>
+                    <br><button class="icon-btn" style="padding:2px 0; margin-top:4px;" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', ${row.outUTshirt}, ${row.outUIdcard})">✏️ Edit</button>
                 </div>`;
             } else {
                 outPhotoHTML = `<div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
-                    <img src="${row.outPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="openAuditModal('${row.outPhoto}', '${row.lastOutId}')">
-                    <span class="badge bg-orange" style="font-size:10px; cursor:pointer;" onclick="openAuditModal('${row.outPhoto}', '${row.lastOutId}')">Needs Audit</span>
+                    <img src="${row.outPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', false, false)">
+                    <span class="badge bg-orange" style="font-size:10px; cursor:pointer;" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', false, false)">Needs Audit</span>
                 </div>`;
             }
         }
@@ -1665,40 +1715,58 @@
         processedData.forEach(r => {
             const dateStr = r.date.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
             
-            const buildCard = (photo, logId, type, isReviewed) => {
-                if(!photo || photo.length < 100 || isReviewed) return '';
+            const buildCard = (photo, logId, type, isReviewed, uTshirt, uIdcard) => {
+                // If filter is active and the photo IS reviewed, skip rendering it
+                if (showOnlyPendingPhotos && isReviewed) return '';
+                if (!photo || photo.length < 100) return '';
+                
                 photoCount++;
                 const badgeColor = type === 'IN' ? 'var(--success)' : 'var(--danger)';
+                
+                const tChecked = (uTshirt === true || uTshirt === 'true') ? 'checked' : '';
+                const iChecked = (uIdcard === true || uIdcard === 'true') ? 'checked' : '';
+                
+                const btnHtml = isReviewed 
+                    ? `<button class="btn-secondary" style="margin-top:auto; justify-content:center; padding:10px; border-color: var(--success); color: var(--success);" onclick="window.saveQuickAudit('${logId}')">✏️ Update Audit</button>`
+                    : `<button class="btn-primary" style="margin-top:auto; justify-content:center; padding:10px;" onclick="window.saveQuickAudit('${logId}')">Approve & Save</button>`;
+
+                // Naya status badge logic
+                const statusBadgeHtml = isReviewed 
+                    ? `<span class="audit-badge" style="left: 12px; right: auto; background: var(--success); border: 1px solid rgba(255,255,255,0.2);">✅ Audited</span>`
+                    : `<span class="audit-badge" style="left: 12px; right: auto; background: var(--warning); color: #000; border: 1px solid rgba(0,0,0,0.2);">⏳ Pending</span>`;
+
                 return `
                 <div class="audit-card">
-                    <div class="audit-img-wrap" onclick="showImageModal('${photo}')">
+                    <div class="audit-img-wrap" onclick="window.openAuditModal('${photo}', '${logId}', ${uTshirt}, ${uIdcard})">
                         <img src="${photo}" class="audit-img" alt="Audit Photo">
                         <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2);">${type}</span>
+                        ${statusBadgeHtml}
                     </div>
                     <div class="audit-details">
                         <div><strong style="color: var(--text-main); font-size: 14px;">${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
                         <div style="font-size: 11px; color: var(--text-soft); font-weight: 600;">${dateStr}</div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}"> T-Shirt</label>
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}"> ID Card</label>
+                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
+                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}" ${iChecked}> ID Card</label>
                         </div>
-                        <button class="btn-primary" style="margin-top:auto; justify-content:center; padding:10px;" onclick="saveQuickAudit('${logId}')">Approve</button>
+                        ${btnHtml}
                     </div>
                 </div>
                 `;
             };
 
-            cardsHtml += buildCard(r.inPhoto, r.firstInId, 'IN', r.inReviewed);
-            cardsHtml += buildCard(r.outPhoto, r.lastOutId, 'OUT', r.outReviewed);
+            cardsHtml += buildCard(r.inPhoto, r.firstInId, 'IN', r.inReviewed, r.uTshirt, r.uIdcard);
+            cardsHtml += buildCard(r.outPhoto, r.lastOutId, 'OUT', r.outReviewed, r.outUTshirt, r.outUIdcard);
         });
 
         if(photoCount === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 60px; color:var(--text-soft); font-weight: 600;">All photos audited for current filter! 🎉</div>';
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 60px; color:var(--text-soft); font-weight: 600;">No photos match the current view filter!</div>';
         } else {
             grid.innerHTML = cardsHtml;
         }
     }
 
+    // Supports saving from the inline gallery buttons
     window.saveQuickAudit = async function(logId) {
         const tshirt = document.getElementById(`tshirt-${logId}`).checked;
         const idcard = document.getElementById(`idcard-${logId}`).checked;
@@ -1993,7 +2061,6 @@
             globalShiftStart = st; globalShiftEnd = en;
             
             try {
-                // Upsert to system_settings table
                 await supabaseClient.from('system_settings').upsert({ 
                     setting_name: 'global_shift', 
                     setting_value: { start: st, end: en } 
