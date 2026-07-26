@@ -104,7 +104,7 @@
     .bg-blue { background: var(--primary-alpha); color: var(--primary); }
     .bg-gray { background: var(--bg-base); color: var(--text-soft); border: 1px solid var(--card-border); }
     
-    .action-link { color: var(--primary); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .action-link { color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
     .action-link:hover { color: var(--primary-hover); text-decoration: underline; }
     .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
 
@@ -192,7 +192,7 @@
 
     .sortable-ghost { opacity: 0.4; background: var(--primary-alpha); border: 1px dashed var(--primary); }
     .sortable-drag { cursor: grabbing !important; }
-    .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
     .widget-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; cursor: grab; position: relative; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s;}
     .widget-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .widget-card:active { cursor: grabbing; }
@@ -239,8 +239,8 @@
     #login-screen { display: none; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-base); }
     .login-card { width: 100%; max-width: 420px; background: var(--card-bg); padding: 48px 40px; border-radius: var(--radius-lg); border: 1px solid var(--card-border); box-shadow: var(--shadow-md); text-align: center; }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; }
-    .modal-card { background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); width: 90%; max-width: 500px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px;}
+    .modal-card { background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
     @keyframes slideUp { from { transform: translateY(20px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
     
     .modal-card h2, .modal-card h3 { color: var(--text-main); font-size: 20px; }
@@ -251,6 +251,21 @@
     .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
     .chart-card h3 { font-size: 14px; margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
     .chart-container { position: relative; height: 300px; width: 100%; }
+
+    /* =========================================================
+       9. LIVE BRANCHES TAB SPECIFICS
+       ========================================================= */
+    .branch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .live-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; }
+    .live-branch-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--primary); }
+    .live-branch-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .live-branch-count { font-size: 32px; font-weight: 800; color: var(--primary); }
+    
+    .live-staff-list { display: flex; flex-direction: column; gap: 12px; }
+    .live-staff-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
+    .live-staff-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: var(--bg-base); }
+    .live-staff-info { flex: 1; }
+    .live-staff-name { font-weight: 700; color: var(--text-main); font-size: 15px; }
 
     /* =========================================================
        SIDEBAR MINIMIZE ANIMATION
@@ -281,48 +296,15 @@
       z-index: 10;
     }
     
-    /* When Collapsed: Hide the brand info completely */
-    .sidebar.collapsed .brand-info {
-      opacity: 0;
-      pointer-events: none;
-      width: 0; /* Stops it from pushing elements */
-    }
-    
-    .sidebar.collapsed .sidebar-toggle-btn {
-      right: 50%;
-      transform: translateX(50%);
-    }
+    .sidebar.collapsed .brand-info { opacity: 0; pointer-events: none; width: 0; }
+    .sidebar.collapsed .sidebar-toggle-btn { right: 50%; transform: translateX(50%); }
 
-    /* Force icons to NEVER shrink */
-    .tab-icon { 
-      flex-shrink: 0; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-    }
-
+    .tab-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .tab-btn-text { transition: opacity 0.2s ease, width 0.2s ease; }
     
-    /* When Collapsed: Make text 0 width so icons center perfectly */
-    .sidebar.collapsed .tab-btn-text { 
-      opacity: 0; 
-      width: 0; 
-      overflow: hidden; 
-    }
-    
-    .sidebar.collapsed .tab-btn {
-      padding-left: 0;
-      padding-right: 0;
-      justify-content: center;
-    }
-    
-    .sidebar.collapsed #absent-badge {
-      position: absolute;
-      right: 4px;
-      top: 4px;
-      transform: scale(0.65);
-      transform-origin: top right;
-    }
+    .sidebar.collapsed .tab-btn-text { opacity: 0; width: 0; overflow: hidden; }
+    .sidebar.collapsed .tab-btn { padding-left: 0; padding-right: 0; justify-content: center; }
+    .sidebar.collapsed #absent-badge { position: absolute; right: 4px; top: 4px; transform: scale(0.65); transform-origin: top right; }
   </style>
 </head>
 <body>
@@ -371,6 +353,13 @@
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
             <span class="tab-btn-text">Overview & Logs</span>
           </button>
+          
+          <!-- NEW: LIVE BRANCHES TAB -->
+          <button class="tab-btn" data-view="view-live" title="Live Branches">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> 
+            <span class="tab-btn-text">Live Branches</span>
+          </button>
+
           <button class="tab-btn" data-view="view-stats" title="Staff Stats">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
             <span class="tab-btn-text">Staff Stats</span>
@@ -530,6 +519,13 @@
                 </div>
                 <div class="metric-value" id="metric-late" style="color: var(--warning);">0</div>
               </div>
+              <div class="widget-card" data-id="w-early">
+                <div class="widget-header">
+                  <span class="widget-title">Early Departures</span>
+                  <span class="drag-handle">⣿</span>
+                </div>
+                <div class="metric-value" id="metric-early" style="color: #f97316;">0</div>
+              </div>
               <div class="widget-card" data-id="w-absent">
                 <div class="widget-header">
                   <span class="widget-title">Missed Shifts</span>
@@ -542,11 +538,10 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
                 <div class="sub-tabs" style="margin-bottom: 0;">
                   <button class="sub-tab-btn active" data-filter="all">Table: All Logs</button>
-                  <button class="sub-tab-btn" data-filter="late">Table: Late Arrivals Only</button>
+                  <button class="sub-tab-btn" data-filter="late">Table: Lates & Early Outs</button>
                   <button class="sub-tab-btn" data-filter="missing-out">⚠️ Missing Clock-Outs</button>
                   <button class="sub-tab-btn" data-filter="gallery">📸 Photo Audit Gallery</button>
                 </div>
-                <!-- Gallery Specific Filter (Hidden initially) -->
                 <div id="gallery-filters" style="display: none; align-items: center;">
                     <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
                         <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
@@ -563,7 +558,7 @@
                       <th>Date</th>
                       <th>Staff Member</th>
                       <th>Shift Timeline & Hours</th>
-                      <th>Status / Branches</th>
+                      <th>Status & Reason</th>
                       <th>Check-In Photo</th>
                       <th>Check-Out Photo</th>
                     </tr>
@@ -590,6 +585,18 @@
           </div>
         </div>
 
+        <!-- NEW VIEW: LIVE BRANCHES -->
+        <div id="view-live" class="app-view" style="display: none;">
+            <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+              <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Live Branch Presence</h2>
+              <span style="color: var(--text-soft); font-size: 13px;">Real-time view of staff currently clocked in today.</span>
+            </div>
+            
+            <div class="branch-grid" id="live-branch-grid">
+               <!-- Branch Cards will be injected here -->
+            </div>
+        </div>
+
         <!-- VIEW 2: STAFF STATS -->
         <div id="view-stats" class="app-view" style="display: none;">
           <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
@@ -609,7 +616,7 @@
                     <th>Total Hours</th>
                     <th>Avg Hours</th>
                     <th>Target vs Actual</th>
-                    <th>Infractions (Lates/Uniform/No-Out)</th>
+                    <th>Infractions (Unexcused)</th>
                   </tr>
                 </thead>
                 <tbody id="stats-tbody">
@@ -634,12 +641,12 @@
                 </div>
                 
                 <div class="chart-card">
-                    <h3>Arrival Analysis (Target vs Actual)</h3>
+                    <h3>Arrival Analysis</h3>
                     <div class="chart-container"><canvas id="arrivalChart"></canvas></div>
                 </div>
                 
                 <div class="chart-card">
-                    <h3>Top Latecomers</h3>
+                    <h3>Top Latecomers (Unexcused)</h3>
                     <div class="chart-container"><canvas id="lateChart"></canvas></div>
                 </div>
                 
@@ -724,10 +731,10 @@
             </div>
 
             <div class="settings-panel">
-              <h3>Leave Reasons Configuration</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences and leaves.</p>
+              <h3>Leave/Exception Reasons</h3>
+              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
               <div style="display:flex; flex-direction: column; gap:12px;">
-                <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason" style="margin:0;">
+                <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
                 <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
               </div>
               <table style="margin-top:24px; width: 100%;">
@@ -787,6 +794,21 @@
   </div> 
 
   <!-- MODALS -->
+  <div id="live-branch-modal" class="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
+          <div>
+              <h2 id="live-modal-title" style="margin-bottom: 4px;">Branch Name</h2>
+              <p style="color: var(--success); font-weight: 600; font-size: 13px;" id="live-modal-subtitle">0 Staff Currently In</p>
+          </div>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="document.getElementById('live-branch-modal').style.display='none'">&times;</span>
+      </div>
+      <div class="live-staff-list" id="live-staff-container">
+          <!-- Staff items injected here -->
+      </div>
+    </div>
+  </div>
+
   <div id="edit-staff-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Staff Details</h2>
@@ -927,16 +949,19 @@
 
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
-      <h2 style="margin-bottom: 8px;">Manage Exception</h2>
+      <h2 style="margin-bottom: 8px;">Manage Reason</h2>
       <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="exc-subtitle">Update record</p>
       
       <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
       <select id="exc-reason" class="input-field" style="margin-top: 8px;"></select>
-      <input type="text" id="exc-reason-custom" class="input-field" placeholder="Type custom reason..." style="margin-top: 8px; display: none;">
+      <input type="text" id="exc-reason-custom" class="input-field" placeholder="Type custom reason (e.g. Heavy Traffic)..." style="margin-top: 8px; display: none;">
       
+      <!-- We store the exception context (Late, Early, Absent) here -->
+      <input type="hidden" id="exc-type" value=""> 
+
       <div style="display: flex; gap: 12px; margin-top: 24px;">
         <button id="btn-cancel-exc" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
-        <button id="btn-save-exc" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Record</button>
+        <button id="btn-save-exc" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Reason</button>
       </div>
     </div>
   </div>
@@ -974,7 +999,7 @@
     let dbRoles = [];
     let dbReasons = [];
     let staffConfig = {};
-    let roleConfig = {}; // Stores role-specific timing
+    let roleConfig = {}; 
     let dbLogs = [];
     let exceptionsData = {}; 
     let processedData = []; 
@@ -1043,7 +1068,6 @@
         const btn = document.getElementById('btn-modal-audit-save');
         btn.innerText = "Saving..."; btn.disabled = true;
         
-        // 1. Optimistic Database Update
         const logIndex = dbLogs.findIndex(l => l.id === logId);
         if(logIndex !== -1) { 
             dbLogs[logIndex].uniform_reviewed = true; 
@@ -1051,11 +1075,9 @@
             dbLogs[logIndex].uniform_idcard = idcard; 
         }
 
-        // 2. Instantly hide modal and redraw to feel fast
         document.getElementById('photo-modal').style.display = 'none';
         processStitchedData();
 
-        // 3. Save to database silently in the background
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
             showToast("Audit Saved", "success");
@@ -1163,6 +1185,7 @@
         if (viewId === 'view-overview') {
             if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
         }
+        if (viewId === 'view-live') renderLiveBranches();
         if (viewId === 'view-matrix') generateMatrix();
         if (viewId === 'view-settings') loadSettingsData();
         if (viewId === 'view-stats') renderStaffStats();
@@ -1611,7 +1634,7 @@
 
     function processStitchedData() {
       processedData = []; missingData = []; statsData = [];
-      let totalPresent = 0, totalLate = 0, totalMissing = 0;
+      let totalPresent = 0, totalLate = 0, totalEarlyDepartures = 0, totalMissing = 0;
       
       const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
@@ -1629,11 +1652,10 @@
          let staffRole = staffConfig[name]?.role || 'Unassigned';
          staffStatsTracker[name] = { 
              name: name, role: staffRole, 
-             daysPresent: 0, totalHoursDec: 0, lateCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
+             daysPresent: 0, totalHoursDec: 0, lateCount: 0, earlyCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
              dailyTargetHours: 0, sumInMins: 0, sumOutMins: 0, daysOut: 0
          };
          
-         // Fallback hierarchy for Target hours computation
          let shiftStartStr = staffConfig[name]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
          let shiftEndStr = staffConfig[name]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
          
@@ -1661,7 +1683,10 @@
 
           const clockIns = dailyLogs.filter(l => l.action === 'Clock In');
           const clockOuts = dailyLogs.filter(l => l.action === 'Clock Out');
-          const exceptionReason = exceptionsData[`${staffName}_${isoDateStr}`] ? exceptionsData[`${staffName}_${isoDateStr}`].reason : null;
+          
+          // Full Exception Object if exists
+          const exceptionObj = exceptionsData[`${staffName}_${isoDateStr}`] ? exceptionsData[`${staffName}_${isoDateStr}`] : null;
+          const exceptionReason = exceptionObj ? exceptionObj.reason : null;
 
           if (clockIns.length > 0 || clockOuts.length > 0 || exceptionReason) {
             
@@ -1679,11 +1704,14 @@
                 if (minsOut < outMinStart || minsOut > outMinEnd) return; 
             }
             
-            totalPresent += exceptionReason ? 0 : 1;
+            // Only count as present if they actually clocked in/out (not just an exception placeholder)
+            if(firstInTime || lastOutTime) totalPresent++;
             
             let formattedHours = "--", totalHoursFloat = 0; 
-            let isLateArrival = false;
             let diffFromTargetMs = 0;
+            
+            let isLateArrival = false;
+            let isEarlyOut = false;
             
             if (firstInTime && lastOutTime) {
               const diffMs = lastOutTime - firstInTime; 
@@ -1691,18 +1719,32 @@
               totalHoursFloat = diffMs/3600000;
             }
             
+            let shiftStartStr = staffConfig[staffName]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
+            let shiftEndStr = staffConfig[staffName]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
+
             if (firstInTime) { 
-              // Fallback hierarchy for Lates computation
-              let shiftStartStr = staffConfig[staffName]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
               let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
               diffFromTargetMs = firstInTime - expectedIn;
-              expectedIn.setMinutes(expectedIn.getMinutes() + 15); // 15 mins grace period
-              if (firstInTime > expectedIn) { isLateArrival = true; totalLate++; } 
+              expectedIn.setMinutes(expectedIn.getMinutes() + 15); // 15 mins grace
+              if (firstInTime > expectedIn) { 
+                  isLateArrival = true; 
+                  if (!exceptionReason) totalLate++; 
+              } 
+            }
+
+            if (lastOutTime) {
+              let expectedOut = parseTimeStrToDate(shiftEndStr, lastOutTime);
+              expectedOut.setMinutes(expectedOut.getMinutes() - 15); // 15 mins early grace
+              if (lastOutTime < expectedOut) {
+                  isEarlyOut = true;
+                  if (!exceptionReason) totalEarlyDepartures++;
+              }
             }
 
             processedData.push({
               date: targetDate, name: staffName, role: staffRole, firstIn: firstInTime, lastOut: lastOutTime, 
-              formattedHours: formattedHours, isLate: isLateArrival, diffFromTargetMs: diffFromTargetMs,
+              formattedHours: formattedHours, diffFromTargetMs: diffFromTargetMs,
+              isLate: isLateArrival, isEarly: isEarlyOut,
               branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
               hasException: exceptionReason, logIdForPhoto: firstInLog?.id, 
               firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
@@ -1712,7 +1754,7 @@
               outUTshirt: lastOutLog?.uniform_tshirt, outUIdcard: lastOutLog?.uniform_idcard
             });
             
-            if(!exceptionReason && firstInTime) {
+            if(firstInTime) {
                 staffStatsTracker[staffName].daysPresent++;
                 staffStatsTracker[staffName].totalHoursDec += totalHoursFloat;
                 staffStatsTracker[staffName].sumInMins += (firstInTime.getHours() * 60 + firstInTime.getMinutes());
@@ -1722,7 +1764,11 @@
                 } else if (dateStringMatch !== new Date().toDateString()) {
                     staffStatsTracker[staffName].missedOut++;
                 }
-                if(isLateArrival) staffStatsTracker[staffName].lateCount++;
+                
+                // Track Infractions only if NOT Excused
+                if(isLateArrival && !exceptionReason) staffStatsTracker[staffName].lateCount++;
+                if(isEarlyOut && !exceptionReason) staffStatsTracker[staffName].earlyCount++;
+                
                 if(firstInLog?.uniform_reviewed) {
                     if(firstInLog.uniform_tshirt === false) staffStatsTracker[staffName].missedShirt++;
                     if(firstInLog.uniform_idcard === false) staffStatsTracker[staffName].missedId++;
@@ -1742,6 +1788,7 @@
 
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
+      document.getElementById('metric-early').innerText = totalEarlyDepartures;
       document.getElementById('metric-absent').innerText = totalMissing;
 
       let unexcusedCount = 0;
@@ -1752,6 +1799,7 @@
       if (document.getElementById('view-overview').style.display !== 'none') {
           if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
       }
+      if (document.getElementById('view-live').style.display !== 'none') renderLiveBranches();
       renderAbsentTable();
       if (document.getElementById('view-matrix').style.display !== 'none') generateMatrix();
       if (document.getElementById('view-stats').style.display !== 'none') renderStaffStats();
@@ -1766,7 +1814,7 @@
 
       // Apply Sub-Tab Filters
       if (activeSubTab === 'late') { 
-          dataToRender = processedData.filter(row => row.isLate); 
+          dataToRender = processedData.filter(row => (row.isLate || row.isEarly) && row.firstIn); 
       } else if (activeSubTab === 'missing-out') {
           dataToRender = processedData.filter(row => row.firstIn && !row.lastOut && row.date.toDateString() !== todayStr);
       } 
@@ -1774,7 +1822,10 @@
       if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-soft);">No records match your filters.</td></tr>'; return; }
       
       tbody.innerHTML = dataToRender.map(row => {
+        if(!row.firstIn && !row.lastOut && row.hasException) return ''; // Pure absent exception (handled in Action center)
+
         const isPastDate = row.date.toDateString() !== todayStr;
+        const isoDate = toLocalISO(row.date);
         
         const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '<span style="color:var(--danger)">Missing</span>';
         
@@ -1782,7 +1833,21 @@
             ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) 
             : (isPastDate ? '<span style="color:var(--danger); font-weight:800; background: var(--danger-alpha); padding: 2px 6px; border-radius: 4px;">Missing</span>' : '<span style="color:var(--success);">Active</span>');
             
-        let statusBadge = row.hasException ? `<span class="badge bg-orange">${row.hasException}</span>` : (row.isLate ? `<span class="badge bg-orange">Late Arrival</span>` : `<span class="badge bg-green">On Time</span>`);
+        let statusHtml = '';
+        if (row.hasException) {
+            statusHtml += `<span class="badge bg-green">Excused: ${row.hasException}</span><br>`;
+        }
+        
+        if (row.isLate) statusHtml += `<span class="badge bg-orange" style="margin-top:4px;">Late In</span> `;
+        if (row.isEarly) statusHtml += `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; margin-top:4px;">Early Out</span> `;
+        
+        if (!row.isLate && !row.isEarly && !row.hasException) statusHtml = `<span class="badge bg-green">On Time</span>`;
+
+        let actionLinks = '';
+        if((row.isLate || row.isEarly) && !row.hasException) {
+            let excType = row.isLate ? 'Late Arrival' : 'Early Departure';
+            actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}', '${excType}')">Manage Reason</a>`;
+        }
         
         let inPhotoHTML = `<span class="badge bg-gray">Archived / Missing</span>`;
         if (row.inPhoto) {
@@ -1817,7 +1882,6 @@
         }
 
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
-        const isoDate = toLocalISO(row.date);
 
         return `<tr>
           <td style="color:var(--text-soft)">${displayDate}</td>
@@ -1831,12 +1895,98 @@
                 </div>
             </div>
           </td>
-          <td>${statusBadge} <br><span style="font-size:12px; color:var(--text-soft); display: inline-block; margin-top: 4px;">${row.branches || "-"}</span></td>
+          <td>${statusHtml} <br>${actionLinks}</td>
           <td>${inPhotoHTML}</td>
           <td>${outPhotoHTML}</td>
         </tr>`;
       }).join('');
     }
+
+    // ==========================================
+    // LIVE BRANCHES LOGIC
+    // ==========================================
+    let liveStaffData = {}; // Global to hold current active staff mapped by branch
+
+    function renderLiveBranches() {
+        const grid = document.getElementById('live-branch-grid');
+        const todayStr = new Date().toDateString();
+        
+        // Find latest log for every employee today
+        const todayLogs = dbLogs.filter(l => new Date(l.timestamp).toDateString() === todayStr);
+        const latestLogs = {};
+        todayLogs.forEach(l => {
+            if (!latestLogs[l.employee_name] || new Date(l.timestamp) > new Date(latestLogs[l.employee_name].timestamp)) {
+                latestLogs[l.employee_name] = l;
+            }
+        });
+
+        // "Live" means their LAST action today was "Clock In"
+        const activeStaff = Object.values(latestLogs).filter(l => l.action === 'Clock In');
+        
+        liveStaffData = {};
+        masterBranchList.forEach(b => liveStaffData[b] = []);
+        activeStaff.forEach(staffLog => {
+            if(!liveStaffData[staffLog.branch]) liveStaffData[staffLog.branch] = [];
+            liveStaffData[staffLog.branch].push(staffLog);
+        });
+
+        if (masterBranchList.length === 0) {
+            grid.innerHTML = '<div style="color:var(--text-soft); padding: 40px; text-align: center;">No branches registered in System Settings.</div>';
+            return;
+        }
+
+        grid.innerHTML = masterBranchList.map(branchName => {
+            const count = liveStaffData[branchName].length;
+            const countColor = count > 0 ? 'var(--primary)' : 'var(--text-soft)';
+            return `
+            <div class="live-branch-card" onclick="window.openLiveBranchModal('${branchName}')">
+                <div>
+                    <div class="live-branch-title">${branchName}</div>
+                    <div style="font-size: 13px; color: var(--text-soft); font-weight: 600;">Active Presence</div>
+                </div>
+                <div class="live-branch-count" style="color: ${countColor}">${count}</div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    window.openLiveBranchModal = function(branchName) {
+        document.getElementById('live-modal-title').innerText = branchName;
+        const staffList = liveStaffData[branchName] || [];
+        
+        document.getElementById('live-modal-subtitle').innerText = `${staffList.length} Staff Currently Clocked In`;
+        const container = document.getElementById('live-staff-container');
+        
+        if (staffList.length === 0) {
+            container.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--text-soft);">Nobody is currently clocked in here.</div>';
+        } else {
+            // Sort by In Time (earliest first)
+            staffList.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            
+            container.innerHTML = staffList.map(log => {
+                const role = staffConfig[log.employee_name]?.role || 'Unassigned';
+                const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
+                const imgSrc = log.photo_capture || 'https://via.placeholder.com/50x50/1e293b/f8fafc?text=?';
+                
+                return `
+                <div class="live-staff-item">
+                    <img src="${imgSrc}" class="live-staff-img" alt="Photo">
+                    <div class="live-staff-info">
+                        <div class="live-staff-name">${log.employee_name}</div>
+                        <div style="font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">In Since</div>
+                        <div style="font-weight: 800; font-size: 16px; color: var(--success);">${timeIn}</div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+        
+        document.getElementById('live-branch-modal').style.display = 'flex';
+    };
+
 
     window.openEditTimeModal = function(staffName, isoDateStr, inId, outId, inIso, outIso) {
       activeEditStaff = staffName; activeEditDateStr = isoDateStr; editLogInId = inId; editLogOutId = outId;
@@ -1850,7 +2000,6 @@
       
       document.getElementById('edit-time-in').value = toTimeString(inIso);
       
-      // SMART PRE-FILL: Check if they have a custom shift end, then role, then global
       let staffRole = staffConfig[staffName]?.role || 'Unassigned';
       let defaultOutStr = staffConfig[staffName]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
       document.getElementById('edit-time-out').value = outIso ? toTimeString(outIso) : defaultOutStr;
@@ -1909,7 +2058,6 @@
                 const tChecked = (uTshirt === true || uTshirt === 'true') ? 'checked' : '';
                 const iChecked = (uIdcard === true || uIdcard === 'true') ? 'checked' : '';
                 
-                // Optimistic UI Buttons
                 const btnHtml = isReviewed 
                     ? `<button class="btn-secondary" style="margin-top:auto; justify-content:center; padding:10px; border-color: var(--success); color: var(--success);" onclick="window.saveQuickAudit('${logId}', this)">✏️ Update Audit</button>`
                     : `<button class="btn-primary" style="margin-top:auto; justify-content:center; padding:10px;" onclick="window.saveQuickAudit('${logId}', this)">Approve & Save</button>`;
@@ -1949,12 +2097,10 @@
         }
     }
 
-    // Supports saving from the inline gallery buttons instantly
     window.saveQuickAudit = async function(logId, btnElement) {
         const tshirt = document.getElementById(`tshirt-${logId}`).checked;
         const idcard = document.getElementById(`idcard-${logId}`).checked;
 
-        // 1. Optimistic Database Update (Instantly mark as reviewed in local memory)
         const logIndex = dbLogs.findIndex(l => l.id === logId);
         if(logIndex !== -1) { 
             dbLogs[logIndex].uniform_reviewed = true; 
@@ -1962,7 +2108,6 @@
             dbLogs[logIndex].uniform_idcard = idcard; 
         }
 
-        // 2. Instant Visual Feedback
         if (btnElement) {
             const card = btnElement.closest('.audit-card');
             if (card) {
@@ -1983,7 +2128,6 @@
             }
         }
 
-        // 3. Save to database silently in the background
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
             showToast("Audit Saved", "success");
@@ -2013,6 +2157,7 @@
 
             let infractions = [];
             if(s.lateCount > 0) infractions.push(`<span style="color:var(--warning)">Lates: ${s.lateCount}</span>`);
+            if(s.earlyCount > 0) infractions.push(`<span style="color:#f97316">EarlyOuts: ${s.earlyCount}</span>`);
             if(s.missedShirt > 0) infractions.push(`<span style="color:var(--danger)">No Shirt: ${s.missedShirt}</span>`);
             if(s.missedId > 0) infractions.push(`<span style="color:var(--danger)">No ID: ${s.missedId}</span>`);
             if(s.missedOut > 0) infractions.push(`<span style="color:var(--danger)">No Out: ${s.missedOut}</span>`);
@@ -2039,7 +2184,7 @@
         const warning = rootStyle.getPropertyValue('--warning').trim();
         
         const trendDates = [...new Set([...processedData, ...missingData].map(r => toLocalISO(r.date)))].sort();
-        const presentCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && !r.hasException).length);
+        const presentCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && !r.hasException && r.firstIn).length);
         const absentCounts = trendDates.map(d => missingData.filter(r => toLocalISO(r.date) === d).length);
         const excCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && r.hasException).length);
 
@@ -2067,7 +2212,7 @@
         if(window.myCharts['arrival']) window.myCharts['arrival'].destroy();
         window.myCharts['arrival'] = new Chart(document.getElementById('arrivalChart'), {
             type: 'doughnut',
-            data: { labels: ['> 1 Hr Early', '0-1 Hr Early', 'Late (After Shift Start)'], 
+            data: { labels: ['> 1 Hr Early', '0-1 Hr Early', 'Late (Unexcused)'], 
                     datasets: [{ data: [earlyOver1Hr, earlyWithin1Hr, lateArr], backgroundColor: [primary, success, danger], borderWidth: 0 }]
             },
             options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
@@ -2078,13 +2223,13 @@
         window.myCharts['late'] = new Chart(document.getElementById('lateChart'), {
             type: 'bar',
             data: { labels: lateStats.map(s => s.name.split(' ')[0]), 
-                    datasets: [{ label: 'Late Days', data: lateStats.map(s => s.lateCount), backgroundColor: warning, borderRadius: 6 }]
+                    datasets: [{ label: 'Unexcused Lates', data: lateStats.map(s => s.lateCount), backgroundColor: warning, borderRadius: 6 }]
             },
             options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
         });
 
         const roleCounts = {};
-        processedData.forEach(r => { if(!r.hasException && r.firstIn) { roleCounts[r.role] = (roleCounts[r.role] || 0) + 1; } });
+        processedData.forEach(r => { if(r.firstIn) { roleCounts[r.role] = (roleCounts[r.role] || 0) + 1; } });
         
         if(window.myCharts['role']) window.myCharts['role'].destroy();
         window.myCharts['role'] = new Chart(document.getElementById('roleChart'), {
@@ -2106,13 +2251,15 @@
         const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
         const statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
           
-        return `<tr><td style="color:var(--text-soft)">${displayDate}</td><td><strong>${row.name}</strong></td><td>${statusHTML}</td><td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}')">Manage Exception</a></td></tr>`;
+        return `<tr><td style="color:var(--text-soft)">${displayDate}</td><td><strong>${row.name}</strong></td><td>${statusHTML}</td><td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}', 'Absent')">Manage Exception</a></td></tr>`;
       }).join('');
     }
 
-    window.openExceptionModal = function(staffName, isoDateString) {
+    // Modal updated to handle Late, Early, and Absent contexts
+    window.openExceptionModal = function(staffName, isoDateString, type = 'Absent') {
       activeExceptionName = staffName; activeExceptionDate = isoDateString;
-      document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString}`;
+      document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString} (${type})`;
+      document.getElementById('exc-type').value = type;
       
       document.getElementById('exc-reason').value = dbReasons.length > 0 ? dbReasons[0].reason_name : '';
       document.getElementById('exc-reason-custom').style.display = 'none';
@@ -2130,14 +2277,20 @@
           if(!reasonVal) return showToast("Please enter a custom reason", "error");
       }
       
+      const excType = document.getElementById('exc-type').value;
+      // Append context if it's Late or Early so admin knows in reports
+      if(excType === 'Late Arrival' || excType === 'Early Departure') {
+          reasonVal = `${excType} - ${reasonVal}`;
+      }
+      
       const saveBtn = document.getElementById('btn-save-exc'); saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
 
       try {
         await supabaseClient.from('attendance_exceptions').upsert({ employee_name: activeExceptionName, date: activeExceptionDate, reason: reasonVal }, { onConflict: 'employee_name, date' }); 
         exceptionsData[`${activeExceptionName}_${activeExceptionDate}`] = { reason: reasonVal };
-        document.getElementById('exception-modal').style.display = 'none'; processStitchedData(); showToast("Exception updated", "success");
-      } catch (err) { showToast("Failed to save Exception.", "error"); } 
-      finally { saveBtn.innerText = "Save Record"; saveBtn.disabled = false; }
+        document.getElementById('exception-modal').style.display = 'none'; processStitchedData(); showToast("Reason saved", "success");
+      } catch (err) { showToast("Failed to save Reason.", "error"); } 
+      finally { saveBtn.innerText = "Save Reason"; saveBtn.disabled = false; }
     });
 
     document.getElementById('btn-open-schedule-leave').addEventListener('click', () => { 
@@ -2216,7 +2369,6 @@
       const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
       const { data: reasonsData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
       
-      // Helper function to remove seconds (converts "12:00:00" to "12:00")
       const formatTime = (t) => t ? t.substring(0, 5) : '';
 
       const roleTbody = document.getElementById('role-settings-list');
@@ -2300,9 +2452,6 @@
         }
     });
 
-    // -------------------------------------------------------------
-    // ROLE CONFIGURATION - ADD & EDIT
-    // -------------------------------------------------------------
     document.getElementById('add-role-btn').addEventListener('click', async () => {
       const roleName = document.getElementById('new-role-name').value.trim();
       let startVal = document.getElementById('new-role-start').value || null;
@@ -2374,8 +2523,6 @@
     window.deleteRoleItem = async (rowId) => { 
       if(confirm("Remove this role? It will not remove it from existing staff automatically.")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
     };
-
-    // -------------------------------------------------------------
 
     document.getElementById('add-reason-btn').addEventListener('click', async () => {
         const name = document.getElementById('new-reason-name').value.trim();
@@ -2577,22 +2724,30 @@
         let columnHeaders, exportRows;
         
         if (isStatsView) {
-            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Avg Hours", "OT/Shortage", "Lates", "Missed Shirt", "Missed ID", "Missed Out"];
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Avg Hours", "OT/Shortage", "Lates", "EarlyOuts", "Missed Shirt", "Missed ID", "Missed Out"];
             exportRows = statsData.map(s => [
                 s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), s.totalHoursDec.toFixed(2), 
                 (s.daysPresent > 0 ? (s.totalHoursDec / s.daysPresent).toFixed(2) : "0.00"), 
                 (s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2),
-                s.lateCount, s.missedShirt, s.missedId, s.missedOut
+                s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
             ]);
         } else {
             columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Status", "Branch List"];
             let dataToExport = processedData;
-            if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate);
-            exportRows = dataToExport.map(d => [
-              d.date.toLocaleDateString(), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', 
-              d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', d.formattedHours, 
-              d.isLate ? "Late" : (d.hasException ? d.hasException : "On Time"), d.branches || "-"
-            ]);
+            if (activeSubTab === 'late') dataToExport = processedData.filter(r => r.isLate || r.isEarly);
+            exportRows = dataToExport.map(d => {
+                let status = "On Time";
+                if(d.hasException) status = "Excused: " + d.hasException;
+                else if (d.isLate && d.isEarly) status = "Late & Early Out";
+                else if (d.isLate) status = "Late Arrival";
+                else if (d.isEarly) status = "Early Out";
+                
+                return [
+                  d.date.toLocaleDateString(), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', 
+                  d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', d.formattedHours, 
+                  status, d.branches || "-"
+                ];
+            });
         }
 
         if (exportType === 'csv') {
@@ -2613,9 +2768,6 @@
       });
     });
 
-    // ==========================================
-    // SIDEBAR MINIMIZE LOGIC
-    // ==========================================
     const appSidebar = document.getElementById('app-sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
 
