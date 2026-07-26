@@ -1016,16 +1016,21 @@
         const btn = document.getElementById('btn-modal-audit-save');
         btn.innerText = "Saving..."; btn.disabled = true;
         
+        // 1. Optimistic Database Update
+        const logIndex = dbLogs.findIndex(l => l.id === logId);
+        if(logIndex !== -1) { 
+            dbLogs[logIndex].uniform_reviewed = true; 
+            dbLogs[logIndex].uniform_tshirt = tshirt; 
+            dbLogs[logIndex].uniform_idcard = idcard; 
+        }
+
+        // 2. Instantly hide modal and redraw to feel fast
+        document.getElementById('photo-modal').style.display = 'none';
+        processStitchedData();
+
+        // 3. Save to database silently in the background
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
-            const logIndex = dbLogs.findIndex(l => l.id === logId);
-            if(logIndex !== -1) { 
-                dbLogs[logIndex].uniform_reviewed = true; 
-                dbLogs[logIndex].uniform_tshirt = tshirt; 
-                dbLogs[logIndex].uniform_idcard = idcard; 
-            }
-            processStitchedData();
-            document.getElementById('photo-modal').style.display = 'none';
             showToast("Audit Saved", "success");
         } catch(e) { 
             showToast("Error saving audit", "error"); 
@@ -1808,8 +1813,8 @@
                 const iChecked = (uIdcard === true || uIdcard === 'true') ? 'checked' : '';
                 
                 const btnHtml = isReviewed 
-                    ? `<button class="btn-secondary" style="margin-top:auto; justify-content:center; padding:10px; border-color: var(--success); color: var(--success);" onclick="window.saveQuickAudit('${logId}')">✏️ Update Audit</button>`
-                    : `<button class="btn-primary" style="margin-top:auto; justify-content:center; padding:10px;" onclick="window.saveQuickAudit('${logId}')">Approve & Save</button>`;
+                    ? `<button class="btn-secondary" style="margin-top:auto; justify-content:center; padding:10px; border-color: var(--success); color: var(--success);" onclick="window.saveQuickAudit('${logId}', this)">✏️ Update Audit</button>`
+                    : `<button class="btn-primary" style="margin-top:auto; justify-content:center; padding:10px;" onclick="window.saveQuickAudit('${logId}', this)">Approve & Save</button>`;
 
                 // Naya status badge logic
                 const statusBadgeHtml = isReviewed 
@@ -1847,22 +1852,51 @@
         }
     }
 
-    // Supports saving from the inline gallery buttons
-    window.saveQuickAudit = async function(logId) {
+    // Supports saving from the inline gallery buttons instantly
+    window.saveQuickAudit = async function(logId, btnElement) {
         const tshirt = document.getElementById(`tshirt-${logId}`).checked;
         const idcard = document.getElementById(`idcard-${logId}`).checked;
+
+        // 1. Optimistic Database Update (Instantly mark as reviewed in local memory)
+        const logIndex = dbLogs.findIndex(l => l.id === logId);
+        if(logIndex !== -1) { 
+            dbLogs[logIndex].uniform_reviewed = true; 
+            dbLogs[logIndex].uniform_tshirt = tshirt; 
+            dbLogs[logIndex].uniform_idcard = idcard; 
+        }
+
+        // 2. Instant Visual Feedback (No waiting for database!)
+        if (btnElement) {
+            const card = btnElement.closest('.audit-card');
+            if (card) {
+                if (showOnlyPendingPhotos) {
+                    // Instantly hide it so you can keep clicking the next ones rapidly
+                    card.style.display = 'none';
+                } else {
+                    // If showing all, instantly turn the button green
+                    btnElement.innerText = "✏️ Update Audit";
+                    btnElement.className = "btn-secondary";
+                    btnElement.style.borderColor = "var(--success)";
+                    btnElement.style.color = "var(--success)";
+                    const badge = card.querySelector('.audit-badge:last-child');
+                    if (badge) {
+                        badge.innerText = "✅ Audited";
+                        badge.style.background = "var(--success)";
+                        badge.style.color = "#fff";
+                    }
+                }
+            }
+        }
+
+        // 3. Save to database silently in the background
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
-            
-            const logIndex = dbLogs.findIndex(l => l.id === logId);
-            if(logIndex !== -1) { 
-                dbLogs[logIndex].uniform_reviewed = true; 
-                dbLogs[logIndex].uniform_tshirt = tshirt; 
-                dbLogs[logIndex].uniform_idcard = idcard; 
-            }
-            processStitchedData();
             showToast("Audit Saved", "success");
-        } catch(e) { showToast("Error saving audit", "error"); }
+        } catch(e) { 
+            showToast("Error saving audit", "error"); 
+            // Put card back if network fails
+            if (btnElement && showOnlyPendingPhotos) btnElement.closest('.audit-card').style.display = 'flex';
+        }
     }
 
     function renderStaffStats() {
