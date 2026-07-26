@@ -1067,6 +1067,16 @@
     });
 
     let lastSyncTime = 0;
+    
+    // Check if the admin is currently typing in a popup
+    function isUserBusy() {
+        const modals = document.querySelectorAll('.modal-overlay');
+        for (let m of modals) {
+            if (m.style.display === 'flex') return true; 
+        }
+        return false;
+    }
+
     function setupRealtimeSync() {
       const isSyncOn = document.getElementById('sync-toggle').checked;
       if (isSyncOn && !realtimeSubscription) {
@@ -1076,7 +1086,10 @@
             const currentTime = Date.now();
             if (currentTime - lastSyncTime > 2000) {
                 lastSyncTime = currentTime;
-                fetchLogsFromDatabase(true); 
+                // Only auto-refresh if the admin isn't busy in a modal!
+                if (!isUserBusy()) {
+                    fetchLogsFromDatabase(true); 
+                }
             }
           })
           .subscribe();
@@ -1115,6 +1128,15 @@
         const viewId = e.currentTarget.getAttribute('data-view');
         document.getElementById(viewId).style.display = 'block';
         
+        // FIX: Hide Export button on unsupported tabs
+        const exportBtn = document.getElementById('export-dropdown');
+        if (viewId === 'view-overview' || viewId === 'view-stats') {
+            exportBtn.style.display = 'inline-block';
+        } else {
+            exportBtn.style.display = 'none';
+        }
+        
+        // Render target views
         if (viewId === 'view-overview') {
             if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
         }
