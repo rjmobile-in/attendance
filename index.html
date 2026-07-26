@@ -131,9 +131,11 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* =========================================================
-       4. FORM INPUTS & DROPDOWNS
+       4. FORM INPUTS, DATE/TIME FIX & DROPDOWNS
        ========================================================= */
-    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+    /* Color-scheme enables native white clock/calendar icons in dark mode */
+    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); color-scheme: dark; }
+    html.light-theme .input-field { color-scheme: light; }
     .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-alpha); }
     select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px auto; }
     
@@ -178,12 +180,18 @@
     .header-title { font-weight: 600; font-size: 16px; color: var(--text-main); }
 
     /* =========================================================
-       6. WIDGETS & TABLES
+       6. STRUCTURED FILTER BAR & WIDGETS
        ========================================================= */
-    .filter-bar { display: flex; align-items: flex-end; gap: 16px; padding: 20px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); margin-bottom: 24px; flex-wrap: wrap; box-shadow: var(--shadow-sm);}
+    .filter-section { display: flex; flex-direction: column; gap: 16px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+    .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
     .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;}
     .time-filter-wrap { display: flex; gap: 8px; align-items: center; }
+    
+    .quick-dates { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); flex-wrap: wrap; }
+    .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .quick-date-btn:hover { color: var(--text-main); background: var(--card-bg); }
+    .quick-date-btn.active { background: var(--card-bg); color: var(--primary); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sub-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); width: fit-content;}
     .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
@@ -210,7 +218,6 @@
     tbody tr:hover td { background: var(--input-bg); }
     tbody tr:last-child td { border-bottom: none; }
 
-    /* Unified Pagination Footer */
     .pagination-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 32px; }
 
     /* =========================================================
@@ -270,38 +277,14 @@
     /* =========================================================
        SIDEBAR MINIMIZE ANIMATION
        ========================================================= */
-    .sidebar { 
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-      overflow-x: hidden; 
-      white-space: nowrap; 
-      width: 280px;
-    }
+    .sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; white-space: nowrap; width: 280px; }
     .sidebar.collapsed { width: 88px; }
-    
-    .brand-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: opacity 0.2s ease;
-      opacity: 1;
-    }
-    
-    .sidebar-toggle-btn {
-      position: absolute;
-      right: 0px;
-      top: 4px;
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      transition: all 0.3s ease;
-      z-index: 10;
-    }
-    
+    .brand-info { display: flex; align-items: center; gap: 12px; transition: opacity 0.2s ease; opacity: 1; }
+    .sidebar-toggle-btn { position: absolute; right: 0px; top: 4px; background: var(--input-bg); border: 1px solid var(--card-border); transition: all 0.3s ease; z-index: 10; }
     .sidebar.collapsed .brand-info { opacity: 0; pointer-events: none; width: 0; }
     .sidebar.collapsed .sidebar-toggle-btn { right: 50%; transform: translateX(50%); }
-
     .tab-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .tab-btn-text { transition: opacity 0.2s ease, width 0.2s ease; }
-    
     .sidebar.collapsed .tab-btn-text { opacity: 0; width: 0; overflow: hidden; }
     .sidebar.collapsed .tab-btn { padding-left: 0; padding-right: 0; justify-content: center; }
     .sidebar.collapsed #absent-badge { position: absolute; right: 4px; top: 4px; transform: scale(0.65); transform-origin: top right; }
@@ -310,7 +293,6 @@
 <body>
 
   <div id="global-loader"><div class="spinner"></div><p id="loader-msg" style="color:var(--text-soft); font-weight: 600;">Authenticating...</p></div>
-
   <div id="toast-container"></div>
 
   <div id="login-screen">
@@ -332,9 +314,7 @@
       
       <!-- SIDEBAR NAVIGATION -->
       <aside class="sidebar" id="app-sidebar">
-        
         <div class="sidebar-brand" style="position: relative;">
-          <!-- Logo and Text -->
           <div class="brand-info">
             <img src="logo.png" alt="RJ Logo" onerror="this.style.display='none'">
             <div class="brand-text-wrap">
@@ -342,7 +322,6 @@
               <div class="brand-subtitle">Attendance Center</div>
             </div>
           </div>
-          <!-- Collapse Button -->
           <button class="icon-btn sidebar-toggle-btn" id="sidebar-toggle" title="Toggle Sidebar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
           </button>
@@ -354,7 +333,6 @@
             <span class="tab-btn-text">Overview & Logs</span>
           </button>
           
-          <!-- NEW: LIVE BRANCHES TAB -->
           <button class="tab-btn" data-view="view-live" title="Live Branches">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> 
             <span class="tab-btn-text">Live Branches</span>
@@ -418,86 +396,104 @@
           </div>
         </div>
 
-        <!-- GLOBAL FILTER BAR -->
-        <div class="filter-bar">
-          <div class="filter-group">
-            <label>Start Date</label>
-            <input type="text" id="global-start" class="input-field" style="margin: 0; width: 130px; padding: 10px;" placeholder="Start Date" />
-          </div>
-          <div class="filter-group">
-            <label>End Date</label>
-            <input type="text" id="global-end" class="input-field" style="margin: 0; width: 130px; padding: 10px;" placeholder="End Date" />
-          </div>
-          <div class="filter-group" style="justify-content: flex-end;">
-            <button id="btn-all-time" class="btn-secondary" style="height: 38px; margin: 0; padding: 0 16px;">All Time</button>
-          </div>
+        <!-- NEW STRUCTURED FILTER BAR -->
+        <div class="filter-section">
+            <!-- Row 1: Date Filters -->
+            <div class="filter-row">
+                <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+                    
+                    <div class="filter-group">
+                        <label>Quick Dates</label>
+                        <div class="quick-dates" id="quick-date-filters">
+                            <button class="quick-date-btn active" data-range="today">Today</button>
+                            <button class="quick-date-btn" data-range="yesterday">Yesterday</button>
+                            <button class="quick-date-btn" data-range="7days">Last 7 Days</button>
+                            <button class="quick-date-btn" data-range="lastmonth">Last Month</button>
+                            <button class="quick-date-btn" data-range="alltime">All Time</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group" style="margin-left: auto;">
+                        <label>Custom Start</label>
+                        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="Start Date" />
+                    </div>
+                    <div class="filter-group">
+                        <label>Custom End</label>
+                        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="End Date" />
+                    </div>
+                </div>
+            </div>
 
-          <div class="filter-group">
-            <label>Clock-In Between</label>
-            <div class="time-filter-wrap">
-              <input type="time" id="filter-in-start" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock In Start" />
-              <span style="color:var(--text-soft); font-weight: bold;">-</span>
-              <input type="time" id="filter-in-end" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock In End" />
-            </div>
-          </div>
+            <!-- Row 2: Time & Entity Filters -->
+            <div class="filter-row" style="border-top: 1px solid var(--card-border); padding-top: 16px;">
+                <div class="filter-group">
+                    <label>Clock-In Between</label>
+                    <div class="time-filter-wrap">
+                        <input type="time" id="filter-in-start" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock In Start" />
+                        <span style="color:var(--text-soft); font-weight: bold;">-</span>
+                        <input type="time" id="filter-in-end" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock In End" />
+                    </div>
+                </div>
 
-          <div class="filter-group">
-            <label>Clock-Out Between</label>
-            <div class="time-filter-wrap">
-              <input type="time" id="filter-out-start" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock Out Start" />
-              <span style="color:var(--text-soft); font-weight: bold;">-</span>
-              <input type="time" id="filter-out-end" class="input-field" style="margin: 0; width: 105px; padding: 10px;" title="Clock Out End" />
-            </div>
-          </div>
-          
-          <!-- Dropdowns -->
-          <div class="filter-group dropdown" id="role-filter-dropdown" style="margin-left: auto;">
-            <label>Filter Role</label>
-            <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 160px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
-              <span id="role-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="role-dropdown-box">
-              <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
-              <div class="multi-select-actions">
-                <button id="btn-select-all-roles">Select All</button>
-                <button id="btn-deselect-all-roles">Clear All</button>
-              </div>
-              <div class="list-container" id="role-checkboxes"></div>
-            </div>
-          </div>
+                <div class="filter-group">
+                    <label>Clock-Out Between</label>
+                    <div class="time-filter-wrap">
+                        <input type="time" id="filter-out-start" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock Out Start" />
+                        <span style="color:var(--text-soft); font-weight: bold;">-</span>
+                        <input type="time" id="filter-out-end" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock Out End" />
+                    </div>
+                </div>
+                
+                <div style="margin-left: auto; display: flex; gap: 16px; flex-wrap: wrap;">
+                    <div class="filter-group dropdown" id="role-filter-dropdown">
+                        <label>Filter Role</label>
+                        <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 140px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
+                            <span id="role-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="role-dropdown-box">
+                            <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
+                            <div class="multi-select-actions">
+                                <button id="btn-select-all-roles">Select All</button>
+                                <button id="btn-deselect-all-roles">Clear All</button>
+                            </div>
+                            <div class="list-container" id="role-checkboxes"></div>
+                        </div>
+                    </div>
 
-          <div class="filter-group dropdown" id="branch-filter-dropdown">
-            <label>Filter Branch</label>
-            <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 180px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
-              <span id="branch-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="branch-dropdown-box">
-              <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
-              <div class="multi-select-actions">
-                <button id="btn-select-all-branches">Select All</button>
-                <button id="btn-deselect-all-branches">Clear All</button>
-              </div>
-              <div class="list-container" id="branch-checkboxes"></div>
-            </div>
-          </div>
+                    <div class="filter-group dropdown" id="branch-filter-dropdown">
+                        <label>Filter Branch</label>
+                        <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
+                            <span id="branch-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="branch-dropdown-box">
+                            <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
+                            <div class="multi-select-actions">
+                                <button id="btn-select-all-branches">Select All</button>
+                                <button id="btn-deselect-all-branches">Clear All</button>
+                            </div>
+                            <div class="list-container" id="branch-checkboxes"></div>
+                        </div>
+                    </div>
 
-          <div class="filter-group dropdown" id="staff-filter-dropdown">
-            <label>Filter Staff</label>
-            <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 170px; padding: 10px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
-              <span id="staff-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="staff-dropdown-box">
-              <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
-              <div class="multi-select-actions">
-                <button id="btn-select-all">Select All</button>
-                <button id="btn-deselect-all">Clear All</button>
-              </div>
-              <div class="list-container" id="staff-checkboxes"></div>
+                    <div class="filter-group dropdown" id="staff-filter-dropdown">
+                        <label>Filter Staff</label>
+                        <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
+                            <span id="staff-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="staff-dropdown-box">
+                            <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
+                            <div class="multi-select-actions">
+                                <button id="btn-select-all">Select All</button>
+                                <button id="btn-deselect-all">Clear All</button>
+                            </div>
+                            <div class="list-container" id="staff-checkboxes"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
 
         <!-- VIEW 1: OVERVIEW & LOGS -->
@@ -585,7 +581,7 @@
           </div>
         </div>
 
-        <!-- NEW VIEW: LIVE BRANCHES -->
+        <!-- LIVE BRANCHES -->
         <div id="view-live" class="app-view" style="display: none;">
             <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
               <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Live Branch Presence</h2>
@@ -1009,9 +1005,10 @@
     let globalShiftStart = "10:00";
     let globalShiftEnd = "19:00";
     
-    let endDate = new Date();
+    // DEFAULT TO TODAY
     let startDate = new Date();
-    startDate.setDate(startDate.getDate() - 7);
+    let endDate = new Date();
+    
     const minLaunchDate = new Date('2026-07-20');
     
     if (startDate < minLaunchDate) startDate = minLaunchDate;
@@ -1227,14 +1224,12 @@
 
     function toggleDropdown(targetId) {
         const boxes = ['export-menu', 'staff-dropdown-box', 'branch-dropdown-box', 'role-dropdown-box'];
-        
         boxes.forEach(id => {
             if (id !== targetId) {
                 const el = document.getElementById(id) || document.querySelector('.' + id);
                 if (el) el.classList.remove('show');
             }
         });
-        
         if (targetId) {
             const target = document.getElementById(targetId) || document.querySelector('.' + targetId);
             if(target) target.classList.toggle('show');
@@ -1252,15 +1247,51 @@
     
     window.addEventListener('click', (e) => { 
       const isDropdownClick = e.target.closest('.dropdown') || e.target.closest('.dropdown-content');
-      if (!isDropdownClick) {
-          toggleDropdown('');
-      }
+      if (!isDropdownClick) { toggleDropdown(''); }
     });
 
     let todayEndLimit = new Date();
     todayEndLimit.setHours(23, 59, 59, 999);
-
     let safeMaxDate = new Date() < minLaunchDate ? null : todayEndLimit;
+
+    // QUICK DATE BUTTONS LOGIC
+    document.querySelectorAll('.quick-date-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            const range = e.target.getAttribute('data-range');
+            const today = new Date();
+            let newStart = new Date();
+            let newEnd = new Date();
+            
+            if (range === 'today') {
+                // defaults to today
+            } else if (range === 'yesterday') {
+                newStart.setDate(today.getDate() - 1);
+                newEnd.setDate(today.getDate() - 1);
+            } else if (range === '7days') {
+                newStart.setDate(today.getDate() - 7);
+            } else if (range === 'lastmonth') {
+                // Previous calendar month
+                newStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                newEnd = new Date(today.getFullYear(), today.getMonth(), 0); 
+            } else if (range === 'alltime') {
+                newStart = new Date(minLaunchDate);
+            }
+            
+            if (newStart < minLaunchDate) newStart = new Date(minLaunchDate);
+            if (newEnd < minLaunchDate) newEnd = new Date(minLaunchDate);
+            
+            startDate = newStart;
+            endDate = newEnd;
+            
+            startPicker.setDate(startDate);
+            endPicker.setDate(endDate);
+            
+            fetchLogsFromDatabase(false);
+        });
+    });
 
     const startPicker = flatpickr("#global-start", { 
         defaultDate: startDate, 
@@ -1269,7 +1300,13 @@
         dateFormat: "Y-m-d", 
         altInput: true, 
         altFormat: "d M, Y", 
-        onChange: (dates) => { if(dates[0]) { startDate = dates[0]; fetchLogsFromDatabase(false); } } 
+        onChange: (dates) => { 
+            if(dates[0]) { 
+                startDate = dates[0]; 
+                document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
+                fetchLogsFromDatabase(false); 
+            } 
+        } 
     });
     
     const endPicker = flatpickr("#global-end", { 
@@ -1279,20 +1316,15 @@
         dateFormat: "Y-m-d", 
         altInput: true, 
         altFormat: "d M, Y", 
-        onChange: (dates) => { if(dates[0]) { endDate = dates[0]; fetchLogsFromDatabase(false); } } 
+        onChange: (dates) => { 
+            if(dates[0]) { 
+                endDate = dates[0]; 
+                document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
+                fetchLogsFromDatabase(false); 
+            } 
+        } 
     });
 
-    document.getElementById('btn-all-time').addEventListener('click', () => {
-        startDate = new Date('2026-07-20');
-        endDate = new Date(); 
-        if (endDate < minLaunchDate) endDate = minLaunchDate; 
-
-        startPicker.setDate(startDate);
-        endPicker.setDate(endDate);
-        
-        fetchLogsFromDatabase(false);
-    });
-    
     const schedStartFP = flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     const schedEndFP = flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     
@@ -1571,9 +1603,14 @@
     async function fetchLogsFromDatabase(keepPage = false) {
       document.getElementById('master-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-soft);">Fetching records from Database...</td></tr>';
       if (!keepPage) currentPage = 0; 
-
-      const startISO = new Date(startDate).toISOString();
-      const endObj = new Date(endDate); endObj.setHours(23, 59, 59); const endISO = endObj.toISOString();
+      
+      let sDate = new Date(startDate);
+      sDate.setHours(0,0,0,0);
+      const startISO = sDate.toISOString();
+      
+      let eDate = new Date(endDate);
+      eDate.setHours(23, 59, 59, 999);
+      const endISO = eDate.toISOString();
 
       const { data: logsData, count } = await supabaseClient
         .from('attendance_logs').select('*', { count: 'exact' })
@@ -1590,7 +1627,7 @@
 
       const { data: excData } = await supabaseClient
         .from('attendance_exceptions').select('*')
-        .gte('date', toLocalISO(startDate)).lte('date', toLocalISO(endDate));
+        .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
         
       exceptionsData = {};
       (excData || []).forEach(e => { exceptionsData[`${e.employee_name}_${e.date}`] = { reason: e.reason }; });
@@ -1684,7 +1721,6 @@
           const clockIns = dailyLogs.filter(l => l.action === 'Clock In');
           const clockOuts = dailyLogs.filter(l => l.action === 'Clock Out');
           
-          // Full Exception Object if exists
           const exceptionObj = exceptionsData[`${staffName}_${isoDateStr}`] ? exceptionsData[`${staffName}_${isoDateStr}`] : null;
           const exceptionReason = exceptionObj ? exceptionObj.reason : null;
 
@@ -1704,7 +1740,6 @@
                 if (minsOut < outMinStart || minsOut > outMinEnd) return; 
             }
             
-            // Only count as present if they actually clocked in/out (not just an exception placeholder)
             if(firstInTime || lastOutTime) totalPresent++;
             
             let formattedHours = "--", totalHoursFloat = 0; 
@@ -1725,7 +1760,7 @@
             if (firstInTime) { 
               let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
               diffFromTargetMs = firstInTime - expectedIn;
-              expectedIn.setMinutes(expectedIn.getMinutes() + 15); // 15 mins grace
+              expectedIn.setMinutes(expectedIn.getMinutes() + 15);
               if (firstInTime > expectedIn) { 
                   isLateArrival = true; 
                   if (!exceptionReason) totalLate++; 
@@ -1734,7 +1769,7 @@
 
             if (lastOutTime) {
               let expectedOut = parseTimeStrToDate(shiftEndStr, lastOutTime);
-              expectedOut.setMinutes(expectedOut.getMinutes() - 15); // 15 mins early grace
+              expectedOut.setMinutes(expectedOut.getMinutes() - 15);
               if (lastOutTime < expectedOut) {
                   isEarlyOut = true;
                   if (!exceptionReason) totalEarlyDepartures++;
@@ -1765,7 +1800,6 @@
                     staffStatsTracker[staffName].missedOut++;
                 }
                 
-                // Track Infractions only if NOT Excused
                 if(isLateArrival && !exceptionReason) staffStatsTracker[staffName].lateCount++;
                 if(isEarlyOut && !exceptionReason) staffStatsTracker[staffName].earlyCount++;
                 
@@ -1812,7 +1846,6 @@
       
       const todayStr = new Date().toDateString();
 
-      // Apply Sub-Tab Filters
       if (activeSubTab === 'late') { 
           dataToRender = processedData.filter(row => (row.isLate || row.isEarly) && row.firstIn); 
       } else if (activeSubTab === 'missing-out') {
@@ -1822,7 +1855,7 @@
       if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-soft);">No records match your filters.</td></tr>'; return; }
       
       tbody.innerHTML = dataToRender.map(row => {
-        if(!row.firstIn && !row.lastOut && row.hasException) return ''; // Pure absent exception (handled in Action center)
+        if(!row.firstIn && !row.lastOut && row.hasException) return ''; 
 
         const isPastDate = row.date.toDateString() !== todayStr;
         const isoDate = toLocalISO(row.date);
@@ -1902,16 +1935,11 @@
       }).join('');
     }
 
-    // ==========================================
-    // LIVE BRANCHES LOGIC
-    // ==========================================
-    let liveStaffData = {}; // Global to hold current active staff mapped by branch
-
+    let liveStaffData = {}; 
     function renderLiveBranches() {
         const grid = document.getElementById('live-branch-grid');
         const todayStr = new Date().toDateString();
         
-        // Find latest log for every employee today
         const todayLogs = dbLogs.filter(l => new Date(l.timestamp).toDateString() === todayStr);
         const latestLogs = {};
         todayLogs.forEach(l => {
@@ -1920,7 +1948,6 @@
             }
         });
 
-        // "Live" means their LAST action today was "Clock In"
         const activeStaff = Object.values(latestLogs).filter(l => l.action === 'Clock In');
         
         liveStaffData = {};
@@ -1960,7 +1987,6 @@
         if (staffList.length === 0) {
             container.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--text-soft);">Nobody is currently clocked in here.</div>';
         } else {
-            // Sort by In Time (earliest first)
             staffList.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
             
             container.innerHTML = staffList.map(log => {
@@ -2255,7 +2281,6 @@
       }).join('');
     }
 
-    // Modal updated to handle Late, Early, and Absent contexts
     window.openExceptionModal = function(staffName, isoDateString, type = 'Absent') {
       activeExceptionName = staffName; activeExceptionDate = isoDateString;
       document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString} (${type})`;
@@ -2278,7 +2303,6 @@
       }
       
       const excType = document.getElementById('exc-type').value;
-      // Append context if it's Late or Early so admin knows in reports
       if(excType === 'Late Arrival' || excType === 'Early Departure') {
           reasonVal = `${excType} - ${reasonVal}`;
       }
