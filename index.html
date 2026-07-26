@@ -703,16 +703,23 @@
           <p style="color: var(--text-soft); margin-bottom: 32px; font-size: 13px;">Changes apply immediately.</p>
           
           <div class="settings-grid">
-            <div class="settings-panel">
+            <div class="settings-panel" style="grid-column: 1 / -1;">
               <h3>Role Configuration</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage designations to assign to your staff.</p>
-              <div style="display:flex; flex-direction: column; gap:12px;">
-                <input type="text" id="new-role-name" class="input-field" placeholder="New Role Name" style="margin:0;">
-                <button id="add-role-btn" class="btn-primary" style="justify-content:center;">Create Role</button>
+              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
+              
+              <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0; flex: 2; min-width: 150px;">
+                <input type="time" id="new-role-start" class="input-field" title="Role Shift Start (Leave blank for global default)" style="margin:0; flex: 1; min-width: 100px;">
+                <input type="time" id="new-role-end" class="input-field" title="Role Shift End (Leave blank for global default)" style="margin:0; flex: 1; min-width: 100px;">
+                <button id="add-role-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Create Role</button>
               </div>
-              <table style="margin-top:24px; width: 100%;">
-                <tbody id="role-settings-list"></tbody>
-              </table>
+
+              <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                <table style="width: 100%;">
+                  <thead><tr><th>Role Details</th><th style="text-align: right;">Action</th></tr></thead>
+                  <tbody id="role-settings-list"></tbody>
+                </table>
+              </div>
             </div>
 
             <div class="settings-panel">
@@ -729,13 +736,14 @@
 
             <div class="settings-panel" style="grid-column: 1 / -1;">
               <h3>Staff Directory & Custom Shifts</h3>
+              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Custom shift times here override Role defaults and Global defaults.</p>
               <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
                 <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
                 <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
                   <option value="">-- Select Role --</option>
                 </select>
-                <input type="time" id="new-staff-start" class="input-field" title="Custom Shift Start (Leave blank for default)" style="margin:0; flex: 1; min-width: 100px;">
-                <input type="time" id="new-staff-end" class="input-field" title="Custom Shift End (Leave blank for default)" style="margin:0; flex: 1; min-width: 100px;">
+                <input type="time" id="new-staff-start" class="input-field" title="Staff Custom Start (Leave blank to use Role/Global default)" style="margin:0; flex: 1; min-width: 100px;">
+                <input type="time" id="new-staff-end" class="input-field" title="Staff Custom End (Leave blank to use Role/Global default)" style="margin:0; flex: 1; min-width: 100px;">
                 <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Add Staff</button>
               </div>
               <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
@@ -748,7 +756,7 @@
 
             <div class="settings-panel">
               <h3>Global Shift Time Defaults</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Used to calculate OT/Shortages. Saves directly to database.</p>
+              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
               <div style="display:flex; flex-direction: column; gap:12px;">
                 <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
                 <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
@@ -791,12 +799,12 @@
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Shift Start</label>
-          <input type="time" id="edit-staff-start" class="input-field" style="margin-top: 8px;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift Start</label>
+          <input type="time" id="edit-staff-start" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Shift End</label>
-          <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift End</label>
+          <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
       </div>
       <div style="display: flex; gap: 12px; margin-top: 16px;">
@@ -811,8 +819,21 @@
       <h2 style="margin-bottom: 8px;">Edit Role</h2>
       <input type="hidden" id="edit-role-id">
       <input type="hidden" id="edit-role-oldname">
+      
       <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Name</label>
       <input type="text" id="edit-role-name" class="input-field" style="margin-top: 8px;">
+      
+      <div style="display: flex; gap: 16px; margin-top: 8px;">
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift Start</label>
+          <input type="time" id="edit-role-start" class="input-field" style="margin-top: 8px;" title="Leave blank for global default">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift End</label>
+          <input type="time" id="edit-role-end" class="input-field" style="margin-top: 8px;" title="Leave blank for global default">
+        </div>
+      </div>
+
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-role" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button id="btn-save-edit-role" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Changes</button>
@@ -952,6 +973,7 @@
     let dbRoles = [];
     let dbReasons = [];
     let staffConfig = {};
+    let roleConfig = {}; // Stores role-specific timing
     let dbLogs = [];
     let exceptionsData = {}; 
     let processedData = []; 
@@ -1072,7 +1094,6 @@
 
     let lastSyncTime = 0;
     
-    // Check if the admin is currently typing in a popup
     function isUserBusy() {
         const modals = document.querySelectorAll('.modal-overlay');
         for (let m of modals) {
@@ -1090,7 +1111,6 @@
             const currentTime = Date.now();
             if (currentTime - lastSyncTime > 2000) {
                 lastSyncTime = currentTime;
-                // Only auto-refresh if the admin isn't busy in a modal!
                 if (!isUserBusy()) {
                     fetchLogsFromDatabase(true); 
                 }
@@ -1132,7 +1152,6 @@
         const viewId = e.currentTarget.getAttribute('data-view');
         document.getElementById(viewId).style.display = 'block';
         
-        // FIX: Hide Export button on unsupported tabs
         const exportBtn = document.getElementById('export-dropdown');
         if (viewId === 'view-overview' || viewId === 'view-stats') {
             exportBtn.style.display = 'inline-block';
@@ -1140,7 +1159,6 @@
             exportBtn.style.display = 'none';
         }
         
-        // Render target views
         if (viewId === 'view-overview') {
             if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
         }
@@ -1151,7 +1169,6 @@
       });
     });
 
-    // Gallery Filter Toggle Listener
     document.getElementById('toggle-pending-photos').addEventListener('change', (e) => {
         showOnlyPendingPhotos = e.target.checked;
         renderAuditGallery();
@@ -1216,8 +1233,6 @@
       }
     });
 
-    // FIX: Flatpickr ko strictly raat 11:59:59 PM tak ki limit denge 
-    // Taki aaj ke current time wali endDate ko wo reject na kare.
     let todayEndLimit = new Date();
     todayEndLimit.setHours(23, 59, 59, 999);
 
@@ -1243,17 +1258,14 @@
         onChange: (dates) => { if(dates[0]) { endDate = dates[0]; fetchLogsFromDatabase(false); } } 
     });
 
-    // All Time Button ka logic
     document.getElementById('btn-all-time').addEventListener('click', () => {
         startDate = new Date('2026-07-20');
         endDate = new Date(); 
         if (endDate < minLaunchDate) endDate = minLaunchDate; 
 
-        // UI me box ko update karein
         startPicker.setDate(startDate);
         endPicker.setDate(endDate);
         
-        // Database se fetch karein
         fetchLogsFromDatabase(false);
     });
     
@@ -1343,8 +1355,14 @@
           const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
           dbRoles = roleData || [];
           masterRoleList = dbRoles.map(r => r.role_name);
+          dbRoles.forEach(r => {
+             roleConfig[r.role_name] = {
+                 shiftStart: r.shift_start || null,
+                 shiftEnd: r.shift_end || null
+             };
+          });
       } catch (err) {
-          console.warn("roles_directory table might not exist yet.");
+          console.warn("roles_directory error or table missing shift_start/end cols.", err);
       }
 
       try {
@@ -1607,14 +1625,17 @@
 
       let staffStatsTracker = {};
       filteredStaffNames.forEach(name => {
+         let staffRole = staffConfig[name]?.role || 'Unassigned';
          staffStatsTracker[name] = { 
-             name: name, role: staffConfig[name]?.role || 'Unassigned', 
+             name: name, role: staffRole, 
              daysPresent: 0, totalHoursDec: 0, lateCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
              dailyTargetHours: 0, sumInMins: 0, sumOutMins: 0, daysOut: 0
          };
          
-         let shiftStartStr = staffConfig[name]?.shiftStart || globalShiftStart;
-         let shiftEndStr = staffConfig[name]?.shiftEnd || globalShiftEnd;
+         // Fallback hierarchy for Target hours computation
+         let shiftStartStr = staffConfig[name]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
+         let shiftEndStr = staffConfig[name]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
+         
          let tStart = parseTimeStrToDate(shiftStartStr, new Date());
          let tEnd = parseTimeStrToDate(shiftEndStr, new Date());
          if(tStart && tEnd) staffStatsTracker[name].dailyTargetHours = (tEnd - tStart) / 3600000;
@@ -1670,10 +1691,11 @@
             }
             
             if (firstInTime) { 
-              let shiftStartStr = staffConfig[staffName]?.shiftStart || globalShiftStart;
+              // Fallback hierarchy for Lates computation
+              let shiftStartStr = staffConfig[staffName]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
               let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
               diffFromTargetMs = firstInTime - expectedIn;
-              expectedIn.setMinutes(expectedIn.getMinutes() + 15);
+              expectedIn.setMinutes(expectedIn.getMinutes() + 15); // 15 mins grace period
               if (firstInTime > expectedIn) { isLateArrival = true; totalLate++; } 
             }
 
@@ -1827,8 +1849,9 @@
       
       document.getElementById('edit-time-in').value = toTimeString(inIso);
       
-      // SMART PRE-FILL: Check if they have a custom shift end, otherwise use global default
-      let defaultOutStr = staffConfig[staffName]?.shiftEnd || globalShiftEnd;
+      // SMART PRE-FILL: Check if they have a custom shift end, then role, then global
+      let staffRole = staffConfig[staffName]?.role || 'Unassigned';
+      let defaultOutStr = staffConfig[staffName]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
       document.getElementById('edit-time-out').value = outIso ? toTimeString(outIso) : defaultOutStr;
       
       document.getElementById('edit-time-modal').style.display = 'flex';
@@ -2192,15 +2215,26 @@
       const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
       const { data: reasonsData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
       
+      // Helper function to remove seconds (converts "12:00:00" to "12:00")
+      const formatTime = (t) => t ? t.substring(0, 5) : '';
+
       const roleTbody = document.getElementById('role-settings-list');
       if (roleTbody) {
-          roleTbody.innerHTML = (rolesData || dbRoles || []).map(r => `<tr>
-              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${r.role_name}</strong></td>
+          roleTbody.innerHTML = (rolesData || dbRoles || []).map(r => {
+              const st = formatTime(r.shift_start);
+              const en = formatTime(r.shift_end);
+              return `<tr>
+              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
+                <strong style="color: var(--text-main);">${r.role_name}</strong><br>
+                <span style="font-size:12px; color:var(--text-soft); font-weight: 600;">
+                  ${st ? `${st} - ${en}` : 'Using Global Default'}
+                </span>
+              </td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditRole('${r.id}', '${r.role_name}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditRole('${r.id}', '${r.role_name}', '${st}', '${en}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteRoleItem('${r.id}')">Remove</button>
               </td>
-          </tr>`).join('');
+          </tr>`}).join('');
       }
 
       const reasonTbody = document.getElementById('reason-settings-list');
@@ -2216,14 +2250,17 @@
 
       const staffTbody = document.getElementById('staff-settings-list');
       if (staffTbody) {
-          staffTbody.innerHTML = (staffData || []).map(s => `<tr>
+          staffTbody.innerHTML = (staffData || []).map(s => {
+              const st = formatTime(s.shift_start);
+              const en = formatTime(s.shift_end);
+              return `<tr>
               <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
-              <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${s.shift_start ? `${s.shift_start} - ${s.shift_end}` : 'Global Default'}</span></td>
+              <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${s.shift_start || ''}', '${s.shift_end || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${st}', '${en}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
-          </tr>`).join('');
+          </tr>`}).join('');
       }
       
       const branchTbody = document.getElementById('branch-settings-list');
@@ -2262,25 +2299,40 @@
         }
     });
 
+    // -------------------------------------------------------------
+    // ROLE CONFIGURATION - ADD & EDIT
+    // -------------------------------------------------------------
     document.getElementById('add-role-btn').addEventListener('click', async () => {
       const roleName = document.getElementById('new-role-name').value.trim();
+      let startVal = document.getElementById('new-role-start').value || null;
+      let endVal = document.getElementById('new-role-end').value || null;
+      
+      if(startVal && startVal.length === 5) startVal += ':00';
+      if(endVal && endVal.length === 5) endVal += ':00';
+
       if(roleName) {
         const btn = document.getElementById('add-role-btn'); btn.innerText = "Adding..."; btn.disabled = true;
         try {
-          await supabaseClient.from('roles_directory').insert([{ role_name: roleName }]);
+          await supabaseClient.from('roles_directory').insert([{ 
+              role_name: roleName, shift_start: startVal, shift_end: endVal 
+          }]);
           document.getElementById('new-role-name').value = '';
+          document.getElementById('new-role-start').value = '';
+          document.getElementById('new-role-end').value = '';
           await initialMetadataLoad(); 
           loadSettingsData();
           showToast("Role created successfully", "success");
-        } catch (err) { showToast("Failed to create role. Make sure table exists.", "error"); }
+        } catch (err) { showToast("Failed to create role. Make sure table has shift_start & shift_end columns.", "error"); }
         finally { btn.innerText = "Create Role"; btn.disabled = false; }
       } else { showToast("Enter a role name.", "error"); }
     });
 
-    window.openEditRole = (id, currentName) => {
+    window.openEditRole = (id, currentName, start, end) => {
       document.getElementById('edit-role-id').value = id;
       document.getElementById('edit-role-oldname').value = currentName;
       document.getElementById('edit-role-name').value = currentName;
+      document.getElementById('edit-role-start').value = start || '';
+      document.getElementById('edit-role-end').value = end || '';
       document.getElementById('edit-role-modal').style.display = 'flex';
     };
     
@@ -2290,12 +2342,22 @@
       const id = document.getElementById('edit-role-id').value;
       const oldName = document.getElementById('edit-role-oldname').value;
       const newName = document.getElementById('edit-role-name').value.trim();
+      let startVal = document.getElementById('edit-role-start').value || null;
+      let endVal = document.getElementById('edit-role-end').value || null;
       
-      if(newName && newName !== oldName) {
+      if(startVal && startVal.length === 5) startVal += ':00';
+      if(endVal && endVal.length === 5) endVal += ':00';
+      
+      if(newName) {
         const btn = document.getElementById('btn-save-edit-role'); btn.innerText = "Saving..."; btn.disabled = true;
         try {
-          await supabaseClient.from('roles_directory').update({ role_name: newName }).eq('id', id);
-          await supabaseClient.from('staff_directory').update({ role: newName }).eq('role', oldName);
+          await supabaseClient.from('roles_directory').update({ 
+              role_name: newName, shift_start: startVal, shift_end: endVal 
+          }).eq('id', id);
+          
+          if(newName !== oldName) {
+            await supabaseClient.from('staff_directory').update({ role: newName }).eq('role', oldName);
+          }
           
           document.getElementById('edit-role-modal').style.display = 'none';
           await initialMetadataLoad();
@@ -2303,12 +2365,16 @@
           showToast("Role updated everywhere", "success");
         } catch(e) { showToast("Failed to update role", "error"); }
         finally { btn.innerText = "Save Changes"; btn.disabled = false; }
-      } else { document.getElementById('edit-role-modal').style.display = 'none'; }
+      } else { 
+        showToast("Role Name is required.", "error");
+      }
     });
     
     window.deleteRoleItem = async (rowId) => { 
       if(confirm("Remove this role? It will not remove it from existing staff automatically.")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
     };
+
+    // -------------------------------------------------------------
 
     document.getElementById('add-reason-btn').addEventListener('click', async () => {
         const name = document.getElementById('new-reason-name').value.trim();
