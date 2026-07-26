@@ -250,6 +250,78 @@
     .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
     .chart-card h3 { font-size: 14px; margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
     .chart-container { position: relative; height: 300px; width: 100%; }
+
+    /* =========================================================
+       SIDEBAR MINIMIZE ANIMATION
+       ========================================================= */
+    .sidebar { 
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      overflow-x: hidden; 
+      white-space: nowrap; 
+      width: 280px;
+    }
+    .sidebar.collapsed { width: 88px; }
+    
+    .brand-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: opacity 0.2s ease;
+      opacity: 1;
+    }
+    
+    .sidebar-toggle-btn {
+      position: absolute;
+      right: 0px;
+      top: 4px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    
+    /* When Collapsed: Hide the brand info completely */
+    .sidebar.collapsed .brand-info {
+      opacity: 0;
+      pointer-events: none;
+      width: 0; /* Stops it from pushing elements */
+    }
+    
+    .sidebar.collapsed .sidebar-toggle-btn {
+      right: 50%;
+      transform: translateX(50%);
+    }
+
+    /* Force icons to NEVER shrink */
+    .tab-icon { 
+      flex-shrink: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+    }
+
+    .tab-btn-text { transition: opacity 0.2s ease, width 0.2s ease; }
+    
+    /* When Collapsed: Make text 0 width so icons center perfectly */
+    .sidebar.collapsed .tab-btn-text { 
+      opacity: 0; 
+      width: 0; 
+      overflow: hidden; 
+    }
+    
+    .sidebar.collapsed .tab-btn {
+      padding-left: 0;
+      padding-right: 0;
+      justify-content: center;
+    }
+    
+    .sidebar.collapsed #absent-badge {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      transform: scale(0.65);
+      transform-origin: top right; /* This pins it to the corner so it doesn't overlap the icon */
+    }
   </style>
 </head>
 <body>
@@ -276,39 +348,48 @@
     <div class="app-container">
       
       <!-- SIDEBAR NAVIGATION -->
-      <aside class="sidebar">
-        <div class="sidebar-brand">
-          <img src="logo.png" alt="RJ Logo" onerror="this.style.display='none'">
-          <div>
-            <div class="brand-title">RJ Mobile <span class="badge bg-green">ADMIN</span></div>
-            <div class="brand-subtitle">Attendance Center</div>
+      <aside class="sidebar" id="app-sidebar">
+        
+        <div class="sidebar-brand" style="position: relative;">
+          <!-- Logo and Text -->
+          <div class="brand-info">
+            <img src="logo.png" alt="RJ Logo" onerror="this.style.display='none'">
+            <div class="brand-text-wrap">
+              <div class="brand-title">RJ Mobile <span class="badge bg-green">ADMIN</span></div>
+              <div class="brand-subtitle">Attendance Center</div>
+            </div>
           </div>
+          <!-- Collapse Button -->
+          <button class="icon-btn sidebar-toggle-btn" id="sidebar-toggle" title="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+          </button>
         </div>
         
         <div class="tab-controls">
-          <button class="tab-btn active" data-view="view-overview">
+          <button class="tab-btn active" data-view="view-overview" title="Overview & Logs">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
-            Overview & Logs
+            <span class="tab-btn-text">Overview & Logs</span>
           </button>
-          <button class="tab-btn" data-view="view-stats">
+          <button class="tab-btn" data-view="view-stats" title="Staff Stats">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
-            Staff Stats
+            <span class="tab-btn-text">Staff Stats</span>
           </button>
-          <button class="tab-btn" data-view="view-analysis">
+          <button class="tab-btn" data-view="view-analysis" title="Deep Analysis">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span> 
-            Deep Analysis
+            <span class="tab-btn-text">Deep Analysis</span>
           </button>
-          <button class="tab-btn" data-view="view-absent" style="position: relative;">
+          <button class="tab-btn" data-view="view-absent" style="position: relative;" title="Action Center">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
-            Action Center <span id="absent-badge" class="badge bg-red" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
+            <span class="tab-btn-text">Action Center</span>
+            <span id="absent-badge" class="badge bg-red" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
           </button>
-          <button class="tab-btn" data-view="view-matrix">
+          <button class="tab-btn" data-view="view-matrix" title="Attendance Matrix">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> 
-            Attendance Matrix
+            <span class="tab-btn-text">Attendance Matrix</span>
           </button>
-          <button class="tab-btn" data-view="view-settings">
+          <button class="tab-btn" data-view="view-settings" title="System Settings">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> 
-            System Settings
+            <span class="tab-btn-text">System Settings</span>
           </button>
         </div>
       </aside>
@@ -2358,6 +2439,21 @@
            navigator.clipboard.writeText(clipboardText).then(() => showToast("Table copied to clipboard!", "success"));
         }
       });
+    });
+
+    // ==========================================
+    // SIDEBAR MINIMIZE LOGIC
+    // ==========================================
+    const appSidebar = document.getElementById('app-sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    if (localStorage.getItem('rj_sidebar_collapsed') === 'true') {
+      appSidebar.classList.add('collapsed');
+    }
+
+    sidebarToggle.addEventListener('click', () => {
+      appSidebar.classList.toggle('collapsed');
+      localStorage.setItem('rj_sidebar_collapsed', appSidebar.classList.contains('collapsed'));
     });
   </script>
 </body>
