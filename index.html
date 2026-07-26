@@ -438,6 +438,9 @@
             <label>End Date</label>
             <input type="text" id="global-end" class="input-field" style="margin: 0; width: 130px; padding: 10px;" placeholder="End Date" />
           </div>
+          <div class="filter-group" style="justify-content: flex-end;">
+            <button id="btn-all-time" class="btn-secondary" style="height: 38px; margin: 0; padding: 0 16px;">All Time</button>
+          </div>
 
           <div class="filter-group">
             <label>Clock-In Between</label>
@@ -961,6 +964,10 @@
     let endDate = new Date();
     let startDate = new Date();
     startDate.setDate(startDate.getDate() - 7);
+    const minLaunchDate = new Date('2026-07-20');
+    
+    if (startDate < minLaunchDate) startDate = minLaunchDate;
+    if (endDate < minLaunchDate) endDate = minLaunchDate;
     
     let selectedStaff = new Set();
     let selectedBranches = new Set();
@@ -1209,8 +1216,46 @@
       }
     });
 
-    flatpickr("#global-start", { defaultDate: startDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) { startDate = dates[0]; fetchLogsFromDatabase(false); } } });
-    flatpickr("#global-end", { defaultDate: endDate, dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", onChange: (dates) => { if(dates[0]) { endDate = dates[0]; fetchLogsFromDatabase(false); } } });
+    // FIX: Flatpickr ko strictly raat 11:59:59 PM tak ki limit denge 
+    // Taki aaj ke current time wali endDate ko wo reject na kare.
+    let todayEndLimit = new Date();
+    todayEndLimit.setHours(23, 59, 59, 999);
+
+    let safeMaxDate = new Date() < minLaunchDate ? null : todayEndLimit;
+
+    const startPicker = flatpickr("#global-start", { 
+        defaultDate: startDate, 
+        minDate: "2026-07-20", 
+        maxDate: safeMaxDate,
+        dateFormat: "Y-m-d", 
+        altInput: true, 
+        altFormat: "d M, Y", 
+        onChange: (dates) => { if(dates[0]) { startDate = dates[0]; fetchLogsFromDatabase(false); } } 
+    });
+    
+    const endPicker = flatpickr("#global-end", { 
+        defaultDate: endDate, 
+        minDate: "2026-07-20", 
+        maxDate: safeMaxDate,
+        dateFormat: "Y-m-d", 
+        altInput: true, 
+        altFormat: "d M, Y", 
+        onChange: (dates) => { if(dates[0]) { endDate = dates[0]; fetchLogsFromDatabase(false); } } 
+    });
+
+    // All Time Button ka logic
+    document.getElementById('btn-all-time').addEventListener('click', () => {
+        startDate = new Date('2026-07-20');
+        endDate = new Date(); 
+        if (endDate < minLaunchDate) endDate = minLaunchDate; 
+
+        // UI me box ko update karein
+        startPicker.setDate(startDate);
+        endPicker.setDate(endDate);
+        
+        // Database se fetch karein
+        fetchLogsFromDatabase(false);
+    });
     
     const schedStartFP = flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     const schedEndFP = flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
