@@ -10,6 +10,9 @@
     if (localStorage.getItem('rj_theme') === 'light') { 
       document.documentElement.classList.add('light-theme'); 
     }
+    if (localStorage.getItem('rj_font_scale')) {
+      document.documentElement.style.setProperty('--font-scale', localStorage.getItem('rj_font_scale'));
+    }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -53,6 +56,8 @@
       --radius-sm: 6px;
       --radius-md: 10px;
       --radius-lg: 16px;
+      
+      --font-scale: 1; /* Added for dynamic scaling */
     }
 
     html.light-theme {
@@ -79,39 +84,39 @@
     ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }
 
-    body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); font-size: 14px; min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
     h1, h2, h3, .name, .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; }
     .glass-effect { background: var(--card-bg-alpha); backdrop-filter: blur(16px); border: 1px solid var(--card-border); }
 
     /* =========================================================
        2. TYPOGRAPHY & BUTTONS
        ========================================================= */
-    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: var(--shadow-sm); }
+    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); box-shadow: var(--shadow-sm); }
     .btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
     
-    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); }
     .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .icon-btn { background: transparent; border: none; color: var(--text-soft); cursor: pointer; font-size: 13px; transition: 0.2s; padding: 6px 10px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; }
+    .icon-btn { background: transparent; border: none; color: var(--text-soft); cursor: pointer; font-size: calc(13px * var(--font-scale, 1)); transition: 0.2s; padding: 6px 10px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; }
     .icon-btn:hover { background: var(--input-bg); color: var(--primary); border-color: var(--card-border); }
     
-    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.3px; text-transform: uppercase;}
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.3px; text-transform: uppercase;}
     .bg-green { background: var(--success-alpha); color: var(--success); }
     .bg-red { background: var(--danger-alpha); color: var(--danger); }
     .bg-orange { background: var(--warning-alpha); color: var(--warning); }
     .bg-blue { background: var(--primary-alpha); color: var(--primary); }
     .bg-gray { background: var(--bg-base); color: var(--text-soft); border: 1px solid var(--card-border); }
     
-    .action-link { color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
+    .action-link { color: var(--primary); font-size: calc(12px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
     .action-link:hover { color: var(--primary-hover); text-decoration: underline; }
-    .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
+    .role-tag { font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
 
     /* =========================================================
        3. TOGGLES & LOADERS
        ========================================================= */
-    .switch-wrap { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-main); background: var(--bg-base); padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
+    .switch-wrap { display: flex; align-items: center; gap: 10px; font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; color: var(--text-main); background: var(--bg-base); padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--card-border); transition: .4s; border-radius: 24px; }
@@ -120,7 +125,7 @@
     input:checked + .slider:before { transform: translateX(20px); }
 
     #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
-    .toast { padding: 14px 24px; border-radius: var(--radius-md); color: #fff; font-weight: 600; box-shadow: var(--shadow-md); opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 14px; display: flex; align-items: center; gap: 10px;}
+    .toast { padding: 14px 24px; border-radius: var(--radius-md); color: #fff; font-weight: 600; box-shadow: var(--shadow-md); opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 10px;}
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast-primary { background: var(--primary); }
     .toast-success { background: var(--success); }
@@ -133,8 +138,7 @@
     /* =========================================================
        4. FORM INPUTS, DATE/TIME FIX & DROPDOWNS
        ========================================================= */
-    /* Color-scheme enables native white clock/calendar icons in dark mode */
-    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); color-scheme: dark; }
+    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: calc(13px * var(--font-scale, 1)); transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); color-scheme: dark; }
     html.light-theme .input-field { color-scheme: light; }
     .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-alpha); }
     select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px auto; }
@@ -144,13 +148,13 @@
     .dropdown-content.show { display: block; animation: dropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes dropIn { from {opacity:0; transform: translateY(-10px) scale(0.98);} to {opacity:1; transform:translateY(0) scale(1);} }
     
-    .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-weight: 500; border-radius: var(--radius-sm); transition: 0.2s; font-size: 13px;}
+    .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-weight: 500; border-radius: var(--radius-sm); transition: 0.2s; font-size: calc(13px * var(--font-scale, 1));}
     .dropdown-content.export-menu a:hover { background-color: var(--primary-alpha); color: var(--primary); }
 
     .multi-select-actions { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
-    .multi-select-actions button { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
+    .multi-select-actions button { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none; background: var(--input-bg); color: var(--text-main); font-size: calc(12px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s;}
     .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary); }
-    .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 10px 8px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 13px;}
+    .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 10px 8px; border-radius: var(--radius-sm); transition: 0.2s; font-size: calc(13px * var(--font-scale, 1));}
     .check-wrap:hover { background: var(--input-bg); color: var(--primary); }
     .check-wrap input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; border-radius: 4px; }
     .list-container { max-height: 250px; overflow-y: auto; padding-right: 4px; }
@@ -164,11 +168,11 @@
     .sidebar { width: 280px; background: var(--card-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; padding: 24px 16px; z-index: 100; flex-shrink: 0; }
     .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 32px 8px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px; }
     .sidebar-brand img { height: 36px; object-fit: contain; }
-    .brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-    .brand-subtitle { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600;}
+    .brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(18px * var(--font-scale, 1)); font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .brand-subtitle { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600;}
     
     .tab-controls { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex: 1; padding-right: 8px; }
-    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; transition: all 0.2s; font-size: 14px; display: flex; align-items: center; gap: 12px; }
+    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; transition: all 0.2s; font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 12px; }
     .tab-btn:hover { background: var(--input-bg); color: var(--text-main); }
     .tab-btn.active { background: var(--primary-alpha); color: var(--primary); }
     .tab-icon { display: flex; align-items: center; justify-content: center; }
@@ -177,7 +181,7 @@
     
     .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: var(--radius-lg); background: var(--card-bg); border: 1px solid var(--card-border); margin-bottom: 32px; gap: 16px; box-shadow: var(--shadow-sm); flex-wrap: wrap; z-index: 50;}
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .header-title { font-weight: 600; font-size: 16px; color: var(--text-main); }
+    .header-title { font-weight: 600; font-size: calc(16px * var(--font-scale, 1)); color: var(--text-main); }
 
     /* =========================================================
        6. STRUCTURED FILTER BAR & WIDGETS
@@ -185,16 +189,16 @@
     .filter-section { display: flex; flex-direction: column; gap: 16px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
     .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
-    .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;}
+    .filter-group label { font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;}
     .time-filter-wrap { display: flex; gap: 8px; align-items: center; }
     
     .quick-dates { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); flex-wrap: wrap; }
-    .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .quick-date-btn:hover { color: var(--text-main); background: var(--card-bg); }
     .quick-date-btn.active { background: var(--card-bg); color: var(--primary); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sub-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); width: fit-content;}
-    .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .sub-tab-btn:hover { color: var(--text-main); background: var(--card-bg); }
     .sub-tab-btn.active { background: var(--card-bg); color: var(--primary); border-color: var(--card-border); box-shadow: var(--shadow-sm); }
 
@@ -205,16 +209,16 @@
     .widget-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .widget-card:active { cursor: grabbing; }
     .widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .widget-title { font-size: 12px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; pointer-events: none; letter-spacing: 0.5px;}
-    .metric-value { font-size: 36px; font-weight: 800; color: var(--text-main); pointer-events: none; line-height: 1.1; letter-spacing: -0.5px;}
-    .drag-handle { color: var(--text-soft); opacity: 0.3; cursor: grab; transition: 0.2s; font-size: 18px; line-height: 1;}
+    .widget-title { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); text-transform: uppercase; font-weight: 700; pointer-events: none; letter-spacing: 0.5px;}
+    .metric-value { font-size: calc(36px * var(--font-scale, 1)); font-weight: 800; color: var(--text-main); pointer-events: none; line-height: 1.1; letter-spacing: -0.5px;}
+    .drag-handle { color: var(--text-soft); opacity: 0.3; cursor: grab; transition: 0.2s; font-size: calc(18px * var(--font-scale, 1)); line-height: 1;}
     .widget-card:hover .drag-handle { opacity: 1; color: var(--primary); }
 
     .table-card { background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm);}
     .table-responsive { overflow-x: auto; max-height: 600px; overflow-y: auto; }
     table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; }
-    th { position: sticky; top: 0; background: var(--bg-base); color: var(--text-soft); font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 16px 24px; border-bottom: 1px solid var(--card-border); z-index: 10; letter-spacing: 0.5px; border-top: 1px solid var(--card-border);}
-    td { padding: 16px 24px; border-bottom: 1px solid var(--card-border); vertical-align: middle; font-size: 13px; color: var(--text-main); transition: background 0.1s;}
+    th { position: sticky; top: 0; background: var(--bg-base); color: var(--text-soft); font-weight: 700; font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; padding: 16px 24px; border-bottom: 1px solid var(--card-border); z-index: 10; letter-spacing: 0.5px; border-top: 1px solid var(--card-border);}
+    td { padding: 16px 24px; border-bottom: 1px solid var(--card-border); vertical-align: middle; font-size: calc(13px * var(--font-scale, 1)); color: var(--text-main); transition: background 0.1s;}
     tbody tr:hover td { background: var(--input-bg); }
     tbody tr:last-child td { border-bottom: none; }
 
@@ -229,15 +233,15 @@
     .audit-img-wrap { width: 100%; height: 220px; background: #000; position: relative; overflow: hidden;}
     .audit-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; cursor: pointer; }
     .audit-img-wrap:hover .audit-img { transform: scale(1.05); }
-    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.8); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.8); color: #fff; font-size: calc(11px * var(--font-scale, 1)); padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
     .audit-details { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
     .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .settings-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
-    .settings-panel h3 { font-size: 16px; margin-bottom: 12px; color: var(--text-main); }
-    .del-btn { color: var(--danger); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 12px;}
+    .settings-panel h3 { font-size: calc(16px * var(--font-scale, 1)); margin-bottom: 12px; color: var(--text-main); }
+    .del-btn { color: var(--danger); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; font-size: calc(12px * var(--font-scale, 1));}
     .del-btn:hover { background: var(--danger-alpha); border-color: var(--danger-alpha); }
-    .edit-btn { color: var(--primary); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; margin-right: 6px; font-size: 12px;}
+    .edit-btn { color: var(--primary); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; margin-right: 6px; font-size: calc(12px * var(--font-scale, 1));}
     .edit-btn:hover { background: var(--primary-alpha); border-color: var(--primary-alpha); }
 
     /* =========================================================
@@ -250,13 +254,13 @@
     .modal-card { background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
     @keyframes slideUp { from { transform: translateY(20px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
     
-    .modal-card h2, .modal-card h3 { color: var(--text-main); font-size: 20px; }
+    .modal-card h2, .modal-card h3 { color: var(--text-main); font-size: calc(20px * var(--font-scale, 1)); }
     .modal-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--bg-base); }
     .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
 
     .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
-    .chart-card h3 { font-size: 14px; margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+    .chart-card h3 { font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
     .chart-container { position: relative; height: 300px; width: 100%; }
 
     /* =========================================================
@@ -265,14 +269,14 @@
     .branch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
     .live-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; }
     .live-branch-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--primary); }
-    .live-branch-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-    .live-branch-count { font-size: 32px; font-weight: 800; color: var(--primary); }
+    .live-branch-title { font-size: calc(18px * var(--font-scale, 1)); font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .live-branch-count { font-size: calc(32px * var(--font-scale, 1)); font-weight: 800; color: var(--primary); }
     
     .live-staff-list { display: flex; flex-direction: column; gap: 12px; }
     .live-staff-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
     .live-staff-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: var(--bg-base); }
     .live-staff-info { flex: 1; }
-    .live-staff-name { font-weight: 700; color: var(--text-main); font-size: 15px; }
+    .live-staff-name { font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); }
 
     /* =========================================================
        SIDEBAR MINIMIZE ANIMATION
@@ -298,14 +302,14 @@
   <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" alt="RJ Mobile Logo" style="height: 48px; object-fit: contain; margin-bottom: 24px;" onerror="this.style.display='none'">
-        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px;">Attendance Admin</h2>
-        <p style="color: var(--text-soft); margin-bottom: 32px; font-size: 14px;">Secure management access.</p>
+        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; margin-bottom: 8px;">Attendance Admin</h2>
+        <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(14px * var(--font-scale, 1));">Secure management access.</p>
         
         <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
         <input type="password" id="password-input" class="input-field" placeholder="Password" style="margin-bottom: 8px;" />
         
-        <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: 14px;">Log In to Dashboard</button>
-        <div id="error-msg" style="color: var(--danger); margin-top: 16px; display: none; background: var(--danger-alpha); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--danger-alpha); font-size: 13px; font-weight: 600;">Error</div>
+        <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: calc(14px * var(--font-scale, 1));">Log In to Dashboard</button>
+        <div id="error-msg" style="color: var(--danger); margin-top: 16px; display: none; background: var(--danger-alpha); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--danger-alpha); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Error</div>
     </div>
   </div>
 
@@ -369,6 +373,14 @@
         <div class="header-bar">
           <div class="header-title">Dashboard Overview</div>
           <div class="header-controls">
+            
+            <!-- Font Size Adjuster -->
+            <div style="display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 4px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+              <span style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft);">A</span>
+              <input type="range" id="font-scale-slider" min="0.8" max="1.3" step="0.05" value="1" style="width: 60px; accent-color: var(--primary);" title="Adjust Text Size">
+              <span style="font-size: calc(16px * var(--font-scale, 1)); color: var(--text-main); font-weight: 600;">A</span>
+            </div>
+
             <div class="switch-wrap">
               Auto-Sync
               <label class="switch" title="Enable Live Sync">
@@ -453,7 +465,7 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                         <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="role-dropdown-box">
-                            <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
+                            <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
                             <div class="multi-select-actions">
                                 <button id="btn-select-all-roles">Select All</button>
                                 <button id="btn-deselect-all-roles">Clear All</button>
@@ -469,7 +481,7 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                         <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="branch-dropdown-box">
-                            <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
+                            <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
                             <div class="multi-select-actions">
                                 <button id="btn-select-all-branches">Select All</button>
                                 <button id="btn-deselect-all-branches">Clear All</button>
@@ -485,7 +497,7 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                         <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="staff-dropdown-box">
-                            <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
+                            <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
                             <div class="multi-select-actions">
                                 <button id="btn-select-all">Select All</button>
                                 <button id="btn-deselect-all">Clear All</button>
@@ -575,7 +587,7 @@
             <!-- UNIFIED PAGINATION FOOTER -->
             <div class="pagination-footer">
               <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 100</button>
-              <span id="page-indicator" style="color: var(--text-soft); font-size: 13px; font-weight: 600;">Page 1</span>
+              <span id="page-indicator" style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Page 1</span>
               <button id="next-page-btn" class="btn-secondary" disabled>Next 100 →</button>
             </div>
 
@@ -585,8 +597,8 @@
         <!-- LIVE BRANCHES -->
         <div id="view-live" class="app-view" style="display: none;">
             <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-              <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Live Branch Presence</h2>
-              <span style="color: var(--text-soft); font-size: 13px;">Real-time view of staff currently clocked in today.</span>
+              <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Live Branch Presence</h2>
+              <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time view of staff currently clocked in today.</span>
             </div>
             
             <div class="branch-grid" id="live-branch-grid">
@@ -597,8 +609,8 @@
         <!-- VIEW 2: STAFF STATS -->
         <div id="view-stats" class="app-view" style="display: none;">
           <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-            <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Staff Stats & Payroll Prep</h2>
-            <span style="color: var(--text-soft); font-size: 13px;">Aggregated metrics for the selected date range.</span>
+            <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Staff Stats & Payroll Prep</h2>
+            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Aggregated metrics for the selected date range.</span>
           </div>
 
           <div class="table-card" id="stats-export-container">
@@ -627,8 +639,8 @@
         <!-- VIEW 3: DEEP ANALYSIS -->
         <div id="view-analysis" class="app-view" style="display: none;">
             <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-              <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Deep Analysis Dashboard</h2>
-              <span style="color: var(--text-soft); font-size: 13px;">Visual insights based on current filters.</span>
+              <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Deep Analysis Dashboard</h2>
+              <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Visual insights based on current filters.</span>
             </div>
             
             <div class="chart-grid">
@@ -656,12 +668,18 @@
 
         <!-- VIEW 4: ACTION CENTER -->
         <div id="view-absent" class="app-view" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
             <div>
-              <h2 style="font-size: 20px; margin-bottom: 8px;">Action Center</h2>
-              <p style="color: var(--text-soft); margin: 0; font-size: 13px;">Manage missing staff and schedule future leaves.</p>
+              <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin-bottom: 8px;">Action Center</h2>
+              <p style="color: var(--text-soft); margin: 0; font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and schedule future leaves.</p>
             </div>
             <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Future Leave</button>
+          </div>
+
+          <div class="sub-tabs" id="action-center-tabs" style="margin-bottom: 24px;">
+              <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
+              <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
+              <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
           </div>
           
           <div class="table-card">
@@ -670,9 +688,9 @@
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Missing Staff</th>
-                    <th>Current Status</th>
-                    <th>Admin Actions</th>
+                    <th>Staff Member</th>
+                    <th>Status & Details</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody id="absent-tbody">
@@ -686,8 +704,8 @@
         <!-- VIEW 5: ATTENDANCE MATRIX -->
         <div id="view-matrix" class="app-view" style="display: none;">
           <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-            <h2 style="font-size: 20px; margin: 0; margin-right: 12px;">Attendance Matrix</h2>
-            <span style="color: var(--text-soft); font-size: 13px;">Showing dates derived from currently loaded logs.</span>
+            <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Attendance Matrix</h2>
+            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Showing dates derived from currently loaded logs.</span>
           </div>
 
           <div class="table-card">
@@ -704,13 +722,13 @@
 
         <!-- VIEW 6: SYSTEM SETTINGS -->
         <div id="view-settings" class="app-view" style="display: none;">
-          <h2 style="font-size: 20px; margin-bottom: 8px;">Database & System Preferences</h2>
-          <p style="color: var(--text-soft); margin-bottom: 32px; font-size: 13px;">Changes apply immediately.</p>
+          <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin-bottom: 8px;">Database & System Preferences</h2>
+          <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(13px * var(--font-scale, 1));">Changes apply immediately.</p>
           
           <div class="settings-grid">
             <div class="settings-panel" style="grid-column: 1 / -1;">
               <h3>Role Configuration</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
+              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
               
               <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
                 <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0; flex: 2; min-width: 150px;">
@@ -729,7 +747,7 @@
 
             <div class="settings-panel">
               <h3>Leave/Exception Reasons</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
+              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
               <div style="display:flex; flex-direction: column; gap:12px;">
                 <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
                 <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
@@ -741,7 +759,7 @@
 
             <div class="settings-panel" style="grid-column: 1 / -1;">
               <h3>Staff Directory & Custom Shifts</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Custom shift times here override Role defaults and Global defaults.</p>
+              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Custom shift times here override Role defaults and Global defaults.</p>
               <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
                 <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
                 <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
@@ -761,11 +779,11 @@
 
             <div class="settings-panel">
               <h3>Global Shift Time Defaults</h3>
-              <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
+              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
               <div style="display:flex; flex-direction: column; gap:12px;">
-                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
+                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
                 <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
-                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
+                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
                 <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
                 <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center; margin-top: 8px;">Save to Database</button>
               </div>
@@ -796,9 +814,9 @@
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
           <div>
               <h2 id="live-modal-title" style="margin-bottom: 4px;">Branch Name</h2>
-              <p style="color: var(--success); font-weight: 600; font-size: 13px;" id="live-modal-subtitle">0 Staff Currently In</p>
+              <p style="color: var(--success); font-weight: 600; font-size: calc(13px * var(--font-scale, 1));" id="live-modal-subtitle">0 Staff Currently In</p>
           </div>
-          <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="document.getElementById('live-branch-modal').style.display='none'">&times;</span>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="document.getElementById('live-branch-modal').style.display='none'">&times;</span>
       </div>
       <div class="live-staff-list" id="live-staff-container">
           <!-- Staff items injected here -->
@@ -811,19 +829,19 @@
       <h2 style="margin-bottom: 8px;">Edit Staff Details</h2>
       <input type="hidden" id="edit-staff-id">
       
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
       <input type="text" id="edit-staff-name" class="input-field" style="margin-top: 8px;">
       
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
       <select id="edit-staff-role" class="input-field" style="margin-top: 8px;"></select>
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift Start</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift Start</label>
           <input type="time" id="edit-staff-start" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift End</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift End</label>
           <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
       </div>
@@ -840,16 +858,16 @@
       <input type="hidden" id="edit-role-id">
       <input type="hidden" id="edit-role-oldname">
       
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Name</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Name</label>
       <input type="text" id="edit-role-name" class="input-field" style="margin-top: 8px;">
       
       <div style="display: flex; gap: 16px; margin-top: 8px;">
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift Start</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift Start</label>
           <input type="time" id="edit-role-start" class="input-field" style="margin-top: 8px;" title="Leave blank for global default">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift End</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift End</label>
           <input type="time" id="edit-role-end" class="input-field" style="margin-top: 8px;" title="Leave blank for global default">
         </div>
       </div>
@@ -865,7 +883,7 @@
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Leave Reason</h2>
       <input type="hidden" id="edit-reason-id">
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Reason Name</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Reason Name</label>
       <input type="text" id="edit-reason-name" class="input-field" style="margin-top: 8px;">
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-reason" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
@@ -878,11 +896,11 @@
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Branch</h2>
       <input type="hidden" id="edit-branch-id">
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Branch Name</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Branch Name</label>
       <input type="text" id="edit-branch-name" class="input-field" style="margin-top: 8px;">
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Login Email</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Login Email</label>
       <input type="email" id="edit-branch-email" class="input-field" style="margin-top: 8px;">
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Terminal Password</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Terminal Password</label>
       <input type="text" id="edit-branch-pass" class="input-field" style="margin-top: 8px;">
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-branch" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
@@ -894,15 +912,15 @@
   <div id="edit-time-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Shift Timeline</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="edit-time-subtitle">Updating record</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="edit-time-subtitle">Updating record</p>
       
       <div style="display: flex; flex-direction: column; gap: 16px;">
         <div>
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Clock In Time</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Clock In Time</label>
           <input type="time" id="edit-time-in" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
         </div>
         <div>
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Clock Out Time</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Clock Out Time</label>
           <input type="time" id="edit-time-out" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
         </div>
       </div>
@@ -917,23 +935,23 @@
   <div id="schedule-leave-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Schedule Future Leave</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;">Mark upcoming dates as an approved exception.</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Mark upcoming dates as an approved exception.</p>
       
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Staff</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Staff</label>
       <select id="sched-staff" class="input-field" style="margin-top: 8px;"></select>
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
           <input type="text" id="sched-start" class="input-field" style="margin-top: 8px; padding: 12px;">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
           <input type="text" id="sched-end" class="input-field" style="margin-top: 8px; padding: 12px;">
         </div>
       </div>
 
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
       <select id="sched-reason" class="input-field" style="margin-top: 8px;"></select>
       <input type="text" id="sched-reason-custom" class="input-field" placeholder="Type custom reason..." style="margin-top: 8px; display: none;">
 
@@ -947,13 +965,13 @@
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manage Reason</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="exc-subtitle">Update record</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="exc-subtitle">Update record</p>
       
-      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
       <select id="exc-reason" class="input-field" style="margin-top: 8px;"></select>
       <input type="text" id="exc-reason-custom" class="input-field" placeholder="Type custom reason (e.g. Heavy Traffic)..." style="margin-top: 8px; display: none;">
       
-      <!-- We store the exception context (Late, Early, Absent) here -->
+      <!-- We store the exception context (Late Arrival, Early Departure, Absent) here -->
       <input type="hidden" id="exc-type" value=""> 
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -968,7 +986,7 @@
     <div class="modal-card" onclick="event.stopPropagation()">
       <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
         Audit Photo
-        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="document.getElementById('photo-modal').style.display='none'">&times;</span>
+        <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="document.getElementById('photo-modal').style.display='none'">&times;</span>
       </h3>
       <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo">
       <div id="audit-controls" style="display:none; flex-direction:column; gap:16px; margin-top:8px;">
@@ -1026,6 +1044,9 @@
 
     let showOnlyPendingPhotos = true;
 
+    // Action center active tab logic
+    let currentActionTab = 'absent';
+
     let activeExceptionName = null, activeExceptionDate = null;
     let activeEditDateStr = null, activeEditStaff = null, editLogInId = null, editLogOutId = null;
     let realtimeSubscription = null;
@@ -1034,6 +1055,15 @@
     window.myCharts = {};
     Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim() || '#a1a1aa';
     Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // Typography Slider Listener
+    const fSlider = document.getElementById('font-scale-slider');
+    const savedScale = localStorage.getItem('rj_font_scale') || '1';
+    fSlider.value = savedScale;
+    fSlider.addEventListener('input', (e) => {
+        document.documentElement.style.setProperty('--font-scale', e.target.value);
+        localStorage.setItem('rj_font_scale', e.target.value);
+    });
 
     const toLocalISO = (d) => {
         const year = d.getFullYear();
@@ -1191,14 +1221,24 @@
       });
     });
 
+    // Action center internal sub-tabs
+    document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+          document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          currentActionTab = e.target.getAttribute('data-action-filter');
+          renderAbsentTable();
+      });
+    });
+
     document.getElementById('toggle-pending-photos').addEventListener('change', (e) => {
         showOnlyPendingPhotos = e.target.checked;
         renderAuditGallery();
     });
 
-    document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+    document.querySelectorAll('#view-overview .sub-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#view-overview .sub-tab-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         activeSubTab = e.target.getAttribute('data-filter');
         
@@ -1274,11 +1314,9 @@
             } else if (range === '7days') {
                 newStart.setDate(today.getDate() - 7);
             } else if (range === 'thismonth') {
-                // Current month (1st day of this month to Today)
                 newStart = new Date(today.getFullYear(), today.getMonth(), 1);
                 newEnd = new Date(); 
             } else if (range === 'lastmonth') {
-                // Previous calendar month (1st to last day of last month)
                 newStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
                 newEnd = new Date(today.getFullYear(), today.getMonth(), 0); 
             } else if (range === 'alltime') {
@@ -1808,10 +1846,20 @@
                 if(isLateArrival && !exceptionReason) staffStatsTracker[staffName].lateCount++;
                 if(isEarlyOut && !exceptionReason) staffStatsTracker[staffName].earlyCount++;
                 
-                if(firstInLog?.uniform_reviewed) {
-                    if(firstInLog.uniform_tshirt === false) staffStatsTracker[staffName].missedShirt++;
-                    if(firstInLog.uniform_idcard === false) staffStatsTracker[staffName].missedId++;
+                let missedShirtToday = false;
+                let missedIdToday = false;
+
+                if (firstInLog?.uniform_reviewed) {
+                    if (firstInLog.uniform_tshirt === false) missedShirtToday = true;
+                    if (firstInLog.uniform_idcard === false) missedIdToday = true;
                 }
+                if (lastOutLog?.uniform_reviewed) {
+                    if (lastOutLog.uniform_tshirt === false) missedShirtToday = true;
+                    if (lastOutLog.uniform_idcard === false) missedIdToday = true;
+                }
+
+                if (missedShirtToday) staffStatsTracker[staffName].missedShirt++;
+                if (missedIdToday) staffStatsTracker[staffName].missedId++;
             }
             
           } else {
@@ -1832,6 +1880,9 @@
 
       let unexcusedCount = 0;
       missingData.forEach(row => { if (!exceptionsData[`${row.name}_${toLocalISO(row.date)}`]) unexcusedCount++; });
+      processedData.forEach(row => {
+          if ((row.isLate || row.isEarly) && !row.hasException) unexcusedCount++;
+      });
       const badge = document.getElementById('absent-badge');
       if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
 
@@ -1890,7 +1941,7 @@
         let inPhotoHTML = `<span class="badge bg-gray">Archived / Missing</span>`;
         if (row.inPhoto) {
             if (row.inReviewed) {
-                inPhotoHTML = `<div style="font-size:12px; font-weight:600;">
+                inPhotoHTML = `<div style="font-size:calc(12px * var(--font-scale, 1)); font-weight:600;">
                     <span style="color:var(--text-soft)">Shirt:</span> <span style="color: ${row.uTshirt ? 'var(--success)' : 'var(--danger)'}">${row.uTshirt ? 'Yes' : 'No'}</span><br>
                     <span style="color:var(--text-soft)">ID:</span> <span style="color: ${row.uIdcard ? 'var(--success)' : 'var(--danger)'}">${row.uIdcard ? 'Yes' : 'No'}</span>
                     <br><button class="icon-btn" style="padding:2px 0; margin-top:4px;" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', ${row.uTshirt}, ${row.uIdcard})">✏️ Edit</button>
@@ -1898,7 +1949,7 @@
             } else {
                 inPhotoHTML = `<div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
                     <img src="${row.inPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', false, false)">
-                    <span class="badge bg-orange" style="font-size:10px; cursor:pointer;" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', false, false)">Needs Audit</span>
+                    <span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1)); cursor:pointer;" onclick="window.openAuditModal('${row.inPhoto}', '${row.firstInId}', false, false)">Needs Audit</span>
                 </div>`;
             }
         }
@@ -1906,7 +1957,7 @@
         let outPhotoHTML = `<span class="badge bg-gray">Archived / Missing</span>`;
         if (row.outPhoto) {
             if (row.outReviewed) {
-                outPhotoHTML = `<div style="font-size:12px; font-weight:600;">
+                outPhotoHTML = `<div style="font-size:calc(12px * var(--font-scale, 1)); font-weight:600;">
                     <span style="color:var(--text-soft)">Shirt:</span> <span style="color: ${row.outUTshirt ? 'var(--success)' : 'var(--danger)'}">${row.outUTshirt ? 'Yes' : 'No'}</span><br>
                     <span style="color:var(--text-soft)">ID:</span> <span style="color: ${row.outUIdcard ? 'var(--success)' : 'var(--danger)'}">${row.outUIdcard ? 'Yes' : 'No'}</span>
                     <br><button class="icon-btn" style="padding:2px 0; margin-top:4px;" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', ${row.outUTshirt}, ${row.outUIdcard})">✏️ Edit</button>
@@ -1914,7 +1965,7 @@
             } else {
                 outPhotoHTML = `<div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
                     <img src="${row.outPhoto}" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 1px solid var(--card-border);" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', false, false)">
-                    <span class="badge bg-orange" style="font-size:10px; cursor:pointer;" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', false, false)">Needs Audit</span>
+                    <span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1)); cursor:pointer;" onclick="window.openAuditModal('${row.outPhoto}', '${row.lastOutId}', false, false)">Needs Audit</span>
                 </div>`;
             }
         }
@@ -1928,7 +1979,7 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div><span style="color:var(--text-soft)">In:</span> <strong>${inStr}</strong> <br><span style="color:var(--text-soft)">Out:</span> <strong>${outStr}</strong></div>
                 <div style="text-align:right">
-                    <span style="font-weight:700; color:var(--primary); font-size:16px;">${row.formattedHours}</span><br>
+                    <span style="font-weight:700; color:var(--primary); font-size:calc(16px * var(--font-scale, 1));">${row.formattedHours}</span><br>
                     <button class="icon-btn" onclick="window.openEditTimeModal('${row.name}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" title="Edit Shift Time">✏️ Edit Time</button>
                 </div>
             </div>
@@ -1974,7 +2025,7 @@
             <div class="live-branch-card" onclick="window.openLiveBranchModal('${branchName}')">
                 <div>
                     <div class="live-branch-title">${branchName}</div>
-                    <div style="font-size: 13px; color: var(--text-soft); font-weight: 600;">Active Presence</div>
+                    <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">Active Presence</div>
                 </div>
                 <div class="live-branch-count" style="color: ${countColor}">${count}</div>
             </div>
@@ -2004,11 +2055,11 @@
                     <img src="${imgSrc}" class="live-staff-img" alt="Photo">
                     <div class="live-staff-info">
                         <div class="live-staff-name">${log.employee_name}</div>
-                        <div style="font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
+                        <div style="font-size: calc(12px * var(--font-scale, 1)); color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
                     </div>
                     <div style="text-align: right;">
-                        <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">In Since</div>
-                        <div style="font-weight: 800; font-size: 16px; color: var(--success);">${timeIn}</div>
+                        <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">In Since</div>
+                        <div style="font-weight: 800; font-size: calc(16px * var(--font-scale, 1)); color: var(--success);">${timeIn}</div>
                     </div>
                 </div>
                 `;
@@ -2105,11 +2156,11 @@
                         ${statusBadgeHtml}
                     </div>
                     <div class="audit-details">
-                        <div><strong style="color: var(--text-main); font-size: 14px;">${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
-                        <div style="font-size: 11px; color: var(--text-soft); font-weight: 600;">${dateStr}</div>
+                        <div><strong style="color: var(--text-main); font-size: calc(14px * var(--font-scale, 1));">${r.name}</strong><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
+                        <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">${dateStr}</div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}" ${iChecked}> ID Card</label>
+                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:calc(12px * var(--font-scale, 1)); border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
+                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:calc(12px * var(--font-scale, 1)); border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}" ${iChecked}> ID Card</label>
                         </div>
                         ${btnHtml}
                     </div>
@@ -2196,12 +2247,12 @@
             return `<tr>
                 <td><strong>${s.name}</strong></td>
                 <td><span class="role-tag">${s.role}</span></td>
-                <td style="font-size:16px; font-weight:700;">${s.daysPresent}</td>
-                <td><span style="font-size:12px; color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
-                <td style="font-size:16px; font-weight:700; color:var(--primary);">${s.totalHoursDec.toFixed(1)}h</td>
-                <td style="font-size:16px; font-weight:700; color:var(--primary);">${avgHours}h</td>
-                <td>${otHtml} <br><span style="font-size:11px; color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedTotal.toFixed(1)}h</span></td>
-                <td style="font-size:12px; font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700;">${s.daysPresent}</td>
+                <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary);">${s.totalHoursDec.toFixed(1)}h</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary);">${avgHours}h</td>
+                <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedTotal.toFixed(1)}h</span></td>
+                <td style="font-size:calc(12px * var(--font-scale, 1)); font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
             </tr>`;
         }).join('');
     }
@@ -2273,17 +2324,49 @@
     }
 
     function renderAbsentTable() {
-      const tbody = document.getElementById('absent-tbody');
-      if (missingData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--text-soft);">No missing staff in currently loaded data.</td></tr>'; return; }
-      
-      tbody.innerHTML = missingData.map(row => {
-        const isoDate = toLocalISO(row.date);
-        const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
-        const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
-        const statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
-          
-        return `<tr><td style="color:var(--text-soft)">${displayDate}</td><td><strong>${row.name}</strong></td><td>${statusHTML}</td><td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}', 'Absent')">Manage Exception</a></td></tr>`;
-      }).join('');
+        const tbody = document.getElementById('absent-tbody');
+        let dataToRender = [];
+        let actionTypeStr = '';
+
+        if (currentActionTab === 'absent') {
+            dataToRender = missingData;
+            actionTypeStr = 'Absent';
+        } else if (currentActionTab === 'late') {
+            dataToRender = processedData.filter(r => r.isLate);
+            actionTypeStr = 'Late Arrival';
+        } else if (currentActionTab === 'early') {
+            dataToRender = processedData.filter(r => r.isEarly);
+            actionTypeStr = 'Early Departure';
+        }
+
+        if (dataToRender.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--text-soft);">No records match this category.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dataToRender.map(row => {
+            const isoDate = toLocalISO(row.date);
+            const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
+            const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
+
+            let statusHTML = '';
+            if (currentActionTab === 'absent') {
+                statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
+            } else if (currentActionTab === 'late') {
+                let inTimeStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '--';
+                statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-orange">Late In (${inTimeStr})</span>`;
+            } else if (currentActionTab === 'early') {
+                let outTimeStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '--';
+                statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out (${outTimeStr})</span>`;
+            }
+
+            return `<tr>
+                <td style="color:var(--text-soft)">${displayDate}</td>
+                <td><strong>${row.name}</strong></td>
+                <td>${statusHTML}</td>
+                <td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}', '${actionTypeStr}')">Manage Reason</a></td>
+            </tr>`;
+        }).join('');
     }
 
     window.openExceptionModal = function(staffName, isoDateString, type = 'Absent') {
@@ -2381,11 +2464,11 @@
           
           if(dailyLogs.length === 0) {
             const hasExc = exceptionsData[`${staffName}_${isoDateStr}`];
-            rowStr += `<td>${hasExc ? `<span class="badge bg-orange" style="font-size:10px;">${hasExc.reason}</span>` : `<span class="badge bg-gray" style="font-size:10px;">No Record</span>`}</td>`;
+            rowStr += `<td>${hasExc ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${hasExc.reason}</span>` : `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`}</td>`;
           } else {
             const ins = dailyLogs.filter(l => l.action === 'Clock In').sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
             let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A';
-            rowStr += `<td><span class="badge bg-green" style="font-size:10px;">In: ${inTimeStr}</span></td>`;
+            rowStr += `<td><span class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1));">In: ${inTimeStr}</span></td>`;
           }
         }); 
         return rowStr + '</tr>';
@@ -2408,7 +2491,7 @@
               return `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <strong style="color: var(--text-main);">${r.role_name}</strong><br>
-                <span style="font-size:12px; color:var(--text-soft); font-weight: 600;">
+                <span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">
                   ${st ? `${st} - ${en}` : 'Using Global Default'}
                 </span>
               </td>
@@ -2437,7 +2520,7 @@
               const en = formatTime(s.shift_end);
               return `<tr>
               <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
-              <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
+              <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
                 <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${st}', '${en}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
@@ -2448,7 +2531,7 @@
       const branchTbody = document.getElementById('branch-settings-list');
       if (branchTbody) {
           branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
-              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong><br><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">Email: ${b.email} | Pass: ${b.password || 'N/A'}</span></td>
+              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong><br><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">Email: ${b.email} | Pass: ${b.password || 'N/A'}</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <button class="edit-btn" onclick="window.openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteBranchItem('${b.id}')">Remove</button>
