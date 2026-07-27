@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RJ Mobile | Professional Attendance Admin</title>
+  <title>RJ Mobile | Attendance Admin</title>
   <link rel="icon" type="image/png" href="logo.png" />
   
   <script>
@@ -57,7 +57,7 @@
       --radius-md: 10px;
       --radius-lg: 16px;
       
-      --font-scale: 1; /* Added for dynamic scaling */
+      --font-scale: 1;
     }
 
     html.light-theme {
@@ -856,7 +856,6 @@
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Role</h2>
       <input type="hidden" id="edit-role-id">
-      <input type="hidden" id="edit-role-oldname">
       
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Name</label>
       <input type="text" id="edit-role-name" class="input-field" style="margin-top: 8px;">
@@ -971,7 +970,7 @@
       <select id="exc-reason" class="input-field" style="margin-top: 8px;"></select>
       <input type="text" id="exc-reason-custom" class="input-field" placeholder="Type custom reason (e.g. Heavy Traffic)..." style="margin-top: 8px; display: none;">
       
-      <!-- We store the exception context (Late Arrival, Early Departure, Absent) here -->
+      <input type="hidden" id="exc-staff-id" value=""> 
       <input type="hidden" id="exc-type" value=""> 
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -1008,13 +1007,17 @@
       auth: { storageKey: 'rj_attendance_terminal_auth' }
     });
 
-    let masterStaffList = [];
-    let masterBranchList = [];
-    let masterRoleList = [];
-    let dbRoles = [];
-    let dbReasons = [];
-    let staffConfig = {};
-    let roleConfig = {}; 
+    // RELATIONAL UUID MAPPING VARIABLES
+    let dbStaff = []; 
+    let dbBranches = []; 
+    let dbRoles = []; 
+    let dbReasons = []; 
+
+    let staffMap = {}; 
+    let branchMap = {}; 
+    let roleMap = {}; 
+    let reasonMap = {}; 
+
     let dbLogs = [];
     let exceptionsData = {}; 
     let processedData = []; 
@@ -1029,26 +1032,24 @@
     let endDate = new Date();
     
     const minLaunchDate = new Date('2026-07-20');
-    
     if (startDate < minLaunchDate) startDate = minLaunchDate;
     if (endDate < minLaunchDate) endDate = minLaunchDate;
     
-    let selectedStaff = new Set();
-    let selectedBranches = new Set();
-    let selectedRoles = new Set();
+    let selectedStaffIds = new Set();
+    let selectedBranchIds = new Set();
+    let selectedRoleIds = new Set();
     
     let currentPage = 0;
     const pageSize = 100;
     let totalRecords = 0;
     let activeSubTab = 'all';
-
     let showOnlyPendingPhotos = true;
 
     // Action center active tab logic
     let currentActionTab = 'absent';
 
-    let activeExceptionName = null, activeExceptionDate = null;
-    let activeEditDateStr = null, activeEditStaff = null, editLogInId = null, editLogOutId = null;
+    let activeExceptionStaffId = null, activeExceptionStaffName = null, activeExceptionDate = null;
+    let activeEditDateStr = null, activeEditStaffId = null, activeEditStaffName = null, editLogInId = null, editLogOutId = null;
     let realtimeSubscription = null;
     let isAppInitialized = false;
     
@@ -1072,11 +1073,24 @@
         return `${year}-${month}-${day}`;
     };
 
+    // Helper functions to get UUIDs from objects dynamically or fallback to strings
+    function getStaffId(log) {
+        if (log.staff_id) return log.staff_id;
+        const s = dbStaff.find(s => s.name === log.employee_name);
+        return s ? s.id : null;
+    }
+    
+    function getBranchId(log) {
+        if (log.branch_id) return log.branch_id;
+        const b = dbBranches.find(b => b.branch_name === log.branch);
+        return b ? b.id : null;
+    }
+
     window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked) {
         document.getElementById('modal-image-src').src = imageSrc;
         const controls = document.getElementById('audit-controls');
         
-        if(logId) {
+        if(logId && logId !== 'undefined' && logId !== 'null') {
             controls.style.display = 'flex';
             document.getElementById('modal-tshirt').checked = (isTshirtChecked === true || isTshirtChecked === 'true');
             document.getElementById('modal-idcard').checked = (isIdcardChecked === true || isIdcardChecked === 'true');
@@ -1444,59 +1458,49 @@
               globalShiftStart = data.setting_value.start || "10:00";
               globalShiftEnd = data.setting_value.end || "19:00";
           }
-      } catch(e) {
-          console.warn("system_settings table might not exist or no global shift set.");
-      }
+      } catch(e) {}
       document.getElementById('global-shift-start').value = globalShiftStart;
       document.getElementById('global-shift-end').value = globalShiftEnd;
       
       try {
           const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
           dbRoles = roleData || [];
-          masterRoleList = dbRoles.map(r => r.role_name);
-          dbRoles.forEach(r => {
-             roleConfig[r.role_name] = {
-                 shiftStart: r.shift_start || null,
-                 shiftEnd: r.shift_end || null
-             };
-          });
-      } catch (err) {
-          console.warn("roles_directory error or table missing shift_start/end cols.", err);
-      }
+          roleMap = {};
+          dbRoles.forEach(r => roleMap[r.id] = r);
+      } catch (err) {}
 
       try {
           const { data: reasonData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
           dbReasons = reasonData || [];
-      } catch (err) {
-          console.warn("leave_reasons table might not exist yet.");
-      }
+          reasonMap = {};
+          dbReasons.forEach(r => reasonMap[r.id] = r);
+      } catch (err) {}
       populateReasonDropdowns();
 
-      const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
-      masterStaffList = (staffData || []).map(s => s.name);
-      selectedStaff = new Set(masterStaffList);
+      try {
+          const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
+          dbStaff = staffData || [];
+          staffMap = {};
+          dbStaff.forEach(s => staffMap[s.id] = s);
+      } catch (err) {}
       
-      const distinctRolesSet = new Set(masterRoleList);
-      (staffData || []).forEach(s => {
-        staffConfig[s.name] = { 
-            role: s.role || 'Unassigned', 
-            shiftStart: s.shift_start || null, 
-            shiftEnd: s.shift_end || null 
-        };
-        if(s.role) distinctRolesSet.add(s.role);
-      });
-      masterRoleList = Array.from(distinctRolesSet);
-      selectedRoles = new Set(masterRoleList);
+      try {
+          const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
+          dbBranches = branchesData || [];
+          branchMap = {};
+          dbBranches.forEach(b => branchMap[b.id] = b);
+      } catch (err) {}
+
+      // Default selection (All UUIDs)
+      selectedStaffIds = new Set(dbStaff.map(s => s.id));
+      selectedBranchIds = new Set(dbBranches.map(b => b.id));
+      selectedRoleIds = new Set(dbRoles.map(r => r.id));
       
       populateRoleDropdowns(); 
       
       const schedSelect = document.getElementById('sched-staff');
-      schedSelect.innerHTML = masterStaffList.map(name => `<option value="${name}">${name}</option>`).join('');
+      schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
-      const { data: branchesData } = await supabaseClient.from('branches_directory').select('branch_name').order('branch_name');
-      masterBranchList = (branchesData || []).map(b => b.branch_name);
-      selectedBranches = new Set(masterBranchList);
-      
       renderStaffFilterCheckboxes();
       renderBranchFilterCheckboxes();
       renderRoleFilterCheckboxes();
@@ -1509,13 +1513,13 @@
     }
     
     function populateRoleDropdowns() {
-        const opts = '<option value="">-- Select Role --</option>' + masterRoleList.map(r => `<option value="${r}">${r}</option>`).join('');
+        const opts = '<option value="">-- Select Role --</option>' + dbRoles.map(r => `<option value="${r.id}">${r.role_name}</option>`).join('');
         document.getElementById('new-staff-role').innerHTML = opts;
         document.getElementById('edit-staff-role').innerHTML = opts;
     }
 
     function populateReasonDropdowns() {
-        const opts = dbReasons.map(r => `<option value="${r.reason_name}">${r.reason_name}</option>`).join('') + '<option value="Custom" style="font-weight:bold; color:var(--primary);">-- Type Custom Reason --</option>';
+        const opts = dbReasons.map(r => `<option value="${r.id}">${r.reason_name}</option>`).join('') + '<option value="Custom" style="font-weight:bold; color:var(--primary);">-- Type Custom Reason --</option>';
         document.getElementById('sched-reason').innerHTML = opts;
         document.getElementById('exc-reason').innerHTML = opts;
     }
@@ -1541,28 +1545,26 @@
           .update({ photo_capture: null })
           .eq('uniform_reviewed', true)
           .lte('timestamp', cutoffDate.toISOString());
-      } catch (err) {
-        console.warn("Cleanup failed", err);
-      }
+      } catch (err) {}
     }
 
     function renderRoleFilterCheckboxes() {
       const container = document.getElementById('role-checkboxes');
-      container.innerHTML = masterRoleList.map(name => `<label class="check-wrap"><input type="checkbox" class="role-cb" value="${name}" ${selectedRoles.has(name) ? "checked" : ""}> <span>${name}</span></label>`).join('');
+      container.innerHTML = dbRoles.map(r => `<label class="check-wrap"><input type="checkbox" class="role-cb" value="${r.id}" ${selectedRoleIds.has(r.id) ? "checked" : ""}> <span>${r.role_name}</span></label>`).join('');
       
       document.querySelectorAll('.role-cb').forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedRoles.add(e.target.value); else selectedRoles.delete(e.target.value);
+          if(e.target.checked) selectedRoleIds.add(e.target.value); else selectedRoleIds.delete(e.target.value);
           updateRoleButtonText(); processStitchedData(); 
         });
       });
       
       document.getElementById('btn-select-all-roles').addEventListener('click', () => {
-        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedRoles.add(cb.value); } }); 
+        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedRoleIds.add(cb.value); } }); 
         updateRoleButtonText(); processStitchedData(); 
       });
       document.getElementById('btn-deselect-all-roles').addEventListener('click', () => {
-        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedRoles.delete(cb.value); } }); 
+        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedRoleIds.delete(cb.value); } }); 
         updateRoleButtonText(); processStitchedData(); 
       });
       updateRoleButtonText();
@@ -1570,32 +1572,35 @@
     
     function updateRoleButtonText() {
       const btn = document.getElementById('role-btn-text');
-      if(selectedRoles.size === masterRoleList.length && masterRoleList.length > 0) btn.innerText = "All Roles";
-      else btn.innerText = `${selectedRoles.size} Selected`;
+      if(selectedRoleIds.size === dbRoles.length && dbRoles.length > 0) btn.innerText = "All Roles";
+      else btn.innerText = `${selectedRoleIds.size} Selected`;
     }
 
     document.getElementById('role-search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.role-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
+      document.querySelectorAll('.role-cb').forEach(cb => { 
+        const nameText = cb.nextElementSibling.innerText.toLowerCase();
+        cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+      });
     });
 
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
-      container.innerHTML = masterStaffList.map(name => `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${name}" ${selectedStaff.has(name) ? "checked" : ""}> <span>${name}</span></label>`).join('');
+      container.innerHTML = dbStaff.map(s => `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${s.id}" ${selectedStaffIds.has(s.id) ? "checked" : ""}> <span>${s.name}</span></label>`).join('');
       
       document.querySelectorAll('.staff-cb').forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedStaff.add(e.target.value); else selectedStaff.delete(e.target.value);
+          if(e.target.checked) selectedStaffIds.add(e.target.value); else selectedStaffIds.delete(e.target.value);
           updateStaffButtonText(); processStitchedData(); 
         });
       });
       
       document.getElementById('btn-select-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaff.add(cb.value); } }); 
+        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaffIds.add(cb.value); } }); 
         updateStaffButtonText(); processStitchedData(); 
       });
       document.getElementById('btn-deselect-all').addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaff.delete(cb.value); } }); 
+        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaffIds.delete(cb.value); } }); 
         updateStaffButtonText(); processStitchedData(); 
       });
       updateStaffButtonText();
@@ -1603,31 +1608,34 @@
 
     function updateStaffButtonText() {
       const btn = document.getElementById('staff-btn-text');
-      if(selectedStaff.size === masterStaffList.length && masterStaffList.length > 0) btn.innerText = "All Staff Selected";
-      else btn.innerText = `${selectedStaff.size} Selected`;
+      if(selectedStaffIds.size === dbStaff.length && dbStaff.length > 0) btn.innerText = "All Staff Selected";
+      else btn.innerText = `${selectedStaffIds.size} Selected`;
     }
     document.getElementById('staff-search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.staff-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
+      document.querySelectorAll('.staff-cb').forEach(cb => { 
+        const nameText = cb.nextElementSibling.innerText.toLowerCase();
+        cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+      });
     });
 
     function renderBranchFilterCheckboxes() {
       const container = document.getElementById('branch-checkboxes');
-      container.innerHTML = masterBranchList.map(name => `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${name}" ${selectedBranches.has(name) ? "checked" : ""}> <span>${name}</span></label>`).join('');
+      container.innerHTML = dbBranches.map(b => `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${b.id}" ${selectedBranchIds.has(b.id) ? "checked" : ""}> <span>${b.branch_name}</span></label>`).join('');
       
       document.querySelectorAll('.branch-cb').forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedBranches.add(e.target.value); else selectedBranches.delete(e.target.value);
+          if(e.target.checked) selectedBranchIds.add(e.target.value); else selectedBranchIds.delete(e.target.value);
           updateBranchButtonText(); processStitchedData(); 
         });
       });
       
       document.getElementById('btn-select-all-branches').addEventListener('click', () => {
-        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranches.add(cb.value); } }); 
+        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranchIds.add(cb.value); } }); 
         updateBranchButtonText(); processStitchedData(); 
       });
       document.getElementById('btn-deselect-all-branches').addEventListener('click', () => {
-        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranches.delete(cb.value); } }); 
+        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranchIds.delete(cb.value); } }); 
         updateBranchButtonText(); processStitchedData(); 
       });
       updateBranchButtonText();
@@ -1635,12 +1643,15 @@
 
     function updateBranchButtonText() {
       const btn = document.getElementById('branch-btn-text');
-      if(selectedBranches.size === masterBranchList.length && masterBranchList.length > 0) btn.innerText = "All Branches Selected";
-      else btn.innerText = `${selectedBranches.size} Selected`;
+      if(selectedBranchIds.size === dbBranches.length && dbBranches.length > 0) btn.innerText = "All Branches Selected";
+      else btn.innerText = `${selectedBranchIds.size} Selected`;
     }
     document.getElementById('branch-search').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.branch-cb').forEach(cb => { cb.parentElement.style.display = cb.value.toLowerCase().includes(term) ? 'flex' : 'none'; });
+      document.querySelectorAll('.branch-cb').forEach(cb => { 
+        const nameText = cb.nextElementSibling.innerText.toLowerCase();
+        cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+      });
     });
 
     async function fetchLogsFromDatabase(keepPage = false) {
@@ -1673,7 +1684,12 @@
         .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
         
       exceptionsData = {};
-      (excData || []).forEach(e => { exceptionsData[`${e.employee_name}_${e.date}`] = { reason: e.reason }; });
+      (excData || []).forEach(e => { 
+          // Build keys dynamically considering legacy string formats or UUID formats
+          const sId = e.staff_id || e.employee_name; 
+          const type = e.exception_type || 'Absent'; // Fallback if column missing
+          exceptionsData[`${sId}_${e.date}_${type}`] = e;
+      });
 
       localStorage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
       localStorage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
@@ -1717,7 +1733,7 @@
       let totalPresent = 0, totalLate = 0, totalEarlyDepartures = 0, totalMissing = 0;
       
       const dateArray = getDatesArrayFromFetchedLogs(); 
-      const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
+      const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
       
       let inStartStr = document.getElementById('filter-in-start').value;
       let inEndStr = document.getElementById('filter-in-end').value;
@@ -1728,46 +1744,61 @@
       let outMinStart = timeToMinutes(outStartStr) || 0; let outMinEnd = timeToMinutes(outEndStr) || 1440;
 
       let staffStatsTracker = {};
-      filteredStaffNames.forEach(name => {
-         let staffRole = staffConfig[name]?.role || 'Unassigned';
-         staffStatsTracker[name] = { 
-             name: name, role: staffRole, 
+      filteredStaff.forEach(staff => {
+         let roleObj = roleMap[staff.role_id] || dbRoles.find(r => r.role_name === staff.role);
+         let staffRoleName = roleObj ? roleObj.role_name : (staff.role || 'Unassigned');
+         
+         staffStatsTracker[staff.id] = { 
+             id: staff.id, name: staff.name, role: staffRoleName, 
              daysPresent: 0, totalHoursDec: 0, lateCount: 0, earlyCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
              dailyTargetHours: 0, sumInMins: 0, sumOutMins: 0, daysOut: 0
          };
          
-         let shiftStartStr = staffConfig[name]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
-         let shiftEndStr = staffConfig[name]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
+         let shiftStartStr = staff.shift_start || roleObj?.shift_start || globalShiftStart;
+         let shiftEndStr = staff.shift_end || roleObj?.shift_end || globalShiftEnd;
          
          let tStart = parseTimeStrToDate(shiftStartStr, new Date());
          let tEnd = parseTimeStrToDate(shiftEndStr, new Date());
-         if(tStart && tEnd) staffStatsTracker[name].dailyTargetHours = (tEnd - tStart) / 3600000;
+         if(tStart && tEnd) staffStatsTracker[staff.id].dailyTargetHours = (tEnd - tStart) / 3600000;
       });
 
       dateArray.forEach(targetDate => {
         const dateStringMatch = targetDate.toDateString();
         const isoDateStr = toLocalISO(targetDate); 
 
-        filteredStaffNames.forEach(staffName => {
-          let staffRole = staffConfig[staffName]?.role || 'Unassigned';
-          if (!selectedRoles.has(staffRole)) return;
+        filteredStaff.forEach(staff => {
+          let roleObj = roleMap[staff.role_id] || dbRoles.find(r => r.role_name === staff.role);
+          let roleId = roleObj ? roleObj.id : null;
+          let roleName = roleObj ? roleObj.role_name : (staff.role || 'Unassigned');
 
-          let dailyLogs = dbLogs.filter(log => log.employee_name === staffName && new Date(log.timestamp).toDateString() === dateStringMatch);
+          // Role Filter check
+          if (roleId && !selectedRoleIds.has(roleId)) return;
+          if (!roleId && selectedRoleIds.size < dbRoles.length) return; // Hide unassigned if filtering
+
+          let dailyLogs = dbLogs.filter(log => {
+              const logStaffId = getStaffId(log);
+              return logStaffId === staff.id && new Date(log.timestamp).toDateString() === dateStringMatch;
+          });
           dailyLogs.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-          if (selectedBranches.size !== masterBranchList.length) {
-            const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => !selectedBranches.has(l.branch));
+          if (selectedBranchIds.size !== dbBranches.length) {
+            const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => {
+                let bId = getBranchId(l);
+                return !selectedBranchIds.has(bId);
+            });
             if (workedElsewhere) return; 
-            dailyLogs = dailyLogs.filter(l => selectedBranches.has(l.branch));
+            dailyLogs = dailyLogs.filter(l => selectedBranchIds.has(getBranchId(l)));
           }
 
           const clockIns = dailyLogs.filter(l => l.action === 'Clock In');
           const clockOuts = dailyLogs.filter(l => l.action === 'Clock Out');
           
-          const exceptionObj = exceptionsData[`${staffName}_${isoDateStr}`] ? exceptionsData[`${staffName}_${isoDateStr}`] : null;
-          const exceptionReason = exceptionObj ? exceptionObj.reason : null;
+          // Grab specific exception types for this date/staff
+          const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
+          const excLate = exceptionsData[`${staff.id}_${isoDateStr}_Late Arrival`] || exceptionsData[`${staff.name}_${isoDateStr}_Late Arrival`];
+          const excEarly = exceptionsData[`${staff.id}_${isoDateStr}_Early Departure`] || exceptionsData[`${staff.name}_${isoDateStr}_Early Departure`];
 
-          if (clockIns.length > 0 || clockOuts.length > 0 || exceptionReason) {
+          if (clockIns.length > 0 || clockOuts.length > 0 || excAbsent || excLate || excEarly) {
             
             let firstInLog = clockIns.length > 0 ? clockIns[0] : null;
             let lastOutLog = clockOuts.length > 0 ? clockOuts[clockOuts.length - 1] : null;
@@ -1797,8 +1828,8 @@
               totalHoursFloat = diffMs/3600000;
             }
             
-            let shiftStartStr = staffConfig[staffName]?.shiftStart || roleConfig[staffRole]?.shiftStart || globalShiftStart;
-            let shiftEndStr = staffConfig[staffName]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
+            let shiftStartStr = staff.shift_start || roleObj?.shift_start || globalShiftStart;
+            let shiftEndStr = staff.shift_end || roleObj?.shift_end || globalShiftEnd;
 
             if (firstInTime) { 
               let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
@@ -1806,7 +1837,7 @@
               expectedIn.setMinutes(expectedIn.getMinutes() + 15);
               if (firstInTime > expectedIn) { 
                   isLateArrival = true; 
-                  if (!exceptionReason) totalLate++; 
+                  if (!excLate) totalLate++; 
               } 
             }
 
@@ -1815,16 +1846,22 @@
               expectedOut.setMinutes(expectedOut.getMinutes() - 15);
               if (lastOutTime < expectedOut) {
                   isEarlyOut = true;
-                  if (!exceptionReason) totalEarlyDepartures++;
+                  if (!excEarly) totalEarlyDepartures++;
               }
             }
+            
+            let branchDisplayNames = [...new Set(dailyLogs.map(l => {
+                let bId = getBranchId(l);
+                return branchMap[bId]?.branch_name || l.branch;
+            }))].join(' → ');
 
             processedData.push({
-              date: targetDate, name: staffName, role: staffRole, firstIn: firstInTime, lastOut: lastOutTime, 
+              date: targetDate, staffId: staff.id, name: staff.name, role: roleName, firstIn: firstInTime, lastOut: lastOutTime, 
               formattedHours: formattedHours, diffFromTargetMs: diffFromTargetMs,
               isLate: isLateArrival, isEarly: isEarlyOut,
-              branches: [...new Set(dailyLogs.map(l => l.branch))].join(' → '),
-              hasException: exceptionReason, logIdForPhoto: firstInLog?.id, 
+              branches: branchDisplayNames,
+              excAbsent: excAbsent, excLate: excLate, excEarly: excEarly,
+              logIdForPhoto: firstInLog?.id, 
               firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
               inPhoto: firstInLog?.photo_capture, inReviewed: firstInLog?.uniform_reviewed,
               outPhoto: lastOutLog?.photo_capture, outReviewed: lastOutLog?.uniform_reviewed,
@@ -1833,18 +1870,18 @@
             });
             
             if(firstInTime) {
-                staffStatsTracker[staffName].daysPresent++;
-                staffStatsTracker[staffName].totalHoursDec += totalHoursFloat;
-                staffStatsTracker[staffName].sumInMins += (firstInTime.getHours() * 60 + firstInTime.getMinutes());
+                staffStatsTracker[staff.id].daysPresent++;
+                staffStatsTracker[staff.id].totalHoursDec += totalHoursFloat;
+                staffStatsTracker[staff.id].sumInMins += (firstInTime.getHours() * 60 + firstInTime.getMinutes());
                 if(lastOutTime) {
-                    staffStatsTracker[staffName].daysOut++;
-                    staffStatsTracker[staffName].sumOutMins += (lastOutTime.getHours() * 60 + lastOutTime.getMinutes());
+                    staffStatsTracker[staff.id].daysOut++;
+                    staffStatsTracker[staff.id].sumOutMins += (lastOutTime.getHours() * 60 + lastOutTime.getMinutes());
                 } else if (dateStringMatch !== new Date().toDateString()) {
-                    staffStatsTracker[staffName].missedOut++;
+                    staffStatsTracker[staff.id].missedOut++;
                 }
                 
-                if(isLateArrival && !exceptionReason) staffStatsTracker[staffName].lateCount++;
-                if(isEarlyOut && !exceptionReason) staffStatsTracker[staffName].earlyCount++;
+                if(isLateArrival && !excLate) staffStatsTracker[staff.id].lateCount++;
+                if(isEarlyOut && !excEarly) staffStatsTracker[staff.id].earlyCount++;
                 
                 let missedShirtToday = false;
                 let missedIdToday = false;
@@ -1858,20 +1895,20 @@
                     if (lastOutLog.uniform_idcard === false) missedIdToday = true;
                 }
 
-                if (missedShirtToday) staffStatsTracker[staffName].missedShirt++;
-                if (missedIdToday) staffStatsTracker[staffName].missedId++;
+                if (missedShirtToday) staffStatsTracker[staff.id].missedShirt++;
+                if (missedIdToday) staffStatsTracker[staff.id].missedId++;
             }
             
           } else {
             if (!inStartStr && !inEndStr && !outStartStr && !outEndStr) {
-                totalMissing++; missingData.push({ date: targetDate, name: staffName });
+                totalMissing++; missingData.push({ date: targetDate, staffId: staff.id, name: staff.name, excAbsent: excAbsent });
             }
           }
         });
       });
 
       processedData.sort((a,b) => b.date - a.date); missingData.sort((a,b) => b.date - a.date);
-      statsData = Object.values(staffStatsTracker).filter(s => s.daysPresent > 0 || exceptionsData[s.name]);
+      statsData = Object.values(staffStatsTracker).filter(s => s.daysPresent > 0 || exceptionsData[`${s.id}_${toLocalISO(startDate)}_Absent`]);
 
       document.getElementById('metric-present').innerText = totalPresent;
       document.getElementById('metric-late').innerText = totalLate;
@@ -1879,9 +1916,12 @@
       document.getElementById('metric-absent').innerText = totalMissing;
 
       let unexcusedCount = 0;
-      missingData.forEach(row => { if (!exceptionsData[`${row.name}_${toLocalISO(row.date)}`]) unexcusedCount++; });
+      missingData.forEach(row => { 
+          if (!row.excAbsent) unexcusedCount++; 
+      });
       processedData.forEach(row => {
-          if ((row.isLate || row.isEarly) && !row.hasException) unexcusedCount++;
+          if (row.isLate && !row.excLate) unexcusedCount++;
+          if (row.isEarly && !row.excEarly) unexcusedCount++;
       });
       const badge = document.getElementById('absent-badge');
       if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
@@ -1911,7 +1951,7 @@
       if (dataToRender.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-soft);">No records match your filters.</td></tr>'; return; }
       
       tbody.innerHTML = dataToRender.map(row => {
-        if(!row.firstIn && !row.lastOut && row.hasException) return ''; 
+        if(!row.firstIn && !row.lastOut && !row.excAbsent && !row.excLate && !row.excEarly) return ''; 
 
         const isPastDate = row.date.toDateString() !== todayStr;
         const isoDate = toLocalISO(row.date);
@@ -1923,19 +1963,21 @@
             : (isPastDate ? '<span style="color:var(--danger); font-weight:800; background: var(--danger-alpha); padding: 2px 6px; border-radius: 4px;">Missing</span>' : '<span style="color:var(--success);">Active</span>');
             
         let statusHtml = '';
-        if (row.hasException) {
-            statusHtml += `<span class="badge bg-green">Excused: ${row.hasException}</span><br>`;
-        }
+        if (row.excAbsent) statusHtml += `<span class="badge bg-green">Excused Absent: ${row.excAbsent.reason}</span><br>`;
+        if (row.excLate) statusHtml += `<span class="badge bg-green">Excused Late: ${row.excLate.reason}</span><br>`;
+        if (row.excEarly) statusHtml += `<span class="badge bg-green">Excused Early: ${row.excEarly.reason}</span><br>`;
         
-        if (row.isLate) statusHtml += `<span class="badge bg-orange" style="margin-top:4px;">Late In</span> `;
-        if (row.isEarly) statusHtml += `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; margin-top:4px;">Early Out</span> `;
+        if (row.isLate && !row.excLate) statusHtml += `<span class="badge bg-orange" style="margin-top:4px;">Late In</span> `;
+        if (row.isEarly && !row.excEarly) statusHtml += `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; margin-top:4px;">Early Out</span> `;
         
-        if (!row.isLate && !row.isEarly && !row.hasException) statusHtml = `<span class="badge bg-green">On Time</span>`;
+        if (!row.isLate && !row.isEarly && !row.excAbsent && !row.excLate && !row.excEarly) statusHtml = `<span class="badge bg-green">On Time</span>`;
 
         let actionLinks = '';
-        if((row.isLate || row.isEarly) && !row.hasException) {
-            let excType = row.isLate ? 'Late Arrival' : 'Early Departure';
-            actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}', '${excType}')">Manage Reason</a>`;
+        if(row.isLate && !row.excLate) {
+            actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', 'Late Arrival')">Manage Reason (Late)</a><br>`;
+        }
+        if(row.isEarly && !row.excEarly) {
+            actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', 'Early Departure')">Manage Reason (Early)</a>`;
         }
         
         let inPhotoHTML = `<span class="badge bg-gray">Archived / Missing</span>`;
@@ -1980,11 +2022,11 @@
                 <div><span style="color:var(--text-soft)">In:</span> <strong>${inStr}</strong> <br><span style="color:var(--text-soft)">Out:</span> <strong>${outStr}</strong></div>
                 <div style="text-align:right">
                     <span style="font-weight:700; color:var(--primary); font-size:calc(16px * var(--font-scale, 1));">${row.formattedHours}</span><br>
-                    <button class="icon-btn" onclick="window.openEditTimeModal('${row.name}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" title="Edit Shift Time">✏️ Edit Time</button>
+                    <button class="icon-btn" onclick="window.openEditTimeModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" title="Edit Shift Time">✏️ Edit Time</button>
                 </div>
             </div>
           </td>
-          <td>${statusHtml} <br>${actionLinks}</td>
+          <td>${statusHtml} ${actionLinks}</td>
           <td>${inPhotoHTML}</td>
           <td>${outPhotoHTML}</td>
         </tr>`;
@@ -1999,32 +2041,34 @@
         const todayLogs = dbLogs.filter(l => new Date(l.timestamp).toDateString() === todayStr);
         const latestLogs = {};
         todayLogs.forEach(l => {
-            if (!latestLogs[l.employee_name] || new Date(l.timestamp) > new Date(latestLogs[l.employee_name].timestamp)) {
-                latestLogs[l.employee_name] = l;
+            const sId = getStaffId(l);
+            if (!latestLogs[sId] || new Date(l.timestamp) > new Date(latestLogs[sId].timestamp)) {
+                latestLogs[sId] = l;
             }
         });
 
         const activeStaff = Object.values(latestLogs).filter(l => l.action === 'Clock In');
         
         liveStaffData = {};
-        masterBranchList.forEach(b => liveStaffData[b] = []);
+        dbBranches.forEach(b => liveStaffData[b.id] = { branchName: b.branch_name, logs: [] });
+        
         activeStaff.forEach(staffLog => {
-            if(!liveStaffData[staffLog.branch]) liveStaffData[staffLog.branch] = [];
-            liveStaffData[staffLog.branch].push(staffLog);
+            const bId = getBranchId(staffLog);
+            if(bId && liveStaffData[bId]) liveStaffData[bId].logs.push(staffLog);
         });
 
-        if (masterBranchList.length === 0) {
+        if (dbBranches.length === 0) {
             grid.innerHTML = '<div style="color:var(--text-soft); padding: 40px; text-align: center;">No branches registered in System Settings.</div>';
             return;
         }
 
-        grid.innerHTML = masterBranchList.map(branchName => {
-            const count = liveStaffData[branchName].length;
+        grid.innerHTML = dbBranches.map(b => {
+            const count = liveStaffData[b.id].logs.length;
             const countColor = count > 0 ? 'var(--primary)' : 'var(--text-soft)';
             return `
-            <div class="live-branch-card" onclick="window.openLiveBranchModal('${branchName}')">
+            <div class="live-branch-card" onclick="window.openLiveBranchModal('${b.id}')">
                 <div>
-                    <div class="live-branch-title">${branchName}</div>
+                    <div class="live-branch-title">${b.branch_name}</div>
                     <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">Active Presence</div>
                 </div>
                 <div class="live-branch-count" style="color: ${countColor}">${count}</div>
@@ -2033,9 +2077,10 @@
         }).join('');
     }
 
-    window.openLiveBranchModal = function(branchName) {
-        document.getElementById('live-modal-title').innerText = branchName;
-        const staffList = liveStaffData[branchName] || [];
+    window.openLiveBranchModal = function(branchId) {
+        const bObj = liveStaffData[branchId];
+        document.getElementById('live-modal-title').innerText = bObj.branchName;
+        const staffList = bObj.logs || [];
         
         document.getElementById('live-modal-subtitle').innerText = `${staffList.length} Staff Currently Clocked In`;
         const container = document.getElementById('live-staff-container');
@@ -2046,7 +2091,12 @@
             staffList.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
             
             container.innerHTML = staffList.map(log => {
-                const role = staffConfig[log.employee_name]?.role || 'Unassigned';
+                const sId = getStaffId(log);
+                const sObj = staffMap[sId];
+                const rObj = roleMap[sObj?.role_id];
+                const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
+                const displayName = sObj ? sObj.name : log.employee_name;
+                
                 const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
                 const imgSrc = log.photo_capture || 'https://via.placeholder.com/50x50/1e293b/f8fafc?text=?';
                 
@@ -2054,7 +2104,7 @@
                 <div class="live-staff-item">
                     <img src="${imgSrc}" class="live-staff-img" alt="Photo">
                     <div class="live-staff-info">
-                        <div class="live-staff-name">${log.employee_name}</div>
+                        <div class="live-staff-name">${displayName}</div>
                         <div style="font-size: calc(12px * var(--font-scale, 1)); color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
                     </div>
                     <div style="text-align: right;">
@@ -2070,8 +2120,9 @@
     };
 
 
-    window.openEditTimeModal = function(staffName, isoDateStr, inId, outId, inIso, outIso) {
-      activeEditStaff = staffName; activeEditDateStr = isoDateStr; editLogInId = inId; editLogOutId = outId;
+    window.openEditTimeModal = function(staffId, staffName, isoDateStr, inId, outId, inIso, outIso) {
+      activeEditStaffId = staffId; activeEditStaffName = staffName; activeEditDateStr = isoDateStr; 
+      editLogInId = inId; editLogOutId = outId;
       document.getElementById('edit-time-subtitle').innerText = `Editing ${staffName} on ${isoDateStr}`;
       
       const toTimeString = (iso) => {
@@ -2082,8 +2133,10 @@
       
       document.getElementById('edit-time-in').value = toTimeString(inIso);
       
-      let staffRole = staffConfig[staffName]?.role || 'Unassigned';
-      let defaultOutStr = staffConfig[staffName]?.shiftEnd || roleConfig[staffRole]?.shiftEnd || globalShiftEnd;
+      let staff = staffMap[staffId];
+      let roleObj = roleMap[staff?.role_id];
+      let defaultOutStr = staff?.shift_end || roleObj?.shift_end || globalShiftEnd;
+      
       document.getElementById('edit-time-out').value = outIso ? toTimeString(outIso) : defaultOutStr;
       
       document.getElementById('edit-time-modal').style.display = 'flex';
@@ -2108,7 +2161,8 @@
                    await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso }).eq('id', editLogOutId);
                } else {
                    await supabaseClient.from('attendance_logs').insert([{
-                       employee_name: activeEditStaff, action: 'Clock Out', branch: 'Admin Edited', timestamp: newOutIso
+                       staff_id: activeEditStaffId, employee_name: activeEditStaffName, 
+                       action: 'Clock Out', branch: 'Admin Edited', timestamp: newOutIso
                    }]);
                }
            }
@@ -2266,9 +2320,9 @@
         const warning = rootStyle.getPropertyValue('--warning').trim();
         
         const trendDates = [...new Set([...processedData, ...missingData].map(r => toLocalISO(r.date)))].sort();
-        const presentCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && !r.hasException && r.firstIn).length);
+        const presentCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && !r.excAbsent && !r.excLate && !r.excEarly && r.firstIn).length);
         const absentCounts = trendDates.map(d => missingData.filter(r => toLocalISO(r.date) === d).length);
-        const excCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && r.hasException).length);
+        const excCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && (r.excAbsent || r.excLate || r.excEarly)).length);
 
         if(window.myCharts['trend']) window.myCharts['trend'].destroy();
         window.myCharts['trend'] = new Chart(document.getElementById('trendChart'), {
@@ -2285,7 +2339,7 @@
 
         let earlyOver1Hr = 0; let earlyWithin1Hr = 0; let lateArr = 0;
         processedData.forEach(r => {
-            if(!r.firstIn || r.hasException) return;
+            if(!r.firstIn || r.excLate || r.excEarly) return;
             if (r.diffFromTargetMs < -3600000) earlyOver1Hr++;
             else if (r.diffFromTargetMs >= -3600000 && r.diffFromTargetMs <= 0) earlyWithin1Hr++;
             else if (r.diffFromTargetMs > 0) lateArr++;
@@ -2332,10 +2386,10 @@
             dataToRender = missingData;
             actionTypeStr = 'Absent';
         } else if (currentActionTab === 'late') {
-            dataToRender = processedData.filter(r => r.isLate);
+            dataToRender = processedData.filter(r => r.isLate && !r.excLate);
             actionTypeStr = 'Late Arrival';
         } else if (currentActionTab === 'early') {
-            dataToRender = processedData.filter(r => r.isEarly);
+            dataToRender = processedData.filter(r => r.isEarly && !r.excEarly);
             actionTypeStr = 'Early Departure';
         }
 
@@ -2347,34 +2401,38 @@
         tbody.innerHTML = dataToRender.map(row => {
             const isoDate = toLocalISO(row.date);
             const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
-            const existingExc = exceptionsData[`${row.name}_${isoDate}`] ? exceptionsData[`${row.name}_${isoDate}`].reason : null;
+            
+            const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
 
             let statusHTML = '';
             if (currentActionTab === 'absent') {
-                statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
+                statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
             } else if (currentActionTab === 'late') {
                 let inTimeStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '--';
-                statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge bg-orange">Late In (${inTimeStr})</span>`;
+                statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge bg-orange">Late In (${inTimeStr})</span>`;
             } else if (currentActionTab === 'early') {
                 let outTimeStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '--';
-                statusHTML = existingExc ? `<span class="badge bg-orange">${existingExc}</span>` : `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out (${outTimeStr})</span>`;
+                statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out (${outTimeStr})</span>`;
             }
 
             return `<tr>
                 <td style="color:var(--text-soft)">${displayDate}</td>
                 <td><strong>${row.name}</strong></td>
                 <td>${statusHTML}</td>
-                <td><a class="action-link" onclick="openExceptionModal('${row.name}', '${isoDate}', '${actionTypeStr}')">Manage Reason</a></td>
+                <td><a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${actionTypeStr}')">Manage Reason</a></td>
             </tr>`;
         }).join('');
     }
 
-    window.openExceptionModal = function(staffName, isoDateString, type = 'Absent') {
-      activeExceptionName = staffName; activeExceptionDate = isoDateString;
+    window.openExceptionModal = function(staffId, staffName, isoDateString, type = 'Absent') {
+      activeExceptionStaffId = staffId; 
+      activeExceptionStaffName = staffName; 
+      activeExceptionDate = isoDateString;
       document.getElementById('exc-subtitle').innerText = `Update record for ${staffName} on ${isoDateString} (${type})`;
       document.getElementById('exc-type').value = type;
+      document.getElementById('exc-staff-id').value = staffId;
       
-      document.getElementById('exc-reason').value = dbReasons.length > 0 ? dbReasons[0].reason_name : '';
+      document.getElementById('exc-reason').value = dbReasons.length > 0 ? dbReasons[0].id : '';
       document.getElementById('exc-reason-custom').style.display = 'none';
       document.getElementById('exc-reason-custom').value = '';
 
@@ -2384,29 +2442,44 @@
     document.getElementById('btn-cancel-exc').addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-exc').addEventListener('click', async () => {
-      let reasonVal = document.getElementById('exc-reason').value;
-      if (reasonVal === 'Custom') {
-          reasonVal = document.getElementById('exc-reason-custom').value.trim();
-          if(!reasonVal) return showToast("Please enter a custom reason", "error");
+      let reasonId = document.getElementById('exc-reason').value;
+      let customReason = '';
+      if (reasonId === 'Custom') {
+          customReason = document.getElementById('exc-reason-custom').value.trim();
+          if(!customReason) return showToast("Please enter a custom reason", "error");
       }
       
       const excType = document.getElementById('exc-type').value;
-      if(excType === 'Late Arrival' || excType === 'Early Departure') {
-          reasonVal = `${excType} - ${reasonVal}`;
-      }
-      
       const saveBtn = document.getElementById('btn-save-exc'); saveBtn.innerText = "Saving..."; saveBtn.disabled = true;
 
       try {
-        await supabaseClient.from('attendance_exceptions').upsert({ employee_name: activeExceptionName, date: activeExceptionDate, reason: reasonVal }, { onConflict: 'employee_name, date' }); 
-        exceptionsData[`${activeExceptionName}_${activeExceptionDate}`] = { reason: reasonVal };
-        document.getElementById('exception-modal').style.display = 'none'; processStitchedData(); showToast("Reason saved", "success");
+        let payload = { 
+            date: activeExceptionDate, 
+            staff_id: activeExceptionStaffId,
+            employee_name: activeExceptionStaffName, // String fallback for legacy compat
+            exception_type: excType
+        };
+
+        if (reasonId === 'Custom') {
+            payload.reason = customReason;
+            payload.reason_id = null;
+        } else {
+            payload.reason_id = reasonId;
+            payload.reason = reasonMap[reasonId]?.reason_name;
+        }
+
+        await supabaseClient.from('attendance_exceptions').upsert(payload, { onConflict: 'staff_id, date, exception_type' }); 
+        exceptionsData[`${activeExceptionStaffId}_${activeExceptionDate}_${excType}`] = payload;
+        
+        document.getElementById('exception-modal').style.display = 'none'; 
+        processStitchedData(); 
+        showToast("Reason saved", "success");
       } catch (err) { showToast("Failed to save Reason.", "error"); } 
       finally { saveBtn.innerText = "Save Reason"; saveBtn.disabled = false; }
     });
 
     document.getElementById('btn-open-schedule-leave').addEventListener('click', () => { 
-        document.getElementById('sched-reason').value = dbReasons.length > 0 ? dbReasons[0].reason_name : '';
+        document.getElementById('sched-reason').value = dbReasons.length > 0 ? dbReasons[0].id : '';
         document.getElementById('sched-reason-custom').style.display = 'none';
         document.getElementById('sched-reason-custom').value = '';
         document.getElementById('schedule-leave-modal').style.display = 'flex'; 
@@ -2414,30 +2487,42 @@
     document.getElementById('btn-cancel-sched').addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'none'; });
     
     document.getElementById('btn-save-sched').addEventListener('click', async () => {
-       const staff = document.getElementById('sched-staff').value;
+       const staffId = document.getElementById('sched-staff').value;
        const dStart = document.getElementById('sched-start').value;
        const dEnd = document.getElementById('sched-end').value;
-       let reason = document.getElementById('sched-reason').value;
+       let reasonId = document.getElementById('sched-reason').value;
        
-       if (reason === 'Custom') {
-           reason = document.getElementById('sched-reason-custom').value.trim();
-           if(!reason) return showToast("Please enter a custom reason", "error");
+       let customReason = '';
+       if (reasonId === 'Custom') {
+           customReason = document.getElementById('sched-reason-custom').value.trim();
+           if(!customReason) return showToast("Please enter a custom reason", "error");
        }
        
-       if(!staff || !dStart || !dEnd) return showToast("Select staff and date range", "error");
+       if(!staffId || !dStart || !dEnd) return showToast("Select staff and date range", "error");
        
        const btn = document.getElementById('btn-save-sched');
        btn.innerText = "Processing..."; btn.disabled = true;
        
        let curr = new Date(dStart); let end = new Date(dEnd);
        let inserts = [];
+       const sName = staffMap[staffId]?.name;
+
+       let rName = reasonId === 'Custom' ? customReason : reasonMap[reasonId]?.reason_name;
+
        while(curr <= end) {
-           inserts.push({ employee_name: staff, date: toLocalISO(curr), reason: reason });
+           inserts.push({ 
+               staff_id: staffId, 
+               employee_name: sName, // string fallback
+               date: toLocalISO(curr), 
+               reason_id: reasonId === 'Custom' ? null : reasonId, 
+               reason: rName, // string fallback
+               exception_type: 'Absent'
+           });
            curr.setDate(curr.getDate() + 1);
        }
 
        try {
-           await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'employee_name, date' });
+           await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'staff_id, date, exception_type' });
            document.getElementById('schedule-leave-modal').style.display = 'none';
            fetchLogsFromDatabase(true);
            showToast(`Scheduled leave for ${inserts.length} days!`, "success");
@@ -2449,22 +2534,26 @@
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
       
-      const filteredStaffNames = masterStaffList.filter(n => selectedStaff.has(n));
-      if (filteredStaffNames.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff selected.</td></tr>'; return; }
+      const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
+      if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff selected.</td></tr>'; return; }
       
       const dateList = getDatesArrayFromFetchedLogs();
       headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
         
-      tableBody.innerHTML = filteredStaffNames.map(staffName => {
-        let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${staffName}</td>`;
+      tableBody.innerHTML = filteredStaff.map(staff => {
+        let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${staff.name}</td>`;
         
         dateList.forEach(dateObj => {
           const dateStringMatch = dateObj.toDateString(); const isoDateStr = toLocalISO(dateObj);
-          const dailyLogs = dbLogs.filter(l => l.employee_name === staffName && new Date(l.timestamp).toDateString() === dateStringMatch);
+          
+          const dailyLogs = dbLogs.filter(l => {
+              return getStaffId(l) === staff.id && new Date(l.timestamp).toDateString() === dateStringMatch;
+          });
           
           if(dailyLogs.length === 0) {
-            const hasExc = exceptionsData[`${staffName}_${isoDateStr}`];
-            rowStr += `<td>${hasExc ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${hasExc.reason}</span>` : `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`}</td>`;
+            const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
+            const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
+            rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`}</td>`;
           } else {
             const ins = dailyLogs.filter(l => l.action === 'Clock In').sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
             let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A';
@@ -2496,7 +2585,7 @@
                 </span>
               </td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditRole('${r.id}', '${r.role_name}', '${st}', '${en}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditRole('${r.id}', '${r.role_name.replace(/'/g, "\\'")}', '${st}', '${en}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteRoleItem('${r.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -2507,7 +2596,7 @@
           reasonTbody.innerHTML = (reasonsData || dbReasons || []).map(r => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${r.reason_name}</strong></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditReason('${r.id}', '${r.reason_name}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditReason('${r.id}', '${r.reason_name.replace(/'/g, "\\'")}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteReasonItem('${r.id}')">Remove</button>
               </td>
           </tr>`).join('');
@@ -2518,11 +2607,12 @@
           staffTbody.innerHTML = (staffData || []).map(s => {
               const st = formatTime(s.shift_start);
               const en = formatTime(s.shift_end);
+              const roleName = roleMap[s.role_id]?.role_name || s.role || 'No Role';
               return `<tr>
-              <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${s.role || 'No Role'}</span></td>
+              <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${roleName}</span></td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name}', '${s.role || ''}', '${st}', '${en}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -2533,7 +2623,7 @@
           branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong><br><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">Email: ${b.email} | Pass: ${b.password || 'N/A'}</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditBranch('${b.id}', '${b.branch_name}', '${b.email}', '${b.password || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditBranch('${b.id}', '${b.branch_name.replace(/'/g, "\\'")}', '${b.email}', '${b.password || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteBranchItem('${b.id}')">Remove</button>
               </td>
           </tr>`).join('');
@@ -2591,7 +2681,6 @@
 
     window.openEditRole = (id, currentName, start, end) => {
       document.getElementById('edit-role-id').value = id;
-      document.getElementById('edit-role-oldname').value = currentName;
       document.getElementById('edit-role-name').value = currentName;
       document.getElementById('edit-role-start').value = start || '';
       document.getElementById('edit-role-end').value = end || '';
@@ -2602,7 +2691,6 @@
     
     document.getElementById('btn-save-edit-role').addEventListener('click', async () => {
       const id = document.getElementById('edit-role-id').value;
-      const oldName = document.getElementById('edit-role-oldname').value;
       const newName = document.getElementById('edit-role-name').value.trim();
       let startVal = document.getElementById('edit-role-start').value || null;
       let endVal = document.getElementById('edit-role-end').value || null;
@@ -2617,10 +2705,6 @@
               role_name: newName, shift_start: startVal, shift_end: endVal 
           }).eq('id', id);
           
-          if(newName !== oldName) {
-            await supabaseClient.from('staff_directory').update({ role: newName }).eq('role', oldName);
-          }
-          
           document.getElementById('edit-role-modal').style.display = 'none';
           await initialMetadataLoad();
           loadSettingsData();
@@ -2633,7 +2717,7 @@
     });
     
     window.deleteRoleItem = async (rowId) => { 
-      if(confirm("Remove this role? It will not remove it from existing staff automatically.")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
+      if(confirm("Remove this role?")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
     };
 
     document.getElementById('add-reason-btn').addEventListener('click', async () => {
@@ -2687,7 +2771,7 @@
     
     document.getElementById('add-staff-btn').addEventListener('click', async () => {
       const nameVal = document.getElementById('new-staff-name').value.trim();
-      const roleVal = document.getElementById('new-staff-role').value || null;
+      const roleId = document.getElementById('new-staff-role').value || null;
       let startVal = document.getElementById('new-staff-start').value || null;
       let endVal = document.getElementById('new-staff-end').value || null;
       
@@ -2697,8 +2781,10 @@
       if(nameVal) {
         const btn = document.getElementById('add-staff-btn'); btn.innerText = "Adding..."; btn.disabled = true;
         try {
+          // Inserting UUID (role_id) and legacy string fallback (role) just in case
+          const rName = roleMap[roleId]?.role_name || null;
           const { error } = await supabaseClient.from('staff_directory').insert([{ 
-              name: nameVal, role: roleVal, shift_start: startVal, shift_end: endVal 
+              name: nameVal, role_id: roleId, role: rName, shift_start: startVal, shift_end: endVal 
           }]);
           if(error) throw error;
           
@@ -2713,10 +2799,10 @@
       } else { showToast("Please enter a staff name.", "error"); }
     });
 
-    window.openEditStaff = (id, name, role, start, end) => {
+    window.openEditStaff = (id, name, roleId, start, end) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
-        document.getElementById('edit-staff-role').value = role || '';
+        document.getElementById('edit-staff-role').value = roleId || '';
         document.getElementById('edit-staff-start').value = start || '';
         document.getElementById('edit-staff-end').value = end || '';
         document.getElementById('edit-staff-modal').style.display = 'flex';
@@ -2727,7 +2813,7 @@
     document.getElementById('btn-save-edit-staff').addEventListener('click', async () => {
         const id = document.getElementById('edit-staff-id').value;
         const name = document.getElementById('edit-staff-name').value.trim();
-        const role = document.getElementById('edit-staff-role').value || null;
+        const roleId = document.getElementById('edit-staff-role').value || null;
         let start = document.getElementById('edit-staff-start').value || null;
         let end = document.getElementById('edit-staff-end').value || null;
 
@@ -2737,8 +2823,9 @@
         if(name) {
             const btn = document.getElementById('btn-save-edit-staff'); btn.innerText = "Saving..."; btn.disabled = true;
             try {
+                const rName = roleMap[roleId]?.role_name || null;
                 await supabaseClient.from('staff_directory').update({
-                    name: name, role: role, shift_start: start, shift_end: end
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end
                 }).eq('id', id);
                 document.getElementById('edit-staff-modal').style.display = 'none';
                 await initialMetadataLoad();
@@ -2763,6 +2850,7 @@
         document.getElementById('new-branch-name').value = ''; 
         document.getElementById('new-branch-email').value = ''; 
         document.getElementById('new-branch-pass').value = ''; 
+        await initialMetadataLoad();
         loadSettingsData(); 
         showToast("Branch registered successfully", "success");
       } else { 
@@ -2802,6 +2890,7 @@
                 }
 
                 document.getElementById('edit-branch-modal').style.display = 'none';
+                await initialMetadataLoad();
                 loadSettingsData();
                 showToast("Branch updated", "success");
             } catch(e) { 
