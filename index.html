@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RJ Mobile | Attendance Admin</title>
+  <title>RJ Mobile | Attendance Workspace</title>
   <link rel="icon" type="image/png" href="logo.png" />
   
   <script>
     if (localStorage.getItem('rj_theme') === 'light') { 
       document.documentElement.classList.add('light-theme'); 
     }
-    
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,43 +25,41 @@
 
   <style>
     /* =========================================================
-       1. ROOT VARIABLES & THEME (Slate Palette)
+       1. ROOT VARIABLES & THEME (Premium SaaS Palette)
        ========================================================= */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --bg-base: #0f172a; 
-      --bg-surface: #1e293b;
-      --card-bg: #1e293b; 
-      --card-bg-alpha: rgba(30, 41, 59, 0.85);
-      --card-border: #334155;
+      --bg-base: #09090b; 
+      --bg-surface: #18181b;
+      --card-bg: #18181b; 
+      --card-border: #27272a;
       
-      --primary: #3b82f6; 
-      --primary-hover: #2563eb; 
-      --primary-alpha: rgba(59, 130, 246, 0.15);
+      --primary: #6366f1; 
+      --primary-hover: #4f46e5; 
+      --primary-alpha: rgba(99, 102, 241, 0.15);
       
-      --text-main: #f8fafc; 
-      --text-soft: #94a3b8;
+      --text-main: #f4f4f5; 
+      --text-soft: #a1a1aa;
       
       --success: #10b981; --success-alpha: rgba(16, 185, 129, 0.15);
       --danger: #ef4444; --danger-alpha: rgba(239, 68, 68, 0.15);
       --warning: #f59e0b; --warning-alpha: rgba(245, 158, 11, 0.15);
       
-      --input-bg: #0f172a; 
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
+      --input-bg: #09090b; 
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
       
       --font-scale: 1;
     }
 
     html.light-theme {
-      --bg-base: #f1f5f9; 
+      --bg-base: #f8fafc; 
       --bg-surface: #ffffff;
       --card-bg: #ffffff; 
-      --card-bg-alpha: rgba(255, 255, 255, 0.9);
       --card-border: #e2e8f0;
       
       --primary: #4f46e5; 
@@ -72,28 +69,27 @@
       --text-main: #0f172a; 
       --text-soft: #64748b; 
       
-      --input-bg: #f8fafc; 
+      --input-bg: #f1f5f9; 
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
     }
     
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }
 
     body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
-    h1, h2, h3, .name, .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .glass-effect { background: var(--card-bg-alpha); backdrop-filter: blur(16px); border: 1px solid var(--card-border); }
+    h1, h2, h3, .name, .metric-value, .sidebar-category { font-family: 'Plus Jakarta Sans', sans-serif; }
 
     /* =========================================================
        2. TYPOGRAPHY & BUTTONS
        ========================================================= */
-    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); box-shadow: var(--shadow-sm); }
+    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); box-shadow: var(--shadow-sm); }
     .btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
     
-    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); }
+    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); }
     .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
     
@@ -119,12 +115,12 @@
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--card-border); transition: .4s; border-radius: 24px; }
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    input:checked + .slider { background-color: var(--success); }
+    input:checked + .slider { background-color: var(--primary); }
     input:checked + .slider:before { transform: translateX(20px); }
 
-    #toast-container { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
-    .toast { padding: 14px 24px; border-radius: var(--radius-md); color: #fff; font-weight: 600; box-shadow: var(--shadow-md); opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 10px;}
-    .toast.show { opacity: 1; transform: translateY(0); }
+    #toast-container { position: fixed; bottom: 40px; right: 40px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+    .toast { padding: 14px 24px; border-radius: var(--radius-md); color: #fff; font-weight: 600; box-shadow: var(--shadow-md); opacity: 0; transform: translateX(20px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 10px;}
+    .toast.show { opacity: 1; transform: translateX(0); }
     .toast-primary { background: var(--primary); }
     .toast-success { background: var(--success); }
     .toast-error { background: var(--danger); }
@@ -134,15 +130,15 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     /* =========================================================
-       4. FORM INPUTS, DATE/TIME FIX & DROPDOWNS
+       4. FORM INPUTS & DROPDOWNS
        ========================================================= */
-    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: calc(13px * var(--font-scale, 1)); transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); color-scheme: dark; }
+    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-main); margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: calc(13px * var(--font-scale, 1)); transition: all 0.2s; color-scheme: dark; }
     html.light-theme .input-field { color-scheme: light; }
     .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-alpha); }
     select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px auto; }
     
     .dropdown { position: relative; display: inline-block; }
-    .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 260px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; z-index: 1000; box-shadow: var(--shadow-md); }
+    .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 260px; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; z-index: 1000; box-shadow: var(--shadow-md); }
     .dropdown-content.show { display: block; animation: dropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes dropIn { from {opacity:0; transform: translateY(-10px) scale(0.98);} to {opacity:1; transform:translateY(0) scale(1);} }
     
@@ -163,42 +159,48 @@
     #dashboard { display: none; height: 100vh; width: 100vw; }
     .app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
     
-    .sidebar { width: 280px; background: var(--card-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; padding: 24px 16px; z-index: 100; flex-shrink: 0; }
+    .sidebar { width: 280px; background: var(--sidebar-bg, var(--bg-surface)); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; padding: 24px 16px; z-index: 100; flex-shrink: 0; }
     .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 32px 8px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px; }
     .sidebar-brand img { height: 36px; object-fit: contain; }
     .brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(18px * var(--font-scale, 1)); font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
     .brand-subtitle { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600;}
     
-    .tab-controls { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex: 1; padding-right: 8px; }
-    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; text-align: left; transition: all 0.2s; font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 12px; }
+    .tab-controls { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-right: 8px; }
+    .sidebar-category { font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px 8px; }
+    
+    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 16px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; transition: all 0.2s; font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 12px; }
     .tab-btn:hover { background: var(--input-bg); color: var(--text-main); }
-    .tab-btn.active { background: var(--primary-alpha); color: var(--primary); }
+    .tab-btn.active { background: var(--selected-bg, var(--primary-alpha)); color: var(--primary); }
     .tab-icon { display: flex; align-items: center; justify-content: center; }
 
-    .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; background: var(--bg-base); padding: 24px 40px; }
+    .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; background: var(--bg-base); position: relative; }
     
-    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-radius: var(--radius-lg); background: var(--card-bg); border: 1px solid var(--card-border); margin-bottom: 32px; gap: 16px; box-shadow: var(--shadow-sm); flex-wrap: wrap; z-index: 50;}
+    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: var(--header-bg, var(--bg-base)); border-bottom: 1px solid var(--card-border); z-index: 50; position: relative;}
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .header-title { font-weight: 600; font-size: calc(16px * var(--font-scale, 1)); color: var(--text-main); }
+    .header-title { font-weight: 700; font-size: calc(20px * var(--font-scale, 1)); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;}
+
+    .content-wrapper { padding: 32px 40px; flex: 1; display: flex; flex-direction: column; }
 
     /* =========================================================
        6. STRUCTURED FILTER BAR & WIDGETS
        ========================================================= */
-    .filter-section { display: flex; flex-direction: column; gap: 16px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+    .filter-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 16px; transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease; overflow: visible; position: relative; z-index: 100; }
+    .filter-section.collapsed { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 0; border-width: 0; overflow: hidden; pointer-events: none; }
+    
     .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
     .filter-group label { font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;}
     .time-filter-wrap { display: flex; gap: 8px; align-items: center; }
     
-    .quick-dates { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); flex-wrap: wrap; }
+    .quick-dates { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); flex-wrap: wrap; }
     .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-    .quick-date-btn:hover { color: var(--text-main); background: var(--card-bg); }
-    .quick-date-btn.active { background: var(--card-bg); color: var(--primary); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
+    .quick-date-btn:hover { color: var(--text-main); background: var(--bg-surface); }
+    .quick-date-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sub-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); width: fit-content;}
     .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .sub-tab-btn:hover { color: var(--text-main); background: var(--card-bg); }
-    .sub-tab-btn.active { background: var(--card-bg); color: var(--primary); border-color: var(--card-border); box-shadow: var(--shadow-sm); }
+    .sub-tab-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary); border-color: var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sortable-ghost { opacity: 0.4; background: var(--primary-alpha); border: 1px dashed var(--primary); }
     .sortable-drag { cursor: grabbing !important; }
@@ -212,26 +214,26 @@
     .drag-handle { color: var(--text-soft); opacity: 0.3; cursor: grab; transition: 0.2s; font-size: calc(18px * var(--font-scale, 1)); line-height: 1;}
     .widget-card:hover .drag-handle { opacity: 1; color: var(--primary); }
 
-    .table-card { background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm);}
+    .table-card { background: var(--table-bg, var(--card-bg)); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm);}
     .table-responsive { overflow-x: auto; max-height: calc(100vh - 340px); min-height: 400px; overflow-y: auto; }
     table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; }
-    th { position: sticky; top: 0; background: var(--bg-base); color: var(--text-soft); font-weight: 700; font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; padding: 16px 24px; border-bottom: 1px solid var(--card-border); z-index: 10; letter-spacing: 0.5px; border-top: 1px solid var(--card-border);}
+    th { position: sticky; top: 0; background: var(--bg-surface); color: var(--text-soft); font-weight: 700; font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; padding: 16px 24px; border-bottom: 1px solid var(--card-border); z-index: 10; letter-spacing: 0.5px; border-top: 1px solid var(--card-border);}
     td { padding: 16px 24px; border-bottom: 1px solid var(--card-border); vertical-align: middle; font-size: calc(13px * var(--font-scale, 1)); color: var(--text-main); transition: background 0.1s;}
     tbody tr:hover td { background: var(--input-bg); }
     tbody tr:last-child td { border-bottom: none; }
 
-    .pagination-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 32px; }
+    .pagination-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 24px; }
 
     /* =========================================================
        7. SETTINGS PANELS & AUDIT GALLERY
        ========================================================= */
-    .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding: 24px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border); margin-bottom: 24px; }
-    .audit-card { background: var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; box-shadow: var(--shadow-sm);}
+    .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; background: transparent; border-radius: var(--radius-lg); margin-bottom: 24px; }
+    .audit-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; box-shadow: var(--shadow-sm);}
     .audit-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
     .audit-img-wrap { width: 100%; height: 220px; background: #000; position: relative; overflow: hidden;}
     .audit-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; cursor: pointer; }
     .audit-img-wrap:hover .audit-img { transform: scale(1.05); }
-    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.8); color: #fff; font-size: calc(11px * var(--font-scale, 1)); padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(9, 9, 11, 0.8); color: #fff; font-size: calc(11px * var(--font-scale, 1)); padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
     .audit-details { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
     .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
@@ -248,7 +250,7 @@
     #login-screen { display: none; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-base); }
     .login-card { width: 100%; max-width: 420px; background: var(--card-bg); padding: 48px 40px; border-radius: var(--radius-lg); border: 1px solid var(--card-border); box-shadow: var(--shadow-md); text-align: center; }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px;}
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px;}
     .modal-card { background: var(--card-bg); padding: 32px; border-radius: var(--radius-lg); width: 100%; max-width: 500px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
     @keyframes slideUp { from { transform: translateY(20px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
     
@@ -287,11 +289,17 @@
     .sidebar.collapsed .sidebar-toggle-btn { right: 50%; transform: translateX(50%); }
     .tab-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .tab-btn-text { transition: opacity 0.2s ease, width 0.2s ease; }
-    .sidebar.collapsed .tab-btn-text { opacity: 0; width: 0; overflow: hidden; }
+    .sidebar.collapsed .tab-btn-text, .sidebar.collapsed .sidebar-category { opacity: 0; width: 0; overflow: hidden; height: 0; margin: 0; }
     .sidebar.collapsed .tab-btn { padding-left: 0; padding-right: 0; justify-content: center; }
     .sidebar.collapsed #absent-badge { position: absolute; right: 4px; top: 4px; transform: scale(0.65); transform-origin: top right; }
 
-    
+    .color-picker-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); margin-bottom: 12px; }
+    .color-picker-label { font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; color: var(--text-main); }
+    .color-picker-input { -webkit-appearance: none; border: 2px solid var(--card-border); width: 36px; height: 36px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; background: transparent; transition: 0.2s; }
+    .color-picker-input:hover { transform: scale(1.05); }
+    .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker-input::-webkit-color-swatch { border: none; border-radius: 50%; }
+
   </style>
 </head>
 <body>
@@ -302,13 +310,13 @@
   <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" alt="RJ Mobile Logo" style="height: 48px; object-fit: contain; margin-bottom: 24px;" onerror="this.style.display='none'">
-        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; margin-bottom: 8px;">Attendance Admin</h2>
-        <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(14px * var(--font-scale, 1));">Secure management access.</p>
+        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; margin-bottom: 8px;">Workspace Login</h2>
+        <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(14px * var(--font-scale, 1));">Secure admin access.</p>
         
         <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
         <input type="password" id="password-input" class="input-field" placeholder="Password" style="margin-bottom: 8px;" />
         
-        <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: calc(14px * var(--font-scale, 1));">Log In to Dashboard</button>
+        <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: calc(14px * var(--font-scale, 1));">Log In</button>
         <div id="error-msg" style="color: var(--danger); margin-top: 16px; display: none; background: var(--danger-alpha); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--danger-alpha); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Error</div>
     </div>
   </div>
@@ -316,14 +324,14 @@
   <div id="dashboard">
     <div class="app-container">
       
-      <!-- SIDEBAR NAVIGATION -->
+      <!-- SIDEBAR NAVIGATION (Reorganized) -->
       <aside class="sidebar" id="app-sidebar">
         <div class="sidebar-brand" style="position: relative;">
           <div class="brand-info">
             <img src="logo.png" alt="RJ Logo" onerror="this.style.display='none'">
             <div class="brand-text-wrap">
-              <div class="brand-title">RJ Mobile <span class="badge bg-green">ADMIN</span></div>
-              <div class="brand-subtitle">Attendance Center</div>
+              <div class="brand-title">RJ Mobile <span class="badge bg-blue" style="font-size: 9px; padding: 2px 4px;">ADMIN</span></div>
+              <div class="brand-subtitle">Workspace Hub</div>
             </div>
           </div>
           <button class="icon-btn sidebar-toggle-btn" id="sidebar-toggle" title="Toggle Sidebar">
@@ -332,36 +340,60 @@
         </div>
         
         <div class="tab-controls">
-          <button class="tab-btn active" data-view="view-overview" title="Overview & Logs">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
-            <span class="tab-btn-text">Overview & Logs</span>
+          <!-- Dashboards -->
+          <div class="sidebar-category">Dashboards</div>
+          <button class="tab-btn active" data-view="view-dashboard" title="Overview">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></span> 
+            <span class="tab-btn-text">Overview</span>
           </button>
           
-          <button class="tab-btn" data-view="view-live" title="Live Branches">
+          <button class="tab-btn" data-view="view-live" title="Live Tracker">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> 
-            <span class="tab-btn-text">Live Branches</span>
+            <span class="tab-btn-text">Live Tracker</span>
           </button>
 
+          <!-- Records -->
+          <div class="sidebar-category">Records</div>
+          <button class="tab-btn" data-view="view-logs" title="Attendance Logs">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
+            <span class="tab-btn-text">Attendance Logs</span>
+          </button>
+          
+          <button class="tab-btn" data-view="view-audits" title="Photo Audits">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> 
+            <span class="tab-btn-text">Photo Audits</span>
+          </button>
+
+          <!-- Analytics -->
+          <div class="sidebar-category">Analytics</div>
           <button class="tab-btn" data-view="view-stats" title="Staff Stats">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
             <span class="tab-btn-text">Staff Stats</span>
           </button>
-          <button class="tab-btn" data-view="view-analysis" title="Deep Analysis">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span> 
-            <span class="tab-btn-text">Deep Analysis</span>
+          
+          <button class="tab-btn" data-view="view-matrix" title="Attendance Matrix">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> 
+            <span class="tab-btn-text">Data Matrix</span>
           </button>
-          <button class="tab-btn" data-view="view-absent" style="position: relative;" title="Action Center">
+
+          <!-- Management -->
+          <div class="sidebar-category">Management</div>
+          <button class="tab-btn" data-view="view-action" style="position: relative;" title="Action Center">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
             <span class="tab-btn-text">Action Center</span>
             <span id="absent-badge" class="badge bg-red" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
           </button>
-          <button class="tab-btn" data-view="view-matrix" title="Attendance Matrix">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> 
-            <span class="tab-btn-text">Attendance Matrix</span>
+
+          <!-- Settings -->
+          <div class="sidebar-category">Settings</div>
+          <button class="tab-btn" data-view="view-settings-hr" title="HR Settings">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
+            <span class="tab-btn-text">HR Settings</span>
           </button>
-          <button class="tab-btn" data-view="view-settings" title="System Settings">
+          
+          <button class="tab-btn" data-view="view-settings-org" title="Org Settings">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> 
-            <span class="tab-btn-text">System Settings</span>
+            <span class="tab-btn-text">Org Settings</span>
           </button>
         </div>
       </aside>
@@ -371,10 +403,8 @@
         
         <!-- HEADER -->
         <div class="header-bar">
-          <div class="header-title">Dashboard Overview</div>
+          <div class="header-title" id="page-title">Overview</div>
           <div class="header-controls">
-            
-            
 
             <div class="switch-wrap">
               Auto-Sync
@@ -384,7 +414,7 @@
               </label>
             </div>
             
-            <div class="dropdown" id="export-dropdown">
+            <div class="dropdown" id="export-dropdown" style="display: none;">
               <button id="export-btn" class="btn-primary" data-target="export-menu">
                 Export <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
               </button>
@@ -396,413 +426,472 @@
               </div>
             </div>
             
-            <button id="save-settings-btn" class="btn-secondary">💾 Save Layout</button>
+            <button id="toggle-filter-btn" class="btn-secondary" title="Toggle Filters">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Data
+            </button>
+            
             <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
+            <button id="btn-open-theme" class="btn-secondary" title="Advanced Theme Customizer">🎨 Theme</button>
             <button id="theme-toggle" class="btn-secondary" title="Toggle Theme">🌓</button>
             <button id="logout-btn" class="btn-secondary">Log Out</button>
           </div>
         </div>
 
-        <!-- NEW STRUCTURED FILTER BAR -->
-        <div class="filter-section">
-            <!-- Row 1: Date Filters -->
-            <div class="filter-row">
-                <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
-                    
-                    <div class="filter-group">
-                        <label>Quick Dates</label>
-                        <div class="quick-dates" id="quick-date-filters">
-                            <button class="quick-date-btn active" data-range="today">Today</button>
-                            <button class="quick-date-btn" data-range="yesterday">Yesterday</button>
-                            <button class="quick-date-btn" data-range="7days">Last 7 Days</button>
-                            <button class="quick-date-btn" data-range="thismonth">This Month</button>
-                            <button class="quick-date-btn" data-range="lastmonth">Last Month</button>
-                            <button class="quick-date-btn" data-range="alltime">All Time</button>
+        <div class="content-wrapper">
+            <!-- NEW COLLAPSIBLE FILTER BAR (Controls global state) -->
+            <div class="filter-section" id="master-filter-section">
+                <!-- Row 1: Date Filters (Split as requested) -->
+                <div class="filter-row">
+                    <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+                        <div class="filter-group">
+                            <label>Quick Dates</label>
+                            <div class="quick-dates" id="quick-date-filters" style="width: fit-content;">
+                                <button class="quick-date-btn active" data-range="today">Today</button>
+                                <button class="quick-date-btn" data-range="yesterday">Yesterday</button>
+                                <button class="quick-date-btn" data-range="7days">Last 7 Days</button>
+                                <button class="quick-date-btn" data-range="thismonth">This Month</button>
+                                <button class="quick-date-btn" data-range="lastmonth">Last Month</button>
+                                <button class="quick-date-btn" data-range="alltime">All Time</button>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="filter-group" style="margin-left: auto;">
-                        <label>Custom Start</label>
-                        <input type="text" id="global-start" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="Start Date" />
-                    </div>
-                    <div class="filter-group">
-                        <label>Custom End</label>
-                        <input type="text" id="global-end" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="End Date" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 2: Time & Entity Filters -->
-            <div class="filter-row" style="border-top: 1px solid var(--card-border); padding-top: 16px;">
-                <div class="filter-group">
-                    <label>Clock-In Between</label>
-                    <div class="time-filter-wrap">
-                        <input type="time" id="filter-in-start" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock In Start" />
-                        <span style="color:var(--text-soft); font-weight: bold;">-</span>
-                        <input type="time" id="filter-in-end" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock In End" />
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Clock-Out Between</label>
-                    <div class="time-filter-wrap">
-                        <input type="time" id="filter-out-start" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock Out Start" />
-                        <span style="color:var(--text-soft); font-weight: bold;">-</span>
-                        <input type="time" id="filter-out-end" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock Out End" />
                     </div>
                 </div>
                 
-                <div style="margin-left: auto; display: flex; gap: 16px; flex-wrap: wrap;">
-                    <div class="filter-group dropdown" id="role-filter-dropdown">
-                        <label>Filter Role</label>
-                        <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 140px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
-                            <span id="role-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                        <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="role-dropdown-box">
-                            <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
-                            <div class="multi-select-actions">
-                                <button id="btn-select-all-roles">Select All</button>
-                                <button id="btn-deselect-all-roles">Clear All</button>
-                            </div>
-                            <div class="list-container" id="role-checkboxes"></div>
+                <div class="filter-row" style="margin-top: -4px;">
+                    <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+                        <div class="filter-group">
+                            <label>Custom Start</label>
+                            <input type="text" id="global-start" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="Start Date" />
                         </div>
-                    </div>
-
-                    <div class="filter-group dropdown" id="branch-filter-dropdown">
-                        <label>Filter Branch</label>
-                        <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
-                            <span id="branch-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                        <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="branch-dropdown-box">
-                            <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
-                            <div class="multi-select-actions">
-                                <button id="btn-select-all-branches">Select All</button>
-                                <button id="btn-deselect-all-branches">Clear All</button>
-                            </div>
-                            <div class="list-container" id="branch-checkboxes"></div>
-                        </div>
-                    </div>
-
-                    <div class="filter-group dropdown" id="staff-filter-dropdown">
-                        <label>Filter Staff</label>
-                        <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
-                            <span id="staff-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                        <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="staff-dropdown-box">
-                            <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
-                            <div class="multi-select-actions">
-                                <button id="btn-select-all">Select All</button>
-                                <button id="btn-deselect-all">Clear All</button>
-                            </div>
-                            <div class="list-container" id="staff-checkboxes"></div>
+                        <div class="filter-group">
+                            <label>Custom End</label>
+                            <input type="text" id="global-end" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="End Date" />
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- VIEW 1: OVERVIEW & LOGS -->
-        <div id="view-overview" class="app-view">
-          <div id="export-container">
-            
-            <div class="widget-grid" id="draggable-widgets">
-              <div class="widget-card" data-id="w-present">
-                <div class="widget-header">
-                  <span class="widget-title">Total Staff Logged</span>
-                  <span class="drag-handle">⣿</span>
-                </div>
-                <div class="metric-value" id="metric-present">0</div>
-              </div>
-              <div class="widget-card" data-id="w-late">
-                <div class="widget-header">
-                  <span class="widget-title">Late Arrivals</span>
-                  <span class="drag-handle">⣿</span>
-                </div>
-                <div class="metric-value" id="metric-late" style="color: var(--warning);">0</div>
-              </div>
-              <div class="widget-card" data-id="w-early">
-                <div class="widget-header">
-                  <span class="widget-title">Early Departures</span>
-                  <span class="drag-handle">⣿</span>
-                </div>
-                <div class="metric-value" id="metric-early" style="color: #f97316;">0</div>
-              </div>
-              <div class="widget-card" data-id="w-absent">
-                <div class="widget-header">
-                  <span class="widget-title">Missed Shifts</span>
-                  <span class="drag-handle">⣿</span>
-                </div>
-                <div class="metric-value" id="metric-absent" style="color: var(--danger);">0</div>
-              </div>
-            </div>
+                <!-- Row 2: Time & Entity Filters -->
+                <div class="filter-row" style="border-top: 1px solid var(--card-border); padding-top: 16px;">
+                    <div class="filter-group">
+                        <label>Clock-In Between</label>
+                        <div class="time-filter-wrap">
+                            <input type="time" id="filter-in-start" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock In Start" />
+                            <span style="color:var(--text-soft); font-weight: bold;">-</span>
+                            <input type="time" id="filter-in-end" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock In End" />
+                        </div>
+                    </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-                <div class="sub-tabs" style="margin-bottom: 0;">
-                  <button class="sub-tab-btn active" data-filter="all">All Logs</button>
-                  <button class="sub-tab-btn" data-filter="late">Lates & Early Outs</button>
-                  <button class="sub-tab-btn" data-filter="missing-out">⚠️ Missing Clock-Outs</button>
-                  <button class="sub-tab-btn" data-filter="gallery">📸 Photo Audit Gallery</button>
-                </div>
-                <div id="gallery-filters" style="display: none; align-items: center;">
-                    <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
-                        <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
-                    </label>
-                </div>
-            </div>
+                    <div class="filter-group">
+                        <label>Clock-Out Between</label>
+                        <div class="time-filter-wrap">
+                            <input type="time" id="filter-out-start" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock Out Start" />
+                            <span style="color:var(--text-soft); font-weight: bold;">-</span>
+                            <input type="time" id="filter-out-end" class="input-field" style="margin: 0; width: 115px; padding: 9px 12px;" title="Clock Out End" />
+                        </div>
+                    </div>
+                    
+                    <div style="margin-left: auto; display: flex; gap: 16px; flex-wrap: wrap;">
+                        <div class="filter-group dropdown" id="role-filter-dropdown">
+                            <label>Filter Role</label>
+                            <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 140px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
+                                <span id="role-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="role-dropdown-box">
+                                <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
+                                <div class="multi-select-actions">
+                                    <button id="btn-select-all-roles">Select All</button>
+                                    <button id="btn-deselect-all-roles">Clear All</button>
+                                </div>
+                                <div class="list-container" id="role-checkboxes"></div>
+                            </div>
+                        </div>
 
-            <!-- TABLE CONTAINER -->
-            <div class="table-card" id="master-table-container">
-              <div class="table-responsive">
-                <table id="master-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Staff Member</th>
-                      <th>Timeline & Time Split</th>
-                      <th>Status & Reason</th>
-                      <th>Audit Photos (Timeline)</th>
-                    </tr>
-                  </thead>
-                  <tbody id="master-tbody">
-                    <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                        <div class="filter-group dropdown" id="branch-filter-dropdown">
+                            <label>Filter Branch</label>
+                            <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
+                                <span id="branch-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="branch-dropdown-box">
+                                <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
+                                <div class="multi-select-actions">
+                                    <button id="btn-select-all-branches">Select All</button>
+                                    <button id="btn-deselect-all-branches">Clear All</button>
+                                </div>
+                                <div class="list-container" id="branch-checkboxes"></div>
+                            </div>
+                        </div>
 
-            <!-- GALLERY CONTAINER -->
-            <div id="audit-gallery-container" style="display: none;">
-              <div class="audit-grid" id="audit-grid"></div>
+                        <div class="filter-group dropdown" id="staff-filter-dropdown">
+                            <label>Filter Staff</label>
+                            <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
+                                <span id="staff-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                            <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="staff-dropdown-box">
+                                <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
+                                <div class="multi-select-actions">
+                                    <button id="btn-select-all">Select All</button>
+                                    <button id="btn-deselect-all">Clear All</button>
+                                </div>
+                                <div class="list-container" id="staff-checkboxes"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- UNIFIED PAGINATION FOOTER -->
+            <!-- UNIFIED PAGINATION CONTROLS (Always visible near top to indicate global dataset logic) -->
             <div class="pagination-footer">
               <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 100</button>
               <span id="page-indicator" style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Page 1</span>
               <button id="next-page-btn" class="btn-secondary" disabled>Next 100 →</button>
             </div>
 
-          </div>
-        </div>
-
-        <!-- LIVE BRANCHES -->
-        <div id="view-live" class="app-view" style="display: none;">
-            <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-              <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Live Branch Presence</h2>
-              <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time view of staff currently clocked in today.</span>
-            </div>
+            <!-- TAB VIEWS CONTAINER -->
+            <div id="export-container">
             
-            <div class="branch-grid" id="live-branch-grid">
-               <!-- Branch Cards will be injected here -->
-            </div>
-        </div>
+                <!-- VIEW 1: DASHBOARD (Widgets + Charts) -->
+                <div id="view-dashboard" class="app-view">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time metrics based on filters.</span>
+                    </div>
 
-        <!-- VIEW 2: STAFF STATS -->
-        <div id="view-stats" class="app-view" style="display: none;">
-          <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-            <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Staff Stats & Payroll Prep</h2>
-            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Aggregated metrics for the selected date range.</span>
-          </div>
+                    <div class="widget-grid" id="draggable-widgets">
+                        <div class="widget-card" data-id="w-present">
+                            <div class="widget-header">
+                            <span class="widget-title">Total Staff Logged</span>
+                            <span class="drag-handle">⣿</span>
+                            </div>
+                            <div class="metric-value" id="metric-present">0</div>
+                        </div>
+                        <div class="widget-card" data-id="w-late">
+                            <div class="widget-header">
+                            <span class="widget-title">Late Arrivals</span>
+                            <span class="drag-handle">⣿</span>
+                            </div>
+                            <div class="metric-value" id="metric-late" style="color: var(--warning);">0</div>
+                        </div>
+                        <div class="widget-card" data-id="w-early">
+                            <div class="widget-header">
+                            <span class="widget-title">Early Departures</span>
+                            <span class="drag-handle">⣿</span>
+                            </div>
+                            <div class="metric-value" id="metric-early" style="color: #f97316;">0</div>
+                        </div>
+                        <div class="widget-card" data-id="w-absent">
+                            <div class="widget-header">
+                            <span class="widget-title">Missed Shifts</span>
+                            <span class="drag-handle">⣿</span>
+                            </div>
+                            <div class="metric-value" id="metric-absent" style="color: var(--danger);">0</div>
+                        </div>
+                    </div>
 
-          <div class="table-card" id="stats-export-container">
-            <div class="table-responsive">
-              <table id="stats-table">
-                <thead>
-                  <tr>
-                    <th>Staff Name</th>
-                    <th>Role</th>
-                    <th>Days Present</th>
-                    <th>Avg In & Out</th>
-                    <th>Total Hours</th>
-                    <th>Work vs Travel</th>
-                    <th>Target vs Actual</th>
-                    <th>Infractions (Unexcused)</th>
-                  </tr>
-                </thead>
-                <tbody id="stats-tbody">
-                  <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        
-        <!-- VIEW 3: DEEP ANALYSIS -->
-        <div id="view-analysis" class="app-view" style="display: none;">
-            <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-              <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Deep Analysis Dashboard</h2>
-              <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Visual insights based on current filters.</span>
-            </div>
-            
-            <div class="chart-grid">
-                <div class="chart-card">
-                    <h3>Attendance Trend</h3>
-                    <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                    <h3 style="margin: 24px 0 16px 0; font-size: calc(18px * var(--font-scale, 1)); font-family: 'Plus Jakarta Sans', sans-serif;">Deep Analysis</h3>
+                    <div class="chart-grid">
+                        <div class="chart-card">
+                            <h3>Attendance Trend</h3>
+                            <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Arrival Analysis</h3>
+                            <div class="chart-container"><canvas id="arrivalChart"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Top Latecomers (Unexcused)</h3>
+                            <div class="chart-container"><canvas id="lateChart"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Role Distribution (Present)</h3>
+                            <div class="chart-container"><canvas id="roleChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: LIVE TRACKER -->
+                <div id="view-live" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time view of staff currently clocked in today.</span>
+                    </div>
+                    
+                    <div class="branch-grid" id="live-branch-grid">
+                    <!-- Branch Cards will be injected here -->
+                    </div>
+                </div>
+
+                <!-- VIEW 3: ATTENDANCE LOGS -->
+                <div id="view-logs" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+                        <div class="sub-tabs" style="margin-bottom: 0;">
+                        <button class="sub-tab-btn active" data-filter="all">All Logs</button>
+                        <button class="sub-tab-btn" data-filter="late">Lates & Early Outs</button>
+                        <button class="sub-tab-btn" data-filter="missing-out">⚠️ Missing Clock-Outs</button>
+                        </div>
+                    </div>
+
+                    <div class="table-card" id="master-table-container">
+                    <div class="table-responsive">
+                        <table id="master-table">
+                        <thead>
+                            <tr>
+                            <th>Date</th>
+                            <th>Staff Member</th>
+                            <th>Timeline & Time Split</th>
+                            <th>Status & Reason</th>
+                            <th>Timeline Audits</th>
+                            </tr>
+                        </thead>
+                        <tbody id="master-tbody">
+                            <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: PHOTO AUDITS -->
+                <div id="view-audits" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Review check-in/out photos.</span>
+                        <div id="gallery-filters" style="display: flex; align-items: center;">
+                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
+                                <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="audit-gallery-container">
+                        <div class="audit-grid" id="audit-grid"></div>
+                    </div>
+                </div>
+
+                <!-- VIEW 5: STAFF STATS -->
+                <div id="view-stats" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Aggregated metrics for the selected date range. Good for Payroll prep.</span>
+                    </div>
+
+                    <div class="table-card" id="stats-export-container">
+                    <div class="table-responsive">
+                        <table id="stats-table">
+                        <thead>
+                            <tr>
+                            <th>Staff Name</th>
+                            <th>Role</th>
+                            <th>Days Present</th>
+                            <th>Avg In & Out</th>
+                            <th>Total Hours</th>
+                            <th>Work vs Travel</th>
+                            <th>Target vs Actual</th>
+                            <th>Infractions (Unexcused)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tbody">
+                            <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
                 </div>
                 
-                <div class="chart-card">
-                    <h3>Arrival Analysis</h3>
-                    <div class="chart-container"><canvas id="arrivalChart"></canvas></div>
+                <!-- VIEW 6: ATTENDANCE MATRIX -->
+                <div id="view-matrix" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Showing dates derived from currently loaded logs.</span>
+                    </div>
+
+                    <div class="table-card">
+                    <div class="table-responsive">
+                        <table id="matrix-table">
+                        <thead><tr id="matrix-header"></tr></thead>
+                        <tbody id="matrix-body">
+                            <tr><td colspan="100%" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
                 </div>
-                
-                <div class="chart-card">
-                    <h3>Top Latecomers (Unexcused)</h3>
-                    <div class="chart-container"><canvas id="lateChart"></canvas></div>
+
+                <!-- VIEW 7: ACTION CENTER -->
+                <div id="view-action" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and resolve exceptions.</span>
+                        <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Future Leave</button>
+                    </div>
+
+                    <div class="sub-tabs" id="action-center-tabs" style="margin-bottom: 24px;">
+                        <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
+                        <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
+                        <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
+                    </div>
+                    
+                    <div class="table-card">
+                    <div class="table-responsive">
+                        <table id="absent-table">
+                        <thead>
+                            <tr>
+                            <th>Date</th>
+                            <th>Staff Member</th>
+                            <th>Status & Details</th>
+                            <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="absent-tbody">
+                            <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
                 </div>
-                
-                <div class="chart-card">
-                    <h3>Role Distribution (Present)</h3>
-                    <div class="chart-container"><canvas id="roleChart"></canvas></div>
+
+                <!-- VIEW 8: HR SETTINGS -->
+                <div id="view-settings-hr" class="app-view" style="display: none;">
+                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Manage people, roles, and leave reasons.</span>
+                    
+                    <div class="settings-grid">
+                        <div class="settings-panel" style="grid-column: 1 / -1;">
+                            <h3>Staff Directory & Custom Shifts</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Custom shift times here override Role defaults and Global defaults.</p>
+                            <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                                <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
+                                <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
+                                <option value="">-- Select Role --</option>
+                                </select>
+                                <input type="time" id="new-staff-start" class="input-field" title="Staff Custom Start (Leave blank to use Role/Global default)" style="margin:0; flex: 1; min-width: 100px;">
+                                <input type="time" id="new-staff-end" class="input-field" title="Staff Custom End (Leave blank to use Role/Global default)" style="margin:0; flex: 1; min-width: 100px;">
+                                <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Add Staff</button>
+                            </div>
+                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                                <table>
+                                <thead><tr><th>Staff Details</th><th>Custom Shift Time</th><th style="text-align: right;">Action</th></tr></thead>
+                                <tbody id="staff-settings-list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel">
+                            <h3>Role Configuration</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
+                            
+                            <div style="display:flex; flex-direction:column; gap:12px; background: var(--bg-base); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                                <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0;">
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="time" id="new-role-start" class="input-field" title="Role Shift Start (Leave blank for global default)" style="margin:0; flex: 1;">
+                                    <input type="time" id="new-role-end" class="input-field" title="Role Shift End (Leave blank for global default)" style="margin:0; flex: 1;">
+                                </div>
+                                <button id="add-role-btn" class="btn-primary" style="justify-content: center;">Create Role</button>
+                            </div>
+
+                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                                <table style="width: 100%;">
+                                <thead><tr><th>Role Details</th><th style="text-align: right;">Action</th></tr></thead>
+                                <tbody id="role-settings-list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel">
+                            <h3>Leave/Exception Reasons</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
+                            <div style="display:flex; flex-direction: column; gap:12px;">
+                                <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
+                                <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
+                            </div>
+                            <table style="margin-top:24px; width: 100%;">
+                                <tbody id="reason-settings-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- VIEW 4: ACTION CENTER -->
-        <div id="view-absent" class="app-view" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-            <div>
-              <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin-bottom: 8px;">Action Center</h2>
-              <p style="color: var(--text-soft); margin: 0; font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and schedule future leaves.</p>
-            </div>
-            <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Future Leave</button>
-          </div>
+                <!-- VIEW 9: ORG SETTINGS -->
+                <div id="view-settings-org" class="app-view" style="display: none;">
+                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Manage physical branches and organization-wide defaults.</span>
+                    
+                    <div class="settings-grid">
+                        <div class="settings-panel">
+                            <h3>Branch Configuration</h3>
+                            <div style="display:flex; flex-direction: column; gap:12px; margin-top: 16px;">
+                                <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name" style="margin:0;">
+                                <input type="email" id="new-branch-email" class="input-field" placeholder="Terminal Login Email" style="margin:0;">
+                                <input type="text" id="new-branch-pass" class="input-field" placeholder="Terminal Password" style="margin:0;">
+                                <button id="add-branch-btn" class="btn-primary" style="justify-content:center;">Register Branch</button>
+                            </div>
+                            <table style="margin-top:24px; width: 100%;">
+                                <tbody id="branch-settings-list"></tbody>
+                            </table>
+                        </div>
 
-          <div class="sub-tabs" id="action-center-tabs" style="margin-bottom: 24px;">
-              <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
-              <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
-              <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
-          </div>
-          
-          <div class="table-card">
-            <div class="table-responsive">
-              <table id="absent-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Staff Member</th>
-                    <th>Status & Details</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="absent-tbody">
-                  <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+                        <div class="settings-panel">
+                            <h3>Global Shift Time Defaults</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
+                            <div style="display:flex; flex-direction: column; gap:12px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
+                                <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
+                                <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
+                                <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center; margin-top: 8px;">Save to Database</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- VIEW 5: ATTENDANCE MATRIX -->
-        <div id="view-matrix" class="app-view" style="display: none;">
-          <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-            <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin: 0; margin-right: 12px;">Attendance Matrix</h2>
-            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Showing dates derived from currently loaded logs.</span>
-          </div>
-
-          <div class="table-card">
-            <div class="table-responsive">
-              <table id="matrix-table">
-                <thead><tr id="matrix-header"></tr></thead>
-                <tbody id="matrix-body">
-                  <tr><td colspan="100%" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- VIEW 6: SYSTEM SETTINGS -->
-        <div id="view-settings" class="app-view" style="display: none;">
-          <h2 style="font-size: calc(20px * var(--font-scale, 1)); margin-bottom: 8px;">Database & System Preferences</h2>
-          <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(13px * var(--font-scale, 1));">Changes apply immediately.</p>
-          
-          <div class="settings-grid">
-            <div class="settings-panel" style="grid-column: 1 / -1;">
-              <h3>Role Configuration</h3>
-              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
-              
-              <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
-                <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0; flex: 2; min-width: 150px;">
-                <input type="time" id="new-role-start" class="input-field" title="Role Shift Start (Leave blank for global default)" style="margin:0; flex: 1; min-width: 100px;">
-                <input type="time" id="new-role-end" class="input-field" title="Role Shift End (Leave blank for global default)" style="margin:0; flex: 1; min-width: 100px;">
-                <button id="add-role-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Create Role</button>
-              </div>
-
-              <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                <table style="width: 100%;">
-                  <thead><tr><th>Role Details</th><th style="text-align: right;">Action</th></tr></thead>
-                  <tbody id="role-settings-list"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="settings-panel">
-              <h3>Leave/Exception Reasons</h3>
-              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
-              <div style="display:flex; flex-direction: column; gap:12px;">
-                <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
-                <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
-              </div>
-              <table style="margin-top:24px; width: 100%;">
-                <tbody id="reason-settings-list"></tbody>
-              </table>
-            </div>
-
-            <div class="settings-panel" style="grid-column: 1 / -1;">
-              <h3>Staff Directory & Custom Shifts</h3>
-              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Custom shift times here override Role defaults and Global defaults.</p>
-              <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
-                <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
-                <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
-                  <option value="">-- Select Role --</option>
-                </select>
-                <input type="time" id="new-staff-start" class="input-field" title="Staff Custom Start (Leave blank to use Role/Global default)" style="margin:0; flex: 1; min-width: 100px;">
-                <input type="time" id="new-staff-end" class="input-field" title="Staff Custom End (Leave blank to use Role/Global default)" style="margin:0; flex: 1; min-width: 100px;">
-                <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center; min-width: 120px;">Add Staff</button>
-              </div>
-              <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                <table>
-                  <thead><tr><th>Staff Details</th><th>Custom Shift Time</th><th style="text-align: right;">Action</th></tr></thead>
-                  <tbody id="staff-settings-list"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="settings-panel">
-              <h3>Global Shift Time Defaults</h3>
-              <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
-              <div style="display:flex; flex-direction: column; gap:12px;">
-                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
-                <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
-                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
-                <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
-                <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center; margin-top: 8px;">Save to Database</button>
-              </div>
-            </div>
-
-            <div class="settings-panel">
-              <h3>Branch Configuration</h3>
-              <div style="display:flex; flex-direction: column; gap:12px; margin-top: 16px;">
-                <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name" style="margin:0;">
-                <input type="email" id="new-branch-email" class="input-field" placeholder="Terminal Login Email" style="margin:0;">
-                <input type="text" id="new-branch-pass" class="input-field" placeholder="Terminal Password" style="margin:0;">
-                <button id="add-branch-btn" class="btn-primary" style="justify-content:center;">Register Branch</button>
-              </div>
-              <table style="margin-top:24px; width: 100%;">
-                <tbody id="branch-settings-list"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
+            </div> <!-- End Export Container -->
+        </div> <!-- End Content Wrapper -->
       </main>
     </div>
   </div> 
 
-  <!-- MODALS -->
+  <!-- THEME CUSTOMIZER MODAL -->
+  <div id="theme-modal" class="modal-overlay" onclick="this.style.display='none'">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2 style="margin:0;">Theme Customizer</h2>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="document.getElementById('theme-modal').style.display='none'">&times;</span>
+      </div>
+      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));">Personalize the colors of your workspace.</p>
+      
+      <div style="max-height: 50vh; overflow-y: auto; padding-right: 8px;">
+        <div class="color-picker-row">
+            <span class="color-picker-label">Primary Accent</span>
+            <input type="color" id="theme-primary" class="color-picker-input theme-color-input" data-var="--primary" value="#6366f1">
+        </div>
+        <div class="color-picker-row">
+            <span class="color-picker-label">App Background</span>
+            <input type="color" id="theme-bg" class="color-picker-input theme-color-input" data-var="--bg-base" value="#09090b">
+        </div>
+        <div class="color-picker-row">
+            <span class="color-picker-label">Sidebar Background</span>
+            <input type="color" id="theme-sidebar" class="color-picker-input theme-color-input" data-var="--sidebar-bg" value="#18181b">
+        </div>
+        <div class="color-picker-row">
+            <span class="color-picker-label">Header Background</span>
+            <input type="color" id="theme-header" class="color-picker-input theme-color-input" data-var="--header-bg" value="#09090b">
+        </div>
+        <div class="color-picker-row">
+            <span class="color-picker-label">Cards & Tables</span>
+            <input type="color" id="theme-card" class="color-picker-input theme-color-input" data-var="--table-bg" value="#18181b">
+        </div>
+        <div class="color-picker-row">
+            <span class="color-picker-label">Main Text</span>
+            <input type="color" id="theme-text" class="color-picker-input theme-color-input" data-var="--text-main" value="#f4f4f5">
+        </div>
+        <div class="color-picker-row">
+            <span class="color-picker-label">Selected Option BG</span>
+            <input type="color" id="theme-selected" class="color-picker-input theme-color-input" data-var="--selected-bg" value="#312e81">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button id="btn-reset-theme" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Reset Defaults</button>
+        <button id="btn-close-theme" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS (Unchanged functionality, styling upgraded) -->
   <div id="live-branch-modal" class="modal-overlay" onclick="this.style.display='none'">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
@@ -1001,7 +1090,6 @@
       auth: { storageKey: 'rj_attendance_terminal_auth' }
     });
 
-    // RELATIONAL UUID MAPPING VARIABLES
     let dbStaff = []; 
     let dbBranches = []; 
     let dbRoles = []; 
@@ -1021,7 +1109,6 @@
     let globalShiftStart = "10:00";
     let globalShiftEnd = "19:00";
     
-    // DEFAULT TO TODAY
     let startDate = new Date();
     let endDate = new Date();
     
@@ -1039,7 +1126,6 @@
     let activeSubTab = 'all';
     let showOnlyPendingPhotos = true;
 
-    // Action center active tab logic
     let currentActionTab = 'absent';
 
     let activeExceptionStaffId = null, activeExceptionStaffName = null, activeExceptionDate = null;
@@ -1051,7 +1137,11 @@
     Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim() || '#a1a1aa';
     Chart.defaults.font.family = "'Inter', sans-serif";
 
-    
+    // Toggle Filters Drawer
+    document.getElementById('toggle-filter-btn').addEventListener('click', () => {
+        const drawer = document.getElementById('master-filter-section');
+        drawer.classList.toggle('collapsed');
+    });
 
     const toLocalISO = (d) => {
         const year = d.getFullYear();
@@ -1066,7 +1156,6 @@
         return `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
     }
 
-    // Helper functions to get UUIDs from objects dynamically or fallback to strings
     function getStaffId(log) {
         if (log.staff_id) return log.staff_id;
         const s = dbStaff.find(s => s.name === log.employee_name);
@@ -1136,19 +1225,84 @@
       }, 3000);
     }
 
-    document.getElementById('theme-toggle').addEventListener('click', () => {
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
       const isLight = document.documentElement.classList.toggle('light-theme');
       localStorage.setItem('rj_theme', isLight ? 'light' : 'dark');
       document.getElementById('flatpickr-theme').href = isLight ? 'https://npmcdn.com/flatpickr/dist/themes/light.css' : 'https://npmcdn.com/flatpickr/dist/themes/dark.css';
       Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim();
-      renderAnalysisDashboard();
+      if (typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
     });
 
-    document.getElementById('save-settings-btn').addEventListener('click', () => {
-      const sync = document.getElementById('sync-toggle').checked;
-      localStorage.setItem('rj_settings', JSON.stringify({ sync }));
-      showToast("Layout/Sync settings saved!", "success");
-    });
+    // --- ADVANCED THEME CUSTOMIZER (SAFE MODE) ---
+    try {
+        const themeModal = document.getElementById('theme-modal');
+        const colorInputs = document.querySelectorAll('.theme-color-input');
+        const btnOpenTheme = document.getElementById('btn-open-theme');
+        const btnCloseTheme = document.getElementById('btn-close-theme');
+        const btnResetTheme = document.getElementById('btn-reset-theme');
+        
+        window.hexToRgba = window.hexToRgba || function(hex, alpha) {
+            if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex)) return hex;
+            let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+
+        function applySavedTheme() {
+            const savedTheme = JSON.parse(localStorage.getItem('rj_advanced_theme') || '{}');
+            colorInputs.forEach(input => {
+                const varName = input.getAttribute('data-var');
+                if (savedTheme[varName]) {
+                    input.value = savedTheme[varName];
+                    document.documentElement.style.setProperty(varName, savedTheme[varName]);
+                    if (varName === '--primary') {
+                        document.documentElement.style.setProperty('--primary-hover', savedTheme[varName]);
+                        document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(savedTheme[varName], 0.15));
+                    }
+                }
+            });
+        }
+        
+        applySavedTheme();
+
+        if (btnOpenTheme && themeModal) btnOpenTheme.addEventListener('click', () => themeModal.style.display = 'flex');
+        if (btnCloseTheme && themeModal) btnCloseTheme.addEventListener('click', () => themeModal.style.display = 'none');
+
+        colorInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const varName = e.target.getAttribute('data-var');
+                const newColor = e.target.value;
+                document.documentElement.style.setProperty(varName, newColor);
+                if (varName === '--primary') {
+                    document.documentElement.style.setProperty('--primary-hover', newColor);
+                    document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(newColor, 0.15));
+                }
+                const savedTheme = JSON.parse(localStorage.getItem('rj_advanced_theme') || '{}');
+                savedTheme[varName] = newColor;
+                localStorage.setItem('rj_advanced_theme', JSON.stringify(savedTheme));
+            });
+        });
+
+        if (btnResetTheme) {
+            btnResetTheme.addEventListener('click', () => {
+                localStorage.removeItem('rj_advanced_theme');
+                colorInputs.forEach(input => {
+                    const varName = input.getAttribute('data-var');
+                    document.documentElement.style.removeProperty(varName);
+                    if (varName === '--primary') {
+                        document.documentElement.style.removeProperty('--primary-hover');
+                        document.documentElement.style.removeProperty('--primary-alpha');
+                    }
+                });
+                showToast("Theme reset. Reloading page...", "primary");
+                setTimeout(() => location.reload(), 1000);
+            });
+        }
+    } catch (err) {
+        console.error("Theme Customizer setup failed:", err);
+    }
+    // --- END SAFE THEME LOGIC ---
+
+    
 
     let lastSyncTime = 0;
     
@@ -1161,7 +1315,7 @@
     }
 
     function setupRealtimeSync() {
-      const isSyncOn = document.getElementById('sync-toggle').checked;
+      const isSyncOn = document.getElementById('sync-toggle')?.checked;
       if (isSyncOn && !realtimeSubscription) {
         realtimeSubscription = supabaseClient
           .channel('public:attendance_logs')
@@ -1180,51 +1334,69 @@
         realtimeSubscription = null;
       }
     }
-    document.getElementById('sync-toggle').addEventListener('change', setupRealtimeSync);
+    
+    const syncToggle = document.getElementById('sync-toggle');
+    if(syncToggle) {
+        syncToggle.addEventListener('change', (e) => {
+            setupRealtimeSync();
+            localStorage.setItem('rj_settings', JSON.stringify({ sync: e.target.checked }));
+            showToast(e.target.checked ? "Auto-Sync Enabled & Saved" : "Auto-Sync Disabled & Saved", "success");
+        });
+    }
 
-    document.getElementById('sched-reason').addEventListener('change', (e) => {
+    document.getElementById('sched-reason')?.addEventListener('change', (e) => {
       document.getElementById('sched-reason-custom').style.display = e.target.value === 'Custom' ? 'block' : 'none';
     });
-    document.getElementById('exc-reason').addEventListener('change', (e) => {
+    document.getElementById('exc-reason')?.addEventListener('change', (e) => {
       document.getElementById('exc-reason-custom').style.display = e.target.value === 'Custom' ? 'block' : 'none';
     });
 
-    Sortable.create(document.getElementById('draggable-widgets'), {
-      handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
-      store: {
-        get: (s) => { const order = localStorage.getItem('rj_widget_order'); return order ? order.split('|') : []; },
-        set: (s) => { localStorage.setItem('rj_widget_order', s.toArray().join('|')); }
-      }
-    });
+    const dragWidgets = document.getElementById('draggable-widgets');
+    if (dragWidgets) {
+        Sortable.create(dragWidgets, {
+          handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
+          store: {
+            get: (s) => { const order = localStorage.getItem('rj_widget_order'); return order ? order.split('|') : []; },
+            set: (s) => { localStorage.setItem('rj_widget_order', s.toArray().join('|')); }
+          }
+        });
+    }
     
-    document.getElementById('reset-layout-btn').addEventListener('click', () => { 
+    document.getElementById('reset-layout-btn')?.addEventListener('click', () => { 
       localStorage.removeItem('rj_widget_order'); location.reload(); 
     });
 
+    // Main Tab Switcher Logic
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
         document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
         
+        // Update Page Title
+        const titleEl = document.getElementById('page-title');
+        if (titleEl) titleEl.innerText = e.currentTarget.querySelector('.tab-btn-text').innerText;
+        
         const viewId = e.currentTarget.getAttribute('data-view');
-        document.getElementById(viewId).style.display = 'block';
+        const viewEl = document.getElementById(viewId);
+        if (viewEl) viewEl.style.display = 'block';
         
         const exportBtn = document.getElementById('export-dropdown');
-        if (viewId === 'view-overview' || viewId === 'view-stats') {
-            exportBtn.style.display = 'inline-block';
-        } else {
-            exportBtn.style.display = 'none';
+        if (exportBtn) {
+            if (viewId === 'view-logs' || viewId === 'view-stats') {
+                exportBtn.style.display = 'inline-block';
+            } else {
+                exportBtn.style.display = 'none';
+            }
         }
         
-        if (viewId === 'view-overview') {
-            if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
-        }
-        if (viewId === 'view-live') renderLiveBranches();
-        if (viewId === 'view-matrix') generateMatrix();
-        if (viewId === 'view-settings') loadSettingsData();
-        if (viewId === 'view-stats') renderStaffStats();
-        if (viewId === 'view-analysis') renderAnalysisDashboard();
+        if (viewId === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard(); 
+        if (viewId === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
+        if (viewId === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
+        if (viewId === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
+        if (viewId === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
+        if ((viewId === 'view-settings-hr' || viewId === 'view-settings-org') && typeof loadSettingsData === 'function') loadSettingsData();
+        if (viewId === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
       });
     });
 
@@ -1234,39 +1406,22 @@
           document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
           e.target.classList.add('active');
           currentActionTab = e.target.getAttribute('data-action-filter');
-          renderAbsentTable();
+          if (typeof renderAbsentTable === 'function') renderAbsentTable();
       });
     });
 
-    document.getElementById('toggle-pending-photos').addEventListener('change', (e) => {
+    document.getElementById('toggle-pending-photos')?.addEventListener('change', (e) => {
         showOnlyPendingPhotos = e.target.checked;
-        renderAuditGallery();
+        if (typeof renderAuditGallery === 'function') renderAuditGallery();
     });
 
-    document.querySelectorAll('#view-overview .sub-tab-btn').forEach(btn => {
+    // Master Logs sub-tabs
+    document.querySelectorAll('#view-logs .sub-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        document.querySelectorAll('#view-overview .sub-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#view-logs .sub-tab-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         activeSubTab = e.target.getAttribute('data-filter');
-        
-        const galleryFilters = document.getElementById('gallery-filters');
-        
-        if (activeSubTab === 'gallery') {
-            document.getElementById('master-table-container').style.display = 'none';
-            document.getElementById('audit-gallery-container').style.display = 'block';
-            galleryFilters.style.display = 'flex';
-            
-            showOnlyPendingPhotos = true;
-            document.getElementById('toggle-pending-photos').checked = true;
-            
-            renderAuditGallery();
-        } else {
-            document.getElementById('master-table-container').style.display = 'block';
-            document.getElementById('audit-gallery-container').style.display = 'none';
-            galleryFilters.style.display = 'none';
-            
-            renderMasterTable(); 
-        }
+        if (typeof renderMasterTable === 'function') renderMasterTable();
       });
     });
 
@@ -1284,14 +1439,14 @@
         }
     }
 
-    document.getElementById('export-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('export-menu'); });
-    document.getElementById('staff-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('staff-dropdown-box'); });
-    document.getElementById('branch-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('branch-dropdown-box'); });
-    document.getElementById('role-filter-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('role-dropdown-box'); });
+    document.getElementById('export-btn')?.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('export-menu'); });
+    document.getElementById('staff-filter-btn')?.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('staff-dropdown-box'); });
+    document.getElementById('branch-filter-btn')?.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('branch-dropdown-box'); });
+    document.getElementById('role-filter-btn')?.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown('role-dropdown-box'); });
     
-    document.getElementById('staff-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
-    document.getElementById('branch-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); }); 
-    document.getElementById('role-dropdown-box').addEventListener('click', (e) => { e.stopPropagation(); });
+    document.getElementById('staff-dropdown-box')?.addEventListener('click', (e) => { e.stopPropagation(); }); 
+    document.getElementById('branch-dropdown-box')?.addEventListener('click', (e) => { e.stopPropagation(); }); 
+    document.getElementById('role-dropdown-box')?.addEventListener('click', (e) => { e.stopPropagation(); });
     
     window.addEventListener('click', (e) => { 
       const isDropdownClick = e.target.closest('.dropdown') || e.target.closest('.dropdown-content');
@@ -1302,7 +1457,6 @@
     todayEndLimit.setHours(23, 59, 59, 999);
     let safeMaxDate = new Date() < minLaunchDate ? null : todayEndLimit;
 
-    // QUICK DATE BUTTONS LOGIC
     document.querySelectorAll('.quick-date-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
@@ -1314,7 +1468,6 @@
             let newEnd = new Date();
             
             if (range === 'today') {
-                // defaults to today
             } else if (range === 'yesterday') {
                 newStart.setDate(today.getDate() - 1);
                 newEnd.setDate(today.getDate() - 1);
@@ -1336,14 +1489,15 @@
             startDate = newStart;
             endDate = newEnd;
             
-            startPicker.setDate(startDate);
-            endPicker.setDate(endDate);
+            if(startPicker) startPicker.setDate(startDate);
+            if(endPicker) endPicker.setDate(endDate);
             
-            fetchLogsFromDatabase(false);
+            if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false);
         });
     });
 
-    const startPicker = flatpickr("#global-start", { 
+    const startPickerEl = document.getElementById("global-start");
+    const startPicker = startPickerEl ? flatpickr(startPickerEl, { 
         defaultDate: startDate, 
         minDate: "2026-07-20", 
         maxDate: safeMaxDate,
@@ -1354,12 +1508,13 @@
             if(dates[0]) { 
                 startDate = dates[0]; 
                 document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
-                fetchLogsFromDatabase(false); 
+                if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false); 
             } 
         } 
-    });
+    }) : null;
     
-    const endPicker = flatpickr("#global-end", { 
+    const endPickerEl = document.getElementById("global-end");
+    const endPicker = endPickerEl ? flatpickr(endPickerEl, { 
         defaultDate: endDate, 
         minDate: "2026-07-20", 
         maxDate: safeMaxDate,
@@ -1370,21 +1525,21 @@
             if(dates[0]) { 
                 endDate = dates[0]; 
                 document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
-                fetchLogsFromDatabase(false); 
+                if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false); 
             } 
         } 
-    });
+    }) : null;
 
-    const schedStartFP = flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
-    const schedEndFP = flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    if (document.getElementById("sched-start")) flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    if (document.getElementById("sched-end")) flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     
-    document.getElementById('filter-in-start').addEventListener('change', processStitchedData);
-    document.getElementById('filter-in-end').addEventListener('change', processStitchedData);
-    document.getElementById('filter-out-start').addEventListener('change', processStitchedData);
-    document.getElementById('filter-out-end').addEventListener('change', processStitchedData);
+    document.getElementById('filter-in-start')?.addEventListener('change', processStitchedData);
+    document.getElementById('filter-in-end')?.addEventListener('change', processStitchedData);
+    document.getElementById('filter-out-start')?.addEventListener('change', processStitchedData);
+    document.getElementById('filter-out-end')?.addEventListener('change', processStitchedData);
 
-    document.getElementById('prev-page-btn').addEventListener('click', () => { if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); } });
-    document.getElementById('next-page-btn').addEventListener('click', () => { if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); } });
+    document.getElementById('prev-page-btn')?.addEventListener('click', () => { if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); } });
+    document.getElementById('next-page-btn')?.addEventListener('click', () => { if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); } });
 
     async function checkUser() {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1394,55 +1549,74 @@
 
     async function handleAuthChange(user) {
       const loader = document.getElementById('global-loader');
-      loader.style.display = 'none';
+      if (loader) loader.style.display = 'none';
 
       if (user) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+        const loginScreen = document.getElementById('login-screen');
+        const dashScreen = document.getElementById('dashboard');
+        
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (dashScreen) dashScreen.style.display = 'block';
         
         if (!isAppInitialized) {
           isAppInitialized = true;
-          loader.style.display = 'flex';
+          if (loader) loader.style.display = 'flex';
           try {
-              await initialMetadataLoad();
-              setupRealtimeSync();
+              if (typeof initialMetadataLoad === 'function') await initialMetadataLoad();
+              if (typeof setupRealtimeSync === 'function') setupRealtimeSync();
           } catch (err) {
               console.error("Data Initialization Error:", err);
               showToast("Failed to load some data. Refresh page.", "error");
           } finally {
-              loader.style.display = 'none'; 
+              if (loader) loader.style.display = 'none'; 
           }
         }
       } else {
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('dashboard').style.display = 'none';
+        const loginScreen = document.getElementById('login-screen');
+        const dashScreen = document.getElementById('dashboard');
+        
+        if (loginScreen) loginScreen.style.display = 'flex';
+        if (dashScreen) dashScreen.style.display = 'none';
         isAppInitialized = false;
       }
     }
 
     checkUser();
 
-    document.getElementById('login-btn').addEventListener('click', async () => {
+    document.getElementById('login-btn')?.addEventListener('click', async () => {
       const btn = document.getElementById('login-btn');
       const errorMsg = document.getElementById('error-msg');
       const loader = document.getElementById('global-loader');
-      errorMsg.style.display = 'none'; btn.disabled = true; btn.innerText = "Authenticating..."; loader.style.display = 'flex';
+      
+      if(errorMsg) errorMsg.style.display = 'none'; 
+      if(btn) { btn.disabled = true; btn.innerText = "Authenticating..."; }
+      if(loader) loader.style.display = 'flex';
 
-      const email = document.getElementById('email-input').value.trim();
-      const password = document.getElementById('password-input').value;
+      const email = document.getElementById('email-input')?.value.trim();
+      const password = document.getElementById('password-input')?.value;
       if (!email || !password) {
-        loader.style.display = 'none'; errorMsg.style.display = 'block'; errorMsg.innerText = "Please enter both Email and Password."; btn.disabled = false; btn.innerText = "Log In to Dashboard"; return;
+        if(loader) loader.style.display = 'none'; 
+        if(errorMsg) { errorMsg.style.display = 'block'; errorMsg.innerText = "Please enter both Email and Password."; }
+        if(btn) { btn.disabled = false; btn.innerText = "Log In"; }
+        return;
       }
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) {
-        loader.style.display = 'none'; errorMsg.style.display = 'block'; errorMsg.innerText = error.message; btn.disabled = false; btn.innerText = "Log In to Dashboard";
+        if(loader) loader.style.display = 'none'; 
+        if(errorMsg) { errorMsg.style.display = 'block'; errorMsg.innerText = error.message; }
+        if(btn) { btn.disabled = false; btn.innerText = "Log In"; }
       }
     });
 
-    document.getElementById('logout-btn').addEventListener('click', async () => { document.getElementById('global-loader').style.display = 'flex'; await supabaseClient.auth.signOut(); });
+    document.getElementById('logout-btn')?.addEventListener('click', async () => { 
+        const loader = document.getElementById('global-loader');
+        if(loader) loader.style.display = 'flex'; 
+        await supabaseClient.auth.signOut(); 
+    });
 
     async function initialMetadataLoad() {
-      document.getElementById('loader-msg').innerText = "Loading Metadata & Purging Photos...";
+      const loaderMsg = document.getElementById('loader-msg');
+      if(loaderMsg) loaderMsg.innerText = "Loading Metadata & Purging Photos...";
       await executeLazyPhotoDelete();
 
       try {
@@ -1452,8 +1626,9 @@
               globalShiftEnd = data.setting_value.end || "19:00";
           }
       } catch(e) {}
-      document.getElementById('global-shift-start').value = globalShiftStart;
-      document.getElementById('global-shift-end').value = globalShiftEnd;
+      
+      if(document.getElementById('global-shift-start')) document.getElementById('global-shift-start').value = globalShiftStart;
+      if(document.getElementById('global-shift-end')) document.getElementById('global-shift-end').value = globalShiftEnd;
       
       try {
           const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
@@ -1484,7 +1659,6 @@
           dbBranches.forEach(b => branchMap[b.id] = b);
       } catch (err) {}
 
-      // Default selection (All UUIDs)
       selectedStaffIds = new Set(dbStaff.map(s => s.id));
       selectedBranchIds = new Set(dbBranches.map(b => b.id));
       selectedRoleIds = new Set(dbRoles.map(r => r.id));
@@ -1492,14 +1666,15 @@
       populateRoleDropdowns(); 
       
       const schedSelect = document.getElementById('sched-staff');
-      schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      if (schedSelect) schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
       renderStaffFilterCheckboxes();
       renderBranchFilterCheckboxes();
       renderRoleFilterCheckboxes();
 
       const savedSettings = JSON.parse(localStorage.getItem('rj_settings') || '{}');
-      if (savedSettings.sync !== undefined) document.getElementById('sync-toggle').checked = savedSettings.sync;
+      const syncToggle = document.getElementById('sync-toggle');
+      if (savedSettings.sync !== undefined && syncToggle) syncToggle.checked = savedSettings.sync;
 
       loadFromCache();
       await fetchLogsFromDatabase();
@@ -1507,14 +1682,18 @@
     
     function populateRoleDropdowns() {
         const opts = '<option value="">-- Select Role --</option>' + dbRoles.map(r => `<option value="${r.id}">${r.role_name}</option>`).join('');
-        document.getElementById('new-staff-role').innerHTML = opts;
-        document.getElementById('edit-staff-role').innerHTML = opts;
+        const newStaffRole = document.getElementById('new-staff-role');
+        const editStaffRole = document.getElementById('edit-staff-role');
+        if(newStaffRole) newStaffRole.innerHTML = opts;
+        if(editStaffRole) editStaffRole.innerHTML = opts;
     }
 
     function populateReasonDropdowns() {
         const opts = dbReasons.map(r => `<option value="${r.id}">${r.reason_name}</option>`).join('') + '<option value="Custom" style="font-weight:bold; color:var(--primary);">-- Type Custom Reason --</option>';
-        document.getElementById('sched-reason').innerHTML = opts;
-        document.getElementById('exc-reason').innerHTML = opts;
+        const schedReason = document.getElementById('sched-reason');
+        const excReason = document.getElementById('exc-reason');
+        if(schedReason) schedReason.innerHTML = opts;
+        if(excReason) excReason.innerHTML = opts;
     }
 
     function loadFromCache() {
@@ -1531,7 +1710,7 @@
 
     async function executeLazyPhotoDelete() {
       const cutoffDate = new Date(); 
-      cutoffDate.setDate(cutoffDate.getDate() - 3); // Changed from 7 to 3 Days
+      cutoffDate.setDate(cutoffDate.getDate() - 3);
       
       try {
         await supabaseClient.from('attendance_logs')
@@ -1543,6 +1722,7 @@
 
     function renderRoleFilterCheckboxes() {
       const container = document.getElementById('role-checkboxes');
+      if(!container) return;
       container.innerHTML = dbRoles.map(r => `<label class="check-wrap"><input type="checkbox" class="role-cb" value="${r.id}" ${selectedRoleIds.has(r.id) ? "checked" : ""}> <span>${r.role_name}</span></label>`).join('');
       
       document.querySelectorAll('.role-cb').forEach(cb => {
@@ -1552,11 +1732,11 @@
         });
       });
       
-      document.getElementById('btn-select-all-roles').addEventListener('click', () => {
+      document.getElementById('btn-select-all-roles')?.addEventListener('click', () => {
         document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedRoleIds.add(cb.value); } }); 
         updateRoleButtonText(); processStitchedData(); 
       });
-      document.getElementById('btn-deselect-all-roles').addEventListener('click', () => {
+      document.getElementById('btn-deselect-all-roles')?.addEventListener('click', () => {
         document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedRoleIds.delete(cb.value); } }); 
         updateRoleButtonText(); processStitchedData(); 
       });
@@ -1565,11 +1745,12 @@
     
     function updateRoleButtonText() {
       const btn = document.getElementById('role-btn-text');
+      if(!btn) return;
       if(selectedRoleIds.size === dbRoles.length && dbRoles.length > 0) btn.innerText = "All Roles";
       else btn.innerText = `${selectedRoleIds.size} Selected`;
     }
 
-    document.getElementById('role-search').addEventListener('input', (e) => {
+    document.getElementById('role-search')?.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       document.querySelectorAll('.role-cb').forEach(cb => { 
         const nameText = cb.nextElementSibling.innerText.toLowerCase();
@@ -1579,6 +1760,7 @@
 
     function renderStaffFilterCheckboxes() {
       const container = document.getElementById('staff-checkboxes');
+      if(!container) return;
       container.innerHTML = dbStaff.map(s => `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${s.id}" ${selectedStaffIds.has(s.id) ? "checked" : ""}> <span>${s.name}</span></label>`).join('');
       
       document.querySelectorAll('.staff-cb').forEach(cb => {
@@ -1588,11 +1770,11 @@
         });
       });
       
-      document.getElementById('btn-select-all').addEventListener('click', () => {
+      document.getElementById('btn-select-all')?.addEventListener('click', () => {
         document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaffIds.add(cb.value); } }); 
         updateStaffButtonText(); processStitchedData(); 
       });
-      document.getElementById('btn-deselect-all').addEventListener('click', () => {
+      document.getElementById('btn-deselect-all')?.addEventListener('click', () => {
         document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaffIds.delete(cb.value); } }); 
         updateStaffButtonText(); processStitchedData(); 
       });
@@ -1601,10 +1783,12 @@
 
     function updateStaffButtonText() {
       const btn = document.getElementById('staff-btn-text');
+      if(!btn) return;
       if(selectedStaffIds.size === dbStaff.length && dbStaff.length > 0) btn.innerText = "All Staff Selected";
       else btn.innerText = `${selectedStaffIds.size} Selected`;
     }
-    document.getElementById('staff-search').addEventListener('input', (e) => {
+    
+    document.getElementById('staff-search')?.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       document.querySelectorAll('.staff-cb').forEach(cb => { 
         const nameText = cb.nextElementSibling.innerText.toLowerCase();
@@ -1614,6 +1798,7 @@
 
     function renderBranchFilterCheckboxes() {
       const container = document.getElementById('branch-checkboxes');
+      if(!container) return;
       container.innerHTML = dbBranches.map(b => `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${b.id}" ${selectedBranchIds.has(b.id) ? "checked" : ""}> <span>${b.branch_name}</span></label>`).join('');
       
       document.querySelectorAll('.branch-cb').forEach(cb => {
@@ -1623,11 +1808,11 @@
         });
       });
       
-      document.getElementById('btn-select-all-branches').addEventListener('click', () => {
+      document.getElementById('btn-select-all-branches')?.addEventListener('click', () => {
         document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranchIds.add(cb.value); } }); 
         updateBranchButtonText(); processStitchedData(); 
       });
-      document.getElementById('btn-deselect-all-branches').addEventListener('click', () => {
+      document.getElementById('btn-deselect-all-branches')?.addEventListener('click', () => {
         document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranchIds.delete(cb.value); } }); 
         updateBranchButtonText(); processStitchedData(); 
       });
@@ -1636,10 +1821,12 @@
 
     function updateBranchButtonText() {
       const btn = document.getElementById('branch-btn-text');
+      if(!btn) return;
       if(selectedBranchIds.size === dbBranches.length && dbBranches.length > 0) btn.innerText = "All Branches Selected";
       else btn.innerText = `${selectedBranchIds.size} Selected`;
     }
-    document.getElementById('branch-search').addEventListener('input', (e) => {
+    
+    document.getElementById('branch-search')?.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       document.querySelectorAll('.branch-cb').forEach(cb => { 
         const nameText = cb.nextElementSibling.innerText.toLowerCase();
@@ -1648,7 +1835,9 @@
     });
 
     async function fetchLogsFromDatabase(keepPage = false) {
-      document.getElementById('master-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">Fetching records from Database...</td></tr>';
+      const masterTbody = document.getElementById('master-tbody');
+      if (masterTbody) masterTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">Fetching records from Database...</td></tr>';
+      
       if (!keepPage) currentPage = 0; 
       
       let sDate = new Date(startDate);
@@ -1668,9 +1857,14 @@
       totalRecords = count || 0;
 
       const totalPages = Math.ceil(totalRecords / pageSize) || 1;
-      document.getElementById('page-indicator').innerText = `Page ${currentPage + 1} of ${totalPages}`;
-      document.getElementById('prev-page-btn').disabled = currentPage === 0;
-      document.getElementById('next-page-btn').disabled = (currentPage + 1) * pageSize >= totalRecords;
+      const pageIndicator = document.getElementById('page-indicator');
+      if(pageIndicator) pageIndicator.innerText = `Page ${currentPage + 1} of ${totalPages}`;
+      
+      const prevBtn = document.getElementById('prev-page-btn');
+      if(prevBtn) prevBtn.disabled = currentPage === 0;
+      
+      const nextBtn = document.getElementById('next-page-btn');
+      if(nextBtn) nextBtn.disabled = (currentPage + 1) * pageSize >= totalRecords;
 
       const { data: excData } = await supabaseClient
         .from('attendance_exceptions').select('*')
@@ -1678,9 +1872,8 @@
         
       exceptionsData = {};
       (excData || []).forEach(e => { 
-          // Build keys dynamically considering legacy string formats or UUID formats
           const sId = e.staff_id || e.employee_name; 
-          const type = e.exception_type || 'Absent'; // Fallback if column missing
+          const type = e.exception_type || 'Absent'; 
           exceptionsData[`${sId}_${e.date}_${type}`] = e;
       });
 
@@ -1728,10 +1921,15 @@
       const dateArray = getDatesArrayFromFetchedLogs(); 
       const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
       
-      let inStartStr = document.getElementById('filter-in-start').value;
-      let inEndStr = document.getElementById('filter-in-end').value;
-      let outStartStr = document.getElementById('filter-out-start').value;
-      let outEndStr = document.getElementById('filter-out-end').value;
+      const inStartEl = document.getElementById('filter-in-start');
+      const inEndEl = document.getElementById('filter-in-end');
+      const outStartEl = document.getElementById('filter-out-start');
+      const outEndEl = document.getElementById('filter-out-end');
+
+      let inStartStr = inStartEl ? inStartEl.value : '';
+      let inEndStr = inEndEl ? inEndEl.value : '';
+      let outStartStr = outStartEl ? outStartEl.value : '';
+      let outEndStr = outEndEl ? outEndEl.value : '';
       
       let inMinStart = timeToMinutes(inStartStr) || 0; let inMinEnd = timeToMinutes(inEndStr) || 1440;
       let outMinStart = timeToMinutes(outStartStr) || 0; let outMinEnd = timeToMinutes(outEndStr) || 1440;
@@ -1764,9 +1962,8 @@
           let roleId = roleObj ? roleObj.id : null;
           let roleName = roleObj ? roleObj.role_name : (staff.role || 'Unassigned');
 
-          // Role Filter check
           if (roleId && !selectedRoleIds.has(roleId)) return;
-          if (!roleId && selectedRoleIds.size < dbRoles.length) return; // Hide unassigned if filtering
+          if (!roleId && selectedRoleIds.size < dbRoles.length) return; 
 
           let dailyLogs = dbLogs.filter(log => {
               const logStaffId = getStaffId(log);
@@ -1783,7 +1980,6 @@
             dailyLogs = dailyLogs.filter(l => selectedBranchIds.has(getBranchId(l)));
           }
           
-          // Grab specific exception types for this date/staff
           const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
           const excLate = exceptionsData[`${staff.id}_${isoDateStr}_Late Arrival`] || exceptionsData[`${staff.name}_${isoDateStr}_Late Arrival`];
           const excEarly = exceptionsData[`${staff.id}_${isoDateStr}_Early Departure`] || exceptionsData[`${staff.name}_${isoDateStr}_Early Departure`];
@@ -1795,7 +1991,6 @@
             
             let workMs = 0, travelMs = 0, currentState = 'out', lastTime = null;
 
-            // NEW: Fetch all photos for this shift
             let photoLogs = dailyLogs.filter(l => l.photo_capture).map(l => ({
                 id: l.id,
                 action: l.action,
@@ -1874,7 +2069,6 @@
               }
             }
             
-            // Build the route logic
             let branchesSet = [];
             dailyLogs.forEach(l => {
                 let bName = branchMap[getBranchId(l)]?.branch_name || l.branch;
@@ -1891,7 +2085,7 @@
               branches: branchDisplayNames,
               excAbsent: excAbsent, excLate: excLate, excEarly: excEarly,
               firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
-              photoLogs: photoLogs // New property to pass all photos to UI
+              photoLogs: photoLogs
             });
             
             if(firstInTime) {
@@ -1910,7 +2104,6 @@
                 if(isLateArrival && !excLate) staffStatsTracker[staff.id].lateCount++;
                 if(isEarlyOut && !excEarly) staffStatsTracker[staff.id].earlyCount++;
                 
-                // Track missing uniform dynamically across all photos
                 let missedShirtToday = photoLogs.some(pl => pl.reviewed && !pl.uTshirt);
                 let missedIdToday = photoLogs.some(pl => pl.reviewed && !pl.uIdcard);
 
@@ -1929,10 +2122,15 @@
       processedData.sort((a,b) => b.date - a.date); missingData.sort((a,b) => b.date - a.date);
       statsData = Object.values(staffStatsTracker).filter(s => s.daysPresent > 0 || exceptionsData[`${s.id}_${toLocalISO(startDate)}_Absent`]);
 
-      document.getElementById('metric-present').innerText = totalPresent;
-      document.getElementById('metric-late').innerText = totalLate;
-      document.getElementById('metric-early').innerText = totalEarlyDepartures;
-      document.getElementById('metric-absent').innerText = totalMissing;
+      const elPresent = document.getElementById('metric-present');
+      const elLate = document.getElementById('metric-late');
+      const elEarly = document.getElementById('metric-early');
+      const elAbsent = document.getElementById('metric-absent');
+      
+      if(elPresent) elPresent.innerText = totalPresent;
+      if(elLate) elLate.innerText = totalLate;
+      if(elEarly) elEarly.innerText = totalEarlyDepartures;
+      if(elAbsent) elAbsent.innerText = totalMissing;
 
       let unexcusedCount = 0;
       missingData.forEach(row => { 
@@ -1943,20 +2141,30 @@
           if (row.isEarly && !row.excEarly) unexcusedCount++;
       });
       const badge = document.getElementById('absent-badge');
-      if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
-
-      if (document.getElementById('view-overview').style.display !== 'none') {
-          if(activeSubTab === 'gallery') renderAuditGallery(); else renderMasterTable();
+      if(badge) {
+          if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
       }
-      if (document.getElementById('view-live').style.display !== 'none') renderLiveBranches();
-      renderAbsentTable();
-      if (document.getElementById('view-matrix').style.display !== 'none') generateMatrix();
-      if (document.getElementById('view-stats').style.display !== 'none') renderStaffStats();
-      if (document.getElementById('view-analysis').style.display !== 'none') renderAnalysisDashboard();
+
+      const vDash = document.getElementById('view-dashboard');
+      const vLogs = document.getElementById('view-logs');
+      const vAudits = document.getElementById('view-audits');
+      const vLive = document.getElementById('view-live');
+      const vAction = document.getElementById('view-action');
+      const vMatrix = document.getElementById('view-matrix');
+      const vStats = document.getElementById('view-stats');
+      
+      if (vDash && vDash.style.display !== 'none' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
+      if (vLogs && vLogs.style.display !== 'none' && typeof renderMasterTable === 'function') renderMasterTable();
+      if (vAudits && vAudits.style.display !== 'none' && typeof renderAuditGallery === 'function') renderAuditGallery();
+      if (vLive && vLive.style.display !== 'none' && typeof renderLiveBranches === 'function') renderLiveBranches();
+      if (vAction && vAction.style.display !== 'none' && typeof renderAbsentTable === 'function') renderAbsentTable();
+      if (vMatrix && vMatrix.style.display !== 'none' && typeof generateMatrix === 'function') generateMatrix();
+      if (vStats && vStats.style.display !== 'none' && typeof renderStaffStats === 'function') renderStaffStats();
     }
 
     function renderMasterTable() {
       const tbody = document.getElementById('master-tbody');
+      if(!tbody) return;
       let dataToRender = processedData;
       
       const todayStr = new Date().toDateString();
@@ -1999,7 +2207,6 @@
             actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', 'Early Departure')">Manage Reason (Early)</a>`;
         }
         
-        // --- NEW: RENDER ALL PHOTOS FOR THE DAY ---
         let photosHTML = `<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">`;
         if (!row.photoLogs || row.photoLogs.length === 0) {
             photosHTML += `<span class="badge bg-gray">Archived / Missing</span>`;
@@ -2060,6 +2267,7 @@
 
     function renderLiveBranches() {
         const grid = document.getElementById('live-branch-grid');
+        if(!grid) return;
         const todayStr = new Date().toDateString();
         
         const todayLogs = dbLogs.filter(l => new Date(l.timestamp).toDateString() === todayStr);
@@ -2152,7 +2360,7 @@
                 const displayName = sObj ? sObj.name : log.employee_name;
                 
                 const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
-                const imgSrc = log.photo_capture || 'https://via.placeholder.com/50x50/1e293b/f8fafc?text=?';
+                const imgSrc = log.photo_capture || 'https://via.placeholder.com/50x50/18181b/f8fafc?text=?';
                 
                 const timeLabel = branchId === 'transit' ? 'Started Travel' : 'In Since';
 
@@ -2198,9 +2406,9 @@
       document.getElementById('edit-time-modal').style.display = 'flex';
     }
 
-    document.getElementById('btn-cancel-edit-time').addEventListener('click', () => { document.getElementById('edit-time-modal').style.display = 'none'; });
+    document.getElementById('btn-cancel-edit-time')?.addEventListener('click', () => { document.getElementById('edit-time-modal').style.display = 'none'; });
     
-    document.getElementById('btn-save-edit-time').addEventListener('click', async () => {
+    document.getElementById('btn-save-edit-time')?.addEventListener('click', async () => {
        const inVal = document.getElementById('edit-time-in').value;
        const outVal = document.getElementById('edit-time-out').value;
        const btn = document.getElementById('btn-save-edit-time');
@@ -2234,6 +2442,7 @@
 
     function renderAuditGallery() {
         const grid = document.getElementById('audit-grid');
+        if(!grid) return;
         let cardsHtml = '';
         let photoCount = 0;
 
@@ -2278,7 +2487,6 @@
                 `;
             };
 
-            // Loop over ALL photos for the day
             if (r.photoLogs && r.photoLogs.length > 0) {
                 r.photoLogs.forEach(pl => {
                     let typeBadge = '';
@@ -2341,6 +2549,7 @@
 
     function renderStaffStats() {
         const tbody = document.getElementById('stats-tbody');
+        if(!tbody) return;
         if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-soft);">No data available.</td></tr>'; return; }
         
         tbody.innerHTML = statsData.map(s => {
@@ -2397,18 +2606,21 @@
         const absentCounts = trendDates.map(d => missingData.filter(r => toLocalISO(r.date) === d).length);
         const excCounts = trendDates.map(d => processedData.filter(r => toLocalISO(r.date) === d && (r.excAbsent || r.excLate || r.excEarly)).length);
 
-        if(window.myCharts['trend']) window.myCharts['trend'].destroy();
-        window.myCharts['trend'] = new Chart(document.getElementById('trendChart'), {
-            type: 'line',
-            data: { labels: trendDates.map(d => new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})), 
-                    datasets: [
-                        { label: 'Present', data: presentCounts, borderColor: success, backgroundColor: success, tension: 0.3 },
-                        { label: 'Absent', data: absentCounts, borderColor: danger, backgroundColor: danger, tension: 0.3 },
-                        { label: 'Excused', data: excCounts, borderColor: warning, backgroundColor: warning, tension: 0.3 }
-                    ]
-            },
-            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-        });
+        const trendCanvas = document.getElementById('trendChart');
+        if(trendCanvas) {
+            if(window.myCharts['trend']) window.myCharts['trend'].destroy();
+            window.myCharts['trend'] = new Chart(trendCanvas, {
+                type: 'line',
+                data: { labels: trendDates.map(d => new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})), 
+                        datasets: [
+                            { label: 'Present', data: presentCounts, borderColor: success, backgroundColor: success, tension: 0.3 },
+                            { label: 'Absent', data: absentCounts, borderColor: danger, backgroundColor: danger, tension: 0.3 },
+                            { label: 'Excused', data: excCounts, borderColor: warning, backgroundColor: warning, tension: 0.3 }
+                        ]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
 
         let earlyOver1Hr = 0; let earlyWithin1Hr = 0; let lateArr = 0;
         processedData.forEach(r => {
@@ -2418,40 +2630,50 @@
             else if (r.diffFromTargetMs > 0) lateArr++;
         });
 
-        if(window.myCharts['arrival']) window.myCharts['arrival'].destroy();
-        window.myCharts['arrival'] = new Chart(document.getElementById('arrivalChart'), {
-            type: 'doughnut',
-            data: { labels: ['> 1 Hr Early', '0-1 Hr Early', 'Late (Unexcused)'], 
-                    datasets: [{ data: [earlyOver1Hr, earlyWithin1Hr, lateArr], backgroundColor: [primary, success, danger], borderWidth: 0 }]
-            },
-            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
-        });
+        const arrivalCanvas = document.getElementById('arrivalChart');
+        if(arrivalCanvas) {
+            if(window.myCharts['arrival']) window.myCharts['arrival'].destroy();
+            window.myCharts['arrival'] = new Chart(arrivalCanvas, {
+                type: 'doughnut',
+                data: { labels: ['> 1 Hr Early', '0-1 Hr Early', 'Late (Unexcused)'], 
+                        datasets: [{ data: [earlyOver1Hr, earlyWithin1Hr, lateArr], backgroundColor: [primary, success, danger], borderWidth: 0 }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+            });
+        }
 
         const lateStats = [...statsData].filter(s => s.lateCount > 0).sort((a,b) => b.lateCount - a.lateCount).slice(0, 5);
-        if(window.myCharts['late']) window.myCharts['late'].destroy();
-        window.myCharts['late'] = new Chart(document.getElementById('lateChart'), {
-            type: 'bar',
-            data: { labels: lateStats.map(s => s.name.split(' ')[0]), 
-                    datasets: [{ label: 'Unexcused Lates', data: lateStats.map(s => s.lateCount), backgroundColor: warning, borderRadius: 6 }]
-            },
-            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-        });
+        const lateCanvas = document.getElementById('lateChart');
+        if(lateCanvas) {
+            if(window.myCharts['late']) window.myCharts['late'].destroy();
+            window.myCharts['late'] = new Chart(lateCanvas, {
+                type: 'bar',
+                data: { labels: lateStats.map(s => s.name.split(' ')[0]), 
+                        datasets: [{ label: 'Unexcused Lates', data: lateStats.map(s => s.lateCount), backgroundColor: warning, borderRadius: 6 }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+        }
 
         const roleCounts = {};
         processedData.forEach(r => { if(r.firstIn) { roleCounts[r.role] = (roleCounts[r.role] || 0) + 1; } });
         
-        if(window.myCharts['role']) window.myCharts['role'].destroy();
-        window.myCharts['role'] = new Chart(document.getElementById('roleChart'), {
-            type: 'pie',
-            data: { labels: Object.keys(roleCounts), 
-                    datasets: [{ data: Object.values(roleCounts), backgroundColor: [primary, success, warning, '#8b5cf6', '#ec4899', '#14b8a6'], borderWidth: 0 }]
-            },
-            options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-        });
+        const roleCanvas = document.getElementById('roleChart');
+        if(roleCanvas) {
+            if(window.myCharts['role']) window.myCharts['role'].destroy();
+            window.myCharts['role'] = new Chart(roleCanvas, {
+                type: 'pie',
+                data: { labels: Object.keys(roleCounts), 
+                        datasets: [{ data: Object.values(roleCounts), backgroundColor: [primary, success, warning, '#8b5cf6', '#ec4899', '#14b8a6'], borderWidth: 0 }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
     }
 
     function renderAbsentTable() {
         const tbody = document.getElementById('absent-tbody');
+        if(!tbody) return;
         let dataToRender = [];
         let actionTypeStr = '';
 
@@ -2512,9 +2734,9 @@
       document.getElementById('exception-modal').style.display = 'flex';
     };
     
-    document.getElementById('btn-cancel-exc').addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
+    document.getElementById('btn-cancel-exc')?.addEventListener('click', () => { document.getElementById('exception-modal').style.display = 'none'; });
     
-    document.getElementById('btn-save-exc').addEventListener('click', async () => {
+    document.getElementById('btn-save-exc')?.addEventListener('click', async () => {
       let reasonId = document.getElementById('exc-reason').value;
       let customReason = '';
       if (reasonId === 'Custom') {
@@ -2529,7 +2751,7 @@
         let payload = { 
             date: activeExceptionDate, 
             staff_id: activeExceptionStaffId,
-            employee_name: activeExceptionStaffName, // String fallback for legacy compat
+            employee_name: activeExceptionStaffName, 
             exception_type: excType
         };
 
@@ -2551,15 +2773,15 @@
       finally { saveBtn.innerText = "Save Reason"; saveBtn.disabled = false; }
     });
 
-    document.getElementById('btn-open-schedule-leave').addEventListener('click', () => { 
+    document.getElementById('btn-open-schedule-leave')?.addEventListener('click', () => { 
         document.getElementById('sched-reason').value = dbReasons.length > 0 ? dbReasons[0].id : '';
         document.getElementById('sched-reason-custom').style.display = 'none';
         document.getElementById('sched-reason-custom').value = '';
         document.getElementById('schedule-leave-modal').style.display = 'flex'; 
     });
-    document.getElementById('btn-cancel-sched').addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'none'; });
+    document.getElementById('btn-cancel-sched')?.addEventListener('click', () => { document.getElementById('schedule-leave-modal').style.display = 'none'; });
     
-    document.getElementById('btn-save-sched').addEventListener('click', async () => {
+    document.getElementById('btn-save-sched')?.addEventListener('click', async () => {
        const staffId = document.getElementById('sched-staff').value;
        const dStart = document.getElementById('sched-start').value;
        const dEnd = document.getElementById('sched-end').value;
@@ -2585,10 +2807,10 @@
        while(curr <= end) {
            inserts.push({ 
                staff_id: staffId, 
-               employee_name: sName, // string fallback
+               employee_name: sName,
                date: toLocalISO(curr), 
                reason_id: reasonId === 'Custom' ? null : reasonId, 
-               reason: rName, // string fallback
+               reason: rName, 
                exception_type: 'Absent'
            });
            curr.setDate(curr.getDate() + 1);
@@ -2606,6 +2828,7 @@
     function generateMatrix() {
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
+      if(!headerRow || !tableBody) return;
       
       const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
       if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff selected.</td></tr>'; return; }
@@ -2703,7 +2926,7 @@
       }
     }
     
-    document.getElementById('save-global-shift-btn').addEventListener('click', async () => {
+    document.getElementById('save-global-shift-btn')?.addEventListener('click', async () => {
         const st = document.getElementById('global-shift-start').value;
         const en = document.getElementById('global-shift-end').value;
         if(st && en) {
@@ -2727,7 +2950,7 @@
         }
     });
 
-    document.getElementById('add-role-btn').addEventListener('click', async () => {
+    document.getElementById('add-role-btn')?.addEventListener('click', async () => {
       const roleName = document.getElementById('new-role-name').value.trim();
       let startVal = document.getElementById('new-role-start').value || null;
       let endVal = document.getElementById('new-role-end').value || null;
@@ -2760,9 +2983,9 @@
       document.getElementById('edit-role-modal').style.display = 'flex';
     };
     
-    document.getElementById('btn-cancel-edit-role').addEventListener('click', () => document.getElementById('edit-role-modal').style.display = 'none');
+    document.getElementById('btn-cancel-edit-role')?.addEventListener('click', () => document.getElementById('edit-role-modal').style.display = 'none');
     
-    document.getElementById('btn-save-edit-role').addEventListener('click', async () => {
+    document.getElementById('btn-save-edit-role')?.addEventListener('click', async () => {
       const id = document.getElementById('edit-role-id').value;
       const newName = document.getElementById('edit-role-name').value.trim();
       let startVal = document.getElementById('edit-role-start').value || null;
@@ -2793,7 +3016,7 @@
       if(confirm("Remove this role?")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
     };
 
-    document.getElementById('add-reason-btn').addEventListener('click', async () => {
+    document.getElementById('add-reason-btn')?.addEventListener('click', async () => {
         const name = document.getElementById('new-reason-name').value.trim();
         if(name) {
             const btn = document.getElementById('add-reason-btn'); btn.innerText = "Adding..."; btn.disabled = true;
@@ -2814,9 +3037,9 @@
         document.getElementById('edit-reason-modal').style.display = 'flex';
     };
 
-    document.getElementById('btn-cancel-edit-reason').addEventListener('click', () => document.getElementById('edit-reason-modal').style.display = 'none');
+    document.getElementById('btn-cancel-edit-reason')?.addEventListener('click', () => document.getElementById('edit-reason-modal').style.display = 'none');
 
-    document.getElementById('btn-save-edit-reason').addEventListener('click', async () => {
+    document.getElementById('btn-save-edit-reason')?.addEventListener('click', async () => {
         const id = document.getElementById('edit-reason-id').value;
         const newName = document.getElementById('edit-reason-name').value.trim();
         
@@ -2842,7 +3065,7 @@
         }
     };
     
-    document.getElementById('add-staff-btn').addEventListener('click', async () => {
+    document.getElementById('add-staff-btn')?.addEventListener('click', async () => {
       const nameVal = document.getElementById('new-staff-name').value.trim();
       const roleId = document.getElementById('new-staff-role').value || null;
       let startVal = document.getElementById('new-staff-start').value || null;
@@ -2854,7 +3077,6 @@
       if(nameVal) {
         const btn = document.getElementById('add-staff-btn'); btn.innerText = "Adding..."; btn.disabled = true;
         try {
-          // Inserting UUID (role_id) and legacy string fallback (role) just in case
           const rName = roleMap[roleId]?.role_name || null;
           const { error } = await supabaseClient.from('staff_directory').insert([{ 
               name: nameVal, role_id: roleId, role: rName, shift_start: startVal, shift_end: endVal 
@@ -2881,9 +3103,9 @@
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
     
-    document.getElementById('btn-cancel-edit-staff').addEventListener('click', () => document.getElementById('edit-staff-modal').style.display = 'none');
+    document.getElementById('btn-cancel-edit-staff')?.addEventListener('click', () => document.getElementById('edit-staff-modal').style.display = 'none');
     
-    document.getElementById('btn-save-edit-staff').addEventListener('click', async () => {
+    document.getElementById('btn-save-edit-staff')?.addEventListener('click', async () => {
         const id = document.getElementById('edit-staff-id').value;
         const name = document.getElementById('edit-staff-name').value.trim();
         const roleId = document.getElementById('edit-staff-role').value || null;
@@ -2913,7 +3135,7 @@
       if(confirm("Remove this staff member?")) { await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary"); }
     };
 
-    document.getElementById('add-branch-btn').addEventListener('click', async () => { 
+    document.getElementById('add-branch-btn')?.addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-branch-name').value;
       const emailVal = document.getElementById('new-branch-email').value;
       const passVal = document.getElementById('new-branch-pass').value; 
@@ -2939,9 +3161,9 @@
         document.getElementById('edit-branch-modal').style.display = 'flex';
     };
     
-    document.getElementById('btn-cancel-edit-branch').addEventListener('click', () => document.getElementById('edit-branch-modal').style.display = 'none');
+    document.getElementById('btn-cancel-edit-branch')?.addEventListener('click', () => document.getElementById('edit-branch-modal').style.display = 'none');
     
-    document.getElementById('btn-save-edit-branch').addEventListener('click', async () => {
+    document.getElementById('btn-save-edit-branch')?.addEventListener('click', async () => {
         const id = document.getElementById('edit-branch-id').value;
         const name = document.getElementById('edit-branch-name').value;
         const email = document.getElementById('edit-branch-email').value;
@@ -3046,13 +3268,17 @@
     const sidebarToggle = document.getElementById('sidebar-toggle');
 
     if (localStorage.getItem('rj_sidebar_collapsed') === 'true') {
-      appSidebar.classList.add('collapsed');
+      if(appSidebar) appSidebar.classList.add('collapsed');
     }
 
-    sidebarToggle.addEventListener('click', () => {
-      appSidebar.classList.toggle('collapsed');
-      localStorage.setItem('rj_sidebar_collapsed', appSidebar.classList.contains('collapsed'));
-    });
+    if(sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+          if(appSidebar) {
+              appSidebar.classList.toggle('collapsed');
+              localStorage.setItem('rj_sidebar_collapsed', appSidebar.classList.contains('collapsed'));
+          }
+        });
+    }
   </script>
 </body>
 </html>
