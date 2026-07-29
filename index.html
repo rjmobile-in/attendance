@@ -746,9 +746,12 @@
                         <div style="display: flex; gap: 16px; align-items: center;">
                             <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Drag & Drop staff to assign them for the selected date.</span>
                         </div>
-                        <div style="display: flex; gap: 12px; align-items: center; background: var(--card-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                            <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
-                            <input type="text" id="roster-date-picker" class="input-field" style="margin: 0; width: 140px; padding: 8px 12px; background: var(--input-bg) !important; border-color: var(--card-border);" placeholder="Select Date" />
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button id="btn-save-as-default" class="btn-primary" title="Make current board layout the permanent default for everyone">📌 Save as Default</button>
+                            <div style="display: flex; gap: 12px; align-items: center; background: var(--card-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
+                                <input type="text" id="roster-date-picker" class="input-field" style="margin: 0; width: 140px; padding: 8px 12px; background: var(--input-bg) !important; border-color: var(--card-border);" placeholder="Select Date" />
+                            </div>
                         </div>
                     </div>
 
@@ -3204,6 +3207,75 @@
             rosterSortables.push(sortable);
         });
     }
+
+    document.getElementById('btn-save-as-default')?.addEventListener('click', async () => {
+        if (!confirm("This will set the current board layout as the PERMANENT Default Branch for all staff shown here. Proceed?")) return;
+        
+        const btn = document.getElementById('btn-save-as-default');
+        const originalText = btn.innerText;
+        btn.innerText = "Saving Defaults...";
+        btn.disabled = true;
+
+        try {
+            const dateStr = toLocalISO(currentRosterDate);
+            let updatePromises = [];
+            let rosterDeletes = [];
+
+            // 1. Process Unassigned Pool (set default to null)
+            const unassignedStaff = Array.from(document.getElementById('roster-unassigned-list').children);
+            unassignedStaff.forEach(item => {
+                const sId = item.getAttribute('data-staff-id');
+                if (staffMap[sId]) {
+                    staffMap[sId].default_branch_id = null;
+                    updatePromises.push(supabaseClient.from('staff_directory').update({ default_branch_id: null }).eq('id', sId));
+                    rosterDeletes.push(sId);
+                }
+            });
+
+            // 2. Process all Branch Lists
+            dbBranches.forEach(b => {
+                const branchList = document.getElementById(`list-${b.id}`);
+                if (branchList) {
+                    const staffItems = Array.from(branchList.children);
+                    staffItems.forEach(item => {
+                        const sId = item.getAttribute('data-staff-id');
+                        if (staffMap[sId]) {
+                            staffMap[sId].default_branch_id = b.id;
+                            updatePromises.push(supabaseClient.from('staff_directory').update({ default_branch_id: b.id }).eq('id', sId));
+                            rosterDeletes.push(sId);
+                        }
+                    });
+                }
+            });
+
+            if (updatePromises.length > 0) {
+                await Promise.all(updatePromises);
+            }
+
+            // Clean up roster overrides for this date since they are now defaults
+            if (rosterDeletes.length > 0) {
+                await supabaseClient.from('staff_roster').delete().in('staff_id', rosterDeletes).eq('date', dateStr);
+                rosterDeletes.forEach(sId => {
+                    delete rosterMap[`${sId}_${dateStr}`];
+                });
+            }
+
+            showToast("Default branches updated successfully!", "success");
+            
+            // Re-render
+            if (typeof renderDragDropRoster === 'function') renderDragDropRoster();
+            
+            // Sync with HR Settings Table quietly
+            if (typeof loadSettingsData === 'function') loadSettingsData();
+
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to save defaults.", "error");
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    });
       function generateMatrix() {
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
