@@ -3416,7 +3416,49 @@
     });
     
     window.deleteStaffItem = async (rowId) => { 
-      if(confirm("Remove this staff member?")) { await supabaseClient.from('staff_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Staff removed", "primary"); }
+      if(confirm("Remove this staff member permanently? This will also delete their login access.")) { 
+          const serviceKey = getServiceKey();
+          if (!serviceKey) {
+              showToast("Please save Service Role Key in Org Settings first to delete login access!", "error");
+              return;
+          }
+
+          try {
+              // 1. Database se staff ka email nikalna
+              const { data: staff } = await supabaseClient.from('staff_directory').select('email').eq('id', rowId).single();
+              
+              if (staff && staff.email) {
+                  // 2. Supabase Auth se saare users fetch karna
+                  const usersRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+                      headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` }
+                  });
+                  
+                  if (usersRes.ok) {
+                      const data = await usersRes.json();
+                      const usersList = data.users || data;
+                      // 3. User dhoondhna jo match kare
+                      const authUser = usersList.find(u => u.email === staff.email);
+                      
+                      // 4. Agar Auth user mil gaya, toh usko Auth system se Delete karna
+                      if (authUser) {
+                          await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${authUser.id}`, {
+                              method: 'DELETE',
+                              headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` }
+                          });
+                      }
+                  }
+              }
+
+              // 5. Akhir me Staff Directory (Database table) se delete karna
+              await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
+              
+              loadSettingsData(); 
+              showToast("Staff & Login removed successfully", "success"); 
+          } catch(e) {
+              console.error(e);
+              showToast("Error deleting staff", "error");
+          }
+      }
     };
 
     document.getElementById('add-branch-btn')?.addEventListener('click', async () => { 
