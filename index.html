@@ -303,6 +303,21 @@
     .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
     .color-picker-input::-webkit-color-swatch { border: none; border-radius: 50%; }
 
+    /* =========================================================
+       10. DRAG & DROP ROSTER
+       ========================================================= */
+    .roster-board { display: flex; gap: 20px; height: calc(100vh - 220px); align-items: flex-start; }
+    .roster-branches { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; align-content: start; overflow-y: auto; height: 100%; padding-right: 8px;}
+    .roster-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); display: flex; flex-direction: column; max-height: 50vh;}
+    .roster-branch-header { padding: 12px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--primary); border-radius: var(--radius-md) var(--radius-md) 0 0; display: flex; justify-content: space-between; align-items: center; font-size: calc(14px * var(--font-scale, 1));}
+    .roster-list { flex: 1; padding: 12px; overflow-y: auto; min-height: 120px; display: flex; flex-direction: column; gap: 8px; }
+    .roster-staff-item { background: var(--input-bg); border: 1px solid var(--card-border); padding: 10px 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: grab; transition: box-shadow 0.2s;}
+    .roster-staff-item:hover { box-shadow: var(--shadow-sm); }
+    .roster-staff-item:active { cursor: grabbing; }
+    .roster-staff-item.is-override { border-left: 3px solid var(--warning); }
+    .roster-sidebar { width: 300px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); display: flex; flex-direction: column; height: 100%; flex-shrink: 0;}
+    .roster-sidebar-header { padding: 16px; border-bottom: 1px solid var(--card-border); }
+
     /* Force Flatpickr to obey theme colors */
     .input-field[readonly], .flatpickr-input[readonly] { background-color: var(--input-bg) !important; color: var(--text-main) !important; }
 
@@ -382,19 +397,20 @@
             <span class="tab-btn-text">Data Matrix</span>
           </button>
 
+          <button class="tab-btn" data-view="view-roster" title="Duty Roster">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span> 
+            <span class="tab-btn-text">Duty Roster</span>
+          </button>
+
+          
+
           <!-- Management -->
           <div class="sidebar-category">Management</div>
+
           <button class="tab-btn" data-view="view-action" style="position: relative;" title="Action Center">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
             <span class="tab-btn-text">Action Center</span>
             <span id="absent-badge" class="badge bg-red" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
-          </button>
-
-          <!-- Settings -->
-          <div class="sidebar-category">Settings</div>
-          <button class="tab-btn" data-view="view-settings-hr" title="HR Settings">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
-            <span class="tab-btn-text">HR Settings</span>
           </button>
           
           <button class="tab-btn" data-view="view-settings-org" title="Org Settings">
@@ -716,6 +732,39 @@
                     </div>
                     </div>
                 </div>
+                
+                <!-- VIEW 10: DUTY ROSTER -->
+                <div id="view-roster" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+                        <div style="display: flex; gap: 16px; align-items: center;">
+                            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Drag & Drop staff to assign them for the selected date.</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center; background: var(--card-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                            <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
+                            <input type="text" id="roster-date-picker" class="input-field" style="margin: 0; width: 140px; padding: 8px 12px; background: var(--input-bg) !important; border-color: var(--card-border);" placeholder="Select Date" />
+                        </div>
+                    </div>
+
+                    <div class="roster-board">
+                        <div class="roster-branches" id="roster-branches-container">
+                            <!-- Branches injected here -->
+                        </div>
+                        
+                        <div class="roster-sidebar">
+                            <div class="roster-sidebar-header">
+                                <div style="font-weight: 800; font-size: calc(15px * var(--font-scale, 1)); color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                                    Staff Pool <span class="badge bg-gray" id="unassigned-count">0</span>
+                                </div>
+                                <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); margin-top: 6px; font-weight: 500;">Unassigned staff. Drag here to remove overrides.</div>
+                            </div>
+                            <div class="roster-list" id="roster-unassigned-list" data-branch-id="unassigned">
+                                <!-- Unassigned staff injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 7: ACTION CENTER -->
 
                 <!-- VIEW 7: ACTION CENTER -->
                 <div id="view-action" class="app-view" style="display: none;">
@@ -770,6 +819,7 @@
 </div>
                                 
                                 <div style="width: 100%; display: flex; gap: 12px; margin-top: 8px;">
+                                    <select id="new-staff-branch" class="input-field" style="margin:0; flex: 1.5;" title="Default Branch"></select>
                                     <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1;">
                                     <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1;">
                                     <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center;">Add Staff</button>
@@ -959,6 +1009,9 @@
       
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
       <select id="edit-staff-role" class="input-field" style="margin-top: 8px;"></select>
+
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Default Branch</label>
+      <select id="edit-staff-branch" class="input-field" style="margin-top: 8px; margin-bottom: 8px;"></select>
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
@@ -1126,6 +1179,26 @@
     </div>
   </div>
 
+  <!-- ROSTER MODAL -->
+  <div id="roster-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Edit Shift Location</h2>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="roster-subtitle">Assigning branch</p>
+      
+      <input type="hidden" id="roster-staff-id">
+      <input type="hidden" id="roster-date">
+      
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Branch</label>
+      <select id="roster-branch-select" class="input-field" style="margin-top: 8px;"></select>
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button id="btn-roster-default" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px; color: var(--warning); border-color: var(--warning-alpha);">↺ Set to Default</button>
+        <button id="btn-cancel-roster" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+        <button id="btn-save-roster" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Assignment</button>
+      </div>
+    </div>
+  </div>
+
   <!-- AUDIT MODAL -->
   <div id="photo-modal" class="modal-overlay" onclick="this.style.display='none'">
     <div class="modal-card" onclick="event.stopPropagation()">
@@ -1174,6 +1247,9 @@
     let branchMap = {}; 
     let roleMap = {}; 
     let reasonMap = {}; 
+
+    let dbRoster = [];
+    let rosterMap = {}; 
 
     let dbLogs = [];
     let exceptionsData = {}; 
@@ -1520,6 +1596,7 @@
         if (viewId === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
         if (viewId === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
         if (viewId === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
+        if (viewId === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
         if ((viewId === 'view-settings-hr' || viewId === 'view-settings-org') && typeof loadSettingsData === 'function') loadSettingsData();
         if (viewId === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
       });
@@ -1771,6 +1848,14 @@
       populateReasonDropdowns();
 
       try {
+          const todayIso = toLocalISO(new Date());
+          const { data: rosterData } = await supabaseClient.from('staff_roster').select('*').gte('date', todayIso);
+          dbRoster = rosterData || [];
+          rosterMap = {};
+          dbRoster.forEach(r => rosterMap[`${r.staff_id}_${r.date}`] = r);
+      } catch (err) {}
+
+      try {
           const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
           dbStaff = staffData || [];
           staffMap = {};
@@ -1789,6 +1874,7 @@
       selectedRoleIds = new Set(dbRoles.map(r => r.id));
       
       populateRoleDropdowns(); 
+      populateBranchDropdowns(); 
       
       const schedSelect = document.getElementById('sched-staff');
       if (schedSelect) schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
@@ -1811,6 +1897,14 @@
         const editStaffRole = document.getElementById('edit-staff-role');
         if(newStaffRole) newStaffRole.innerHTML = opts;
         if(editStaffRole) editStaffRole.innerHTML = opts;
+    }
+
+    function populateBranchDropdowns() {
+        const opts = '<option value="">-- No Default Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${b.branch_name}</option>`).join('');
+        const newStaffBranch = document.getElementById('new-staff-branch');
+        const editStaffBranch = document.getElementById('edit-staff-branch');
+        if(newStaffBranch) newStaffBranch.innerHTML = opts;
+        if(editStaffBranch) editStaffBranch.innerHTML = opts;
     }
 
     function populateReasonDropdowns() {
@@ -2285,6 +2379,8 @@
       if (vAudits && vAudits.style.display !== 'none' && typeof renderAuditGallery === 'function') renderAuditGallery();
       if (vLive && vLive.style.display !== 'none' && typeof renderLiveBranches === 'function') renderLiveBranches();
       if (vAction && vAction.style.display !== 'none' && typeof renderAbsentTable === 'function') renderAbsentTable();
+      const vRoster = document.getElementById('view-roster');
+      if (vRoster && vRoster.style.display !== 'none' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
       if (vMatrix && vMatrix.style.display !== 'none' && typeof generateMatrix === 'function') generateMatrix();
       if (vStats && vStats.style.display !== 'none' && typeof renderStaffStats === 'function') renderStaffStats();
     }
@@ -2957,7 +3053,151 @@
        finally { btn.innerText = "Confirm Schedule"; btn.disabled = false; }
     });
 
-    function generateMatrix() {
+    let currentRosterDate = new Date();
+    let rosterSortables = [];
+
+    // Initialize Flatpickr for the Roster UI
+    setTimeout(() => {
+        flatpickr("#roster-date-picker", {
+            defaultDate: currentRosterDate,
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d M, Y",
+            onChange: (dates) => {
+                if(dates[0]) {
+                    currentRosterDate = dates[0];
+                    renderDragDropRoster();
+                }
+            }
+        });
+    }, 500);
+
+    async function handleRosterDrop(evt) {
+        const item = evt.item;
+        const toList = evt.to;
+        const fromList = evt.from;
+        
+        const staffId = item.getAttribute('data-staff-id');
+        const toBranchId = toList.getAttribute('data-branch-id');
+        const fromBranchId = fromList.getAttribute('data-branch-id');
+        
+        if (toBranchId === fromBranchId) return;
+
+        const dateStr = toLocalISO(currentRosterDate);
+        item.style.opacity = '0.5'; // Visual loading indicator
+
+        try {
+            if (toBranchId === 'unassigned') {
+                // Delete override from DB
+                await supabaseClient.from('staff_roster').delete().match({ staff_id: staffId, date: dateStr });
+                delete rosterMap[`${staffId}_${dateStr}`];
+                
+                const hasDefault = !!staffMap[staffId]?.default_branch_id;
+                showToast(hasDefault ? "Override removed. Back to Default." : "Moved to unassigned pool.", "primary");
+            } else {
+                // Upsert new override
+                await supabaseClient.from('staff_roster').upsert({
+                    staff_id: staffId, date: dateStr, assigned_branch_id: toBranchId
+                }, { onConflict: 'staff_id, date' });
+                
+                rosterMap[`${staffId}_${dateStr}`] = { staff_id: staffId, date: dateStr, assigned_branch_id: toBranchId };
+                showToast("Shift updated!", "success");
+            }
+        } catch(e) {
+            showToast("Failed to update roster.", "error");
+        } finally {
+            // Re-render to sort everything correctly visually
+            renderDragDropRoster(); 
+        }
+    }
+
+    function renderDragDropRoster() {
+        const container = document.getElementById('roster-branches-container');
+        const unassignedList = document.getElementById('roster-unassigned-list');
+        if (!container || !unassignedList) return;
+
+        // Cleanup old Sortable instances to prevent bugs
+        rosterSortables.forEach(s => s.destroy());
+        rosterSortables = [];
+
+        // Generate Branch Grids
+        let branchesHtml = dbBranches.map(b => `
+            <div class="roster-branch-card">
+                <div class="roster-branch-header">
+                    ${b.branch_name}
+                    <span class="badge bg-blue" id="count-${b.id}" style="font-size: 12px; padding: 4px 8px;">0</span>
+                </div>
+                <div class="roster-list" data-branch-id="${b.id}" id="list-${b.id}"></div>
+            </div>
+        `).join('');
+        
+        container.innerHTML = branchesHtml;
+        unassignedList.innerHTML = '';
+
+        const branchCounts = {};
+        dbBranches.forEach(b => branchCounts[b.id] = 0);
+        let unassignedCount = 0;
+
+        const dateStr = toLocalISO(currentRosterDate);
+        const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
+        
+        // Loop through staff and assign them to correct column
+        filteredStaff.forEach(staff => {
+            const override = rosterMap[`${staff.id}_${dateStr}`];
+            const hasDefault = !!staff.default_branch_id;
+            
+            let targetBranchId = 'unassigned';
+            let isOverride = false;
+
+            if (override && branchMap[override.assigned_branch_id]) {
+                targetBranchId = override.assigned_branch_id;
+                isOverride = true;
+            } else if (staff.default_branch_id && branchMap[staff.default_branch_id]) {
+                targetBranchId = staff.default_branch_id;
+            }
+
+            const statusText = isOverride ? '🟡 Override' : (hasDefault ? '✅ Default' : '⚪ Unassigned');
+            
+            const itemHtml = `
+                <div class="roster-staff-item ${isOverride ? 'is-override' : ''}" data-staff-id="${staff.id}">
+                    <div>
+                        <div style="font-size: calc(14px * var(--font-scale, 1)); color: var(--text-main); margin-bottom: 2px;">${staff.name}</div>
+                        <div style="font-size: 10px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">
+                            ${statusText}
+                        </div>
+                    </div>
+                    <span style="color: var(--text-soft); font-size: 16px;">⣿</span>
+                </div>
+            `;
+
+            if (targetBranchId === 'unassigned') {
+                unassignedList.insertAdjacentHTML('beforeend', itemHtml);
+                unassignedCount++;
+            } else {
+                document.getElementById(`list-${targetBranchId}`).insertAdjacentHTML('beforeend', itemHtml);
+                branchCounts[targetBranchId]++;
+            }
+        });
+
+        // Update UI Counts
+        dbBranches.forEach(b => {
+            document.getElementById(`count-${b.id}`).innerText = branchCounts[b.id];
+        });
+        document.getElementById('unassigned-count').innerText = unassignedCount;
+
+        // Init SortableJS for Drag & Drop
+        const allLists = document.querySelectorAll('.roster-list');
+        allLists.forEach(el => {
+            const sortable = Sortable.create(el, {
+                group: 'roster-group',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: handleRosterDrop
+            });
+            rosterSortables.push(sortable);
+        });
+    }
+      function generateMatrix() {
       const headerRow = document.getElementById('matrix-header');
       const tableBody = document.getElementById('matrix-body');
       if(!headerRow || !tableBody) return;
@@ -3040,7 +3280,7 @@
               <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${roleName}</span><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email Set'}</span></td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -3276,6 +3516,7 @@
 
           // STEP 2: Database table me Staff ki details save karein
           const rName = roleMap[roleId]?.role_name || null;
+          const defBranchId = document.getElementById('new-staff-branch').value || null;
           const { error: dbError } = await supabaseClient.from('staff_directory').insert([{ 
               name: nameVal, 
               role_id: roleId, 
@@ -3283,7 +3524,8 @@
               shift_start: startVal, 
               shift_end: endVal, 
               email: emailVal, 
-              password: passVal
+              password: passVal,
+              default_branch_id: defBranchId
           }]);
           
           if(dbError) throw dbError;
@@ -3291,6 +3533,7 @@
           // Form clear karein
           document.getElementById('new-staff-name').value = ''; 
           document.getElementById('new-staff-role').value = '';
+          if (document.getElementById('new-staff-branch')) document.getElementById('new-staff-branch').value = '';
           document.getElementById('new-staff-email').value = ''; 
           document.getElementById('new-staff-pass').value = '';
           document.getElementById('new-staff-start').value = ''; 
@@ -3312,7 +3555,7 @@
       }
     });
 
-    window.openEditStaff = (id, name, roleId, start, end, email, pass) => {
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
         document.getElementById('edit-staff-role').value = roleId || '';
@@ -3320,6 +3563,7 @@
         document.getElementById('edit-staff-pass').value = pass || '';
         document.getElementById('edit-staff-start').value = start || '';
         document.getElementById('edit-staff-end').value = end || '';
+        if (document.getElementById('edit-staff-branch')) document.getElementById('edit-staff-branch').value = defBranchId || '';
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
     
@@ -3394,8 +3638,9 @@
 
                 // 4. Update the staff_directory database table
                 const rName = roleMap[roleId]?.role_name || null;
+                const defBranchId = document.getElementById('edit-staff-branch').value || null;
                 await supabaseClient.from('staff_directory').update({
-                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId
                 }).eq('id', id);
 
                 document.getElementById('edit-staff-modal').style.display = 'none';
