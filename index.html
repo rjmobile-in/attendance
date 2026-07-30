@@ -813,6 +813,26 @@
                     <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Manage people, roles, and leave reasons.</span>
                     
                     <div class="settings-grid">
+
+                        <!-- NAYA SECTION: ASSIGN DUTY OVERRIDE -->
+                        <div class="settings-panel" style="grid-column: 1 / -1;">
+                            <h3>Assign Duty Override (Manual)</h3>
+                            <p style="color: var(--text-soft); font-size: 13px; margin-bottom: 16px;">Assign a specific branch to a staff member for a specific date (Overrides Default Branch).</p>
+                            <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                                <select id="override-staff-select" class="input-field" style="margin:0; flex: 2; cursor:pointer;">
+                                    <option value="" disabled selected>Select Staff...</option>
+                                </select>
+                                
+                                <select id="override-branch-select" class="input-field" style="margin:0; flex: 2; cursor:pointer;">
+                                    <option value="" disabled selected>Select Branch...</option>
+                                </select>
+                                
+                                <input type="date" id="override-date-picker" class="input-field" style="margin:0; flex: 1;" title="Select Override Date">
+                                
+                                <button id="btn-save-override" class="btn-primary" style="flex: 1; justify-content: center;">Save Override</button>
+                            </div>
+                        </div>
+
                         <div class="settings-panel" style="grid-column: 1 / -1;">
                             <h3>Staff Directory & Login Credentials</h3>
                             <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
@@ -3784,6 +3804,74 @@
           }
       }
     };
+
+    // =========================================================================
+    //  DUTY OVERRIDE LOGIC (NAYA CODE)
+    // =========================================================================
+
+    // Dropdowns me Staff aur Branch ka data load karna
+    const originalLoadSettingsData = window.loadSettingsData || loadSettingsData;
+    window.loadSettingsData = async function() {
+        await originalLoadSettingsData();
+        
+        const staffSelect = document.getElementById('override-staff-select');
+        if (staffSelect) {
+            staffSelect.innerHTML = '<option value="" disabled selected>Select Staff...</option>' + 
+                dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        }
+        
+        const branchSelect = document.getElementById('override-branch-select');
+        if (branchSelect) {
+            branchSelect.innerHTML = '<option value="" disabled selected>Select Branch...</option>' + 
+                dbBranches.map(b => `<option value="${b.id}">${b.branch_name}</option>`).join('');
+        }
+    };
+
+    // Button Click hone par Override Save karna
+    document.getElementById('btn-save-override')?.addEventListener('click', async () => {
+        const staffId = document.getElementById('override-staff-select').value;
+        const branchId = document.getElementById('override-branch-select').value;
+        const dateVal = document.getElementById('override-date-picker').value; 
+        
+        if (!staffId || !branchId || !dateVal) {
+            showToast("Please select Staff, Branch, and Date.", "error");
+            return;
+        }
+
+        const btn = document.getElementById('btn-save-override');
+        btn.innerText = "Saving..."; btn.disabled = true;
+
+        try {
+            const { error } = await supabaseClient
+                .from('staff_roster')
+                .upsert([
+                    {
+                        staff_id: staffId,
+                        date: dateVal, 
+                        assigned_branch_id: branchId
+                    }
+                ], { onConflict: 'staff_id, date' }); 
+
+            if (error) throw error;
+            
+            showToast("Override assigned successfully!", "success");
+            
+            // Update UI Map & Reset
+            rosterMap[`${staffId}_${dateVal}`] = { staff_id: staffId, date: dateVal, assigned_branch_id: branchId };
+            document.getElementById('override-staff-select').value = "";
+            document.getElementById('override-branch-select').value = "";
+            document.getElementById('override-date-picker').value = "";
+            
+            // Agar Roster Board open hai to usko bhi hatho-hath update kar do
+            if (typeof renderDragDropRoster === 'function') renderDragDropRoster();
+            
+        } catch (err) {
+            console.error("Error saving override:", err);
+            showToast("Failed to save: " + err.message, "error");
+        } finally {
+            btn.innerText = "Save Override"; btn.disabled = false;
+        }
+    });
 
     document.getElementById('add-branch-btn')?.addEventListener('click', async () => { 
       const nameVal = document.getElementById('new-branch-name').value;
