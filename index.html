@@ -22,6 +22,7 @@
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     /* =========================================================
@@ -371,6 +372,10 @@
           <button class="tab-btn" data-view="view-live" title="Live Tracker">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> 
             <span class="tab-btn-text">Live Tracker</span>
+          </button>
+          <button class="tab-btn" data-view="view-birthdays" title="Staff Birthdays">
+            <span class="tab-icon">🎂</span> 
+            <span class="tab-btn-text">Staff Birthdays</span>
           </button>
 
           <!-- Records -->
@@ -740,6 +745,32 @@
                     </div>
                 </div>
                 
+                <!-- VIEW 11: BIRTHDAYS -->
+                <div id="view-birthdays" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Upcoming staff celebrations. DOB is managed in HR Settings.</span>
+                    </div>
+                    
+                    <div class="widget-grid" id="bday-top-cards" style="grid-template-columns: 1fr;">
+                        <div class="widget-card" style="background: linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%); border-color: var(--primary); text-align: center;">
+                            <div class="badge bg-blue" style="margin-bottom: 12px;">Next Celebration</div>
+                            <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
+                            <div id="admin-next-bday-name" style="font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main);">Loading...</div>
+                            <div id="admin-next-bday-date" style="color: var(--text-soft); margin-bottom: 8px;">--</div>
+                            <div id="admin-next-bday-age" class="role-tag">--</div>
+                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: var(--success); background: var(--success-alpha); padding: 8px; border-radius: var(--radius-md); display: inline-block;">--</div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                            📅 All Upcoming Birthdays
+                        </div>
+                        <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;" id="admin-bday-list-container">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- VIEW 10: DUTY ROSTER -->
                 <div id="view-roster" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
@@ -850,6 +881,7 @@
                                 
                                 <div style="width: 100%; display: flex; gap: 12px; margin-top: 8px;">
                                     <select id="new-staff-branch" class="input-field" style="margin:0; flex: 1.5;" title="Default Branch"></select>
+                                    <input type="date" id="new-staff-dob" class="input-field" title="Date of Birth" style="margin:0; flex: 1.5;">
                                     <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1;">
                                     <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1;">
                                     <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center;">Add Staff</button>
@@ -1042,6 +1074,9 @@
 
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Default Branch</label>
       <select id="edit-staff-branch" class="input-field" style="margin-top: 8px; margin-bottom: 8px;"></select>
+      
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
+      <input type="date" id="edit-staff-dob" class="input-field" style="margin-top: 8px; margin-bottom: 8px;">
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
@@ -3379,7 +3414,7 @@
               <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${roleName}</span><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email Set'}</span></td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -3574,6 +3609,7 @@
       const roleId = document.getElementById('new-staff-role').value || null;
       const emailVal = document.getElementById('new-staff-email').value.trim() || null;
       const passVal = document.getElementById('new-staff-pass').value || null;
+      const dobVal = document.getElementById('new-staff-dob').value || null;
       let startVal = document.getElementById('new-staff-start').value || null;
       let endVal = document.getElementById('new-staff-end').value || null;
       
@@ -3624,7 +3660,8 @@
               shift_end: endVal, 
               email: emailVal, 
               password: passVal,
-              default_branch_id: defBranchId
+              default_branch_id: defBranchId,
+              dob: dobVal
           }]);
           
           if(dbError) throw dbError;
@@ -3654,7 +3691,7 @@
       }
     });
 
-    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId) => {
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
         document.getElementById('edit-staff-role').value = roleId || '';
@@ -3663,6 +3700,7 @@
         document.getElementById('edit-staff-start').value = start || '';
         document.getElementById('edit-staff-end').value = end || '';
         if (document.getElementById('edit-staff-branch')) document.getElementById('edit-staff-branch').value = defBranchId || '';
+        if (document.getElementById('edit-staff-dob')) document.getElementById('edit-staff-dob').value = dob || '';
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
     
@@ -3674,6 +3712,7 @@
         const roleId = document.getElementById('edit-staff-role').value || null;
         const newEmail = document.getElementById('edit-staff-email').value.trim() || null;
         const newPass = document.getElementById('edit-staff-pass').value || null;
+        const newDob = document.getElementById('edit-staff-dob').value || null;
         let start = document.getElementById('edit-staff-start').value || null;
         let end = document.getElementById('edit-staff-end').value || null;
 
@@ -3739,7 +3778,7 @@
                 const rName = roleMap[roleId]?.role_name || null;
                 const defBranchId = document.getElementById('edit-staff-branch').value || null;
                 await supabaseClient.from('staff_directory').update({
-                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId, dob: newDob
                 }).eq('id', id);
 
                 document.getElementById('edit-staff-modal').style.display = 'none';
@@ -4011,6 +4050,96 @@
 
     const appSidebar = document.getElementById('app-sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    let currentUserEmail = '';
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        if(session?.user) currentUserEmail = session.user.email;
+    });
+
+    function renderAdminBirthdays() {
+        const container = document.getElementById('admin-bday-list-container');
+        if (!container) return;
+
+        let bdayStaff = dbStaff.filter(s => s.dob && s.dob.trim() !== '');
+        if (bdayStaff.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: var(--text-soft); padding: 20px;">No staff birthdays found. Update DOBs in HR Settings.</div>';
+            document.getElementById('admin-next-bday-name').innerText = "No upcoming";
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const enriched = bdayStaff.map(staff => {
+            const [year, month, day] = staff.dob.split('-');
+            const bdayThisYear = new Date(today.getFullYear(), parseInt(month) - 1, parseInt(day));
+            
+            let nextBday = new Date(bdayThisYear);
+            let turningAge = today.getFullYear() - parseInt(year);
+            
+            if (bdayThisYear.getTime() < today.getTime()) {
+                nextBday.setFullYear(today.getFullYear() + 1);
+                turningAge++;
+            }
+            
+            const diffDays = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
+            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+            
+            return { ...staff, daysLeft: diffDays, turningAge, formattedDate };
+        });
+
+        enriched.sort((a, b) => a.daysLeft - b.daysLeft);
+
+        let currentUserIndex = enriched.findIndex(s => s.email === currentUserEmail);
+        if (currentUserIndex !== -1) {
+            let pinnedBday = enriched.splice(currentUserIndex, 1)[0];
+            enriched.unshift(pinnedBday);
+        }
+
+        const nextBday = enriched[0];
+        document.getElementById('admin-next-bday-name').innerText = (nextBday.email === currentUserEmail) ? "Your Birthday" : nextBday.name;
+        document.getElementById('admin-next-bday-date').innerText = nextBday.formattedDate;
+        document.getElementById('admin-next-bday-age').innerText = `Turning ${nextBday.turningAge}`;
+        
+        const countdownEl = document.getElementById('admin-next-bday-countdown');
+        if (nextBday.daysLeft === 0) {
+            countdownEl.innerText = "It's Today! 🎂🎉";
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#10b981', '#f59e0b'] });
+        } else if (nextBday.daysLeft === 1) {
+            countdownEl.innerText = "Tomorrow!";
+        } else {
+            countdownEl.innerText = `In ${nextBday.daysLeft} Days`;
+        }
+
+        container.innerHTML = enriched.map(staff => {
+            const isCurrentUser = (staff.email === currentUserEmail);
+            const displayName = isCurrentUser ? "Your Birthday 📌" : staff.name;
+            
+            let tagClass = 'bg-gray';
+            let tagText = `In ${staff.daysLeft} days`;
+
+            if (staff.daysLeft === 0) { tagClass = 'bg-green'; tagText = 'Today! 🎂'; } 
+            else if (staff.daysLeft <= 7) { tagClass = 'bg-orange'; if (staff.daysLeft === 1) tagText = 'Tomorrow!'; }
+
+            return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
+                <div>
+                    <div style="font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); display: flex; align-items: center; gap: 8px;">
+                        ${displayName} 
+                        <span class="role-tag" ${isCurrentUser ? `style="background: var(--success-alpha); color: var(--success); border-color: var(--success-alpha);"` : ''}>Turning ${staff.turningAge}</span>
+                    </div>
+                    <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
+                </div>
+                <div class="badge ${tagClass}" style="font-size: 12px; padding: 6px 12px;">${tagText}</div>
+            </div>`;
+        }).join('');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (e.currentTarget.getAttribute('data-view') === 'view-birthdays') renderAdminBirthdays();
+        });
+    });
 
     if (localStorage.getItem('rj_sidebar_collapsed') === 'true') {
       if(appSidebar) appSidebar.classList.add('collapsed');
