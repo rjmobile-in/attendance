@@ -1660,6 +1660,12 @@
         if (viewId === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
         if (viewId === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
         if (viewId === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
+        if (viewId === 'view-action' && typeof renderAbsentTable === 'function') {
+            document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('#action-center-tabs .sub-tab-btn[data-action-filter="absent"]').classList.add('active');
+            currentActionTab = 'absent';
+            renderAbsentTable();
+        }
         if (viewId === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
         if (viewId === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
         if ((viewId === 'view-settings-hr' || viewId === 'view-settings-org') && typeof loadSettingsData === 'function') loadSettingsData();
