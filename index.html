@@ -1328,7 +1328,7 @@
     let startDate = new Date();
     let endDate = new Date();
     
-    const minLaunchDate = new Date('2026-07-20');
+    const minLaunchDate = new Date('2026-08-01');
     if (startDate < minLaunchDate) startDate = minLaunchDate;
     if (endDate < minLaunchDate) endDate = minLaunchDate;
     
@@ -1772,7 +1772,7 @@
     const startPickerEl = document.getElementById("global-start");
     const startPicker = startPickerEl ? flatpickr(startPickerEl, { 
         defaultDate: startDate, 
-        minDate: "2026-07-20", 
+        minDate: "2026-08-01", 
         maxDate: safeMaxDate,
         dateFormat: "Y-m-d", 
         altInput: true, 
@@ -1789,7 +1789,7 @@
     const endPickerEl = document.getElementById("global-end");
     const endPicker = endPickerEl ? flatpickr(endPickerEl, { 
         defaultDate: endDate, 
-        minDate: "2026-07-20", 
+        minDate: "2026-08-01", 
         maxDate: safeMaxDate,
         dateFormat: "Y-m-d", 
         altInput: true, 
