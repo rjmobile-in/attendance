@@ -243,6 +243,7 @@
     .audit-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; box-shadow: var(--shadow-sm);}
     .audit-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
     .audit-img-wrap { width: 100%; height: 220px; background: #000; position: relative; overflow: hidden;}
+    .audit-img-wrap::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 5; pointer-events: none; }
     .audit-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; cursor: pointer; }
     .audit-img-wrap:hover .audit-img { transform: scale(1.05); }
     .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(9, 9, 11, 0.8); color: #fff; font-size: calc(11px * var(--font-scale, 1)); padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
@@ -494,9 +495,10 @@
             <span class="tab-btn-text">Attendance Logs</span>
           </button>
           
-          <button class="tab-btn" data-view="view-audits" title="Photo Audits">
+          <button class="tab-btn" data-view="view-audits" style="position: relative;" title="Photo Audits">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> 
             <span class="tab-btn-text">Photo Audits</span>
+            <span id="pending-audits-badge" class="badge bg-orange" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
           </button>
 
           <!-- Analytics -->
@@ -1170,6 +1172,46 @@
     </div>
   </div>
 
+  <!-- SHORTCUTS CHEAT SHEET MODAL -->
+  <div id="shortcuts-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0; color: var(--text-main);">⌨️ Keyboard Shortcuts</h3>
+        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="document.getElementById('shortcuts-modal').style.display='none'">&times;</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: calc(13px * var(--font-scale, 1));">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <span>Open Command Palette</span>
+          <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">/</kbd> or <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Cmd+K</kbd></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <span>Toggle T-Shirt (in Modal)</span>
+          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">T</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <span>Toggle ID Card (in Modal)</span>
+          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">I</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <span>Approve & Save (in Modal)</span>
+          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Enter</kbd>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <span>Next / Previous Photo</span>
+          <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">←</kbd> <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">→</kbd></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <span>Range Select Checkboxes</span>
+          <span style="color: var(--text-soft);">Hold <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Shift</kbd> + Click</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Close Modals / Deselect All</span>
+          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">ESC</kbd>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODALS -->
   <div id="live-branch-modal" class="modal-overlay" onclick="this.style.display='none'">
     <div class="modal-card" onclick="event.stopPropagation()">
@@ -1523,8 +1565,25 @@
     }
 
     window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked) {
+        window.currentActiveAuditLogId = logId; 
         document.getElementById('modal-image-src').src = imageSrc;
         const controls = document.getElementById('audit-controls');
+
+        // SILENT PRELOADER: Find the next visible photo and cache it in the browser
+        setTimeout(() => {
+            const currentBox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
+            if (currentBox) {
+                const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none');
+                const currentIndex = allVisibleCards.indexOf(currentBox.closest('.audit-card'));
+                if (currentIndex !== -1 && currentIndex + 1 < allVisibleCards.length) {
+                    const nextImg = allVisibleCards[currentIndex + 1].querySelector('.audit-img');
+                    if (nextImg && nextImg.src) {
+                        const preloader = new Image();
+                        preloader.src = nextImg.src; // Forces the browser to download and cache it
+                    }
+                }
+            }
+        }, 50);
         
         if(logId && logId !== 'undefined' && logId !== 'null') {
             controls.style.display = 'flex';
@@ -1566,7 +1625,7 @@
         }
     };
 
-    function showToast(message, type = 'primary') {
+    function showToast(message, type = 'primary', duration = 3000) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
@@ -1579,7 +1638,7 @@
       setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300); 
-      }, 3000);
+      }, duration);
     }
 
     // --- ADVANCED THEME CUSTOMIZER WITH PRESETS (SAFE MODE) ---
@@ -1842,10 +1901,20 @@
       });
     });
 
-    document.getElementById('toggle-pending-photos')?.addEventListener('change', (e) => {
-        showOnlyPendingPhotos = e.target.checked;
-        if (typeof renderAuditGallery === 'function') renderAuditGallery();
-    });
+    const pendingToggleEl = document.getElementById('toggle-pending-photos');
+    if (pendingToggleEl) {
+        // 1. Restore saved state (default to true if no saved state exists)
+        const savedState = localStorage.getItem('rj_audit_pending_only');
+        showOnlyPendingPhotos = savedState === null ? true : savedState === 'true';
+        pendingToggleEl.checked = showOnlyPendingPhotos;
+        
+        // 2. Listen for changes and save to local storage
+        pendingToggleEl.addEventListener('change', (e) => {
+            showOnlyPendingPhotos = e.target.checked;
+            localStorage.setItem('rj_audit_pending_only', e.target.checked);
+            if (typeof renderAuditGallery === 'function') renderAuditGallery();
+        });
+    }
 
     // Master Logs sub-tabs
     document.querySelectorAll('#view-logs .sub-tab-btn').forEach(btn => {
@@ -2302,6 +2371,23 @@
               <td><div class="skeleton" style="width: 50px; height: 50px; border-radius: 8px;"></div></td>
           </tr>`).join('');
       }
+
+      const auditGrid = document.getElementById('audit-grid');
+      if (auditGrid) {
+          auditGrid.innerHTML = Array(8).fill(`
+          <div class="audit-card" style="pointer-events: none; border-color: transparent;">
+              <div class="skeleton" style="width: 100%; height: 220px; border-radius: 0;"></div>
+              <div class="audit-details" style="gap: 12px;">
+                  <div class="skeleton" style="width: 70%; height: 18px;"></div>
+                  <div class="skeleton" style="width: 40%; height: 12px;"></div>
+                  <div style="display: flex; gap: 8px; margin-top: 4px;">
+                      <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
+                      <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
+                  </div>
+                  <div class="skeleton" style="width: 100%; height: 38px; border-radius: var(--radius-sm); margin-top: auto;"></div>
+              </div>
+          </div>`).join('');
+      }
       
       if (!keepPage) currentPage = 0; 
       
@@ -2610,6 +2696,32 @@
       const badge = document.getElementById('absent-badge');
       if(badge) {
           if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
+      }
+
+      // Calculate total pending photo audits
+      let pendingPhotoCount = 0;
+      processedData.forEach(r => {
+          if (r.photoLogs) {
+              pendingPhotoCount += r.photoLogs.filter(pl => !pl.reviewed).length;
+          }
+      });
+
+      const auditBadge = document.getElementById('pending-audits-badge');
+      if (auditBadge) {
+          if (pendingPhotoCount > 0) {
+              auditBadge.innerText = pendingPhotoCount;
+              auditBadge.style.display = 'inline-block';
+          } else {
+              auditBadge.style.display = 'none';
+          }
+      }
+
+      // Update Browser Tab Title for Background Notifications
+      const totalAlerts = unexcusedCount + pendingPhotoCount;
+      if (totalAlerts > 0) {
+          document.title = `(${totalAlerts}) RJ Mobile | Workspace`;
+      } else {
+          document.title = `RJ Mobile | Attendance Workspace`;
       }
 
       const vDash = document.getElementById('view-dashboard');
@@ -2950,12 +3062,12 @@
                     ? `<span class="audit-badge" style="top: auto; bottom: 12px; left: 12px; right: auto; background: var(--success); border: 1px solid rgba(255,255,255,0.2);">✅ Audited</span>`
                     : `<span class="audit-badge" style="top: auto; bottom: 12px; left: 12px; right: auto; background: var(--warning); color: #000; border: 1px solid rgba(0,0,0,0.2);">⏳ Pending</span>`;
 
-                const cardCheck = `<input type="checkbox" class="audit-card-checkbox" value="${logId}" ${selectedAuditLogIds.has(logId) ? 'checked' : ''} onclick="event.stopPropagation();" onchange="window.toggleAuditSelection('${logId}', this.checked)">`;
+                const cardCheck = `<input type="checkbox" class="audit-card-checkbox" value="${logId}" ${selectedAuditLogIds.has(logId) ? 'checked' : ''} onclick="event.stopPropagation();" onchange="window.toggleAuditSelection('${logId}', this.checked, event)">`;
                 return `
                 <div class="audit-card" style="position: relative;">
                     ${cardCheck}
                     <div class="audit-img-wrap" onclick="window.openAuditModal('${photo}', '${logId}', ${uTshirt}, ${uIdcard})">
-                        <img src="${photo}" class="audit-img" alt="Audit Photo">
+                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo">
                         <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2);">${typeBadge}</span>
                         ${statusBadgeHtml}
                     </div>
@@ -3034,9 +3146,35 @@
         }
     }
 
-    window.toggleAuditSelection = function(logId, isChecked) {
-        if (isChecked) selectedAuditLogIds.add(logId);
-        else selectedAuditLogIds.delete(logId);
+    let lastCheckedBox = null;
+
+    window.toggleAuditSelection = function(logId, isChecked, event) {
+        const currentBox = event.target;
+        
+        // If Shift is held and we have a previous box to reference
+        if (event && event.shiftKey && lastCheckedBox) {
+            const checkboxes = Array.from(document.querySelectorAll('.audit-card-checkbox'));
+            const start = checkboxes.indexOf(lastCheckedBox);
+            const end = checkboxes.indexOf(currentBox);
+            
+            // Protect against elements that might have disappeared from the DOM
+            if (start !== -1 && end !== -1) {
+                const min = Math.min(start, end);
+                const max = Math.max(start, end);
+                
+                for (let i = min; i <= max; i++) {
+                    checkboxes[i].checked = isChecked;
+                    if (isChecked) selectedAuditLogIds.add(checkboxes[i].value);
+                    else selectedAuditLogIds.delete(checkboxes[i].value);
+                }
+            }
+        } else {
+            // Standard single click
+            if (isChecked) selectedAuditLogIds.add(logId);
+            else selectedAuditLogIds.delete(logId);
+        }
+
+        lastCheckedBox = currentBox;
         window.updateBulkActionBar();
     };
 
@@ -3075,6 +3213,11 @@
     window.executeBulkAuditSave = async function() {
         if (selectedAuditLogIds.size === 0) return;
         
+        // Safety Check for massive batches
+        if (selectedAuditLogIds.size > 20) {
+            if (!confirm(`You are about to bulk-approve ${selectedAuditLogIds.size} photos at once. Are you sure?`)) return;
+        }
+        
         const tshirt = document.getElementById('bulk-tshirt').checked;
         const idcard = document.getElementById('bulk-idcard').checked;
         const btn = document.getElementById('btn-bulk-save');
@@ -3084,6 +3227,7 @@
         btn.disabled = true;
 
         const selectedArray = Array.from(selectedAuditLogIds);
+        window.lastBulkUpdateIds = [...selectedArray]; // Store for Undo
 
         // Optimistically update the UI arrays locally
         selectedArray.forEach(logId => {
@@ -3096,7 +3240,6 @@
         });
 
         try {
-            // Leverage Supabase .in() filter to batch update multiple rows in parallel
             const { error } = await supabaseClient
                 .from('attendance_logs')
                 .update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard })
@@ -3104,9 +3247,10 @@
 
             if (error) throw error;
 
-            showToast(`Successfully approved ${selectedArray.length} photos!`, "success");
+            // Show success toast with 6-second duration and an embedded Undo button
+            const undoBtnHtml = `<button onclick="window.undoBulkSave(event)" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 4px; margin-left: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Undo</button>`;
+            showToast(`Approved ${selectedArray.length} photos! ${undoBtnHtml}`, "success", 6000);
             
-            // Clear selection and re-render the UI
             selectedAuditLogIds.clear();
             
             // Uncheck the master toggles on the bar for the next time it opens
@@ -3123,6 +3267,39 @@
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
+        }
+    };
+
+    window.undoBulkSave = async function(e) {
+        if(e) {
+            e.stopPropagation();
+            const toast = e.target.closest('.toast');
+            if(toast) toast.style.display = 'none'; // Hide the toast immediately for snappy UX
+        }
+        
+        if (!window.lastBulkUpdateIds || window.lastBulkUpdateIds.length === 0) return;
+
+        // Revert local state
+        window.lastBulkUpdateIds.forEach(logId => {
+            const logIndex = dbLogs.findIndex(l => l.id === logId);
+            if(logIndex !== -1) {
+                dbLogs[logIndex].uniform_reviewed = false;
+                dbLogs[logIndex].uniform_tshirt = false;
+                dbLogs[logIndex].uniform_idcard = false;
+            }
+        });
+
+        try {
+            // Revert database state
+            await supabaseClient.from('attendance_logs')
+                .update({ uniform_reviewed: false, uniform_tshirt: false, uniform_idcard: false })
+                .in('id', window.lastBulkUpdateIds);
+
+            showToast("Bulk approval undone.", "primary");
+            window.lastBulkUpdateIds = [];
+            processStitchedData(); // Re-render the gallery to bring the photos back
+        } catch (err) {
+            showToast("Failed to undo action.", "error");
         }
     };
 
@@ -4443,20 +4620,20 @@
     // =========================================================================
     //  COMMAND PALETTE (Ctrl+K / Cmd+K) LOGIC
     // =========================================================================
-    document.addEventListener('keydown', (e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            const palette = document.getElementById('cmd-palette-overlay');
-            palette.style.display = 'flex';
-            document.getElementById('cmd-input').focus();
-            renderCmdResults('');
-        }
-        if (e.key === 'Escape') {
-            document.getElementById('cmd-palette-overlay').style.display = 'none';
-        }
-    });
+    
 
-    document.getElementById('cmd-input')?.addEventListener('input', (e) => renderCmdResults(e.target.value.toLowerCase()));
+    // Lightweight Debounce Utility
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    document.getElementById('cmd-input')?.addEventListener('input', debounce((e) => {
+        renderCmdResults(e.target.value.toLowerCase());
+    }, 150));
 
     function renderCmdResults(query) {
         const resultsContainer = document.getElementById('cmd-results');
@@ -4486,6 +4663,25 @@
             </div>`;
         });
 
+        // 3. System Actions (Triggered by typing ">" or matching keywords)
+        const actions = [
+            { name: '> Toggle Auto-Sync', icon: '🔄', action: () => document.getElementById('sync-toggle').click() },
+            { name: '> Change Theme', icon: '🎨', action: () => document.getElementById('btn-open-theme').click() },
+            { name: '> Log Out', icon: '🚪', action: () => document.getElementById('logout-btn').click() },
+            { name: '> Export Data Menu', icon: '📥', action: () => document.getElementById('export-btn').click() }
+        ];
+        
+        actions.filter(a => a.name.toLowerCase().includes(query)).forEach(a => {
+            html += `<div class="cmd-item" onclick="document.getElementById('cmd-palette-overlay').style.display='none'; (${a.action.toString()})();">
+                <span class="cmd-icon">${a.icon}</span> ${a.name.replace('> ', '')}
+            </div>`;
+        });
+
+        if (!query) {
+            html = `<div style="padding: 12px 16px; color: var(--text-soft); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Suggestions</div>` + html;
+            html += `<div style="padding: 12px 16px; color: var(--text-soft); font-size: 12px; margin-top: 8px; border-top: 1px solid var(--card-border);"><kbd style="background: var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">&gt;</kbd> Type <b>&gt;</b> for system actions</div>`;
+        }
+
         resultsContainer.innerHTML = html || `<div style="padding: 24px; text-align: center; color: var(--text-soft);">No results found</div>`;
     }
 
@@ -4506,6 +4702,150 @@
         updateStaffButtonText();
         processStitchedData();
     };
+
+    // =========================================================================
+    //  MASTER KEYBOARD SHORTCUTS
+    // =========================================================================
+    document.addEventListener('keydown', (e) => {
+        // Prevent shortcuts from firing if the admin is typing in an input/search box
+        const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+
+        // 1. Command Palette: Cmd+K, Ctrl+K, or "/"
+        if (!isTyping && ((e.metaKey || e.ctrlKey) && e.key === 'k' || e.key === '/')) {
+            e.preventDefault();
+            const palette = document.getElementById('cmd-palette-overlay');
+            if (palette) {
+                palette.style.display = 'flex';
+                const cmdInput = document.getElementById('cmd-input');
+                cmdInput.focus();
+                cmdInput.select(); // Instantly highlights previous text to overwrite
+                if (!cmdInput.value) renderCmdResults(''); // Only clear if empty
+            }
+            return;
+        }
+
+        // Show Shortcuts Cheat Sheet with "?"
+        if (!isTyping && e.key === '?') {
+            e.preventDefault();
+            const modal = document.getElementById('shortcuts-modal');
+            if (modal) modal.style.display = 'flex';
+            return;
+        }
+
+        // 2. Escape Key: Close Modals & Clear Selections
+        if (e.key === 'Escape') {
+            // Close Cmd Palette
+            const palette = document.getElementById('cmd-palette-overlay');
+            if (palette) palette.style.display = 'none';
+
+            // Close all standard Modals (Action, Roster, Photo, etc.)
+            document.querySelectorAll('.modal-overlay').forEach(m => {
+                if (m.style.display === 'flex') m.style.display = 'none';
+            });
+
+            // Clear bulk selections
+            if (typeof selectedAuditLogIds !== 'undefined' && selectedAuditLogIds.size > 0) {
+                selectedAuditLogIds.clear();
+                document.querySelectorAll('.audit-card-checkbox').forEach(cb => cb.checked = false);
+                if (typeof window.updateBulkActionBar === 'function') window.updateBulkActionBar();
+            }
+            return;
+        }
+
+        // 3. Photo Audit Modal Hotkeys
+        const photoModal = document.getElementById('photo-modal');
+        if (photoModal && photoModal.style.display === 'flex' && !isTyping) {
+            const tCheck = document.getElementById('modal-tshirt');
+            const iCheck = document.getElementById('modal-idcard');
+            const saveBtn = document.getElementById('btn-modal-audit-save');
+
+            // T and I to toggle uniform checks
+            if (e.key.toLowerCase() === 't' && tCheck) tCheck.checked = !tCheck.checked;
+            if (e.key.toLowerCase() === 'i' && iCheck) iCheck.checked = !iCheck.checked;
+
+            // Enter to Save
+            if (e.key === 'Enter' && saveBtn) {
+                e.preventDefault();
+                saveBtn.click();
+            }
+
+            // Left / Right Arrows to navigate through visible photos
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                if (!window.currentActiveAuditLogId) return;
+                
+                // Find the checkbox that corresponds to the currently open image
+                const currentBox = document.querySelector(`.audit-card-checkbox[value="${window.currentActiveAuditLogId}"]`);
+                if (currentBox) {
+                    const currentCard = currentBox.closest('.audit-card');
+                    // Create an array of only the cards currently visible on screen
+                    const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none');
+                    const currentIndex = allVisibleCards.indexOf(currentCard);
+
+                    if (currentIndex !== -1) {
+                        let nextIndex = e.key === 'ArrowRight' ? currentIndex + 1 : currentIndex - 1;
+                        
+                        // If a next/previous card exists, simulate a click to open it in the modal
+                        if (nextIndex >= 0 && nextIndex < allVisibleCards.length) {
+                            const nextCard = allVisibleCards[nextIndex];
+                            const imgWrap = nextCard.querySelector('.audit-img-wrap');
+                            if (imgWrap) imgWrap.click();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // =========================================================================
+    //  UNIVERSAL MODAL UPGRADES (Auto-Focus & Click-Outside to Close)
+    // =========================================================================
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        // 1. Standardize Click-Outside to Close
+        overlay.addEventListener('click', function(e) {
+            // Only close if they clicked the darkened background, not the card itself
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // 2. Auto-focus the first text input when a modal opens
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'style') {
+                    if (overlay.style.display === 'flex') {
+                        // Find the first logical input to focus
+                        const firstInput = overlay.querySelector('input[type="text"], input[type="email"], input[type="number"]');
+                        if (firstInput) setTimeout(() => firstInput.focus(), 50); // 50ms delay allows display transition to catch up
+                    }
+                }
+            });
+        });
+        observer.observe(overlay, { attributes: true });
+    });
+
+    // =========================================================================
+    //  NETWORK CONNECTIVITY WATCHER
+    // =========================================================================
+    window.addEventListener('offline', () => {
+        showToast("You are offline! Changes will not be saved.", "error", 100000); // Stays on screen
+        document.documentElement.style.filter = 'grayscale(0.6)'; // Visual cue that the app is frozen
+        // Disable dangerous bulk buttons
+        const bulkBtn = document.getElementById('btn-bulk-save');
+        if(bulkBtn) bulkBtn.disabled = true;
+    });
+
+    window.addEventListener('online', () => {
+        // Clear all toasts to remove the offline warning
+        document.getElementById('toast-container').innerHTML = ''; 
+        document.documentElement.style.filter = 'none';
+        
+        const bulkBtn = document.getElementById('btn-bulk-save');
+        if(bulkBtn) bulkBtn.disabled = false;
+        
+        showToast("Back online! Connection restored.", "success");
+        // Auto-refresh data to ensure we didn't miss anything while offline
+        if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(true);
+    });
 
   </script>
 </body>
