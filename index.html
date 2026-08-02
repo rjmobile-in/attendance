@@ -2716,14 +2716,6 @@
           }
       }
 
-      // Update Browser Tab Title for Background Notifications
-      const totalAlerts = unexcusedCount + pendingPhotoCount;
-      if (totalAlerts > 0) {
-          document.title = `(${totalAlerts}) RJ Mobile | Workspace`;
-      } else {
-          document.title = `RJ Mobile | Attendance Workspace`;
-      }
-
       const vDash = document.getElementById('view-dashboard');
       const vLogs = document.getElementById('view-logs');
       const vAudits = document.getElementById('view-audits');
