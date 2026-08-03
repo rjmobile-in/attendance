@@ -16,7 +16,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Export Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
@@ -662,8 +665,7 @@
               <div class="dropdown-content export-menu">
                 <a href="#" data-export="copy">📋 Copy Table</a>
                 <a href="#" data-export="pdf">📄 Download PDF</a>
-                <a href="#" data-export="csv">📊 Download CSV</a>
-                <a href="#" data-export="xls">📈 Download Excel</a>
+                <a href="#" data-export="xlsx">📈 Download Excel</a>
               </div>
             </div>
             
@@ -4633,17 +4635,19 @@
         const reportName = isStatsView ? "STAFF STATS" : "ATTENDANCE LOGS";
         const sDateStr = startDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
         const eDateStr = endDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
-        const titleString = `RJ MOBILE | ${reportName} (${sDateStr} - ${eDateStr})`;
-        const safeFileName = `RJ_Mobile_${reportName.replace(' ', '_')}`;
+        const titleLine1 = `RJ MOBILE | ${reportName}`;
+        const titleLine2 = `(${sDateStr} - ${eDateStr})`;
+        const titleString = `${titleLine1} ${titleLine2}`;
+        const safeFileName = `RJ_Mobile_${reportName.replace(/ /g, '_')}`;
 
         let columnHeaders, exportRows;
         
         if (isStatsView) {
             columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Lates", "EarlyOuts", "Missed Shirt", "Missed ID", "Missed Out"];
             exportRows = statsData.map(s => [
-                s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), s.totalHoursDec.toFixed(2), 
-                (s.sumWorkMins / 60).toFixed(2), (s.sumTravelMins / 60).toFixed(2),
-                (s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2),
+                s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), parseFloat(s.totalHoursDec.toFixed(2)), 
+                parseFloat((s.sumWorkMins / 60).toFixed(2)), parseFloat((s.sumTravelMins / 60).toFixed(2)),
+                parseFloat((s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2)),
                 s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
             ]);
         } else {
@@ -4664,59 +4668,184 @@
                 else if (d.isLate) status = "Late Arrival";
                 else if (d.isEarly) status = "Early Out";
                 
+                // Clean up Emojis & Arrows so PDF text wrapping calculates width perfectly
+                let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
+                
                 return [
                   d.date.toLocaleDateString('en-GB'), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', 
                   d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', d.formattedHours, d.formattedWork, d.formattedTravel,
-                  status, d.branches || "-"
+                  status, cleanBranches
                 ];
             });
         }
 
-        if (exportType === 'csv') {
-          if (exportRows.length === 0) return showToast("No data to export.", "error");
-          let csvString = `"${titleString}"\n\n` + columnHeaders.join(",") + "\n" + exportRows.map(r => `"${r.join('","')}"`).join("\n");
-          const anchor = document.createElement("a"); anchor.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csvString); anchor.download = `${safeFileName}.csv`; anchor.click();
-          return;
-        }
+        if (exportRows.length === 0) return showToast("No data to export.", "error");
 
         if (exportType === 'copy') {
-           if (exportRows.length === 0) return showToast("No data to copy.", "error");
            const clipboardText = titleString + "\n\n" + columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
            navigator.clipboard.writeText(clipboardText).then(() => showToast("Table & Header copied to clipboard!", "success"));
            return;
         }
 
-        // BUILD CLEAN HTML TEMPLATE FOR PDF & XLS
-        if (exportRows.length === 0) return showToast("No data to export.", "error");
+        // --- TRUE EXCEL (.XLSX) EXPORT W/ AUTO-SIZING COLUMNS ---
+        if (exportType === 'xlsx') {
+            showToast("Generating Excel File...", "primary");
+            
+            const wsData = [
+                [titleLine1], 
+                [titleLine2], 
+                [], 
+                columnHeaders,
+                ...exportRows
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Dynamically auto-size column widths based on maximum text length
+            const colWidths = columnHeaders.map((col, i) => {
+                let maxLength = col.length;
+                exportRows.forEach(row => {
+                    let cellVal = row[i] ? row[i].toString() : "";
+                    if (cellVal.length > maxLength) maxLength = cellVal.length;
+                });
+                return { wch: maxLength + 5 }; // Increased padding
+            });
+            ws['!cols'] = colWidths;
+            
+            // Merge title rows cleanly across
+            if(!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push({ s: {r:0, c:0}, e: {r:0, c:columnHeaders.length - 1} });
+            ws['!merges'].push({ s: {r:1, c:0}, e: {r:1, c:columnHeaders.length - 1} });
 
-        let htmlTableString = `
-        <div id="print-template" style="padding: 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000; background: #fff;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="logo.png" style="height: 60px; object-fit: contain; margin-bottom: 10px;" onerror="this.style.display='none'" />
-                <h2 style="margin: 0; font-size: 20px; font-weight: bold; color: #111;">${titleString}</h2>
-            </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-                <thead>
-                    <tr>${columnHeaders.map(h => `<th style="padding: 10px; border: 1px solid #ddd; background-color: #f1f5f9; font-weight: bold; color: #333;">${h}</th>`).join('')}</tr>
-                </thead>
-                <tbody>
-                    ${exportRows.map(r => `<tr>${r.map(c => `<td style="padding: 10px; border: 1px solid #ddd; color: #444;">${c}</td>`).join('')}</tr>`).join('')}
-                </tbody>
-            </table>
-        </div>`;
+            // Apply Styles to Cells (Colors, Alignment, Bold)
+            for (let i in ws) {
+                if (typeof ws[i] !== 'object') continue;
+                let cell = XLSX.utils.decode_cell(i);
+                
+                // Default alignment: Center
+                ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
 
+                if (cell.r === 0) {
+                    // Title Line 1 (Big, Bold, Indigo BG)
+                    ws[i].s.font = { bold: true, sz: 18, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
+                } else if (cell.r === 1) {
+                    // Title Line 2 (Date line, smaller, Indigo BG)
+                    ws[i].s.font = { bold: true, sz: 12, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
+                } else if (cell.r === 3) {
+                    // Column Headers (Bold, Green BG)
+                    ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "10B981" } };
+                } else if (cell.r > 3) {
+                    // Data rows alternate background colors
+                    if (cell.r % 2 === 0) {
+                        ws[i].s.fill = { fgColor: { rgb: "F8FAFC" } }; // Light gray
+                    }
+                }
+            }
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Export");
+            XLSX.writeFile(wb, `${safeFileName}.xlsx`);
+        }
+
+        // --- PERFECT TABLE PDF EXPORT ---
         if (exportType === 'pdf') {
-            showToast("Generating PDF. Please wait...", "primary");
-            html2pdf().set({
-                margin: 10,
-                filename: `${safeFileName}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-            }).from(htmlTableString).save();
-        } else if (exportType === 'xls') {
-           const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>${htmlTableString}</body></html>`;
-           const anchor = document.createElement("a"); anchor.href = "data:application/vnd.ms-excel;base64," + btoa(unescape(encodeURIComponent(template))); anchor.download = `${safeFileName}.xls`; anchor.click();
+            showToast("Generating PDF Table...", "primary");
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'pt', 'a4'); 
+            const pageWidth = doc.internal.pageSize.getWidth();
+            
+            // 1. Add Logo Centered
+            const existingLogo = document.querySelector('img[src="logo.png"]');
+            let startYOffset = 60;
+            if (existingLogo && existingLogo.complete) {
+                try {
+                    doc.addImage(existingLogo, 'PNG', pageWidth / 2 - 25, 20, 50, 50);
+                    startYOffset = 95;
+                } catch (e) { console.warn("Logo issue", e); }
+            }
+
+            // 2. Header Big & Bold Centered
+            doc.setFontSize(22);
+            doc.setTextColor(40, 40, 40);
+            doc.setFont("helvetica", "bold");
+            doc.text(titleLine1, pageWidth / 2, startYOffset, { align: 'center' });
+            
+            // 3. Date in Next Line
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont("helvetica", "normal");
+            doc.text(titleLine2, pageWidth / 2, startYOffset + 18, { align: 'center' });
+            
+            // Build native vector table matching Excel structure perfectly
+            doc.autoTable({
+                startY: startYOffset + 40,
+                head: [columnHeaders],
+                body: exportRows,
+                theme: 'grid',
+                headStyles: { 
+                    fillColor: [99, 102, 241],
+                    textColor: 255, 
+                    fontSize: 11, 
+                    fontStyle: 'bold',
+                    halign: 'center', // Align Center
+                    valign: 'middle'
+                },
+                bodyStyles: { 
+                    fontSize: 9.5, 
+                    cellPadding: 6, 
+                    textColor: [50, 50, 50],
+                    halign: 'center', // Align Center
+                    valign: 'middle'
+                },
+                styles: {
+                    overflow: 'linebreak', // Drops text to the next line instead of bleeding off-page
+                    cellWidth: 'auto'      // Shrinks the entire table to fit perfectly inside the A4 width
+                },
+                alternateRowStyles: {
+                    fillColor: [244, 244, 250]
+                },
+                margin: { left: 30, right: 30 },
+                didParseCell: function(data) {
+                    // 5. Dynamic text coloring for status & stats
+                    if (data.section === 'body') {
+                        const colName = columnHeaders[data.column.index];
+                        const val = data.cell.raw;
+                        
+                        if (colName === "Status") {
+                            if (val === 'On Time') {
+                                data.cell.styles.textColor = [16, 185, 129]; // Green
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (val === 'Late Arrival' || val === 'Early Out' || val === 'Late & Early Out') {
+                                data.cell.styles.textColor = [245, 158, 11]; // Orange
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (val === 'Missing' || val === 'Unexcused') {
+                                data.cell.styles.textColor = [239, 68, 68]; // Red
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (val === 'Excused') {
+                                data.cell.styles.textColor = [99, 102, 241]; // Blue
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                        
+                        if (colName === "OT/Shortage") {
+                            let numVal = parseFloat(val);
+                            if (numVal > 0) {
+                                data.cell.styles.textColor = [16, 185, 129]; // Green
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (numVal < 0) {
+                                data.cell.styles.textColor = [239, 68, 68];  // Red
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    }
+                }
+            });
+            
+            doc.save(`${safeFileName}.pdf`);
         }
       });
     });
