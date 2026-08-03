@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>RJ Mobile | Attendance Workspace</title>
   <link rel="icon" type="image/png" href="logo.png" />
+  
+  <!-- PWA Native App Polish -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
   
   <script>
     if (localStorage.getItem('rj_theme') === 'light') { 
@@ -26,6 +31,10 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Security & IndexedDB Caching -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
   <style>
     /* =========================================================
@@ -1784,6 +1793,8 @@
         }
     };
 
+    window.safeHTML = (str) => typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(str) : str;
+
     function showToast(message, type = 'primary', duration = 3000) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -2212,7 +2223,14 @@
       const { data: { session } } = await supabaseClient.auth.getSession();
       handleAuthChange(session?.user);
     }
-    supabaseClient.auth.onAuthStateChange((event, session) => handleAuthChange(session?.user));
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        // Kick back to login screen immediately if session dies or logs out
+        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESH_FAILED') {
+            localStorage.removeItem('rj_attendance_admin_auth');
+            window.location.reload(); 
+        }
+        handleAuthChange(session?.user);
+    });
 
     async function handleAuthChange(user) {
       const loader = document.getElementById('global-loader');
@@ -2388,16 +2406,18 @@
         if(excReason) excReason.innerHTML = opts;
     }
 
-    function loadFromCache() {
+    async function loadFromCache() {
       try {
-        const cachedLogs = localStorage.getItem('rj_cached_logs');
-        const cachedExceptions = localStorage.getItem('rj_cached_exceptions');
+        const cachedLogs = await localforage.getItem('rj_cached_logs');
+        const cachedExceptions = await localforage.getItem('rj_cached_exceptions');
         if (cachedLogs && cachedExceptions) {
           dbLogs = JSON.parse(cachedLogs);
           exceptionsData = JSON.parse(cachedExceptions);
           processStitchedData(); 
         }
-      } catch(e) {}
+      } catch(e) {
+          console.warn("Cache load failed", e);
+      }
     }
 
     async function executeLazyPhotoDelete() {
@@ -2565,10 +2585,21 @@
       eDate.setHours(23, 59, 59, 999);
       const endISO = eDate.toISOString();
 
-      const { data: logsData, count } = await supabaseClient
-        .from('attendance_logs').select('*', { count: 'exact' })
-        .gte('timestamp', startISO).lte('timestamp', endISO)
-        .order('timestamp', { ascending: false }).range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
+      // Build dynamic query
+      let query = supabaseClient
+        .from('attendance_logs')
+        .select('*', { count: 'exact' })
+        .gte('timestamp', startISO)
+        .lte('timestamp', endISO);
+
+      // Apply server-side Staff filter so pagination accurately reflects the UI
+      if (selectedStaffIds && selectedStaffIds.size > 0 && selectedStaffIds.size !== dbStaff.length) {
+          query = query.in('staff_id', Array.from(selectedStaffIds));
+      }
+
+      const { data: logsData, count } = await query
+        .order('timestamp', { ascending: false })
+        .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
         
       dbLogs = logsData || [];
       totalRecords = count || 0;
@@ -2594,8 +2625,8 @@
           exceptionsData[`${sId}_${e.date}_${type}`] = e;
       });
 
-      localStorage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
-      localStorage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
+      localforage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
+      localforage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
 
       processStitchedData();
     }
@@ -2911,7 +2942,8 @@
       if (activeSubTab === 'late') { 
           dataToRender = processedData.filter(row => (row.isLate || row.isEarly) && row.firstIn); 
       } else if (activeSubTab === 'missing-out') {
-          dataToRender = processedData.filter(row => row.firstIn && !row.lastOut && row.date.toDateString() !== todayStr);
+          // Removed the date restriction so it shows today's active staff too
+          dataToRender = processedData.filter(row => row.firstIn && !row.lastOut);
       } 
       
       if (dataToRender.length === 0) { 
@@ -4657,8 +4689,8 @@
             if (activeSubTab === 'late') {
                 dataToExport = processedData.filter(r => r.isLate || r.isEarly);
             } else if (activeSubTab === 'missing-out') {
-                const todayStr = new Date().toDateString();
-                dataToExport = processedData.filter(row => row.firstIn && !row.lastOut && row.date.toDateString() !== todayStr);
+                // Removed the date restriction for exports as well
+                dataToExport = processedData.filter(row => row.firstIn && !row.lastOut);
             }
 
             exportRows = dataToExport.map(d => {
