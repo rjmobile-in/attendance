@@ -541,6 +541,7 @@
         100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
     }
     
+  .spinner-sm { width: 24px; height: 24px; border: 3px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
   </style>
 </head>
 <body>
@@ -803,12 +804,7 @@
                 </div>
             </div>
 
-            <!-- UNIFIED PAGINATION CONTROLS -->
-            <div class="pagination-footer">
-              <button id="prev-page-btn" class="btn-secondary" disabled>← Previous 100</button>
-              <span id="page-indicator" style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Page 1</span>
-              <button id="next-page-btn" class="btn-secondary" disabled>Next 100 →</button>
-            </div>
+            
 
             <!-- TAB VIEWS CONTAINER -->
             <div id="export-container">
@@ -1647,8 +1643,10 @@
     let selectedRoleIds = new Set();
     
     let currentPage = 0;
-    const pageSize = 100;
+    const pageSize = 50;
     let totalRecords = 0;
+    let isFetchingLogs = false;
+    let hasMoreLogs = true;
     let activeSubTab = 'all';
     let showOnlyPendingPhotos = true;
     let selectedAuditLogIds = new Set(); // Tracks bulk selection
@@ -2242,8 +2240,7 @@
     document.getElementById('filter-out-start')?.addEventListener('change', processStitchedData);
     document.getElementById('filter-out-end')?.addEventListener('change', processStitchedData);
 
-    document.getElementById('prev-page-btn')?.addEventListener('click', () => { if (currentPage > 0) { currentPage--; fetchLogsFromDatabase(true); } });
-    document.getElementById('next-page-btn')?.addEventListener('click', () => { if ((currentPage + 1) * pageSize < totalRecords) { currentPage++; fetchLogsFromDatabase(true); } });
+    
 
     async function checkUser() {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -2582,36 +2579,40 @@
       });
     });
 
-    async function fetchLogsFromDatabase(keepPage = false) {
-      const masterTbody = document.getElementById('master-tbody');
-      if (masterTbody) {
-          masterTbody.innerHTML = Array(6).fill(`<tr>
-              <td><div class="skeleton" style="width: 80px;"></div></td>
-              <td><div class="skeleton" style="width: 150px; height: 16px; margin-bottom: 6px;"></div><br><div class="skeleton" style="width: 80px; height: 12px;"></div></td>
-              <td><div class="skeleton" style="width: 100%; height: 30px;"></div></td>
-              <td><div class="skeleton" style="width: 120px; height: 20px;"></div></td>
-              <td><div class="skeleton" style="width: 50px; height: 50px; border-radius: 8px;"></div></td>
-          </tr>`).join('');
-      }
+    async function fetchLogsFromDatabase(isAppend = false) {
+      if (isFetchingLogs) return;
+      isFetchingLogs = true;
 
-      const auditGrid = document.getElementById('audit-grid');
-      if (auditGrid) {
-          auditGrid.innerHTML = Array(8).fill(`
-          <div class="audit-card" style="pointer-events: none; border-color: transparent;">
-              <div class="skeleton" style="width: 100%; height: 220px; border-radius: 0;"></div>
-              <div class="audit-details" style="gap: 12px;">
-                  <div class="skeleton" style="width: 70%; height: 18px;"></div>
-                  <div class="skeleton" style="width: 40%; height: 12px;"></div>
-                  <div style="display: flex; gap: 8px; margin-top: 4px;">
-                      <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
-                      <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
+      if (!isAppend) {
+          currentPage = 0;
+          hasMoreLogs = true;
+          const masterTbody = document.getElementById('master-tbody');
+          if (masterTbody) {
+              masterTbody.innerHTML = Array(6).fill(`<tr>
+                  <td><div class="skeleton" style="width: 80px;"></div></td>
+                  <td><div class="skeleton" style="width: 150px; height: 16px; margin-bottom: 6px;"></div><br><div class="skeleton" style="width: 80px; height: 12px;"></div></td>
+                  <td><div class="skeleton" style="width: 100%; height: 30px;"></div></td>
+                  <td><div class="skeleton" style="width: 120px; height: 20px;"></div></td>
+                  <td><div class="skeleton" style="width: 50px; height: 50px; border-radius: 8px;"></div></td>
+              </tr>`).join('');
+          }
+          const auditGrid = document.getElementById('audit-grid');
+          if (auditGrid) {
+              auditGrid.innerHTML = Array(8).fill(`
+              <div class="audit-card" style="pointer-events: none; border-color: transparent;">
+                  <div class="skeleton" style="width: 100%; height: 220px; border-radius: 0;"></div>
+                  <div class="audit-details" style="gap: 12px;">
+                      <div class="skeleton" style="width: 70%; height: 18px;"></div>
+                      <div class="skeleton" style="width: 40%; height: 12px;"></div>
+                      <div style="display: flex; gap: 8px; margin-top: 4px;">
+                          <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
+                          <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
+                      </div>
+                      <div class="skeleton" style="width: 100%; height: 38px; border-radius: var(--radius-sm); margin-top: auto;"></div>
                   </div>
-                  <div class="skeleton" style="width: 100%; height: 38px; border-radius: var(--radius-sm); margin-top: auto;"></div>
-              </div>
-          </div>`).join('');
+              </div>`).join('');
+          }
       }
-      
-      if (!keepPage) currentPage = 0; 
       
       let sDate = new Date(startDate);
       sDate.setHours(0,0,0,0);
@@ -2621,14 +2622,12 @@
       eDate.setHours(23, 59, 59, 999);
       const endISO = eDate.toISOString();
 
-      // Build dynamic query
       let query = supabaseClient
         .from('attendance_logs')
         .select('*', { count: 'exact' })
         .gte('timestamp', startISO)
         .lte('timestamp', endISO);
 
-      // Apply server-side Staff filter so pagination accurately reflects the UI
       if (selectedStaffIds && selectedStaffIds.size > 0 && selectedStaffIds.size !== dbStaff.length) {
           query = query.in('staff_id', Array.from(selectedStaffIds));
       }
@@ -2637,34 +2636,36 @@
         .order('timestamp', { ascending: false })
         .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
         
-      dbLogs = logsData || [];
       totalRecords = count || 0;
 
-      const totalPages = Math.ceil(totalRecords / pageSize) || 1;
-      const pageIndicator = document.getElementById('page-indicator');
-      if(pageIndicator) pageIndicator.innerText = `Page ${currentPage + 1} of ${totalPages}`;
-      
-      const prevBtn = document.getElementById('prev-page-btn');
-      if(prevBtn) prevBtn.disabled = currentPage === 0;
-      
-      const nextBtn = document.getElementById('next-page-btn');
-      if(nextBtn) nextBtn.disabled = (currentPage + 1) * pageSize >= totalRecords;
+      if (!logsData || logsData.length < pageSize) {
+          hasMoreLogs = false;
+      }
 
-      const { data: excData } = await supabaseClient
-        .from('attendance_exceptions').select('*')
-        .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
-        
-      exceptionsData = {};
-      (excData || []).forEach(e => { 
-          const sId = e.staff_id || e.employee_name; 
-          const type = e.exception_type || 'Absent'; 
-          exceptionsData[`${sId}_${e.date}_${type}`] = e;
-      });
+      if (isAppend) {
+          dbLogs = [...dbLogs, ...(logsData || [])];
+      } else {
+          dbLogs = logsData || [];
+      }
+
+      if (!isAppend) {
+          const { data: excData } = await supabaseClient
+            .from('attendance_exceptions').select('*')
+            .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
+            
+          exceptionsData = {};
+          (excData || []).forEach(e => { 
+              const sId = e.staff_id || e.employee_name; 
+              const type = e.exception_type || 'Absent'; 
+              exceptionsData[`${sId}_${e.date}_${type}`] = e;
+          });
+      }
 
       localforage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
       localforage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
 
       processStitchedData();
+      isFetchingLogs = false;
     }
 
     function getDatesArrayFromFetchedLogs() {
@@ -3090,6 +3091,30 @@
           <td>${photosHTML}</td>
         </tr>`;
       }).join('');
+
+      if (hasMoreLogs) {
+          tbody.innerHTML += `
+          <tr id="infinite-scroll-trigger">
+              <td colspan="100%" style="text-align: center; padding: 24px; border: none; background: transparent !important;">
+                  <div class="spinner-sm"></div>
+                  <div style="color: var(--text-soft); font-size: 11px; margin-top: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Loading more records...</div>
+              </td>
+          </tr>`;
+      }
+
+      setTimeout(() => {
+          const trigger = document.getElementById('infinite-scroll-trigger');
+          if (trigger) {
+              if (window.tableScrollObserver) window.tableScrollObserver.disconnect();
+              window.tableScrollObserver = new IntersectionObserver((entries) => {
+                  if (entries[0].isIntersecting && !isFetchingLogs && hasMoreLogs) {
+                      currentPage++;
+                      fetchLogsFromDatabase(true);
+                  }
+              }, { root: document.querySelector('#master-table-container .table-responsive'), rootMargin: '100px', threshold: 0.1 });
+              window.tableScrollObserver.observe(trigger);
+          }
+      }, 100);
     }
 
     let liveStaffData = {}; 
