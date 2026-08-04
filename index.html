@@ -2042,8 +2042,8 @@
 
     // Native Mobile Back Button Support
     window.addEventListener('popstate', () => {
-        const pathName = window.location.pathname.replace(/^\/+/g, '');
-        const viewParam = pathName === '' || pathName === 'index.html' ? 'dashboard' : pathName;
+        const params = new URLSearchParams(window.location.search);
+        const viewParam = params.get('view') || 'dashboard';
         const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
         if (targetBtn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2085,11 +2085,11 @@
         
         const viewId = e.currentTarget.getAttribute('data-view');
         
-        // UPDATE URL TO USE / PATH ROUTING
+        // UPDATE URL TO USE QUERY PARAM ROUTING
         try {
-            const cleanView = viewId.replace('view-', '');
-            // Keep existing query params (filters) when switching tabs
-            window.history.pushState({}, '', '/' + cleanView + window.location.search);
+            const url = new URL(window.location);
+            url.searchParams.set('view', viewId.replace('view-', ''));
+            window.history.pushState({}, '', url);
         } catch (err) {
             console.warn("URL routing skipped.");
         }
@@ -2335,9 +2335,9 @@
               if (typeof initialMetadataLoad === 'function') await initialMetadataLoad();
               if (typeof setupRealtimeSync === 'function') setupRealtimeSync();
               
-              // READ PATH ON LOAD AND SWITCH TAB
-              const pathName = window.location.pathname.replace(/^\/+/g, '');
-              const viewParam = pathName === '' || pathName === 'index.html' ? 'dashboard' : pathName;
+              // READ URL ON LOAD AND SWITCH TAB
+              const params = new URLSearchParams(window.location.search);
+              const viewParam = params.get('view');
               if (viewParam) {
                   const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
                   if (targetBtn) targetBtn.click();
