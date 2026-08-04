@@ -690,7 +690,8 @@
             
             <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
             <button id="btn-open-theme" class="btn-secondary" title="Advanced Theme Customizer">🎨 Theme</button>
-            <button id="logout-btn" class="btn-secondary">Log Out</button>
+            <button id="fullscreen-btn" class="btn-secondary" title="Toggle Fullscreen">⛶ Fullscreen</button>
+            <button id="logout-btn" class="btn-secondary" style="margin-left: 8px;">Log Out</button>
           </div>
         </div>
 
@@ -1342,12 +1343,15 @@
   <!-- MODALS -->
   <div id="live-branch-modal" class="modal-overlay" onclick="window.closeModal(this)">
     <div class="modal-card" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
           <div>
               <h2 id="live-modal-title" style="margin-bottom: 4px;">Branch Name</h2>
               <p style="color: var(--success); font-weight: 600; font-size: calc(13px * var(--font-scale, 1));" id="live-modal-subtitle">0 Staff Currently In</p>
           </div>
-          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('live-branch-modal'))">&times;</span>
+          <div style="display: flex; gap: 12px; align-items: center;">
+              <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="window.copyLiveList()">📋 Copy List</button>
+              <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('live-branch-modal'))">&times;</span>
+          </div>
       </div>
       <div class="live-staff-list" id="live-staff-container"></div>
     </div>
@@ -2045,7 +2049,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (viewId === 'view-logs' || viewId === 'view-stats') {
+            if (viewId === 'view-logs' || viewId === 'view-stats' || viewId === 'view-action' || viewId === 'view-live') {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -2327,6 +2331,16 @@
         const loader = document.getElementById('global-loader');
         if(loader) loader.style.display = 'flex'; 
         await supabaseClient.auth.signOut(); 
+    });
+
+    document.getElementById('fullscreen-btn')?.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                showToast(`Error enabling fullscreen: ${err.message}`, "error");
+            });
+        } else {
+            document.exitFullscreen();
+        }
     });
 
     async function initialMetadataLoad() {
@@ -2914,7 +2928,16 @@
       });
       const badge = document.getElementById('absent-badge');
       if(badge) {
-          if(unexcusedCount > 0) { badge.innerText = unexcusedCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
+          if(unexcusedCount > 0) { 
+              badge.innerText = unexcusedCount; 
+              badge.style.display = 'inline-block'; 
+          } else { 
+              badge.style.display = 'none'; 
+              // Gamification: Perfect Day Confetti! (Fires only if there's actual data to prevent false positives)
+              if (totalPresent > 0 && totalLate === 0 && totalMissing === 0 && totalEarlyDepartures === 0 && document.getElementById('view-dashboard').style.display !== 'none') {
+                  setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#10b981', '#6366f1', '#ffffff'] }), 500);
+              }
+          }
       }
 
       // Calculate total pending photo audits
@@ -3188,6 +3211,19 @@
         }
         
         document.getElementById('live-branch-modal').style.display = 'flex';
+    };
+
+    window.copyLiveList = function() {
+        const title = document.getElementById('live-modal-title').innerText;
+        const subtitle = document.getElementById('live-modal-subtitle').innerText;
+        const names = Array.from(document.querySelectorAll('.live-staff-name')).map(el => "- " + el.innerText);
+        
+        if (names.length === 0) return showToast("No names to copy", "error");
+        
+        const textToCopy = `*${title}*\n${subtitle}\n\n${names.join('\n')}`;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showToast("List copied to clipboard! Ready to WhatsApp.", "success");
+        });
     };
 
 
@@ -4653,11 +4689,26 @@
         const exportType = e.target.getAttribute('data-export');
         
         const isStatsView = document.getElementById('view-stats').style.display === 'block';
-        const reportName = isStatsView ? "STAFF STATS" : "ATTENDANCE LOGS";
+        const isActionView = document.getElementById('view-action').style.display === 'block';
+        const isLiveView = document.getElementById('view-live').style.display === 'block';
+
+        let reportName = "ATTENDANCE LOGS";
+        if (isStatsView) {
+          reportName = "STAFF STATS";
+        } else if (isActionView) {
+          const actionTitles = { 'absent': 'ABSENT', 'late': 'LATE ARRIVALS', 'early': 'EARLY DEPARTURES' };
+          reportName = `ACTION CENTER - ${actionTitles[currentActionTab] || 'EXCEPTIONS'}`;
+        } else if (isLiveView) {
+          reportName = "LIVE TRACKER STATUS";
+        } else {
+          const logsTitles = { 'all': 'ALL', 'late': 'LATES & EARLY OUTS', 'missing-out': 'MISSING CLOCK-OUTS' };
+          reportName = `ATTENDANCE LOGS - ${logsTitles[activeSubTab] || 'ALL'}`;
+        }
+        
         const sDateStr = startDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
         const eDateStr = endDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
         const titleLine1 = `RJ MOBILE | ${reportName}`;
-        const titleLine2 = `(${sDateStr} - ${eDateStr})`;
+        const titleLine2 = isLiveView ? `(Generated: ${new Date().toLocaleString('en-GB')})` : `(${sDateStr} - ${eDateStr})`;
         const titleString = `${titleLine1} ${titleLine2}`;
         const safeFileName = `RJ_Mobile_${reportName.replace(/ /g, '_')}`;
 
@@ -4671,6 +4722,56 @@
                 parseFloat((s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2)),
                 s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
             ]);
+        } else if (isActionView) {
+            columnHeaders = ["Date", "Staff Name", "Role", "Exception", "Status"];
+            let dataToExport = [];
+            let actionTypeStr = '';
+
+            if (currentActionTab === 'absent') { dataToExport = missingData; actionTypeStr = 'Absent'; } 
+            else if (currentActionTab === 'late') { dataToExport = processedData.filter(r => r.isLate && !r.excLate); actionTypeStr = 'Late Arrival'; } 
+            else if (currentActionTab === 'early') { dataToExport = processedData.filter(r => r.isEarly && !r.excEarly); actionTypeStr = 'Early Departure'; }
+
+            exportRows = dataToExport.map(row => {
+                const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
+                let statusDetails = '';
+                if (currentActionTab === 'absent') statusDetails = reasonTxt ? reasonTxt : "Unexcused Absence";
+                else if (currentActionTab === 'late') statusDetails = reasonTxt ? reasonTxt : `Late In (${row.firstIn ? row.firstIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '--'})`;
+                else if (currentActionTab === 'early') statusDetails = reasonTxt ? reasonTxt : `Early Out (${row.lastOut ? row.lastOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '--'})`;
+
+                const staffObj = staffMap[row.staffId];
+                const rObj = staffObj ? roleMap[staffObj.role_id] : null;
+                const roleName = rObj ? rObj.role_name : (staffObj?.role || row.role || 'Unassigned');
+                return [row.date.toLocaleDateString('en-GB'), row.name, roleName, actionTypeStr, statusDetails];
+            });
+        } else if (isLiveView) {
+            columnHeaders = ["Location / Status", "Staff Name", "Role", "Timestamp"];
+            exportRows = [];
+            
+            // Add In Transit Staff
+            liveTransitList.forEach(log => {
+                const sId = getStaffId(log);
+                const sObj = staffMap[sId];
+                const rObj = roleMap[sObj?.role_id];
+                const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
+                const displayName = sObj ? sObj.name : log.employee_name;
+                const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
+                exportRows.push(["In Transit (Moving)", displayName, role, timeIn]);
+            });
+
+            // Add Branch Staff
+            dbBranches.forEach(b => {
+                if (liveStaffData[b.id] && liveStaffData[b.id].logs) {
+                    liveStaffData[b.id].logs.forEach(log => {
+                        const sId = getStaffId(log);
+                        const sObj = staffMap[sId];
+                        const rObj = roleMap[sObj?.role_id];
+                        const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
+                        const displayName = sObj ? sObj.name : log.employee_name;
+                        const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
+                        exportRows.push([b.branch_name, displayName, role, timeIn]);
+                    });
+                }
+            });
         } else {
             columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
             let dataToExport = processedData;
