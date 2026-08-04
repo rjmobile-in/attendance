@@ -2528,6 +2528,9 @@
       const syncToggle = document.getElementById('sync-toggle');
       if (savedSettings.sync !== undefined && syncToggle) syncToggle.checked = savedSettings.sync;
 
+      // Populate Settings Tables on direct page refresh
+      if (typeof loadSettingsData === 'function') loadSettingsData();
+
       await fetchLogsFromDatabase();
     }
     
