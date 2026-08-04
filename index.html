@@ -1647,6 +1647,31 @@
     let endDate = urlParams.get('end') ? new Date(urlParams.get('end')) : new Date();
     
     const minLaunchDate = new Date('2026-08-01');
+
+    // INSTANT TAB SWITCH ON LOAD (Prevents visual delay/flash)
+    (function() {
+        const urlParamsLocal = new URLSearchParams(window.location.search);
+        const viewParam = urlParamsLocal.get('view');
+        if (viewParam) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
+            
+            const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+                const titleEl = document.getElementById('page-title');
+                if (titleEl) titleEl.innerText = targetBtn.querySelector('.tab-btn-text').innerText;
+            }
+            const viewEl = document.getElementById(`view-${viewParam}`);
+            if (viewEl) viewEl.style.display = 'block';
+            
+            const exportBtn = document.getElementById('export-dropdown');
+            if (exportBtn) {
+                if (['logs', 'stats', 'action', 'live'].includes(viewParam)) exportBtn.style.display = 'inline-block';
+                else exportBtn.style.display = 'none';
+            }
+        }
+    })();
     if (startDate < minLaunchDate) startDate = minLaunchDate;
     if (endDate < minLaunchDate) endDate = minLaunchDate;
     
@@ -2369,14 +2394,6 @@
           try {
               if (typeof initialMetadataLoad === 'function') await initialMetadataLoad();
               if (typeof setupRealtimeSync === 'function') setupRealtimeSync();
-              
-              // READ URL ON LOAD AND SWITCH TAB
-              const params = new URLSearchParams(window.location.search);
-              const viewParam = params.get('view');
-              if (viewParam) {
-                  const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
-                  if (targetBtn) targetBtn.click();
-              }
           } catch (err) {
               console.error("Data Initialization Error:", err);
               showToast("Failed to load some data. Refresh page.", "error");
