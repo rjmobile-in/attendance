@@ -2747,8 +2747,7 @@
       isFetchingLogs = true;
 
       if (!isAppend) {
-          currentPage = 0;
-          hasMoreLogs = true;
+          currentPage = 0; // Reset UI pagination
           const masterTbody = document.getElementById('master-tbody');
           if (masterTbody) {
               masterTbody.innerHTML = Array(6).fill(`<tr>
@@ -2803,44 +2802,48 @@
           window.history.replaceState({}, '', url); // replaceState prevents bloating the back-button history
       } catch (err) {}
 
-      let query = supabaseClient
-        .from('attendance_logs')
-        .select('*', { count: 'exact' })
-        .gte('timestamp', startISO)
-        .lte('timestamp', endISO);
+      // FETCH ALL DATA FOR THE SELECTED RANGE
+      let allLogs = [];
+      let fetchCount = 1000;
+      let currentOffset = 0;
+      let keepFetching = true;
 
-      if (selectedStaffIds && selectedStaffIds.size > 0 && selectedStaffIds.size !== dbStaff.length) {
-          query = query.in('staff_id', Array.from(selectedStaffIds));
-      }
+      while(keepFetching) {
+          let query = supabaseClient
+            .from('attendance_logs')
+            .select('*')
+            .gte('timestamp', startISO)
+            .lte('timestamp', endISO);
 
-      const { data: logsData, count } = await query
-        .order('timestamp', { ascending: false })
-        .range(currentPage * pageSize, (currentPage + 1) * pageSize - 1);
-        
-      totalRecords = count || 0;
+          if (selectedStaffIds && selectedStaffIds.size > 0 && selectedStaffIds.size !== dbStaff.length) {
+              query = query.in('staff_id', Array.from(selectedStaffIds));
+          }
 
-      if (!logsData || logsData.length < pageSize) {
-          hasMoreLogs = false;
-      }
-
-      if (isAppend) {
-          dbLogs = [...dbLogs, ...(logsData || [])];
-      } else {
-          dbLogs = logsData || [];
-      }
-
-      if (!isAppend) {
-          const { data: excData } = await supabaseClient
-            .from('attendance_exceptions').select('*')
-            .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
+          const { data } = await query
+            .order('timestamp', { ascending: false })
+            .range(currentOffset, currentOffset + fetchCount - 1);
             
-          exceptionsData = {};
-          (excData || []).forEach(e => { 
-              const sId = e.staff_id || e.employee_name; 
-              const type = e.exception_type || 'Absent'; 
-              exceptionsData[`${sId}_${e.date}_${type}`] = e;
-          });
+          if (data && data.length > 0) {
+              allLogs = [...allLogs, ...data];
+              currentOffset += fetchCount;
+              if (data.length < fetchCount) keepFetching = false;
+          } else {
+              keepFetching = false;
+          }
       }
+
+      dbLogs = allLogs;
+
+      const { data: excData } = await supabaseClient
+        .from('attendance_exceptions').select('*')
+        .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
+        
+      exceptionsData = {};
+      (excData || []).forEach(e => { 
+          const sId = e.staff_id || e.employee_name; 
+          const type = e.exception_type || 'Absent'; 
+          exceptionsData[`${sId}_${e.date}_${type}`] = e;
+      });
 
       localforage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
       localforage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
@@ -3191,8 +3194,13 @@
           </td></tr>`; 
           return; 
       }
+
+      // CLIENT-SIDE PAGINATION LOGIC
+      const pageSizeUI = 50;
+      const paginatedData = dataToRender.slice(0, (currentPage + 1) * pageSizeUI);
+      const hasMoreLogsUI = paginatedData.length < dataToRender.length;
       
-      tbody.innerHTML = dataToRender.map(row => {
+      tbody.innerHTML = paginatedData.map(row => {
         if(!row.firstIn && !row.lastOut && !row.excAbsent && !row.excLate && !row.excEarly) return ''; 
 
         const isPastDate = row.date.toDateString() !== todayStr;
@@ -3281,7 +3289,7 @@
         </tr>`;
       }).join('');
 
-      if (hasMoreLogs) {
+      if (hasMoreLogsUI) {
           tbody.innerHTML += `
           <tr id="infinite-scroll-trigger">
               <td colspan="100%" style="text-align: center; padding: 24px; border: none; background: transparent !important;">
@@ -3296,9 +3304,9 @@
           if (trigger) {
               if (window.tableScrollObserver) window.tableScrollObserver.disconnect();
               window.tableScrollObserver = new IntersectionObserver((entries) => {
-                  if (entries[0].isIntersecting && !isFetchingLogs && hasMoreLogs) {
+                  if (entries[0].isIntersecting) {
                       currentPage++;
-                      fetchLogsFromDatabase(true);
+                      renderMasterTable();
                   }
               }, { root: document.querySelector('#master-table-container .table-responsive'), rootMargin: '100px', threshold: 0.1 });
               window.tableScrollObserver.observe(trigger);
