@@ -543,6 +543,11 @@
         100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
     }
 
+    /* Personalization: UI Density & Motion */
+    html.density-compact th, html.density-compact td { padding: 8px 16px !important; font-size: calc(12px * var(--font-scale, 1)) !important; }
+    html.density-compact .widget-card, html.density-compact .chart-card { padding: 16px !important; }
+    html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+
     /* Native Scroll Snapping */
     .sub-tabs { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
     .sub-tab-btn { scroll-snap-align: start; }
@@ -1299,8 +1304,20 @@
             <input type="color" id="theme-danger" class="color-picker-input theme-color-input" data-var="--danger" value="#ef4444">
         </div>
       </div>
+      
+      <div style="margin-top: 24px; margin-bottom: 8px; border-top: 1px solid var(--card-border); padding-top: 16px;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;">Workspace Preferences</label>
+      </div>
+      <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
+          <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
+          <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
+      </div>
+      <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 16px;">
+          <div><div style="color:var(--text-main);">Reduce Motion</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Disable animations for speed</div></div>
+          <label class="switch"><input type="checkbox" id="toggle-motion"><span class="slider"></span></label>
+      </div>
 
-      <div style="display: flex; gap: 12px; margin-top: 24px;">
+      <div style="display: flex; gap: 12px; margin-top: 12px;">
         <button id="btn-reset-theme" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Reset Defaults</button>
         <button id="btn-close-theme" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Done</button>
       </div>
@@ -1991,6 +2008,33 @@
                 showToast(`Applied ${presetKey} theme!`, "success");
             });
         });
+
+        // Apply Workspace Preferences
+        const toggleDensity = document.getElementById('toggle-density');
+        const toggleMotion = document.getElementById('toggle-motion');
+        
+        const uiPrefs = JSON.parse(localStorage.getItem('rj_ui_prefs') || '{"compact":false,"reducedMotion":false}');
+        if (uiPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
+        if (uiPrefs.reducedMotion) { document.documentElement.classList.add('reduce-motion'); if (toggleMotion) toggleMotion.checked = true; }
+        
+        if (toggleDensity) {
+            toggleDensity.addEventListener('change', (e) => {
+                if (e.target.checked) document.documentElement.classList.add('density-compact');
+                else document.documentElement.classList.remove('density-compact');
+                uiPrefs.compact = e.target.checked;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(uiPrefs));
+                showToast(e.target.checked ? "Compact Mode Enabled" : "Cozy Mode Enabled", "success");
+            });
+        }
+        if (toggleMotion) {
+            toggleMotion.addEventListener('change', (e) => {
+                if (e.target.checked) document.documentElement.classList.add('reduce-motion');
+                else document.documentElement.classList.remove('reduce-motion');
+                uiPrefs.reducedMotion = e.target.checked;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(uiPrefs));
+                showToast("Motion preferences saved", "success");
+            });
+        }
 
         if (btnResetTheme) {
             btnResetTheme.addEventListener('click', () => {
