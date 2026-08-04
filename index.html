@@ -4586,10 +4586,15 @@
         const isActionView = document.getElementById('view-action').style.display === 'block';
 
         let reportName = "ATTENDANCE LOGS";
-        if (isStatsView) reportName = "STAFF STATS";
-        if (isActionView) {
+        if (isStatsView) {
+          reportName = "STAFF STATS";
+        } else if (isActionView) {
           const actionTitles = { 'absent': 'ABSENT', 'late': 'LATE ARRIVALS', 'early': 'EARLY DEPARTURES' };
           reportName = `ACTION CENTER - ${actionTitles[currentActionTab] || 'EXCEPTIONS'}`;
+        } else {
+          // Dynamic title for Attendance Logs sub-tabs
+          const logsTitles = { 'all': 'ALL', 'late': 'LATES & EARLY OUTS', 'missing-out': 'MISSING CLOCK-OUTS' };
+          reportName = `ATTENDANCE LOGS - ${logsTitles[activeSubTab] || 'ALL'}`;
         }
 
         const sDateStr = startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
