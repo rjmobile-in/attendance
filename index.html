@@ -2526,7 +2526,6 @@
       const syncToggle = document.getElementById('sync-toggle');
       if (savedSettings.sync !== undefined && syncToggle) syncToggle.checked = savedSettings.sync;
 
-      loadFromCache();
       await fetchLogsFromDatabase();
     }
     
