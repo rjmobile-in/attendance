@@ -1102,7 +1102,7 @@
                                 
                                 <div style="width: 100%; display: flex; gap: 12px; margin-top: 8px;">
                                     <select id="new-staff-branch" class="input-field" style="margin:0; flex: 1.5;" title="Default Branch"></select>
-                                    <input type="date" id="new-staff-dob" class="input-field" title="Date of Birth" style="margin:0; flex: 1.5;">
+                                    <input type="text" id="new-staff-dob" class="input-field" title="Date of Birth" placeholder="Date of Birth" style="margin:0; flex: 1.5;">
                                     <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1;">
                                     <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1;">
                                     <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center;">Add Staff</button>
@@ -1379,7 +1379,7 @@
       <select id="edit-staff-branch" class="input-field" style="margin-top: 8px; margin-bottom: 8px;"></select>
       
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
-      <input type="date" id="edit-staff-dob" class="input-field" style="margin-top: 8px; margin-bottom: 8px;">
+      <input type="text" id="edit-staff-dob" class="input-field" placeholder="Select DOB" style="margin-top: 8px; margin-bottom: 8px;">
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
@@ -2356,6 +2356,8 @@
 
     if (document.getElementById("sched-start")) flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     if (document.getElementById("sched-end")) flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
+    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
     
     document.getElementById('filter-in-start')?.addEventListener('change', processStitchedData);
     document.getElementById('filter-in-end')?.addEventListener('change', processStitchedData);
@@ -4371,16 +4373,11 @@
     }
 
     async function loadSettingsData() {
-      const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
-      const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
-      const { data: rolesData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
-      const { data: reasonsData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
-      
       const formatTime = (t) => t ? t.substring(0, 5) : '';
 
       const roleTbody = document.getElementById('role-settings-list');
       if (roleTbody) {
-          roleTbody.innerHTML = (rolesData || dbRoles || []).map(r => {
+          roleTbody.innerHTML = (dbRoles || []).map(r => {
               const st = formatTime(r.shift_start);
               const en = formatTime(r.shift_end);
               return `<tr>
@@ -4399,7 +4396,7 @@
 
       const reasonTbody = document.getElementById('reason-settings-list');
       if (reasonTbody) {
-          reasonTbody.innerHTML = (reasonsData || dbReasons || []).map(r => `<tr>
+          reasonTbody.innerHTML = (dbReasons || []).map(r => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${r.reason_name}</strong></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <button class="edit-btn" onclick="window.openEditReason('${r.id}', '${r.reason_name.replace(/'/g, "\\'")}')">Edit</button>
@@ -4410,7 +4407,7 @@
 
       const staffTbody = document.getElementById('staff-settings-list');
       if (staffTbody) {
-          staffTbody.innerHTML = (staffData || []).map(s => {
+          staffTbody.innerHTML = (dbStaff || []).map(s => {
               const st = formatTime(s.shift_start);
               const en = formatTime(s.shift_end);
               const roleName = roleMap[s.role_id]?.role_name || s.role || 'No Role';
@@ -4426,7 +4423,7 @@
       
       const branchTbody = document.getElementById('branch-settings-list');
       if (branchTbody) {
-          branchTbody.innerHTML = (branchesData || []).map(b => `<tr>
+          branchTbody.innerHTML = (dbBranches || []).map(b => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong></td>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">Lat: ${b.latitude || 'N/A'}<br>Lng: ${b.longitude || 'N/A'}<br>Radius: ${b.radius_meters || 100}m</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
@@ -4678,6 +4675,11 @@
           document.getElementById('new-staff-pass').value = '';
           document.getElementById('new-staff-start').value = ''; 
           document.getElementById('new-staff-end').value = '';
+          const newDobEl = document.getElementById('new-staff-dob');
+          if (newDobEl) {
+              if (newDobEl._flatpickr) newDobEl._flatpickr.clear();
+              else newDobEl.value = '';
+          }
           
           await initialMetadataLoad(); 
           loadSettingsData(); 
@@ -4704,7 +4706,14 @@
         document.getElementById('edit-staff-start').value = start || '';
         document.getElementById('edit-staff-end').value = end || '';
         if (document.getElementById('edit-staff-branch')) document.getElementById('edit-staff-branch').value = defBranchId || '';
-        if (document.getElementById('edit-staff-dob')) document.getElementById('edit-staff-dob').value = dob || '';
+        if (document.getElementById('edit-staff-dob')) {
+            const dobEl = document.getElementById('edit-staff-dob');
+            if (dobEl._flatpickr) {
+                dobEl._flatpickr.setDate(dob || '');
+            } else {
+                dobEl.value = dob || '';
+            }
+        }
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
     
