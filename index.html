@@ -540,6 +540,11 @@
         0% { opacity: 0; transform: translateY(15px) scale(0.98); filter: blur(8px); }
         100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
     }
+
+    /* Native Scroll Snapping */
+    .sub-tabs { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    .sub-tab-btn { scroll-snap-align: start; }
+    .table-responsive { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
     
   .spinner-sm { width: 24px; height: 24px; border: 3px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
   </style>
@@ -1786,7 +1791,18 @@
 
     window.safeHTML = (str) => typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(str) : str;
 
+    // Haptic Feedback Helper
+    window.triggerHaptic = function(type = 'light') {
+        if (!navigator.vibrate) return;
+        try {
+            if (type === 'light') navigator.vibrate(15);
+            else if (type === 'success') navigator.vibrate([15, 50, 15]);
+            else if (type === 'error') navigator.vibrate([30, 40, 30, 40, 40]);
+        } catch (e) {}
+    };
+
     function showToast(message, type = 'primary', duration = 3000) {
+      window.triggerHaptic(type === 'primary' ? 'light' : type);
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
@@ -2002,6 +2018,50 @@
       localStorage.removeItem('rj_widget_order'); location.reload(); 
     });
 
+    // --- WAKE LOCK API (Prevents screen sleep on Dashboard & Live Tracker) ---
+    let screenWakeLock = null;
+    async function manageWakeLock(viewId) {
+        if (!('wakeLock' in navigator)) return;
+        try {
+            if (viewId === 'view-dashboard' || viewId === 'view-live') {
+                if (!screenWakeLock) screenWakeLock = await navigator.wakeLock.request('screen');
+            } else {
+                if (screenWakeLock) { await screenWakeLock.release(); screenWakeLock = null; }
+            }
+        } catch (err) { console.warn("Wake Lock failed:", err); }
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) manageWakeLock(activeTab.getAttribute('data-view'));
+        } else {
+            screenWakeLock = null; // Browser auto-releases lock when hidden
+        }
+    });
+
+    // Native Mobile Back Button Support
+    window.addEventListener('popstate', () => {
+        const params = new URLSearchParams(window.location.search);
+        const viewParam = params.get('view') || 'dashboard';
+        const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
+        if (targetBtn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            targetBtn.classList.add('active');
+            document.querySelectorAll('.app-view').forEach(v => {
+                v.style.display = 'none';
+                v.classList.remove('animate-tab');
+            });
+            const viewEl = document.getElementById(`view-${viewParam}`);
+            if (viewEl) {
+                viewEl.style.display = 'block';
+                void viewEl.offsetWidth;
+                viewEl.classList.add('animate-tab');
+            }
+            const titleEl = document.getElementById('page-title');
+            if (titleEl) titleEl.innerText = targetBtn.querySelector('.tab-btn-text').innerText;
+        }
+    });
+
     // Main Tab Switcher Logic
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -2054,6 +2114,7 @@
             }
         }
         
+        manageWakeLock(viewId); // Keep screen alive if needed
         if (viewId === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard(); 
         if (viewId === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
         if (viewId === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
@@ -3929,6 +3990,7 @@
         item.style.transform = ''; // Instant reset
 
         if (toBranchId === fromBranchId) return;
+        window.triggerHaptic('light'); // Snappy feel on drop
 
         const dateStr = toLocalISO(currentRosterDate);
         item.style.opacity = '0.5'; // Visual loading indicator
@@ -5112,6 +5174,25 @@
               localStorage.setItem('rj_sidebar_collapsed', appSidebar.classList.contains('collapsed'));
           }
         });
+    }
+
+    // Native Pull-to-Refresh Logic
+    let touchStartY = 0;
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.addEventListener('touchstart', e => {
+            if (mainContent.scrollTop === 0) touchStartY = e.touches[0].clientY;
+        }, {passive: true});
+        mainContent.addEventListener('touchend', e => {
+            if (mainContent.scrollTop === 0 && touchStartY > 0) {
+                const touchEndY = e.changedTouches[0].clientY;
+                if (touchEndY - touchStartY > 100) { // Pulled down 100px
+                    showToast("Refreshing...", "primary", 1500);
+                    if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false);
+                }
+            }
+            touchStartY = 0;
+        }, {passive: true});
     }
 
     // =========================================================================
