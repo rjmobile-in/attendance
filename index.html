@@ -1636,8 +1636,9 @@
     let globalShiftStart = "10:00";
     let globalShiftEnd = "19:00";
     
-    let startDate = new Date();
-    let endDate = new Date();
+    const urlParams = new URLSearchParams(window.location.search);
+    let startDate = urlParams.get('start') ? new Date(urlParams.get('start')) : new Date();
+    let endDate = urlParams.get('end') ? new Date(urlParams.get('end')) : new Date();
     
     const minLaunchDate = new Date('2026-08-01');
     if (startDate < minLaunchDate) startDate = minLaunchDate;
@@ -2041,8 +2042,8 @@
 
     // Native Mobile Back Button Support
     window.addEventListener('popstate', () => {
-        const params = new URLSearchParams(window.location.search);
-        const viewParam = params.get('view') || 'dashboard';
+        const pathName = window.location.pathname.replace(/^\/+/g, '');
+        const viewParam = pathName === '' || pathName === 'index.html' ? 'dashboard' : pathName;
         const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
         if (targetBtn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2084,13 +2085,13 @@
         
         const viewId = e.currentTarget.getAttribute('data-view');
         
-        // UPDATE URL PARAMETER SILENTLY (Safe for local file:// testing)
+        // UPDATE URL TO USE / PATH ROUTING
         try {
-            const url = new URL(window.location);
-            url.searchParams.set('view', viewId.replace('view-', ''));
-            window.history.pushState({}, '', url);
+            const cleanView = viewId.replace('view-', '');
+            // Keep existing query params (filters) when switching tabs
+            window.history.pushState({}, '', '/' + cleanView + window.location.search);
         } catch (err) {
-            console.warn("URL routing skipped (running locally).");
+            console.warn("URL routing skipped.");
         }
 
         // Update Page Title
@@ -2334,9 +2335,9 @@
               if (typeof initialMetadataLoad === 'function') await initialMetadataLoad();
               if (typeof setupRealtimeSync === 'function') setupRealtimeSync();
               
-              // READ URL ON LOAD AND SWITCH TAB
-              const params = new URLSearchParams(window.location.search);
-              const viewParam = params.get('view');
+              // READ PATH ON LOAD AND SWITCH TAB
+              const pathName = window.location.pathname.replace(/^\/+/g, '');
+              const viewParam = pathName === '' || pathName === 'index.html' ? 'dashboard' : pathName;
               if (viewParam) {
                   const targetBtn = document.querySelector(`.tab-btn[data-view="view-${viewParam}"]`);
                   if (targetBtn) targetBtn.click();
@@ -2454,9 +2455,10 @@
           dbBranches.forEach(b => branchMap[b.id] = b);
       } catch (err) {}
 
-      selectedStaffIds = new Set(dbStaff.map(s => s.id));
-      selectedBranchIds = new Set(dbBranches.map(b => b.id));
-      selectedRoleIds = new Set(dbRoles.map(r => r.id));
+      const uParams = new URLSearchParams(window.location.search);
+      selectedStaffIds = uParams.get('staff') ? new Set(uParams.get('staff').split(',')) : new Set(dbStaff.map(s => s.id));
+      selectedBranchIds = uParams.get('branches') ? new Set(uParams.get('branches').split(',')) : new Set(dbBranches.map(b => b.id));
+      selectedRoleIds = uParams.get('roles') ? new Set(uParams.get('roles').split(',')) : new Set(dbRoles.map(r => r.id));
       
       populateRoleDropdowns(); 
       populateBranchDropdowns(); 
@@ -2682,6 +2684,24 @@
       let eDate = new Date(endDate);
       eDate.setHours(23, 59, 59, 999);
       const endISO = eDate.toISOString();
+
+      // SILENTLY UPDATE URL QUERY PARAMS WITH FILTERS
+      try {
+          const url = new URL(window.location);
+          url.searchParams.set('start', toLocalISO(sDate));
+          url.searchParams.set('end', toLocalISO(eDate));
+          
+          if (selectedStaffIds.size !== dbStaff.length) url.searchParams.set('staff', Array.from(selectedStaffIds).join(','));
+          else url.searchParams.delete('staff');
+          
+          if (selectedBranchIds.size !== dbBranches.length) url.searchParams.set('branches', Array.from(selectedBranchIds).join(','));
+          else url.searchParams.delete('branches');
+          
+          if (selectedRoleIds.size !== dbRoles.length) url.searchParams.set('roles', Array.from(selectedRoleIds).join(','));
+          else url.searchParams.delete('roles');
+
+          window.history.replaceState({}, '', url); // replaceState prevents bloating the back-button history
+      } catch (err) {}
 
       let query = supabaseClient
         .from('attendance_logs')
