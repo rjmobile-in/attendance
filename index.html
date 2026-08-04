@@ -8,12 +8,13 @@
   
   <!-- PWA Native App Polish -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
   
   <script>
-    if (localStorage.getItem('rj_theme') === 'light') { 
+    const savedTheme = localStorage.getItem('rj_theme');
+    // If user chose light OR (they have no saved preference AND their OS is set to Light mode)
+    if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) { 
       document.documentElement.classList.add('light-theme'); 
     }
   </script>
@@ -555,7 +556,11 @@
         <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(14px * var(--font-scale, 1));">Secure admin access.</p>
         
         <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
-        <input type="password" id="password-input" class="input-field" placeholder="Password" style="margin-bottom: 8px;" />
+        
+        <div style="position: relative; margin-bottom: 8px;">
+            <input type="password" id="password-input" class="input-field" placeholder="Password" style="margin: 0; padding-right: 40px;" />
+            <span onclick="const inp = document.getElementById('password-input'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
+        </div>
         
         <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: calc(14px * var(--font-scale, 1));">Log In</button>
         <div id="error-msg" style="color: var(--danger); margin-top: 16px; display: none; background: var(--danger-alpha); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--danger-alpha); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Error</div>
@@ -934,14 +939,14 @@
                         <table id="stats-table">
                         <thead>
                             <tr>
-                            <th>Staff Name</th>
-                            <th>Role</th>
-                            <th>Days Present</th>
+                            <th onclick="window.sortStats('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Name ⇅</th>
+                            <th onclick="window.sortStats('role')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Role ⇅</th>
+                            <th onclick="window.sortStats('days')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Present ⇅</th>
                             <th>Avg In & Out</th>
-                            <th>Total Hours</th>
+                            <th onclick="window.sortStats('hours')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Total Hours ⇅</th>
                             <th>Work vs Travel</th>
                             <th>Target vs Actual</th>
-                            <th>Infractions (Unexcused)</th>
+                            <th onclick="window.sortStats('lates')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Infractions (Unexcused) ⇅</th>
                             </tr>
                         </thead>
                         <tbody id="stats-tbody">
@@ -1558,7 +1563,7 @@
         Audit Photo
         <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
       </h3>
-      <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo">
+      <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/18181b/ef4444?text=Image+Purged/Expired'">
       <div id="audit-controls" style="display:none; flex-direction:column; gap:16px; margin-top:8px;">
           <div class="modal-checkboxes">
               <label class="check-wrap"><input type="checkbox" id="modal-tshirt"> RJ T-Shirt</label>
@@ -1944,17 +1949,19 @@
     function setupRealtimeSync() {
       const isSyncOn = document.getElementById('sync-toggle')?.checked;
       if (isSyncOn && !realtimeSubscription) {
-        realtimeSubscription = supabaseClient
-          .channel('public:attendance_logs')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, payload => {
+        const handleSync = () => {
             const currentTime = Date.now();
             if (currentTime - lastSyncTime > 2000) {
                 lastSyncTime = currentTime;
-                if (!isUserBusy()) {
-                    fetchLogsFromDatabase(true); 
-                }
+                if (!isUserBusy()) fetchLogsFromDatabase(true); 
             }
-          })
+        };
+        
+        realtimeSubscription = supabaseClient
+          .channel('workspace-changes')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, handleSync)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_exceptions' }, handleSync)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'staff_roster' }, handleSync)
           .subscribe();
       } else if (!isSyncOn && realtimeSubscription) {
         supabaseClient.removeChannel(realtimeSubscription);
@@ -1996,22 +2003,32 @@
     // Main Tab Switcher Logic
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
+        
+        // Auto-close sidebar on mobile/tablet after clicking a navigation tab
+        if (window.innerWidth <= 900) {
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar && !sidebar.classList.contains('collapsed')) {
+                sidebar.classList.add('collapsed');
+                localStorage.setItem('rj_sidebar_collapsed', 'true');
+            }
+        }
+
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
         document.querySelectorAll('.app-view').forEach(v => {
-          v.style.display = 'none';
-          v.classList.remove('animate-tab'); // Reset animation class
+            v.style.display = 'none';
+            v.classList.remove('animate-tab'); // Reset animation class
         });
         
         const viewId = e.currentTarget.getAttribute('data-view');
         
         // UPDATE URL PARAMETER SILENTLY (Safe for local file:// testing)
         try {
-          const url = new URL(window.location);
-          url.searchParams.set('view', viewId.replace('view-', ''));
-          window.history.pushState({}, '', url);
+            const url = new URL(window.location);
+            url.searchParams.set('view', viewId.replace('view-', ''));
+            window.history.pushState({}, '', url);
         } catch (err) {
-          console.warn("URL routing skipped (running locally).");
+            console.warn("URL routing skipped (running locally).");
         }
 
         // Update Page Title
@@ -2020,19 +2037,19 @@
         
         const viewEl = document.getElementById(viewId);
         if (viewEl) {
-          viewEl.style.display = 'block';
-          // Trigger reflow to restart CSS animation cleanly
-          void viewEl.offsetWidth;
-          viewEl.classList.add('animate-tab');
+            viewEl.style.display = 'block';
+            // Trigger reflow to restart CSS animation cleanly
+            void viewEl.offsetWidth;
+            viewEl.classList.add('animate-tab');
         }
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-          if (viewId === 'view-logs' || viewId === 'view-stats' || viewId === 'view-action') {
-            exportBtn.style.display = 'inline-block';
-          } else {
-            exportBtn.style.display = 'none';
-          }
+            if (viewId === 'view-logs' || viewId === 'view-stats') {
+                exportBtn.style.display = 'inline-block';
+            } else {
+                exportBtn.style.display = 'none';
+            }
         }
         
         if (viewId === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard(); 
@@ -2040,10 +2057,10 @@
         if (viewId === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
         if (viewId === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
         if (viewId === 'view-action' && typeof renderAbsentTable === 'function') {
-          document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelector('#action-center-tabs .sub-tab-btn[data-action-filter="absent"]').classList.add('active');
-          currentActionTab = 'absent';
-          renderAbsentTable();
+            document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('#action-center-tabs .sub-tab-btn[data-action-filter="absent"]').classList.add('active');
+            currentActionTab = 'absent';
+            renderAbsentTable();
         }
         if (viewId === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
         if (viewId === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
@@ -2113,6 +2130,27 @@
     window.addEventListener('click', (e) => { 
       const isDropdownClick = e.target.closest('.dropdown') || e.target.closest('.dropdown-content');
       if (!isDropdownClick) { toggleDropdown(''); }
+    });
+
+    // Keyboard accessibility for dropdowns
+    document.addEventListener('keydown', (e) => {
+        const openDropdown = document.querySelector('.dropdown-content.show');
+        if (!openDropdown) return;
+        
+        const focusable = Array.from(openDropdown.querySelectorAll('input, button, a, [tabindex]:not([tabindex="-1"])'));
+        if (!focusable.length) return;
+        
+        let currentIndex = focusable.indexOf(document.activeElement);
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            let nextIndex = (currentIndex + 1) % focusable.length;
+            focusable[nextIndex].focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            let prevIndex = (currentIndex - 1 + focusable.length) % focusable.length;
+            focusable[prevIndex].focus();
+        }
     });
 
     let todayEndLimit = new Date();
@@ -3005,7 +3043,7 @@
 
         const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
 
-        return `<tr>
+        return `<tr ondblclick="window.openEditTimeModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" style="cursor: pointer;" title="Double-click row to Edit Time">
           <td style="color:var(--text-soft)">${displayDate}</td>
           <td><strong>${row.name}</strong><br><span class="role-tag">${row.role}</span></td>
           <td>
@@ -3190,12 +3228,13 @@
            }
            if(outVal) {
                const newOutIso = new Date(`${activeEditDateStr}T${outVal}:00`).toISOString();
+               const editorTag = currentUserEmail ? `Admin Edited (${currentUserEmail})` : 'Admin Edited';
                if(editLogOutId) {
-                   await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso }).eq('id', editLogOutId);
+                   await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso, branch: editorTag }).eq('id', editLogOutId);
                } else {
                    await supabaseClient.from('attendance_logs').insert([{
                        staff_id: activeEditStaffId, employee_name: activeEditStaffName, 
-                       action: 'Clock Out', branch: 'Admin Edited', timestamp: newOutIso
+                       action: 'Clock Out', branch: editorTag, timestamp: newOutIso
                    }]);
                }
            }
@@ -3241,7 +3280,7 @@
                 <div class="audit-card" style="position: relative;">
                     ${cardCheck}
                     <div class="audit-img-wrap" onclick="window.openAuditModal('${photo}', '${logId}', ${uTshirt}, ${uIdcard})">
-                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo">
+                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300/18181b/a1a1aa?text=Expired'">
                         <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2);">${typeBadge}</span>
                         ${statusBadgeHtml}
                     </div>
@@ -3402,6 +3441,9 @@
 
         const selectedArray = Array.from(selectedAuditLogIds);
         window.lastBulkUpdateIds = [...selectedArray]; // Store for Undo
+        
+        // 1. Create a deep clone snapshot for strict rollback
+        const dbLogsSnapshot = JSON.parse(JSON.stringify(dbLogs));
 
         // Optimistically update the UI arrays locally
         selectedArray.forEach(logId => {
@@ -3419,7 +3461,11 @@
                 .update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard })
                 .in('id', selectedArray);
 
-            if (error) throw error;
+            if (error) {
+                // Rollback local state on API failure
+                dbLogs = dbLogsSnapshot;
+                throw error;
+            }
 
             // Show success toast with 6-second duration and an embedded Undo button
             const undoBtnHtml = `<button onclick="window.undoBulkSave(event)" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 4px; margin-left: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Undo</button>`;
@@ -3475,6 +3521,31 @@
         } catch (err) {
             showToast("Failed to undo action.", "error");
         }
+    };
+
+    let statsSortCol = '';
+    let statsSortAsc = true;
+    window.sortStats = function(column) {
+        if (statsSortCol === column) statsSortAsc = !statsSortAsc;
+        else { statsSortCol = column; statsSortAsc = true; }
+        
+        statsData.sort((a, b) => {
+            let valA, valB;
+            if (column === 'name') { valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); }
+            else if (column === 'role') { valA = a.role.toLowerCase(); valB = b.role.toLowerCase(); }
+            else if (column === 'days') { valA = a.daysPresent; valB = b.daysPresent; }
+            else if (column === 'hours') { valA = a.totalHoursDec; valB = b.totalHoursDec; }
+            else if (column === 'lates') { 
+                // Sum all infractions for sorting
+                valA = a.lateCount + a.earlyCount + a.missedShirt + a.missedId + a.missedOut; 
+                valB = b.lateCount + b.earlyCount + b.missedShirt + b.missedId + b.missedOut; 
+            }
+            
+            if (valA < valB) return statsSortAsc ? -1 : 1;
+            if (valA > valB) return statsSortAsc ? 1 : -1;
+            return 0;
+        });
+        renderStaffStats();
     };
 
     function renderStaffStats() {
@@ -4578,27 +4649,13 @@
 
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
       item.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelector('.export-menu').classList.remove('show');
+        e.preventDefault(); document.querySelector('.export-menu').classList.remove('show');
         const exportType = e.target.getAttribute('data-export');
         
         const isStatsView = document.getElementById('view-stats').style.display === 'block';
-        const isActionView = document.getElementById('view-action').style.display === 'block';
-
-        let reportName = "ATTENDANCE LOGS";
-        if (isStatsView) {
-          reportName = "STAFF STATS";
-        } else if (isActionView) {
-          const actionTitles = { 'absent': 'ABSENT', 'late': 'LATE ARRIVALS', 'early': 'EARLY DEPARTURES' };
-          reportName = `ACTION CENTER - ${actionTitles[currentActionTab] || 'EXCEPTIONS'}`;
-        } else {
-          // Dynamic title for Attendance Logs sub-tabs
-          const logsTitles = { 'all': 'ALL', 'late': 'LATES & EARLY OUTS', 'missing-out': 'MISSING CLOCK-OUTS' };
-          reportName = `ATTENDANCE LOGS - ${logsTitles[activeSubTab] || 'ALL'}`;
-        }
-
-        const sDateStr = startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        const eDateStr = endDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const reportName = isStatsView ? "STAFF STATS" : "ATTENDANCE LOGS";
+        const sDateStr = startDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
+        const eDateStr = endDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
         const titleLine1 = `RJ MOBILE | ${reportName}`;
         const titleLine2 = `(${sDateStr} - ${eDateStr})`;
         const titleString = `${titleLine1} ${titleLine2}`;
@@ -4607,260 +4664,220 @@
         let columnHeaders, exportRows;
         
         if (isStatsView) {
-          columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Lates", "EarlyOuts", "Missed Shirt", "Missed ID", "Missed Out"];
-          exportRows = statsData.map(s => [
-            s.name, 
-            s.role, 
-            s.daysPresent, 
-            formatMinsTo24h(s.sumInMins / s.daysPresent), 
-            formatMinsTo24h(s.sumOutMins / s.daysOut), 
-            parseFloat(s.totalHoursDec.toFixed(2)), 
-            parseFloat((s.sumWorkMins / 60).toFixed(2)), 
-            parseFloat((s.sumTravelMins / 60).toFixed(2)),
-            parseFloat((s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2)),
-            s.lateCount, 
-            s.earlyCount, 
-            s.missedShirt, 
-            s.missedId, 
-            s.missedOut
-          ]);
-        } else if (isActionView) {
-          columnHeaders = ["Date", "Staff Name", "Role", "Exception", "Status"];
-          let dataToExport = [];
-          let actionTypeStr = '';
-
-          if (currentActionTab === 'absent') {
-            dataToExport = missingData;
-            actionTypeStr = 'Absent';
-          } else if (currentActionTab === 'late') {
-            dataToExport = processedData.filter(r => r.isLate && !r.excLate);
-            actionTypeStr = 'Late Arrival';
-          } else if (currentActionTab === 'early') {
-            dataToExport = processedData.filter(r => r.isEarly && !r.excEarly);
-            actionTypeStr = 'Early Departure';
-          }
-
-          exportRows = dataToExport.map(row => {
-            const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
-            let statusDetails = '';
-
-            if (currentActionTab === 'absent') {
-              statusDetails = reasonTxt ? reasonTxt : "Unexcused Absence";
-            } else if (currentActionTab === 'late') {
-              let inTimeStr = row.firstIn ? row.firstIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '--';
-              statusDetails = reasonTxt ? reasonTxt : `Late In (${inTimeStr})`;
-            } else if (currentActionTab === 'early') {
-              let outTimeStr = row.lastOut ? row.lastOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '--';
-              statusDetails = reasonTxt ? reasonTxt : `Early Out (${outTimeStr})`;
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Lates", "EarlyOuts", "Missed Shirt", "Missed ID", "Missed Out"];
+            exportRows = statsData.map(s => [
+                s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), parseFloat(s.totalHoursDec.toFixed(2)), 
+                parseFloat((s.sumWorkMins / 60).toFixed(2)), parseFloat((s.sumTravelMins / 60).toFixed(2)),
+                parseFloat((s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2)),
+                s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
+            ]);
+        } else {
+            columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
+            let dataToExport = processedData;
+            
+            if (activeSubTab === 'late') {
+                dataToExport = processedData.filter(r => r.isLate || r.isEarly);
+            } else if (activeSubTab === 'missing-out') {
+                // Removed the date restriction for exports as well
+                dataToExport = processedData.filter(row => row.firstIn && !row.lastOut);
             }
 
-            const staffObj = staffMap[row.staffId];
-            const rObj = staffObj ? roleMap[staffObj.role_id] : null;
-            const roleName = rObj ? rObj.role_name : (staffObj?.role || row.role || 'Unassigned');
-
-            return [row.date.toLocaleDateString('en-GB'), row.name, roleName, actionTypeStr, statusDetails];
-          });
-        } else {
-          columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
-          let dataToExport = processedData;
-          
-          if (activeSubTab === 'late') {
-            dataToExport = processedData.filter(r => r.isLate || r.isEarly);
-          } else if (activeSubTab === 'missing-out') {
-            dataToExport = processedData.filter(row => row.firstIn && !row.lastOut);
-          }
-
-          exportRows = dataToExport.map(d => {
-            let status = "On Time";
-            if (d.excAbsent || d.excLate || d.excEarly) status = "Excused";
-            else if (d.isLate && d.isEarly) status = "Late & Early Out";
-            else if (d.isLate) status = "Late Arrival";
-            else if (d.isEarly) status = "Early Out";
-            
-            let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
-            
-            return [
-              d.date.toLocaleDateString('en-GB'), 
-              d.name, 
-              d.role, 
-              d.firstIn ? d.firstIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'N/A', 
-              d.lastOut ? d.lastOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'N/A', 
-              d.formattedHours, 
-              d.formattedWork, 
-              d.formattedTravel,
-              status, 
-              cleanBranches
-            ];
-          });
+            exportRows = dataToExport.map(d => {
+                let status = "On Time";
+                if(d.excAbsent || d.excLate || d.excEarly) status = "Excused";
+                else if (d.isLate && d.isEarly) status = "Late & Early Out";
+                else if (d.isLate) status = "Late Arrival";
+                else if (d.isEarly) status = "Early Out";
+                
+                // Clean up Emojis & Arrows so PDF text wrapping calculates width perfectly
+                let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
+                
+                return [
+                  d.date.toLocaleDateString('en-GB'), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', 
+                  d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', d.formattedHours, d.formattedWork, d.formattedTravel,
+                  status, cleanBranches
+                ];
+            });
         }
 
         if (exportRows.length === 0) return showToast("No data to export.", "error");
 
         if (exportType === 'copy') {
-          const clipboardText = titleString + "\n\n" + columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
-          navigator.clipboard.writeText(clipboardText).then(() => showToast("Table & Header copied to clipboard!", "success"));
-          return;
+           const clipboardText = titleString + "\n\n" + columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
+           navigator.clipboard.writeText(clipboardText).then(() => showToast("Table & Header copied to clipboard!", "success"));
+           return;
         }
 
         // --- TRUE EXCEL (.XLSX) EXPORT W/ AUTO-SIZING COLUMNS ---
         if (exportType === 'xlsx') {
-          showToast("Generating Excel File...", "primary");
-          
-          const wsData = [
-            [titleLine1], 
-            [titleLine2], 
-            [], 
-            columnHeaders,
-            ...exportRows
-          ];
-          
-          const ws = XLSX.utils.aoa_to_sheet(wsData);
-          
-          // Dynamically auto-size column widths based on maximum text length
-          const colWidths = columnHeaders.map((col, i) => {
-            let maxLength = col.length;
-            exportRows.forEach(row => {
-              let cellVal = row[i] ? row[i].toString() : "";
-              if (cellVal.length > maxLength) maxLength = cellVal.length;
-            });
-            return { wch: maxLength + 5 }; // Increased padding
-          });
-          ws['!cols'] = colWidths;
-          
-          // Merge title rows cleanly across
-          if (!ws['!merges']) ws['!merges'] = [];
-          ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: columnHeaders.length - 1 } });
-          ws['!merges'].push({ s: { r: 1, c: 0 }, e: { r: 1, c: columnHeaders.length - 1 } });
-
-          // Apply Styles to Cells (Colors, Alignment, Bold)
-          for (let i in ws) {
-            if (typeof ws[i] !== 'object') continue;
-            let cell = XLSX.utils.decode_cell(i);
+            showToast("Generating Excel File...", "primary");
             
-            // Default alignment: Center
-            ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+            const wsData = [
+                [titleLine1], 
+                [titleLine2], 
+                [], 
+                columnHeaders,
+                ...exportRows
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Dynamically auto-size column widths based on maximum text length
+            const colWidths = columnHeaders.map((col, i) => {
+                let maxLength = col.length;
+                exportRows.forEach(row => {
+                    let cellVal = row[i] ? row[i].toString() : "";
+                    if (cellVal.length > maxLength) maxLength = cellVal.length;
+                });
+                return { wch: maxLength + 5 }; // Increased padding
+            });
+            ws['!cols'] = colWidths;
+            
+            // Merge title rows cleanly across
+            if(!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push({ s: {r:0, c:0}, e: {r:0, c:columnHeaders.length - 1} });
+            ws['!merges'].push({ s: {r:1, c:0}, e: {r:1, c:columnHeaders.length - 1} });
 
-            if (cell.r === 0) {
-              // Title Line 1 (Big, Bold, Indigo BG)
-              ws[i].s.font = { bold: true, sz: 18, color: { rgb: "FFFFFF" } };
-              ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
-            } else if (cell.r === 1) {
-              // Title Line 2 (Date line, smaller, Indigo BG)
-              ws[i].s.font = { bold: true, sz: 12, color: { rgb: "FFFFFF" } };
-              ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
-            } else if (cell.r === 3) {
-              // Column Headers (Bold, Green BG)
-              ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-              ws[i].s.fill = { fgColor: { rgb: "10B981" } };
-            } else if (cell.r > 3) {
-              // Data rows alternate background colors
-              if (cell.r % 2 === 0) {
-                ws[i].s.fill = { fgColor: { rgb: "F8FAFC" } }; // Light gray
-              }
+            // Apply Styles to Cells (Colors, Alignment, Bold)
+            for (let i in ws) {
+                if (typeof ws[i] !== 'object') continue;
+                let cell = XLSX.utils.decode_cell(i);
+                
+                // Default alignment: Center
+                ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+
+                if (cell.r === 0) {
+                    // Title Line 1 (Big, Bold, Indigo BG)
+                    ws[i].s.font = { bold: true, sz: 18, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
+                } else if (cell.r === 1) {
+                    // Title Line 2 (Date line, smaller, Indigo BG)
+                    ws[i].s.font = { bold: true, sz: 12, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
+                } else if (cell.r === 3) {
+                    // Column Headers (Bold, Green BG)
+                    ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "10B981" } };
+                } else if (cell.r > 3) {
+                    // Data rows alternate background colors
+                    if (cell.r % 2 === 0) {
+                        ws[i].s.fill = { fgColor: { rgb: "F8FAFC" } }; // Light gray
+                    }
+                }
             }
-          }
 
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, "Export");
-          XLSX.writeFile(wb, `${safeFileName}.xlsx`);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Export");
+            XLSX.writeFile(wb, `${safeFileName}.xlsx`);
         }
 
         // --- PERFECT TABLE PDF EXPORT ---
         if (exportType === 'pdf') {
-          showToast("Generating PDF Table...", "primary");
-          
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF('landscape', 'pt', 'a4'); 
-          const pageWidth = doc.internal.pageSize.getWidth();
-          
-          // 1. Add Logo Centered
-          const existingLogo = document.querySelector('img[src="logo.png"]');
-          let startYOffset = 60;
-          if (existingLogo && existingLogo.complete) {
-            try {
-              doc.addImage(existingLogo, 'PNG', pageWidth / 2 - 25, 20, 50, 50);
-              startYOffset = 95;
-            } catch (e) { console.warn("Logo issue", e); }
-          }
-
-          // 2. Header Big & Bold Centered
-          doc.setFontSize(22);
-          doc.setTextColor(40, 40, 40);
-          doc.setFont("helvetica", "bold");
-          doc.text(titleLine1, pageWidth / 2, startYOffset, { align: 'center' });
-          
-          // 3. Date in Next Line
-          doc.setFontSize(12);
-          doc.setTextColor(100, 100, 100);
-          doc.setFont("helvetica", "normal");
-          doc.text(titleLine2, pageWidth / 2, startYOffset + 18, { align: 'center' });
-          
-          // Build native vector table matching Excel structure perfectly
-          doc.autoTable({
-            startY: startYOffset + 40,
-            head: [columnHeaders],
-            body: exportRows,
-            theme: 'grid',
-            headStyles: { 
-              fillColor: [99, 102, 241],
-              textColor: 255, 
-              fontSize: 11, 
-              fontStyle: 'bold',
-              halign: 'center',
-              valign: 'middle'
-            },
-            bodyStyles: { 
-              fontSize: 9.5, 
-              cellPadding: 6, 
-              textColor: [50, 50, 50],
-              halign: 'center',
-              valign: 'middle'
-            },
-            styles: {
-              overflow: 'linebreak',
-              cellWidth: 'auto'
-            },
-            alternateRowStyles: {
-              fillColor: [244, 244, 250]
-            },
-            margin: { left: 30, right: 30 },
-            didParseCell: function(data) {
-              // Dynamic text coloring for status & stats
-              if (data.section === 'body') {
-                const colName = columnHeaders[data.column.index];
-                const val = data.cell.raw;
-                
-                if (colName === "Status") {
-                  if (val === 'On Time') {
-                    data.cell.styles.textColor = [16, 185, 129];
-                    data.cell.styles.fontStyle = 'bold';
-                  } else if (val.includes('Late') || val.includes('Early') || val === 'Late & Early Out') {
-                    data.cell.styles.textColor = [245, 158, 11];
-                    data.cell.styles.fontStyle = 'bold';
-                  } else if (val.includes('Missing') || val.includes('Unexcused')) {
-                    data.cell.styles.textColor = [239, 68, 68];
-                    data.cell.styles.fontStyle = 'bold';
-                  } else {
-                    data.cell.styles.textColor = [99, 102, 241];
-                    data.cell.styles.fontStyle = 'bold';
-                  }
-                }
-                
-                if (colName === "OT/Shortage") {
-                  let numVal = parseFloat(val);
-                  if (numVal > 0) {
-                    data.cell.styles.textColor = [16, 185, 129];
-                    data.cell.styles.fontStyle = 'bold';
-                  } else if (numVal < 0) {
-                    data.cell.styles.textColor = [239, 68, 68];  
-                    data.cell.styles.fontStyle = 'bold';
-                  }
-                }
-              }
+            showToast("Generating PDF Table...", "primary");
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'pt', 'a4'); 
+            const pageWidth = doc.internal.pageSize.getWidth();
+            
+            // 1. Add Logo Centered
+            const existingLogo = document.querySelector('img[src="logo.png"]');
+            let startYOffset = 60;
+            if (existingLogo && existingLogo.complete) {
+                try {
+                    doc.addImage(existingLogo, 'PNG', pageWidth / 2 - 25, 20, 50, 50);
+                    startYOffset = 95;
+                } catch (e) { console.warn("Logo issue", e); }
             }
-          });
-          
-          doc.save(`${safeFileName}.pdf`);
+
+            // 2. Header Big & Bold Centered
+            doc.setFontSize(22);
+            doc.setTextColor(40, 40, 40);
+            doc.setFont("helvetica", "bold");
+            doc.text(titleLine1, pageWidth / 2, startYOffset, { align: 'center' });
+            
+            // 3. Date in Next Line
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont("helvetica", "normal");
+            doc.text(titleLine2, pageWidth / 2, startYOffset + 18, { align: 'center' });
+            
+            // Build native vector table matching Excel structure perfectly
+            doc.autoTable({
+                startY: startYOffset + 40,
+                head: [columnHeaders],
+                body: exportRows,
+                theme: 'grid',
+                headStyles: { 
+                    fillColor: [99, 102, 241],
+                    textColor: 255, 
+                    fontSize: 11, 
+                    fontStyle: 'bold',
+                    halign: 'center', // Align Center
+                    valign: 'middle'
+                },
+                bodyStyles: { 
+                    fontSize: 9.5, 
+                    cellPadding: 6, 
+                    textColor: [50, 50, 50],
+                    halign: 'center', // Align Center
+                    valign: 'middle'
+                },
+                styles: {
+                    overflow: 'linebreak', // Drops text to the next line instead of bleeding off-page
+                    cellWidth: 'auto'      // Shrinks the entire table to fit perfectly inside the A4 width
+                },
+                alternateRowStyles: {
+                    fillColor: [244, 244, 250]
+                },
+                margin: { left: 30, right: 30, bottom: 40 },
+                didDrawPage: function(data) {
+                  // Footer with Page Numbers
+                  doc.setFontSize(10);
+                  doc.setTextColor(150, 150, 150);
+                  doc.text(
+                    'Page ' + doc.internal.getNumberOfPages(),
+                    pageWidth / 2,
+                    doc.internal.pageSize.getHeight() - 20,
+                    { align: 'center' }
+                  );
+                },
+                didParseCell: function(data) {
+                    // 5. Dynamic text coloring for status & stats
+                    if (data.section === 'body') {
+                        const colName = columnHeaders[data.column.index];
+                        const val = data.cell.raw;
+                        
+                        if (colName === "Status") {
+                            if (val === 'On Time') {
+                                data.cell.styles.textColor = [16, 185, 129]; // Green
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (val === 'Late Arrival' || val === 'Early Out' || val === 'Late & Early Out') {
+                                data.cell.styles.textColor = [245, 158, 11]; // Orange
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (val === 'Missing' || val === 'Unexcused') {
+                                data.cell.styles.textColor = [239, 68, 68]; // Red
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (val === 'Excused') {
+                                data.cell.styles.textColor = [99, 102, 241]; // Blue
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                        
+                        if (colName === "OT/Shortage") {
+                            let numVal = parseFloat(val);
+                            if (numVal > 0) {
+                                data.cell.styles.textColor = [16, 185, 129]; // Green
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (numVal < 0) {
+                                data.cell.styles.textColor = [239, 68, 68];  // Red
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    }
+                }
+            });
+            
+            doc.save(`${safeFileName}.pdf`);
         }
       });
     });
@@ -5162,6 +5179,15 @@
     document.addEventListener('keydown', (e) => {
         // Prevent shortcuts from firing if the admin is typing in an input/search box
         const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+
+        // Tab Navigation Shortcuts (Alt + 1 to 9)
+        if (!isTyping && e.altKey && e.key >= '1' && e.key <= '9') {
+            e.preventDefault();
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabIndex = parseInt(e.key) - 1;
+            if (tabs[tabIndex]) tabs[tabIndex].click();
+            return;
+        }
 
         // 1. Command Palette: Cmd+K, Ctrl+K, or "/"
         if (!isTyping && ((e.metaKey || e.ctrlKey) && e.key === 'k' || e.key === '/')) {
