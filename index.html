@@ -1759,6 +1759,15 @@
         element.animId = window.requestAnimationFrame(step);
     }
 
+    function formatMinsToDuration(mins) {
+        if (isNaN(mins) || mins === 0) return "0h 0m";
+        const sign = mins < 0 ? "-" : "";
+        const absMins = Math.abs(mins);
+        const h = Math.floor(absMins / 60);
+        const m = Math.floor(absMins % 60);
+        return `${sign}${h}h ${m}m`;
+    }
+
     function formatMsToHrMin(ms) {
         if (!ms || ms <= 0) return "0h 0m";
         const totalMins = Math.floor(ms / 60000);
@@ -3868,7 +3877,7 @@
             if (column === 'name') { valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); }
             else if (column === 'role') { valA = a.role.toLowerCase(); valB = b.role.toLowerCase(); }
             else if (column === 'days') { valA = a.daysPresent; valB = b.daysPresent; }
-            else if (column === 'hours') { valA = a.totalHoursDec; valB = b.totalHoursDec; }
+            else if (column === 'hours') { valA = a.sumWorkMins + a.sumTravelMins; valB = b.sumWorkMins + b.sumTravelMins; }
             else if (column === 'lates') { 
                 // Sum all infractions for sorting
                 valA = a.lateCount + a.earlyCount + a.missedShirt + a.missedId + a.missedOut; 
@@ -3888,20 +3897,23 @@
         if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-soft);">No data available.</td></tr>'; return; }
         
         tbody.innerHTML = statsData.map(s => {
-            const expectedTotal = s.daysPresent * s.dailyTargetHours;
-            const diff = s.totalHoursDec - expectedTotal;
+            const expectedMins = Math.round(s.daysPresent * s.dailyTargetHours * 60);
+            const totalMins = s.sumWorkMins + s.sumTravelMins;
+            const diffMins = totalMins - expectedMins;
+            
             let otHtml = '';
             if (s.daysPresent > 0) {
-                if (diff > 0.5) otHtml = `<span class="badge bg-green">OT: +${diff.toFixed(1)}h</span>`;
-                else if (diff < -0.5) otHtml = `<span class="badge bg-red">Short: ${diff.toFixed(1)}h</span>`;
+                if (diffMins > 30) otHtml = `<span class="badge bg-green">OT: +${formatMinsToDuration(diffMins)}</span>`;
+                else if (diffMins < -30) otHtml = `<span class="badge bg-red">Short: ${formatMinsToDuration(diffMins)}</span>`;
                 else otHtml = `<span class="badge bg-gray">Balanced</span>`;
             } else otHtml = `-`;
             
             let avgIn = formatMinsTo24h(s.sumInMins / s.daysPresent);
             let avgOut = formatMinsTo24h(s.sumOutMins / s.daysOut);
             
-            let formattedWork = formatMsToHrMin(s.sumWorkMins * 60000);
-            let formattedTravel = formatMsToHrMin(s.sumTravelMins * 60000);
+            let formattedWork = formatMinsToDuration(s.sumWorkMins);
+            let formattedTravel = formatMinsToDuration(s.sumTravelMins);
+            let formattedTotal = formatMinsToDuration(totalMins);
 
             let infractions = [];
             if(s.lateCount > 0) infractions.push(`<span style="color:var(--warning)">Lates: ${s.lateCount}</span>`);
@@ -3915,14 +3927,14 @@
                 <td><span class="role-tag">${s.role}</span></td>
                 <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700;">${s.daysPresent}</td>
                 <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary);">${s.totalHoursDec.toFixed(1)}h</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary);">${formattedTotal}</td>
                 <td>
                   <span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600;">
                     Work: <span style="color:var(--success)">${formattedWork}</span><br>
                     Travel: <span style="color:var(--warning)">${formattedTravel}</span>
                   </span>
                 </td>
-                <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedTotal.toFixed(1)}h</span></td>
+                <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${formatMinsToDuration(expectedMins)}</span></td>
                 <td style="font-size:calc(12px * var(--font-scale, 1)); font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
             </tr>`;
         }).join('');
@@ -5022,12 +5034,19 @@
         
         if (isStatsView) {
             columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Lates", "EarlyOuts", "Missed Shirt", "Missed ID", "Missed Out"];
-            exportRows = statsData.map(s => [
-                s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), parseFloat(s.totalHoursDec.toFixed(2)), 
-                parseFloat((s.sumWorkMins / 60).toFixed(2)), parseFloat((s.sumTravelMins / 60).toFixed(2)),
-                parseFloat((s.totalHoursDec - (s.daysPresent * s.dailyTargetHours)).toFixed(2)),
-                s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
-            ]);
+            exportRows = statsData.map(s => {
+                const expectedMins = Math.round(s.daysPresent * s.dailyTargetHours * 60);
+                const totalMins = s.sumWorkMins + s.sumTravelMins;
+                const diffMins = totalMins - expectedMins;
+                return [
+                    s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), 
+                    formatMinsToDuration(totalMins), 
+                    formatMinsToDuration(s.sumWorkMins), 
+                    formatMinsToDuration(s.sumTravelMins),
+                    formatMinsToDuration(diffMins),
+                    s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
+                ];
+            });
         } else if (isActionView) {
             columnHeaders = ["Date", "Staff Name", "Role", "Exception", "Status"];
             let dataToExport = [];
