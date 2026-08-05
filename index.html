@@ -395,14 +395,28 @@
     .live-staff-name { font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); }
 
     /* =========================================================
-       SIDEBAR MINIMIZE ANIMATION
+       SIDEBAR MINIMIZE ANIMATION (GEMINI STYLE)
        ========================================================= */
     .sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; white-space: nowrap; width: 280px; }
     .sidebar.collapsed { width: 88px; }
-    .brand-info { display: flex; align-items: center; gap: 12px; transition: opacity 0.2s ease; opacity: 1; }
-    .sidebar-toggle-btn { position: absolute; right: 0px; top: 4px; background: var(--input-bg); border: 1px solid var(--card-border); transition: all 0.3s ease; z-index: 10; }
-    .sidebar.collapsed .brand-info { opacity: 0; pointer-events: none; width: 0; }
-    .sidebar.collapsed .sidebar-toggle-btn { right: 50%; transform: translateX(50%); }
+    
+    .brand-info { display: flex; align-items: center; gap: 12px; transition: all 0.3s ease; opacity: 1; width: 100%; }
+    .brand-text-wrap { transition: opacity 0.2s ease, width 0.2s ease; overflow: hidden; }
+    .sidebar-toggle-btn { position: absolute; right: 0px; top: 4px; background: var(--input-bg); border: 1px solid var(--card-border); transition: all 0.3s ease; z-index: 10; cursor: pointer; }
+    
+    /* Collapsed State: Hide Text, Keep Logo Centered */
+    .sidebar.collapsed .brand-text-wrap { opacity: 0; width: 0; }
+    .sidebar.collapsed .sidebar-brand { padding-left: 0; padding-right: 0; justify-content: center; border-bottom-color: transparent; }
+    .sidebar.collapsed .brand-info { justify-content: center; gap: 0; }
+    .sidebar.collapsed .brand-info img { transition: opacity 0.3s ease; opacity: 1; transform: translateX(5px); }
+    
+    /* Collapsed State: Hide Toggle Button Initially */
+    .sidebar.collapsed .sidebar-toggle-btn { right: 50%; transform: translateX(50%); opacity: 0; pointer-events: none; }
+    
+    /* Hover Magic: Hide Logo, Show Toggle Button */
+    .sidebar.collapsed .sidebar-brand:hover .brand-info img { opacity: 0; }
+    .sidebar.collapsed .sidebar-brand:hover .sidebar-toggle-btn { opacity: 1; pointer-events: auto; }
+    
     .tab-icon { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .tab-btn-text { transition: opacity 0.2s ease, width 0.2s ease; }
     .sidebar.collapsed .tab-btn-text, .sidebar.collapsed .sidebar-category { opacity: 0; width: 0; overflow: hidden; height: 0; margin: 0; }
