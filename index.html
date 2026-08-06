@@ -1246,14 +1246,15 @@
                             <h3>Quick Theme Presets</h3>
                             <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Instantly change the look and feel of your app.</p>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="theme-presets-container">
+                                <button class="btn-secondary preset-btn" data-preset="rjmobile" style="font-size: 12px; padding: 6px 12px; border-color: #f37021; color: #f37021;">📱 RJ Mobile</button>
                                 <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
                                 <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
-                                <button class="btn-secondary preset-btn" data-preset="ocean" style="font-size: 12px; padding: 6px 12px;">🌊 Ocean</button>
-                                <button class="btn-secondary preset-btn" data-preset="forest" style="font-size: 12px; padding: 6px 12px;">🌲 Forest</button>
-                                <button class="btn-secondary preset-btn" data-preset="sunset" style="font-size: 12px; padding: 6px 12px;">🌇 Sunset</button>
+                                <button class="btn-secondary preset-btn" data-preset="ocean" style="font-size: 12px; padding: 6px 12px;">� Ocean</button>
+                                <button class="btn-secondary preset-btn" data-preset="forest" style="font-size: 12px; padding: 6px 12px;">� Forest</button>
+                                <button class="btn-secondary preset-btn" data-preset="sunset" style="font-size: 12px; padding: 6px 12px;">� Sunset</button>
                                 <button class="btn-secondary preset-btn" data-preset="midnight" style="font-size: 12px; padding: 6px 12px;">🌌 Midnight</button>
                                 <button class="btn-secondary preset-btn" data-preset="coffee" style="font-size: 12px; padding: 6px 12px;">☕ Coffee</button>
-                                <button class="btn-secondary preset-btn" data-preset="cyberpunk" style="font-size: 12px; padding: 6px 12px;">🤖 Cyberpunk</button>
+                                <button class="btn-secondary preset-btn" data-preset="cyberpunk" style="font-size: 12px; padding: 6px 12px;">� Cyberpunk</button>
                                 <button class="btn-secondary preset-btn" data-preset="dracula" style="font-size: 12px; padding: 6px 12px;">🧛‍♂️ Dracula</button>
                                 <button class="btn-secondary preset-btn" data-preset="nord" style="font-size: 12px; padding: 6px 12px;">❄️ Nord</button>
                                 <button class="btn-secondary preset-btn" data-preset="neon" style="font-size: 12px; padding: 6px 12px;">🟢 Matrix</button>
@@ -1403,6 +1404,7 @@
         <div style="margin-bottom: 24px;">
             <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Quick Presets</label>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="theme-presets-container">
+                <button class="btn-secondary preset-btn" data-preset="rjmobile" style="font-size: 12px; padding: 6px 12px; border-color: #f37021; color: #f37021;">📱 RJ Mobile</button>
                 <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
                 <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
                 <button class="btn-secondary preset-btn" data-preset="ocean" style="font-size: 12px; padding: 6px 12px;">🌊 Ocean</button>
@@ -2227,7 +2229,8 @@
             dracula: { class: 'dark', fp: 'dark', vars: { '--primary': '#ff79c6', '--bg-base': '#282a36', '--sidebar-bg': '#44475a', '--header-bg': '#282a36', '--table-bg': '#44475a', '--card-bg': '#44475a', '--card-border': '#6272a4', '--input-bg': '#282a36', '--text-main': '#f8f8f2' } },
             nord: { class: 'dark', fp: 'dark', vars: { '--primary': '#88c0d0', '--bg-base': '#2e3440', '--sidebar-bg': '#3b4252', '--header-bg': '#2e3440', '--table-bg': '#3b4252', '--card-bg': '#3b4252', '--card-border': '#434c5e', '--input-bg': '#2e3440', '--text-main': '#eceff4' } },
             neon: { class: 'dark', fp: 'dark', vars: { '--primary': '#39ff14', '--bg-base': '#000000', '--sidebar-bg': '#0a0a0a', '--header-bg': '#000000', '--table-bg': '#0a0a0a', '--card-bg': '#0a0a0a', '--card-border': '#111111', '--input-bg': '#000000', '--text-main': '#ffffff' } },
-            rosegold: { class: 'dark', fp: 'dark', vars: { '--primary': '#e0bfb8', '--bg-base': '#2a2426', '--sidebar-bg': '#3a3234', '--header-bg': '#2a2426', '--table-bg': '#3a3234', '--card-bg': '#3a3234', '--card-border': '#4a4043', '--input-bg': '#2a2426', '--text-main': '#f9f6f6' } }
+            rosegold: { class: 'dark', fp: 'dark', vars: { '--primary': '#e0bfb8', '--bg-base': '#2a2426', '--sidebar-bg': '#3a3234', '--header-bg': '#2a2426', '--table-bg': '#3a3234', '--card-bg': '#3a3234', '--card-border': '#4a4043', '--input-bg': '#2a2426', '--text-main': '#f9f6f6' } },
+            rjmobile: { class: 'dark', fp: 'dark', vars: { '--primary': '#f37021', '--bg-base': '#0a1023', '--sidebar-bg': '#121b33', '--header-bg': '#0a1023', '--table-bg': '#121b33', '--card-bg': '#121b33', '--card-border': '#1e2d4a', '--input-bg': '#0a1023', '--text-main': '#f8fafc' } }
         };
 
         function updateBaseThemeClass(className, fpTheme) {
