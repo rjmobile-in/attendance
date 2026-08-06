@@ -1001,7 +1001,7 @@
                         </div>
                     </div>
 
-                    <div id="audit-gallery-container">
+                    <div id="audit-gallery-container" style="user-select: none; -webkit-user-select: none;">
                         <div class="audit-grid" id="audit-grid"></div>
                     </div>
                 </div>
@@ -2275,41 +2275,37 @@
             dbLogs[logIndex].uniform_idcard = idcard; 
         }
 
-        // AUTO-NEXT LOGIC (Instead of closing)
+        // AUTO-NEXT LOGIC (Optimized to prevent animation clash)
         const cardCheckbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
         let movedToNext = false;
+        let nextCardToOpen = null;
         
         if (cardCheckbox) {
-            const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none');
+            // Only find cards that are fully visible AND not currently fading out
+            const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none' && c.style.opacity !== '0');
             const currentIndex = allVisibleCards.indexOf(cardCheckbox.closest('.audit-card'));
+            
             if (currentIndex !== -1 && currentIndex + 1 < allVisibleCards.length) {
-                const nextCard = allVisibleCards[currentIndex + 1];
-                const imgWrap = nextCard.querySelector('.audit-img-wrap');
-                if (imgWrap) {
-                    imgWrap.click(); // Instantly jump to the next photo
-                    movedToNext = true;
-                }
+                nextCardToOpen = allVisibleCards[currentIndex + 1];
             }
         }
         
-        if (!movedToNext) {
-            window.closeModal(document.getElementById('photo-modal'));
-        }
+        // 1. Fade out current card FIRST
         if (cardCheckbox) {
             const card = cardCheckbox.closest('.audit-card');
             if (card) {
                 if (showOnlyPendingPhotos) {
+                    card.style.opacity = '0'; // Immediately hide to remove from ArrowKey index
                     card.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-                    card.style.opacity = '0';
                     card.style.transform = 'scale(0.9)';
                     setTimeout(() => card.style.display = 'none', 300);
                 } else {
-                    const btn = card.querySelector('.btn-primary');
-                    if (btn) {
-                        btn.innerText = "✏️ Update Audit";
-                        btn.className = "btn-secondary";
-                        btn.style.borderColor = "var(--success)";
-                        btn.style.color = "var(--success)";
+                    const btnElement = card.querySelector('.btn-primary');
+                    if (btnElement) {
+                        btnElement.innerText = "✏️ Update Audit";
+                        btnElement.className = "btn-secondary";
+                        btnElement.style.borderColor = "var(--success)";
+                        btnElement.style.color = "var(--success)";
                     }
                     const badge = card.querySelector('.audit-badge:last-child');
                     if (badge) {
@@ -2321,6 +2317,20 @@
                 }
             }
         }
+
+        // 2. Open Next Card AFTER the current one is handled
+        if (nextCardToOpen) {
+            const imgWrap = nextCardToOpen.querySelector('.audit-img-wrap');
+            if (imgWrap) {
+                imgWrap.click(); // Jump to next photo
+                movedToNext = true;
+            }
+        }
+
+        if (!movedToNext) {
+            window.closeModal(document.getElementById('photo-modal'));
+        }
+
         window.updatePendingBadgeCount(-1);
 
         try {
@@ -4466,7 +4476,7 @@
                 <div class="audit-card" style="position: relative;">
                     ${cardCheck}
                     <div class="audit-img-wrap" onmousedown="window.handleLassoStart(event, '${logId}')" onmouseenter="window.handleLassoMove(event, '${logId}')" onclick="window.handleCardClick(event, '${logId}', '${photo}', ${uTshirt}, ${uIdcard}, ${isReviewed})">
-                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" onload="this.style.opacity=1" onerror="this.onerror=null; this.src='https://placehold.co/400x300/18181b/a1a1aa?text=Expired'; this.style.opacity=1;">
+                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" draggable="false" ondragstart="return false;" onload="this.style.opacity=1" onerror="this.onerror=null; this.src='https://placehold.co/400x300/18181b/a1a1aa?text=Expired'; this.style.opacity=1;">
                         <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2); z-index: 6;">${typeBadge}</span>
                         ${statusBadgeHtml}
                     </div>
@@ -6954,8 +6964,8 @@
                 const currentBox = document.querySelector(`.audit-card-checkbox[value="${window.currentActiveAuditLogId}"]`);
                 if (currentBox) {
                     const currentCard = currentBox.closest('.audit-card');
-                    // Create an array of only the cards currently visible on screen
-                    const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none');
+                    // Create an array of only the cards currently visible AND not fading out
+                    const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none' && c.style.opacity !== '0');
                     const currentIndex = allVisibleCards.indexOf(currentCard);
 
                     if (currentIndex !== -1) {
