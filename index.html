@@ -47,26 +47,26 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --bg-base: #09090b; 
-      --bg-surface: #18181b;
-      --card-bg: #18181b; 
-      --card-border: #27272a;
+      --bg-base: #0a1023; 
+      --bg-surface: #121b33;
+      --card-bg: #121b33; 
+      --card-border: #1e2d4a;
       
-      --primary: #6366f1; 
-      --primary-hover: #4f46e5; 
-      --primary-glow: rgba(99, 102, 241, 0.25);
-      --primary-alpha: rgba(99, 102, 241, 0.15);
+      --primary: #f37021; 
+      --primary-hover: #d9621a; 
+      --primary-glow: rgba(243, 112, 33, 0.25);
+      --primary-alpha: rgba(243, 112, 33, 0.15);
       --shadow-glow: 0 0 20px var(--primary-glow);
       --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       
-      --text-main: #f4f4f5; 
-      --text-soft: #a1a1aa;
+      --text-main: #f8fafc; 
+      --text-soft: #94a3b8;
       
       --success: #10b981; --success-alpha: rgba(16, 185, 129, 0.15);
       --danger: #ef4444; --danger-alpha: rgba(239, 68, 68, 0.15);
       --warning: #f59e0b; --warning-alpha: rgba(245, 158, 11, 0.15);
       
-      --input-bg: #09090b; 
+      --input-bg: #0a1023; 
       --hover-bg: rgba(255, 255, 255, 0.08);
       --selected-bg: var(--primary-alpha);
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -1048,13 +1048,18 @@
                     </div>
                     
                     <div class="widget-grid" id="bday-top-cards" style="grid-template-columns: 1fr;">
-                        <div class="widget-card" style="background: linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%); border-color: var(--primary); text-align: center;">
-                            <div class="badge bg-blue" style="margin-bottom: 12px;">Next Celebration</div>
-                            <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
-                            <div id="admin-next-bday-name" style="font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main);">Loading...</div>
-                            <div id="admin-next-bday-date" style="color: var(--text-soft); margin-bottom: 8px;">--</div>
-                            <div id="admin-next-bday-age" class="role-tag">--</div>
-                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: var(--success); background: var(--success-alpha); padding: 8px; border-radius: var(--radius-md); display: inline-block;">--</div>
+                        <div id="bday-top-card" class="widget-card" style="padding: 40px 24px; padding-top: 350px; text-align: center; position: relative; overflow: hidden; min-height: 640px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; border-color: var(--primary);">
+                            <!-- Background Image Layer -->
+                            <div id="bday-top-bg" style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%); background-size: cover !important; background-position: center top !important; opacity: 0.95; z-index: 0; transition: opacity 0.5s;"></div>
+                            <!-- Dark Bottom Gradient for Text Readability -->
+                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--card-bg) 5%, rgba(18,27,51,0.8) 25%, transparent 65%); z-index: 1;"></div>
+                            
+                            <div class="badge bg-blue" style="margin-bottom: 12px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Next Celebration</div>
+                            <div id="admin-next-bday-emoji" style="font-size: 48px; position: relative; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: -5px;">🎉</div>
+                            <div id="admin-next-bday-name" style="font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
+                            <div id="admin-next-bday-date" style="color: #f1f5f9; margin-bottom: 8px; font-weight: 600; position: relative; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">--</div>
+                            <div id="admin-next-bday-age" class="role-tag" style="position: relative; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">--</div>
+                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: #fff; background: var(--primary); box-shadow: 0 4px 15px rgba(243, 112, 33, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
                         </div>
                     </div>
 
@@ -1451,35 +1456,35 @@
         
         <div class="color-picker-row">
             <span class="color-picker-label">Primary Accent</span>
-            <input type="color" id="theme-primary" class="color-picker-input theme-color-input" data-var="--primary" value="#6366f1">
+            <input type="color" id="theme-primary" class="color-picker-input theme-color-input" data-var="--primary" value="#f37021">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">App Background</span>
-            <input type="color" id="theme-bg" class="color-picker-input theme-color-input" data-var="--bg-base" value="#09090b">
+            <input type="color" id="theme-bg" class="color-picker-input theme-color-input" data-var="--bg-base" value="#0a1023">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">Sidebar Background</span>
-            <input type="color" id="theme-sidebar" class="color-picker-input theme-color-input" data-var="--sidebar-bg" value="#18181b">
+            <input type="color" id="theme-sidebar" class="color-picker-input theme-color-input" data-var="--sidebar-bg" value="#121b33">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">Header Background</span>
-            <input type="color" id="theme-header" class="color-picker-input theme-color-input" data-var="--header-bg" value="#09090b">
+            <input type="color" id="theme-header" class="color-picker-input theme-color-input" data-var="--header-bg" value="#0a1023">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">Cards & Tables</span>
-            <input type="color" id="theme-card" class="color-picker-input theme-color-input" data-var="--card-bg" value="#18181b">
+            <input type="color" id="theme-card" class="color-picker-input theme-color-input" data-var="--card-bg" value="#121b33">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">Main Text</span>
-            <input type="color" id="theme-text" class="color-picker-input theme-color-input" data-var="--text-main" value="#f4f4f5">
+            <input type="color" id="theme-text" class="color-picker-input theme-color-input" data-var="--text-main" value="#f8fafc">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">Secondary Text (Subtitles)</span>
-            <input type="color" id="theme-text-soft" class="color-picker-input theme-color-input" data-var="--text-soft" value="#a1a1aa">
+            <input type="color" id="theme-text-soft" class="color-picker-input theme-color-input" data-var="--text-soft" value="#94a3b8">
         </div>
         <div class="color-picker-row">
             <span class="color-picker-label">Card & Table Borders</span>
-            <input type="color" id="theme-border" class="color-picker-input theme-color-input" data-var="--card-border" value="#27272a">
+            <input type="color" id="theme-border" class="color-picker-input theme-color-input" data-var="--card-border" value="#1e2d4a">
         </div>
 
         <div style="margin-top: 16px; margin-bottom: 8px;">
@@ -2103,6 +2108,18 @@
         if (log.branch_id) return log.branch_id;
         const b = dbBranches.find(b => b.branch_name === log.branch);
         return b ? b.id : null;
+    }
+
+    function getAvatarHtml(name, profilePic, size = 40) {
+        const initials = name ? name.substring(0,2).toUpperCase() : 'RJ';
+        const colors = ['#f43f5e', '#a855f7', '#0ea5e9', '#10b981', '#f59e0b'];
+        const color = colors[(name || '').length % colors.length];
+        
+        if (profilePic) {
+            return `<img src="${profilePic}" style="width: ${size}px; height: ${size}px; border-radius: 50%; object-fit: cover; border: 2px solid ${color}; flex-shrink: 0; background: var(--bg-surface);" alt="👤">`;
+        } else {
+            return `<div style="width: ${size}px; height: ${size}px; border-radius: 50%; border: 2px solid ${color}; color: ${color}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: ${Math.max(12, size/2.5)}px; flex-shrink: 0; background: var(--bg-surface);">${initials}</div>`;
+        }
     }
 
     window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked, isReviewed) {
@@ -3771,9 +3788,17 @@
 
             const displayDate = row.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short', year:'numeric'});
 
+            const staffObj = staffMap[row.staffId];
+            const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
+
             return `<tr ondblclick="window.openEditTimeModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" oncontextmenu="window.showContextMenu(event, '${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}', '${row.latitude || ''}', '${row.longitude || ''}')" style="cursor: pointer;" title="Double-click or Right-click row to Edit">
               <td style="color:var(--text-soft)">${displayDate}</td>
-              <td><div onclick="event.stopPropagation(); window.openStaffProfile('${row.staffId}')" style="cursor:pointer; display:inline-block; transition: 0.2s;" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'"><strong>${row.name}</strong><br><span class="role-tag">${row.role}</span></div></td>
+              <td>
+                <div onclick="event.stopPropagation(); window.openStaffProfile('${row.staffId}')" style="cursor:pointer; display:flex; align-items:center; gap:10px; transition: 0.2s;" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
+                    ${avatar}
+                    <div><strong>${row.name}</strong><br><span class="role-tag">${row.role}</span></div>
+                </div>
+              </td>
               <td>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
@@ -3905,9 +3930,16 @@
                   photoHtml = `<span class="badge bg-gray" style="font-size: 10px;">Missing</span>`;
               }
 
+              const avatar = getAvatarHtml(sName, staffObj?.profile_pic, 36);
+
               return `<tr oncontextmenu="window.showContextMenu(event, '${sId}', '${sName.replace(/'/g, "\\'")}', '${toLocalISO(d)}', '${log.id}', null, '${d.toISOString()}', null, '${log.latitude || ''}', '${log.longitude || ''}')" style="cursor: pointer;" title="Right-click row for Options">
                   <td><div style="font-weight: bold; color: var(--text-main); font-size: 14px; margin-bottom: 4px;">${displayTime}</div><div style="color:var(--text-soft); font-size: 12px;">${displayDate}</div></td>
-                  <td><div onclick="event.stopPropagation(); window.openStaffProfile('${sId}')" style="cursor:pointer; display:inline-block; transition: 0.2s;" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'"><strong>${sName}</strong><br><span class="role-tag">${rName}</span></div></td>
+                  <td>
+                    <div onclick="event.stopPropagation(); window.openStaffProfile('${sId}')" style="cursor:pointer; display:flex; align-items:center; gap:10px; transition: 0.2s;" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
+                        ${avatar}
+                        <div><strong>${sName}</strong><br><span class="role-tag">${rName}</span></div>
+                    </div>
+                  </td>
                   <td>${actionBadge}</td>
                   <td><div style="font-weight: 700; font-size: 13px; color: var(--text-main);">${bName}</div>${mapLinkHtml}</td>
                   <td>${photoHtml}</td>
@@ -4623,8 +4655,16 @@
             if(s.missedId > 0) infractions.push(`<span style="color:var(--danger)">No ID: ${s.missedId}</span>`);
             if(s.missedOut > 0) infractions.push(`<span style="color:var(--danger)">No Out: ${s.missedOut}</span>`);
 
+            const staffObj = dbStaff.find(st => st.id === s.id);
+            const avatar = getAvatarHtml(s.name, staffObj?.profile_pic, 36);
+
             return `<tr>
-                <td><strong onclick="window.openStaffProfile('${s.id}')" style="cursor:pointer; transition:0.2s;" onmouseover="this.style.color='var(--primary)'; this.style.textDecoration='underline'" onmouseout="this.style.color=''; this.style.textDecoration='none'">${s.name}</strong></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px; cursor:pointer; transition:0.2s;" onclick="window.openStaffProfile('${s.id}')" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
+                      ${avatar}
+                      <strong style="color: var(--text-main);">${s.name}</strong>
+                  </div>
+                </td>
                 <td><span class="role-tag">${s.role}</span></td>
                 <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700;">${s.daysPresent}</td>
                 <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
@@ -4769,9 +4809,17 @@
                 statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out (${outTimeStr})</span>`;
             }
 
+            const staffObj = staffMap[row.staffId];
+            const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
+
             return `<tr>
                 <td style="color:var(--text-soft)">${displayDate}</td>
-                <td><strong onclick="window.openStaffProfile('${row.staffId}')" style="cursor:pointer; transition:0.2s;" onmouseover="this.style.color='var(--primary)'; this.style.textDecoration='underline'" onmouseout="this.style.color=''; this.style.textDecoration='none'">${row.name}</strong></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px; cursor:pointer; transition:0.2s;" onclick="window.openStaffProfile('${row.staffId}')" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
+                      ${avatar}
+                      <strong style="color: var(--text-main);">${row.name}</strong>
+                  </div>
+                </td>
                 <td>${statusHTML}</td>
                 <td><a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${actionTypeStr}')">Manage Reason</a></td>
             </tr>`;
@@ -5180,8 +5228,18 @@
               const st = formatTime(s.shift_start);
               const en = formatTime(s.shift_end);
               const roleName = roleMap[s.role_id]?.role_name || s.role || 'No Role';
+              const avatar = getAvatarHtml(s.name, s.profile_pic, 40);
               return `<tr>
-              <td><strong style="color: var(--text-main);">${s.name}</strong><br><span class="role-tag">${roleName}</span><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email Set'}</span></td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    ${avatar}
+                    <div>
+                        <strong style="color: var(--text-main);">${s.name}</strong><br>
+                        <span class="role-tag">${roleName}</span><br>
+                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email Set'}</span>
+                    </div>
+                </div>
+              </td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
                 <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}')">Edit</button>
@@ -5627,7 +5685,8 @@
               // 5. Akhir me Staff Directory (Database table) se delete karna
               await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
               
-              loadSettingsData(); 
+              await initialMetadataLoad(); // Refresh local cached data arrays
+              loadSettingsData(); // Re-render the tables
               showToast("Staff & Login removed successfully", "success"); 
           } catch(e) {
               console.error(e);
@@ -5710,7 +5769,12 @@
     });
 
     window.deleteBranchItem = async (rowId) => { 
-      if(await window.customConfirm("Remove this branch geofence?")) { await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Geofence removed", "primary"); }
+      if(await window.customConfirm("Remove this branch geofence?")) { 
+          await supabaseClient.from('branches_directory').delete().eq('id', rowId); 
+          await initialMetadataLoad(); // Refresh local cached data arrays
+          loadSettingsData(); // Re-render the tables
+          showToast("Geofence removed", "primary"); 
+      }
     };
 
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
@@ -6080,11 +6144,25 @@
         document.getElementById('admin-next-bday-name').innerText = (nextBday.email === currentUserEmail) ? "Your Birthday" : nextBday.name;
         document.getElementById('admin-next-bday-date').innerText = nextBday.formattedDate;
         document.getElementById('admin-next-bday-age').innerText = `Turning ${nextBday.turningAge}`;
+
+        // Set Background Image for Next Birthday (Full Portrait)
+        const bgContainer = document.getElementById('bday-top-bg');
+        const emojiEl = document.getElementById('admin-next-bday-emoji');
+        if (nextBday.profile_pic) {
+            // Using 'contain' so the photo fits nicely without repeating or cropping, leaving clean space on the sides
+            bgContainer.style.background = `url('${nextBday.profile_pic}') no-repeat center center / contain`;
+            bgContainer.style.opacity = '0.95';
+            emojiEl.style.display = 'none'; // Hide emoji if photo exists
+        } else {
+            bgContainer.style.background = `linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%)`;
+            bgContainer.style.opacity = '1';
+            emojiEl.style.display = 'block';
+        }
         
         const countdownEl = document.getElementById('admin-next-bday-countdown');
         if (nextBday.daysLeft === 0) {
             countdownEl.innerText = "It's Today! 🎂🎉";
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#10b981', '#f59e0b'] });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#f37021', '#10b981', '#f59e0b'] });
         } else if (nextBday.daysLeft === 1) {
             countdownEl.innerText = "Tomorrow!";
         } else {
@@ -6101,14 +6179,20 @@
             if (staff.daysLeft === 0) { tagClass = 'bg-green'; tagText = 'Today! 🎂'; } 
             else if (staff.daysLeft <= 7) { tagClass = 'bg-orange'; if (staff.daysLeft === 1) tagText = 'Tomorrow!'; }
 
+            // Global avatar function use karke list me photo lagana
+            let avatarHtml = getAvatarHtml(staff.name, staff.profile_pic, 44);
+
             return `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
-                <div>
-                    <div style="font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); display: flex; align-items: center; gap: 8px;">
-                        ${displayName} 
-                        <span class="role-tag" ${isCurrentUser ? `style="background: var(--success-alpha); color: var(--success); border-color: var(--success-alpha);"` : ''}>Turning ${staff.turningAge}</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    ${avatarHtml}
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); display: flex; align-items: center; gap: 8px;">
+                            ${displayName} 
+                            <span class="role-tag" ${isCurrentUser ? `style="background: var(--success-alpha); color: var(--success); border-color: var(--success-alpha);"` : ''}>Turning ${staff.turningAge}</span>
+                        </div>
+                        <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
                     </div>
-                    <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
                 </div>
                 <div class="badge ${tagClass}" style="font-size: 12px; padding: 6px 12px;">${tagText}</div>
             </div>`;
@@ -6507,7 +6591,11 @@
         if (!staff) return;
 
         document.getElementById('drawer-name').innerText = staff.name;
-        document.getElementById('drawer-avatar').innerText = staff.name.charAt(0).toUpperCase();
+        
+        const avatarDiv = document.getElementById('drawer-avatar');
+        if (avatarDiv) {
+             avatarDiv.outerHTML = getAvatarHtml(staff.name, staff.profile_pic, 80).replace('style="', 'id="drawer-avatar" style="margin-bottom: 16px; ');
+        }
         
         const rObj = roleMap[staff.role_id];
         document.getElementById('drawer-role').innerText = rObj ? rObj.role_name : (staff.role || 'Unassigned');
