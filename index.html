@@ -1627,13 +1627,21 @@
         </div>
       </div>
 
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Action Type</label>
-      <select id="manual-action" class="input-field" style="margin-top: 8px;">
-          <option value="Clock In">🟢 Clock In</option>
-          <option value="Clock Out">🔴 Clock Out</option>
-          <option value="Transit Start">🚗 Transit Start (Departed)</option>
-          <option value="Transit End">📍 Transit End (Reached)</option>
-      </select>
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Action Type</label>
+          <select id="manual-action" class="input-field" style="margin-top: 8px;">
+              <option value="Clock In">🟢 Clock In</option>
+              <option value="Clock Out">🔴 Clock Out</option>
+              <option value="Transit Start">🚗 Transit Start (Departed)</option>
+              <option value="Transit End">📍 Transit End (Reached)</option>
+          </select>
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Branch Location</label>
+          <select id="manual-branch" class="input-field" style="margin-top: 8px;"></select>
+        </div>
+      </div>
 
       <div style="margin-top: 8px; margin-bottom: 16px;">
           <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Uniform Audit (At time of entry)</label>
@@ -3284,8 +3292,11 @@
         const opts = '<option value="">-- No Default Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${b.branch_name}</option>`).join('');
         const newStaffBranch = document.getElementById('new-staff-branch');
         const editStaffBranch = document.getElementById('edit-staff-branch');
+        const manualBranch = document.getElementById('manual-branch'); // New addition for Manual Entry
+        
         if(newStaffBranch) newStaffBranch.innerHTML = opts;
         if(editStaffBranch) editStaffBranch.innerHTML = opts;
+        if(manualBranch) manualBranch.innerHTML = '<option value="">-- Select Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${b.branch_name}</option>`).join('');
     }
 
     function populateReasonDropdowns() {
@@ -4351,11 +4362,12 @@
         const dateVal = document.getElementById('manual-date').value;
         const timeVal = document.getElementById('manual-time').value;
         const actionVal = document.getElementById('manual-action').value;
+        const branchIdVal = document.getElementById('manual-branch').value;
         const tshirtVal = document.getElementById('manual-tshirt').checked;
         const idcardVal = document.getElementById('manual-idcard').checked;
 
-        if (!staffId || !dateVal || !timeVal) {
-            return showToast("Staff, Date, and Time are required!", "error");
+        if (!staffId || !branchIdVal || !dateVal || !timeVal) {
+            return showToast("Staff, Branch, Date, and Time are required!", "error");
         }
 
         const btn = document.getElementById('btn-save-manual');
@@ -4364,13 +4376,15 @@
         try {
             const timestampIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
             const staffObj = staffMap[staffId];
-            const adminTag = currentUserEmail ? `Admin Manual (${currentUserEmail})` : 'Admin Manual Entry';
+            const branchObj = branchMap[branchIdVal];
+            const branchName = branchObj ? branchObj.branch_name : 'Manual Entry';
 
             await supabaseClient.from('attendance_logs').insert([{
                 staff_id: staffId,
                 employee_name: staffObj?.name || 'Unknown',
                 action: actionVal,
-                branch: adminTag,
+                branch: branchName,
+                branch_id: branchIdVal,
                 timestamp: timestampIso,
                 uniform_reviewed: true,
                 uniform_tshirt: tshirtVal,
@@ -4424,13 +4438,15 @@
            }
            if(outVal) {
                const newOutIso = new Date(`${activeEditDateStr}T${outVal}:00`).toISOString();
-               const editorTag = currentUserEmail ? `Admin Edited (${currentUserEmail})` : 'Admin Edited';
+               
                if(editLogOutId) {
-                   await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso, branch: editorTag }).eq('id', editLogOutId);
+                   // Removed branch override so it keeps its original location data
+                   await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso }).eq('id', editLogOutId);
                } else {
+                   // If creating a missing clock out manually
                    await supabaseClient.from('attendance_logs').insert([{
                        staff_id: activeEditStaffId, employee_name: activeEditStaffName, 
-                       action: 'Clock Out', branch: editorTag, timestamp: newOutIso
+                       action: 'Clock Out', branch: 'Time Edited', timestamp: newOutIso
                    }]);
                }
            }
