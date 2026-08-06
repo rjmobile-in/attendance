@@ -269,7 +269,12 @@
     .widget-card:hover .drag-handle { opacity: 1; color: var(--primary); }
 
     .table-card { background: var(--table-bg, var(--card-bg)); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm);}
-    .table-responsive { overflow-x: auto; max-height: calc(100vh - 340px); min-height: 400px; overflow-y: auto; }
+    .table-responsive { 
+        overflow-x: auto; max-height: calc(100vh - 340px); min-height: 400px; overflow-y: auto; 
+        background: linear-gradient(var(--card-bg) 30%, rgba(24, 24, 27, 0)), linear-gradient(rgba(24, 24, 27, 0), var(--card-bg) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)) 0 100%;
+        background-repeat: no-repeat;
+        background-color: var(--card-bg); background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px; background-attachment: local, local, scroll, scroll;
+    }
     table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; }
     th { position: sticky; top: 0; background: var(--bg-surface); color: var(--text-soft); font-weight: 700; font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; padding: 16px 24px; border-bottom: 1px solid var(--card-border); z-index: 10; letter-spacing: 0.5px; border-top: 1px solid var(--card-border);}
     td { padding: 16px 24px; border-bottom: 1px solid var(--card-border); vertical-align: middle; font-size: calc(13px * var(--font-scale, 1)); color: var(--text-main); transition: background 0.1s;}
@@ -569,6 +574,8 @@
     /* Personalization: UI Density & Motion */
     html.density-compact th, html.density-compact td { padding: 8px 16px !important; font-size: calc(12px * var(--font-scale, 1)) !important; }
     html.density-compact .widget-card, html.density-compact .chart-card { padding: 16px !important; }
+    html.high-contrast * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+    html.high-contrast .widget-card, html.high-contrast .sidebar, html.high-contrast .header-bar, html.high-contrast .modal-card, html.high-contrast .dropdown-content { background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; }
     
 
     /* Native Scroll Snapping */
@@ -745,6 +752,7 @@
               </div>
             </div>
             
+            <button id="btn-manual-entry" class="btn-primary" style="margin-right: 8px;">➕ Manual Entry</button>
             <button id="toggle-filter-btn" class="btn-secondary" title="Toggle Filters">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Data
             </button>
@@ -764,7 +772,7 @@
                 <div class="filter-row">
                     <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
                         <div class="filter-group">
-                            <label>Quick Dates</label>
+                            <label>Date Range</label>
                             <div class="quick-dates" id="quick-date-filters" style="width: fit-content;">
                                 <button class="quick-date-btn active" data-range="today">Today</button>
                                 <button class="quick-date-btn" data-range="yesterday">Yesterday</button>
@@ -772,10 +780,10 @@
                                 <button class="quick-date-btn" data-range="thismonth">This Month</button>
                                 <button class="quick-date-btn" data-range="lastmonth">Last Month</button>
                                 <button class="quick-date-btn" data-range="alltime">All Time</button>
-                                
-                                <div style="width: 1px; background: var(--card-border); margin: 0 4px;"></div>
-                                <button id="clear-all-filters-btn" class="quick-date-btn" style="color: var(--danger);">Reset All</button>
+                                <button class="quick-date-btn" data-range="custom" style="border: 1px dashed var(--card-border); color: var(--text-soft);">📅 Custom</button>
                             </div>
+                        </div>
+                        <button id="clear-all-filters-btn" class="btn-secondary" style="color: var(--danger); border-color: var(--danger-alpha); height: fit-content; align-self: flex-end; margin-left: auto;">Reset All Filters</button>
                         </div>
                     </div>
                 </div>
@@ -783,11 +791,11 @@
                 <div class="filter-row" style="margin-top: -4px;">
                     <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
                         <div class="filter-group">
-                            <label>Custom Start</label>
+                            <label>Start Date</label>
                             <input type="text" id="global-start" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="Start Date" />
                         </div>
                         <div class="filter-group">
-                            <label>Custom End</label>
+                            <label>End Date</label>
                             <input type="text" id="global-end" class="input-field" style="margin: 0; width: 140px; padding: 9px 12px;" placeholder="End Date" />
                         </div>
                     </div>
@@ -815,7 +823,7 @@
                     
                     <div style="margin-left: auto; display: flex; gap: 16px; flex-wrap: wrap;">
                         <div class="filter-group dropdown" id="role-filter-dropdown">
-                            <label>Filter Role</label>
+                            <label>Roles</label>
                             <button id="role-filter-btn" class="input-field" data-target="role-dropdown-box" style="margin: 0; width: 140px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
                                 <span id="role-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
@@ -831,7 +839,7 @@
                         </div>
 
                         <div class="filter-group dropdown" id="branch-filter-dropdown">
-                            <label>Filter Branch</label>
+                            <label>Branches</label>
                             <button id="branch-filter-btn" class="input-field" data-target="branch-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
                                 <span id="branch-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
@@ -847,7 +855,7 @@
                         </div>
 
                         <div class="filter-group dropdown" id="staff-filter-dropdown">
-                            <label>Filter Staff</label>
+                            <label>Staff</label>
                             <button id="staff-filter-btn" class="input-field" data-target="staff-dropdown-box" style="margin: 0; width: 150px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);">
                                 <span id="staff-btn-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Loading...</span> 
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
@@ -874,8 +882,12 @@
                 <div id="view-dashboard" class="app-view">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time metrics based on filters.</span>
+                        <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="document.getElementById('draggable-widgets').classList.toggle('hide-widgets')">Toggle Widgets</button>
                     </div>
-
+                    <style>
+                        .hide-widgets .widget-card { display: none !important; }
+                        .hide-widgets .widget-card.visible-override { display: flex !important; }
+                    </style>
                     <div class="widget-grid" id="draggable-widgets">
                         <div class="widget-card" data-id="w-present">
                             <div class="widget-header">
@@ -1312,7 +1324,7 @@
                                 <div style="flex: 1;">
                                     <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Date Format</label>
                                     <select id="pref-date-format" class="input-field" style="margin: 0;">
-                                        <option value="en-GB">DD MMM YYYY (UK/IN)</option>
+                                        <option value="en-GB">DD/MM/YYYY (UK/IN)</option>
                                         <option value="en-US">MM/DD/YYYY (US)</option>
                                         <option value="fr-CA">YYYY-MM-DD (ISO)</option>
                                     </select>
@@ -1340,6 +1352,10 @@
                                 <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
                             </div>
                             <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
+                                <div><div style="color:var(--text-main);">High Contrast</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Removes transparency for legibility</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-high-contrast"><span class="slider"></span></label>
+                            </div>
+                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
                                 <div><div style="color:var(--text-main);">Right Sidebar</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Move navigation to right</div></div>
                                 <label class="switch"><input type="checkbox" id="toggle-sidebar-right"><span class="slider"></span></label>
                             </div>
@@ -1354,9 +1370,15 @@
                             <h3>Workflow & Audio</h3>
                             <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Optimize how you interact with the app.</p>
                             
-                            <div style="margin-bottom: 16px;">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Auto-Sync Interval (Seconds)</label>
-                                <input type="number" id="pref-sync-interval" class="input-field" style="margin: 0;" placeholder="e.g. 5 (0 to disable)" min="0">
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                <div style="flex: 1;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Auto-Sync Interval (Sec)</label>
+                                    <input type="number" id="pref-sync-interval" class="input-field" style="margin: 0;" placeholder="0 to disable" min="0">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Undo Timeout (Sec)</label>
+                                    <input type="number" id="pref-undo-timer" class="input-field" style="margin: 0;" placeholder="e.g. 7" min="3" max="30">
+                                </div>
                             </div>
                             
                             <div style="margin-bottom: 20px;">
@@ -1384,6 +1406,46 @@
                             <div class="switch-wrap" style="justify-content: space-between;">
                                 <div><div style="color:var(--text-main);">UI Sound Effects</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Play clicks, pops, and chimes</div></div>
                                 <label class="switch"><input type="checkbox" id="toggle-ui-sounds"><span class="slider"></span></label>
+                            </div>
+                        </div>
+
+                        <!-- Panel: Custom Shortcuts & Workspaces -->
+                        <div class="settings-panel" style="grid-column: 1 / -1;">
+                            <h3>Custom Keyboard Shortcuts & Saved Views</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Map your own keys. Use the <strong>Save</strong> and <strong>Load</strong> modifiers with numbers (1-9) to instantly switch between your favorite filtered views.</p>
+                            
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px; color: var(--success);">Save View Modifier</label>
+                                    <select id="pref-mod-save" class="input-field" style="margin: 0;">
+                                        <option value="Alt">Alt + [1-9]</option>
+                                        <option value="Ctrl">Ctrl/Cmd + [1-9]</option>
+                                        <option value="Shift">Shift + [1-9]</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1; min-width: 200px;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px; color: var(--primary);">Load View Modifier</label>
+                                    <select id="pref-mod-load" class="input-field" style="margin: 0;">
+                                        <option value="Shift">Shift + [1-9]</option>
+                                        <option value="Ctrl">Ctrl/Cmd + [1-9]</option>
+                                        <option value="Alt">Alt + [1-9]</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 150px;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Command Palette Key</label>
+                                    <input type="text" id="pref-key-cmd" class="input-field" style="margin: 0;" maxlength="1" placeholder="e.g. k">
+                                </div>
+                                <div style="flex: 1; min-width: 150px;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Toggle T-Shirt Check</label>
+                                    <input type="text" id="pref-key-tshirt" class="input-field" style="margin: 0;" maxlength="1" placeholder="e.g. t">
+                                </div>
+                                <div style="flex: 1; min-width: 150px;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Toggle ID Check</label>
+                                    <input type="text" id="pref-key-id" class="input-field" style="margin: 0;" maxlength="1" placeholder="e.g. i">
+                                </div>
                             </div>
                         </div>
 
@@ -1545,6 +1607,49 @@
     </div>
   </div>
 
+  <!-- MANUAL ENTRY MODAL -->
+  <div id="manual-entry-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Add Manual Log</h2>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Create a direct entry if a staff member forgot to punch.</p>
+      
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Staff</label>
+      <select id="manual-staff" class="input-field" style="margin-top: 8px;"></select>
+
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Date</label>
+          <input type="text" id="manual-date" class="input-field" style="margin-top: 8px; padding: 12px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Time</label>
+          <input type="time" id="manual-time" class="input-field" style="margin-top: 8px;">
+        </div>
+      </div>
+
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Action Type</label>
+      <select id="manual-action" class="input-field" style="margin-top: 8px;">
+          <option value="Clock In">🟢 Clock In</option>
+          <option value="Clock Out">🔴 Clock Out</option>
+          <option value="Transit Start">🚗 Transit Start (Departed)</option>
+          <option value="Transit End">📍 Transit End (Reached)</option>
+      </select>
+
+      <div style="margin-top: 8px; margin-bottom: 16px;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Uniform Audit (At time of entry)</label>
+          <div style="display: flex; gap: 16px; margin-top: 8px;">
+              <label class="check-wrap" style="flex: 1; background: var(--bg-base); border: 1px solid var(--card-border); padding: 12px; border-radius: var(--radius-sm);"><input type="checkbox" id="manual-tshirt" checked> T-Shirt Present</label>
+              <label class="check-wrap" style="flex: 1; background: var(--bg-base); border: 1px solid var(--card-border); padding: 12px; border-radius: var(--radius-sm);"><input type="checkbox" id="manual-idcard" checked> ID Card Present</label>
+          </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-manual" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+        <button id="btn-save-manual" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Create Entry</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SHORTCUTS CHEAT SHEET MODAL -->
   <div id="shortcuts-modal" class="modal-overlay">
     <div class="modal-card" style="max-width: 440px;">
@@ -1618,10 +1723,10 @@
       <h2 style="margin-bottom: 8px;">Edit Staff Details</h2>
       <input type="hidden" id="edit-staff-id">
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
+      <label for="edit-staff-name" style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
       <input type="text" id="edit-staff-name" class="input-field" style="margin-top: 8px;">
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
+      <label for="edit-staff-role" style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
       <select id="edit-staff-role" class="input-field" style="margin-top: 8px;"></select>
 
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Default Branch</label>
@@ -1869,7 +1974,7 @@
       </div>
       <div class="drawer-body">
           <div style="margin-bottom: 24px;">
-              <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px;">📧 <span id="drawer-email">--</span></div>
+              <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="navigator.clipboard.writeText(document.getElementById('drawer-email').innerText).then(()=>showToast('Email Copied!', 'success'))" title="Click to Copy">📧 <span id="drawer-email" style="transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color=''">--</span></div>
               <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px;">🏢 Branch: <span id="drawer-branch" style="color: var(--text-main);">--</span></div>
               <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">🎂 DOB: <span id="drawer-dob" style="color: var(--text-main);">--</span></div>
           </div>
@@ -1938,8 +2043,8 @@
     
     const minLaunchDate = new Date('2026-08-01');
 
-    // INITIALIZE GLOBAL PREFS (Time Format, Font, View)
-    const defaultPrefs = { compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2" };
+    // INITIALIZE GLOBAL PREFS (Time Format, Font, View, Shortcuts)
+    const defaultPrefs = { compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i" };
     const uiPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
     
     window.use12HourTime = uiPrefs.use12h;
@@ -2437,6 +2542,7 @@
         let currentPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
         
         const toggleDensity = document.getElementById('toggle-density');
+        const toggleHighContrast = document.getElementById('toggle-high-contrast');
         const toggleTime = document.getElementById('toggle-time-format');
         const defaultViewSelect = document.getElementById('default-view-select');
         const toggleSidebarRight = document.getElementById('toggle-sidebar-right');
@@ -2447,9 +2553,16 @@
         const toggleUiSounds = document.getElementById('toggle-ui-sounds');
         const toggleFocusMode = document.getElementById('toggle-focus-mode');
         const prefSyncInterval = document.getElementById('pref-sync-interval');
+        const prefUndoTimer = document.getElementById('pref-undo-timer');
+        const prefModSave = document.getElementById('pref-mod-save');
+        const prefModLoad = document.getElementById('pref-mod-load');
+        const prefKeyCmd = document.getElementById('pref-key-cmd');
+        const prefKeyTshirt = document.getElementById('pref-key-tshirt');
+        const prefKeyId = document.getElementById('pref-key-id');
 
         // Initial state mapping to Inputs
         if (currentPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
+        if (currentPrefs.highContrast) { document.documentElement.classList.add('high-contrast'); if (toggleHighContrast) toggleHighContrast.checked = true; }
         if (toggleTime) toggleTime.checked = currentPrefs.use12h;
         if (defaultViewSelect) defaultViewSelect.value = currentPrefs.startView;
         if (toggleSidebarRight) toggleSidebarRight.checked = currentPrefs.sidebarRight;
@@ -2460,6 +2573,12 @@
         if (toggleUiSounds) toggleUiSounds.checked = currentPrefs.uiSounds;
         if (toggleFocusMode) toggleFocusMode.checked = currentPrefs.focusMode;
         if (prefSyncInterval) prefSyncInterval.value = currentPrefs.syncInterval;
+        if (prefUndoTimer) prefUndoTimer.value = currentPrefs.undoTimer;
+        if (prefModSave) prefModSave.value = currentPrefs.modSave;
+        if (prefModLoad) prefModLoad.value = currentPrefs.modLoad;
+        if (prefKeyCmd) prefKeyCmd.value = currentPrefs.keyCmd;
+        if (prefKeyTshirt) prefKeyTshirt.value = currentPrefs.keyTshirt;
+        if (prefKeyId) prefKeyId.value = currentPrefs.keyId;
         
         const saveAndReloadObj = (key, val, msg) => {
             currentPrefs[key] = val; localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
@@ -2482,6 +2601,19 @@
         if (prefDateFormat) prefDateFormat.addEventListener('change', e => saveAndReloadObj('dateFormat', e.target.value, "Date format updated! Reloading..."));
         if (prefWeekStart) prefWeekStart.addEventListener('change', e => saveAndReloadObj('weekStart', e.target.value, "Calendar week start updated! Reloading..."));
         if (prefSyncInterval) prefSyncInterval.addEventListener('change', e => saveAndReloadObj('syncInterval', e.target.value, "Auto-Sync interval updated! Reloading..."));
+        if (prefUndoTimer) prefUndoTimer.addEventListener('change', e => saveAndApplyObj('undoTimer', e.target.value, "Undo timeout updated", () => {}));
+        
+        const applyShortcutObj = (key, val) => {
+            currentPrefs[key] = val; uiPrefs[key] = val;
+            localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+            if(typeof window.renderShortcutsModal === 'function') window.renderShortcutsModal();
+            showToast("Shortcut updated", "success");
+        };
+        if (prefModSave) prefModSave.addEventListener('change', e => applyShortcutObj('modSave', e.target.value));
+        if (prefModLoad) prefModLoad.addEventListener('change', e => applyShortcutObj('modLoad', e.target.value));
+        if (prefKeyCmd) prefKeyCmd.addEventListener('change', e => applyShortcutObj('keyCmd', e.target.value.toLowerCase()));
+        if (prefKeyTshirt) prefKeyTshirt.addEventListener('change', e => applyShortcutObj('keyTshirt', e.target.value.toLowerCase()));
+        if (prefKeyId) prefKeyId.addEventListener('change', e => applyShortcutObj('keyId', e.target.value.toLowerCase()));
         
         document.querySelectorAll('.font-size-btn').forEach(b => {
             if(b.getAttribute('data-scale') === (currentPrefs.fontScale || '1')) b.classList.add('active');
@@ -2521,6 +2653,14 @@
         }
         
         // --- 4. Compact Density Toggle ---
+        if (toggleHighContrast) {
+            toggleHighContrast.addEventListener('change', (e) => {
+                if (e.target.checked) document.documentElement.classList.add('high-contrast');
+                else document.documentElement.classList.remove('high-contrast');
+                currentPrefs.highContrast = e.target.checked;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+            });
+        }
         if (toggleDensity) {
             toggleDensity.addEventListener('change', (e) => {
                 if (e.target.checked) document.documentElement.classList.add('density-compact');
@@ -2691,7 +2831,16 @@
 
         // Update Page Title
         const titleEl = document.getElementById('page-title');
-        if (titleEl) titleEl.innerText = e.currentTarget.querySelector('.tab-btn-text').innerText;
+        if (titleEl) {
+            if (viewId === 'view-dashboard') {
+                const hour = new Date().getHours();
+                const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+                const adminName = currentUserEmail ? currentUserEmail.split('@')[0] : "Admin";
+                titleEl.innerText = `${greeting}, ${adminName} 👋`;
+            } else {
+                titleEl.innerText = e.currentTarget.querySelector('.tab-btn-text').innerText;
+            }
+        }
         
         const viewEl = document.getElementById(viewId);
         if (viewEl) {
@@ -2826,7 +2975,10 @@
             let newStart = new Date();
             let newEnd = new Date();
             
-            if (range === 'today') {
+            if (range === 'custom') {
+                document.getElementById('global-start').focus();
+                return; // Let the flatpickr calendar handle it
+            } else if (range === 'today') {
             } else if (range === 'yesterday') {
                 newStart.setDate(today.getDate() - 1);
                 newEnd.setDate(today.getDate() - 1);
@@ -2857,6 +3009,32 @@
 
     const getFpConfig = () => ({ locale: { firstDayOfWeek: parseInt(uiPrefs.weekStart || "1", 10) } });
     
+    window.checkAndSetActiveDateRange = function() {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const s = new Date(startDate); s.setHours(0,0,0,0);
+        const e = new Date(endDate); e.setHours(0,0,0,0);
+        
+        const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+        const days7 = new Date(today); days7.setDate(days7.getDate() - 7);
+        const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+        const allTimeStart = new Date(minLaunchDate); allTimeStart.setHours(0,0,0,0);
+
+        document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
+        let matched = 'custom';
+
+        if (s.getTime() === today.getTime() && e.getTime() === today.getTime()) matched = 'today';
+        else if (s.getTime() === yesterday.getTime() && e.getTime() === yesterday.getTime()) matched = 'yesterday';
+        else if (s.getTime() === days7.getTime() && (e.getTime() === today.getTime() || e.getTime() > today.getTime())) matched = '7days';
+        else if (s.getTime() === thisMonthStart.getTime() && (e.getTime() === today.getTime() || e.getTime() > today.getTime())) matched = 'thismonth';
+        else if (s.getTime() === lastMonthStart.getTime() && e.getTime() === lastMonthEnd.getTime()) matched = 'lastmonth';
+        else if (s.getTime() <= allTimeStart.getTime() && (e.getTime() === today.getTime() || e.getTime() > today.getTime())) matched = 'alltime';
+
+        const targetBtn = document.querySelector(`.quick-date-btn[data-range="${matched}"]`);
+        if (targetBtn) targetBtn.classList.add('active');
+    };
+
     const startPickerEl = document.getElementById("global-start");
     const startPicker = startPickerEl ? flatpickr(startPickerEl, { 
         ...getFpConfig(),
@@ -2869,7 +3047,7 @@
         onChange: (dates) => { 
             if(dates[0]) { 
                 startDate = dates[0]; 
-                document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
+                window.checkAndSetActiveDateRange();
                 if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false); 
             } 
         } 
@@ -2887,11 +3065,14 @@
         onChange: (dates) => { 
             if(dates[0]) { 
                 endDate = dates[0]; 
-                document.querySelectorAll('.quick-date-btn').forEach(b => b.classList.remove('active'));
+                window.checkAndSetActiveDateRange();
                 if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false); 
             } 
         } 
     }) : null;
+
+    // Run once on load to highlight correct button if URL parameters set the date
+    window.checkAndSetActiveDateRange();
 
     if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
     if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
@@ -2941,6 +3122,12 @@
           } finally {
               if (loader) { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; loader.style.opacity = '1'; }, 400); } 
           }
+        }
+      if (!localStorage.getItem('rj_tour_done')) {
+            setTimeout(() => {
+                showToast("👋 Welcome! Press Cmd+K (or Ctrl+K) to open the Command Palette.", "primary", 6000);
+                localStorage.setItem('rj_tour_done', 'true');
+            }, 2000);
         }
       } else {
         const loginScreen = document.getElementById('login-screen');
@@ -3058,6 +3245,8 @@
       
       const schedSelect = document.getElementById('sched-staff');
       if (schedSelect) schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      const manualSelect = document.getElementById('manual-staff');
+      if (manualSelect) manualSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
       renderStaffFilterCheckboxes();
       renderBranchFilterCheckboxes();
@@ -3285,16 +3474,31 @@
           url.searchParams.set('start', toLocalISO(sDate));
           url.searchParams.set('end', toLocalISO(eDate));
           
-          if (selectedStaffIds.size !== dbStaff.length) url.searchParams.set('staff', Array.from(selectedStaffIds).join(','));
+          let filtersActive = false;
+          if (selectedStaffIds.size !== dbStaff.length) { url.searchParams.set('staff', Array.from(selectedStaffIds).join(',')); filtersActive = true; }
           else url.searchParams.delete('staff');
           
-          if (selectedBranchIds.size !== dbBranches.length) url.searchParams.set('branches', Array.from(selectedBranchIds).join(','));
+          if (selectedBranchIds.size !== dbBranches.length) { url.searchParams.set('branches', Array.from(selectedBranchIds).join(',')); filtersActive = true; }
           else url.searchParams.delete('branches');
           
-          if (selectedRoleIds.size !== dbRoles.length) url.searchParams.set('roles', Array.from(selectedRoleIds).join(','));
+          if (selectedRoleIds.size !== dbRoles.length) { url.searchParams.set('roles', Array.from(selectedRoleIds).join(',')); filtersActive = true; }
           else url.searchParams.delete('roles');
 
           window.history.replaceState({}, '', url); // replaceState prevents bloating the back-button history
+          
+          // UI Visual Cue for Active Filters
+          const filterBtn = document.getElementById('toggle-filter-btn');
+          if (filterBtn) {
+              if (filtersActive) {
+                  filterBtn.style.borderColor = 'var(--primary)';
+                  filterBtn.style.color = 'var(--primary)';
+                  filterBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filters Active <span style="display:inline-block; width:8px; height:8px; background:var(--primary); border-radius:50%; margin-left:4px;"></span>`;
+              } else {
+                  filterBtn.style.removeProperty('border-color');
+                  filterBtn.style.removeProperty('color');
+                  filterBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Data`;
+              }
+          }
       } catch (err) {}
 
       // FETCH ALL DATA FOR THE SELECTED RANGE
@@ -3489,7 +3693,14 @@
             }
 
             let firstInTime = firstInLog ? new Date(firstInLog.timestamp) : null;
-            let lastOutTime = lastOutLog && lastOutLog.action === 'Clock Out' ? new Date(lastOutLog.timestamp) : null;
+            
+            // Robust check: Find the actual last Clock Out log, avoiding bugs if a Transit log or duplicate occurs after
+            let outLogsArr = dailyLogs.filter(l => l.action === 'Clock Out');
+            let actualLastOut = outLogsArr.length > 0 ? outLogsArr[outLogsArr.length - 1] : null;
+            let lastOutTime = actualLastOut ? new Date(actualLastOut.timestamp) : null;
+            
+            // Re-assign lastOutLog so Edit buttons reference the correct ID
+            if (actualLastOut) lastOutLog = actualLastOut;
             
             if (firstInTime && (inStartStr || inEndStr)) {
                 let minsIn = firstInTime.getHours() * 60 + firstInTime.getMinutes();
@@ -3703,12 +3914,15 @@
           } 
           
           if (dataToRender.length === 0) { 
+              const isStaffEmpty = dbStaff.length === 0;
               tbody.innerHTML = `<tr><td colspan="5">
                   <div class="empty-state">
-                      <div class="empty-state-icon">📭</div>
-                      <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">No Logs Found</h3>
-                      <p style="margin-bottom: 16px;">Try adjusting your date range or staff filters to see results.</p>
-                      <button class="btn-secondary" onclick="document.getElementById('clear-all-filters-btn').click()">Reset All Filters</button>
+                      <div class="empty-state-icon">${isStaffEmpty ? '👥' : '📭'}</div>
+                      <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">${isStaffEmpty ? 'No Staff Found' : 'No Logs Found'}</h3>
+                      <p style="margin-bottom: 16px;">${isStaffEmpty ? 'Your workspace is empty. Add your team to start tracking.' : 'Try adjusting your date range or staff filters to see results.'}</p>
+                      ${isStaffEmpty 
+                          ? `<button class="btn-primary" onclick="document.querySelector('.tab-btn[data-view=\\'view-settings-hr\\']').click()">+ Add First Staff Member</button>`
+                          : `<button class="btn-secondary" onclick="document.getElementById('clear-all-filters-btn').click()">Reset All Filters</button>`}
                   </div>
               </td></tr>`; 
               return; 
@@ -4108,6 +4322,61 @@
     };
 
 
+    // --- MANUAL ENTRY LOGIC ---
+    if (document.getElementById("manual-date")) {
+        flatpickr("#manual-date", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", defaultDate: "today" });
+    }
+    
+    document.getElementById('btn-manual-entry')?.addEventListener('click', () => {
+        document.getElementById('manual-time').value = '';
+        document.getElementById('manual-entry-modal').style.display = 'flex';
+    });
+
+    document.getElementById('btn-cancel-manual')?.addEventListener('click', () => {
+        window.closeModal(document.getElementById('manual-entry-modal'));
+    });
+
+    document.getElementById('btn-save-manual')?.addEventListener('click', async () => {
+        const staffId = document.getElementById('manual-staff').value;
+        const dateVal = document.getElementById('manual-date').value;
+        const timeVal = document.getElementById('manual-time').value;
+        const actionVal = document.getElementById('manual-action').value;
+        const tshirtVal = document.getElementById('manual-tshirt').checked;
+        const idcardVal = document.getElementById('manual-idcard').checked;
+
+        if (!staffId || !dateVal || !timeVal) {
+            return showToast("Staff, Date, and Time are required!", "error");
+        }
+
+        const btn = document.getElementById('btn-save-manual');
+        btn.innerText = "Saving..."; btn.disabled = true;
+
+        try {
+            const timestampIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
+            const staffObj = staffMap[staffId];
+            const adminTag = currentUserEmail ? `Admin Manual (${currentUserEmail})` : 'Admin Manual Entry';
+
+            await supabaseClient.from('attendance_logs').insert([{
+                staff_id: staffId,
+                employee_name: staffObj?.name || 'Unknown',
+                action: actionVal,
+                branch: adminTag,
+                timestamp: timestampIso,
+                uniform_reviewed: true,
+                uniform_tshirt: tshirtVal,
+                uniform_idcard: idcardVal
+            }]);
+
+            window.closeModal(document.getElementById('manual-entry-modal'));
+            showToast("Manual log inserted successfully!", "success");
+            fetchLogsFromDatabase(false); // Hard refresh to guarantee UI updates
+        } catch (e) {
+            showToast("Failed to create entry", "error");
+        } finally {
+            btn.innerText = "Create Entry"; btn.disabled = false;
+        }
+    });
+
     window.openEditTimeModal = function(staffId, staffName, isoDateStr, inId, outId, inIso, outIso) {
       activeEditStaffId = staffId; activeEditStaffName = staffName; activeEditDateStr = isoDateStr; 
       editLogInId = inId; editLogOutId = outId;
@@ -4156,7 +4425,7 @@
                }
            }
            window.closeModal(document.getElementById('edit-time-modal'));
-           fetchLogsFromDatabase(true); 
+           fetchLogsFromDatabase(false); // Hard refresh to guarantee UI updates
            showToast("Shift timeline updated!", "success");
        } catch (err) {
            showToast("Failed to update timeline.", "error");
@@ -4636,9 +4905,19 @@
             
             let otHtml = '';
             if (s.daysPresent > 0) {
-                if (diffMins > 30) otHtml = `<span class="badge bg-green">OT: +${formatMinsToDuration(diffMins)}</span>`;
-                else if (diffMins < -30) otHtml = `<span class="badge bg-red">Short: ${formatMinsToDuration(diffMins)}</span>`;
-                else otHtml = `<span class="badge bg-gray">Balanced</span>`;
+                const targetMins = expectedMins > 0 ? expectedMins : 1; // Prevent division by zero
+                const percent = Math.min(100, Math.max(0, (totalMins / targetMins) * 100));
+                let barColor = diffMins > 30 ? 'var(--success)' : (diffMins < -30 ? 'var(--danger)' : 'var(--primary)');
+                
+                const barHtml = `
+                    <div style="width: 100%; max-width: 120px; height: 6px; background: var(--input-bg); border-radius: 4px; margin-top: 6px; overflow: hidden; border: 1px solid var(--card-border);">
+                        <div style="height: 100%; width: ${percent}%; background: ${barColor}; transition: width 0.5s ease;"></div>
+                    </div>
+                `;
+
+                if (diffMins > 30) otHtml = `<span class="badge bg-green">OT: +${formatMinsToDuration(diffMins)}</span>` + barHtml;
+                else if (diffMins < -30) otHtml = `<span class="badge bg-red">Short: ${formatMinsToDuration(diffMins)}</span>` + barHtml;
+                else otHtml = `<span class="badge bg-gray">Balanced</span>` + barHtml;
             } else otHtml = `-`;
             
             let avgIn = formatMinsTo24h(s.sumInMins / s.daysPresent);
@@ -4972,14 +5251,14 @@
         try {
             if (toBranchId === 'unassigned') {
                 // Delete override from DB
-                await supabaseClient.from('staff_roster').delete().match({ staff_id: staffId, date: dateStr });
+                supabaseClient.from('staff_roster').delete().match({ staff_id: staffId, date: dateStr }); // Removed await
                 delete rosterMap[`${staffId}_${dateStr}`];
                 
                 const hasDefault = !!staffMap[staffId]?.default_branch_id;
                 showToast(hasDefault ? "Override removed. Back to Default." : "Moved to unassigned pool.", "primary");
             } else {
                 // Upsert new override
-                await supabaseClient.from('staff_roster').upsert({
+                supabaseClient.from('staff_roster').upsert({ // Removed await
                     staff_id: staffId, date: dateStr, assigned_branch_id: toBranchId
                 }, { onConflict: 'staff_id, date' });
                 
@@ -5364,7 +5643,25 @@
     });
     
     window.deleteRoleItem = async (rowId) => { 
-      if(await window.customConfirm("Remove this role?")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
+        const tr = event.target.closest('tr');
+        tr.style.display = 'none'; // Soft delete UI
+        const undoSecs = parseInt(uiPrefs.undoTimer || "7", 10);
+        
+        let isUndone = false;
+        const btnId = 'undo-' + Math.random().toString(36).substr(2, 9);
+        const undoBtnHtml = `<button id="${btnId}" onclick="this.dataset.undone='true'; this.parentElement.style.display='none'" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 4px; margin-left: 12px; font-weight: 700; cursor: pointer;">Undo</button>`;
+        showToast(`Role deleting in ${undoSecs}s. ${undoBtnHtml}`, "warning", undoSecs * 1000);
+        
+        setTimeout(async () => {
+            const toastBtn = document.getElementById(btnId);
+            if (toastBtn && toastBtn.dataset.undone === 'true') {
+                tr.style.display = '';
+                showToast("Deletion undone.", "primary");
+            } else {
+                await supabaseClient.from('roles_directory').delete().eq('id', rowId); 
+                await initialMetadataLoad(); 
+            }
+        }, undoSecs * 1000);
     };
 
     document.getElementById('add-reason-btn')?.addEventListener('click', async () => {
@@ -6335,47 +6632,74 @@
         const resultsContainer = document.getElementById('cmd-results');
         let html = '';
         
-        // 1. Search Standard Views
-        const views = [
-            { id: 'dashboard', name: 'Dashboard Overview', icon: '📊' },
-            { id: 'live', name: 'Live Tracker', icon: '📍' },
-            { id: 'logs', name: 'Attendance Logs', icon: '📋' },
-            { id: 'roster', name: 'Duty Roster', icon: '🗓️' },
-            { id: 'action', name: 'Action Center', icon: '⚠️' },
-            { id: 'stats', name: 'Staff Stats & Payroll', icon: '📈' },
-            { id: 'settings-hr', name: 'HR Settings', icon: '⚙️' }
-        ];
-        
-        views.filter(v => v.name.toLowerCase().includes(query)).forEach(v => {
-            html += `<div class="cmd-item" onclick="document.querySelector('.tab-btn[data-view=\\'view-${v.id}\\']').click(); window.closeModal(document.getElementById('cmd-palette-overlay'));">
-                <span class="cmd-icon">${v.icon}</span> Go to ${v.name}
-            </div>`;
-        });
+        // Detect if user typed ">" for system actions
+        const isActionMode = query.startsWith('>');
+        const cleanQuery = query.replace('>', '').trim().toLowerCase();
 
-        // 2. Search Staff Members (Quick Jump to their Stats)
-        dbStaff.filter(s => s.name.toLowerCase().includes(query)).slice(0, 8).forEach(s => {
-            html += `<div class="cmd-item" onclick="jumpToStaffStats('${s.id}');">
-                <span class="cmd-icon">👤</span> View ${s.name}'s Attendance & Stats
-            </div>`;
-        });
+        const fuzzyMatch = (pattern, str) => {
+            if (!pattern) return true;
+            let patternIdx = 0, strIdx = 0;
+            while(patternIdx < pattern.length && strIdx < str.length){
+                if(pattern[patternIdx] === str[strIdx]) patternIdx++;
+                strIdx++;
+            }
+            return patternIdx === pattern.length;
+        };
 
-        // 3. System Actions (Triggered by typing ">" or matching keywords)
+        if (!isActionMode) {
+            // 1. Search Standard Views
+            const views = [
+                { id: 'dashboard', name: 'Dashboard Overview', icon: '📊' },
+                { id: 'live', name: 'Live Tracker', icon: '📍' },
+                { id: 'logs', name: 'Attendance Logs', icon: '📋' },
+                { id: 'audits', name: 'Photo Audits', icon: '📷' },
+                { id: 'roster', name: 'Duty Roster', icon: '🗓️' },
+                { id: 'action', name: 'Action Center', icon: '⚠️' },
+                { id: 'stats', name: 'Staff Stats & Payroll', icon: '📈' },
+                { id: 'settings-hr', name: 'HR Settings', icon: '⚙️' },
+                { id: 'settings-org', name: 'Org Settings', icon: '🏢' },
+                { id: 'personalize', name: 'Personalize Workspace', icon: '✨' }
+            ];
+
+            views.filter(v => fuzzyMatch(cleanQuery, v.name.toLowerCase()) || v.name.toLowerCase().includes(cleanQuery)).forEach(v => {
+                html += `<div class="cmd-item" onclick="if(document.querySelector('.tab-btn[data-view=\\'view-${v.id}\\']')){ document.querySelector('.tab-btn[data-view=\\'view-${v.id}\\']').click(); } else if(document.getElementById('btn-${v.id}')){ document.getElementById('btn-${v.id}').click(); } window.closeModal(document.getElementById('cmd-palette-overlay'));">
+                    <span class="cmd-icon">${v.icon}</span> Go to ${v.name}
+                </div>`;
+            });
+
+            // 2. Search Staff Members
+            dbStaff.filter(s => fuzzyMatch(cleanQuery, s.name.toLowerCase()) || s.name.toLowerCase().includes(cleanQuery)).slice(0, 8).forEach(s => {
+                html += `<div class="cmd-item" onclick="jumpToStaffStats('${s.id}');">
+                    <span class="cmd-icon">👤</span> View ${s.name}'s Attendance & Stats
+                </div>`;
+            });
+        }
+
+        // 3. System Actions
         const actions = [
-            { name: '> Toggle Auto-Sync', icon: '🔄', action: () => document.getElementById('sync-toggle').click() },
-            { name: '> Change Theme', icon: '🎨', action: () => document.getElementById('btn-open-theme').click() },
-            { name: '> Log Out', icon: '🚪', action: () => document.getElementById('logout-btn').click() },
-            { name: '> Export Data Menu', icon: '📥', action: () => document.getElementById('export-btn').click() }
+            { name: 'Personalize Workspace (Theme)', icon: '🎨', script: "document.getElementById('btn-personalize')?.click()" },
+            { name: 'Export Data Menu', icon: '📥', script: "document.getElementById('export-btn')?.click()" },
+            { name: 'Reset All Filters', icon: '🧹', script: "document.getElementById('clear-all-filters-btn')?.click()" },
+            { name: 'Toggle Fullscreen', icon: '⛶', script: "document.getElementById('fullscreen-btn')?.click()" },
+            { name: 'View Keyboard Shortcuts', icon: '⌨️', script: "document.getElementById('btn-shortcuts')?.click()" },
+            { name: 'Toggle Sidebar', icon: '🗂️', script: "document.getElementById('sidebar-toggle')?.click()" },
+            { name: 'Refresh Data', icon: '🔄', script: "if(typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(true)" },
+            { name: 'Toggle Focus Mode', icon: '�', script: "const cb = document.getElementById('toggle-focus-mode'); if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }" },
+            { name: 'Toggle High Contrast', icon: '�️', script: "const cb = document.getElementById('toggle-high-contrast'); if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }" },
+            { name: 'Log Out', icon: '�', script: "document.getElementById('logout-btn')?.click()" }
         ];
         
-        actions.filter(a => a.name.toLowerCase().includes(query)).forEach(a => {
-            html += `<div class="cmd-item" onclick="window.closeModal(document.getElementById('cmd-palette-overlay')); (${a.action.toString()})();">
-                <span class="cmd-icon">${a.icon}</span> ${a.name.replace('> ', '')}
+        actions.filter(a => fuzzyMatch(cleanQuery, a.name.toLowerCase()) || a.name.toLowerCase().includes(cleanQuery)).forEach(a => {
+            html += `<div class="cmd-item" onclick="window.closeModal(document.getElementById('cmd-palette-overlay')); ${a.script};">
+                <span class="cmd-icon">${a.icon}</span> ${isActionMode ? '' : '> '}${a.name}
             </div>`;
         });
 
         if (!query) {
             html = `<div style="padding: 12px 16px; color: var(--text-soft); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Suggestions</div>` + html;
-            html += `<div style="padding: 12px 16px; color: var(--text-soft); font-size: 12px; margin-top: 8px; border-top: 1px solid var(--card-border);"><kbd style="background: var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">&gt;</kbd> Type <b>&gt;</b> for system actions</div>`;
+            html += `<div class="cmd-item" onclick="document.getElementById('cmd-input').value = '> '; document.getElementById('cmd-input').dispatchEvent(new Event('input'));" style="margin-top: 8px; border-top: 1px solid var(--card-border); border-radius: 0;">
+                <span class="cmd-icon">⚡</span> <span style="color: var(--text-soft);">Click here or type <kbd style="background: var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: var(--text-main);">&gt;</kbd> to view System Actions</span>
+            </div>`;
         }
 
         resultsContainer.innerHTML = html || `<div style="padding: 24px; text-align: center; color: var(--text-soft);">No results found</div>`;
@@ -6404,23 +6728,164 @@
     };
 
     // =========================================================================
-    //  MASTER KEYBOARD SHORTCUTS
+    //  DYNAMIC SHORTCUTS MODAL RENDERER
+    // =========================================================================
+    window.renderShortcutsModal = function() {
+        const cmdText = `Ctrl/Cmd + ${uiPrefs.keyCmd.toUpperCase()}`;
+        const saveText = `${uiPrefs.modSave} + [1-9]`;
+        const loadText = `${uiPrefs.modLoad} + [1-9]`;
+        const tKey = uiPrefs.keyTshirt.toUpperCase();
+        const iKey = uiPrefs.keyId.toUpperCase();
+
+        const modalHtml = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; color: var(--text-main);">⌨️ Keyboard Shortcuts</h3>
+            <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('shortcuts-modal'))">&times;</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: calc(13px * var(--font-scale, 1));">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span style="color: var(--success); font-weight: bold;">Save Current Filter View</span>
+              <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${saveText}</kbd></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span style="color: var(--primary); font-weight: bold;">Load Saved Filter View</span>
+              <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${loadText}</kbd></span>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span>Open Command Palette</span>
+              <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">/</kbd> or <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${cmdText}</kbd></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span>Toggle T-Shirt (in Photo Modal)</span>
+              <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${tKey}</kbd>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span>Toggle ID Card (in Photo Modal)</span>
+              <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${iKey}</kbd>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span>Approve & Save (in Photo Modal)</span>
+              <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Enter</kbd>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span>Next / Previous Photo</span>
+              <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">←</kbd> <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">→</kbd></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+              <span>Range Select Checkboxes</span>
+              <span style="color: var(--text-soft);">Hold <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Shift</kbd> + Click</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Close Modals / Deselect All</span>
+              <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">ESC</kbd>
+            </div>
+          </div>
+        `;
+        const modalContainer = document.querySelector('#shortcuts-modal .modal-card');
+        if(modalContainer) modalContainer.innerHTML = modalHtml;
+    };
+    window.renderShortcutsModal(); // Initial Render
+
+    // =========================================================================
+    //  MASTER KEYBOARD SHORTCUTS & VIEW SAVING
     // =========================================================================
     document.addEventListener('keydown', (e) => {
         // Prevent shortcuts from firing if the admin is typing in an input/search box
         const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
 
-        // Tab Navigation Shortcuts (Alt + 1 to 9)
-        if (!isTyping && e.altKey && e.key >= '1' && e.key <= '9') {
+        // Press 'F' to focus Date Start
+        if (!isTyping && e.key.toLowerCase() === 'f') {
             e.preventDefault();
-            const tabs = document.querySelectorAll('.tab-btn');
-            const tabIndex = parseInt(e.key) - 1;
-            if (tabs[tabIndex]) tabs[tabIndex].click();
+            document.getElementById('global-start')?.focus();
             return;
         }
 
+        // Press 'E' to Export (if visible)
+        if (!isTyping && e.key.toLowerCase() === 'e') {
+            e.preventDefault();
+            document.getElementById('export-btn')?.click();
+            return;
+        }
+
+        // --- SAVED VIEWS & TAB NAVIGATION LOGIC ---
+        if (!isTyping && e.key >= '1' && e.key <= '9') {
+            const checkModifier = (mod) => {
+                if (mod === 'Alt') return e.altKey;
+                if (mod === 'Ctrl') return e.ctrlKey || e.metaKey;
+                if (mod === 'Shift') return e.shiftKey;
+                return false;
+            };
+
+            const isSaveMod = checkModifier(uiPrefs.modSave);
+            const isLoadMod = checkModifier(uiPrefs.modLoad);
+            const slotNum = e.key;
+
+            if (isSaveMod && !isLoadMod) {
+                // SAVE VIEW
+                e.preventDefault();
+                const activeTab = document.querySelector('.tab-btn.active');
+                const viewState = {
+                    viewId: activeTab ? activeTab.getAttribute('data-view') : 'view-dashboard',
+                    start: startDate.toISOString(),
+                    end: endDate.toISOString(),
+                    staff: Array.from(selectedStaffIds),
+                    branches: Array.from(selectedBranchIds),
+                    roles: Array.from(selectedRoleIds)
+                };
+                localStorage.setItem(`rj_saved_view_${slotNum}`, JSON.stringify(viewState));
+                showToast(`Workspace saved to Slot ${slotNum}!`, "success");
+                return;
+            } 
+            else if (isLoadMod && !isSaveMod) {
+                // LOAD VIEW
+                e.preventDefault();
+                const savedJson = localStorage.getItem(`rj_saved_view_${slotNum}`);
+                if (savedJson) {
+                    try {
+                        const viewState = JSON.parse(savedJson);
+                        
+                        // 1. Restore Dates
+                        startDate = new Date(viewState.start);
+                        endDate = new Date(viewState.end);
+                        if(startPicker) startPicker.setDate(startDate);
+                        if(endPicker) endPicker.setDate(endDate);
+                        window.checkAndSetActiveDateRange();
+
+                        // 2. Restore Sets
+                        selectedStaffIds = new Set(viewState.staff);
+                        selectedBranchIds = new Set(viewState.branches);
+                        selectedRoleIds = new Set(viewState.roles);
+
+                        // 3. Update Checkboxes UI
+                        document.querySelectorAll('.staff-cb').forEach(cb => cb.checked = selectedStaffIds.has(cb.value));
+                        document.querySelectorAll('.branch-cb').forEach(cb => cb.checked = selectedBranchIds.has(cb.value));
+                        document.querySelectorAll('.role-cb').forEach(cb => cb.checked = selectedRoleIds.has(cb.value));
+                        
+                        updateStaffButtonText();
+                        updateBranchButtonText();
+                        updateRoleButtonText();
+
+                        // 4. Switch Tab
+                        const targetTabBtn = document.querySelector(`.tab-btn[data-view="${viewState.viewId}"]`);
+                        if(targetTabBtn) targetTabBtn.click();
+
+                        // 5. Fetch Data
+                        fetchLogsFromDatabase(false);
+                        showToast(`Loaded Workspace from Slot ${slotNum}`, "success");
+                    } catch(err) {
+                        showToast(`Error loading Slot ${slotNum}`, "error");
+                    }
+                } else {
+                    showToast(`Slot ${slotNum} is empty. Save a view first.`, "primary");
+                }
+                return;
+            }
+        }
+
         // 1. Command Palette: Cmd+K, Ctrl+K, or "/"
-        if (!isTyping && ((e.metaKey || e.ctrlKey) && e.key === 'k' || e.key === '/')) {
+        if (!isTyping && ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === uiPrefs.keyCmd.toLowerCase() || e.key === '/')) {
             e.preventDefault();
             const palette = document.getElementById('cmd-palette-overlay');
             if (palette) {
@@ -6441,8 +6906,11 @@
             return;
         }
 
-        // 2. Escape Key: Close Modals & Clear Selections
+        // 2. Escape Key: Close Modals, Drawers & Clear Selections
         if (e.key === 'Escape') {
+            // Close Profile Drawer
+            if (typeof window.closeStaffProfile === 'function') window.closeStaffProfile();
+            
             // Close Cmd Palette
             const palette = document.getElementById('cmd-palette-overlay');
             if (palette) palette.style.display = 'none';
@@ -6468,9 +6936,9 @@
             const iCheck = document.getElementById('modal-idcard');
             const saveBtn = document.getElementById('btn-modal-audit-save');
 
-            // T and I to toggle uniform checks
-            if (e.key.toLowerCase() === 't' && tCheck) tCheck.checked = !tCheck.checked;
-            if (e.key.toLowerCase() === 'i' && iCheck) iCheck.checked = !iCheck.checked;
+            // Customizable T and I toggles
+            if (e.key.toLowerCase() === uiPrefs.keyTshirt.toLowerCase() && tCheck) tCheck.checked = !tCheck.checked;
+            if (e.key.toLowerCase() === uiPrefs.keyId.toLowerCase() && iCheck) iCheck.checked = !iCheck.checked;
 
             // Enter to Save
             if (e.key === 'Enter' && saveBtn) {
@@ -6576,7 +7044,7 @@
             try {
                 await supabaseClient.from('attendance_logs').delete().in('id', idsToDelete);
                 showToast("Logs permanently deleted.", "success");
-                fetchLogsFromDatabase(true); 
+                fetchLogsFromDatabase(false); // Hard refresh to guarantee UI updates
             } catch (error) {
                 showToast("Failed to delete logs.", "error");
             }
@@ -6699,6 +7167,15 @@
         // Disable dangerous bulk buttons
         const bulkBtn = document.getElementById('btn-bulk-save');
         if(bulkBtn) bulkBtn.disabled = true;
+    });
+
+    document.querySelectorAll('.table-responsive').forEach(container => {
+        container.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                container.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
     });
 
     window.addEventListener('online', () => {
