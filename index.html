@@ -7174,8 +7174,8 @@
             mutations.forEach((mutation) => {
                 if (mutation.attributeName === 'style') {
                     if (overlay.style.display === 'flex') {
-                        // Find the first logical input to focus
-                        const firstInput = overlay.querySelector('input[type="text"], input[type="email"], input[type="number"]');
+                        // Find the first logical input to focus (Exclude readonly Flatpickr inputs so calendars don't auto-open)
+                        const firstInput = overlay.querySelector('input[type="text"]:not([readonly]), input[type="email"], input[type="number"]');
                         if (firstInput) setTimeout(() => firstInput.focus(), 50); // 50ms delay allows display transition to catch up
                     }
                 }
