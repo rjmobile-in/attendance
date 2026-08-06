@@ -12,11 +12,12 @@
   <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
   
   <script>
-    const savedTheme = localStorage.getItem('rj_theme');
-    // If user chose light OR (they have no saved preference AND their OS is set to Light mode)
-    if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) { 
-      document.documentElement.classList.add('light-theme'); 
-    }
+    (() => {
+      const savedTheme = localStorage.getItem('rj_theme');
+      if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) { 
+        document.documentElement.classList.add('light-theme'); 
+      }
+    })();
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -103,6 +104,10 @@
     
     ::selection { background: var(--primary-alpha); color: var(--primary); }
     ::-moz-selection { background: var(--primary-alpha); color: var(--primary); }
+
+    /* Accessibility: Smart Focus Rings for Keyboard Navigation */
+    *:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 2px; transition: outline-offset 0.1s ease; }
+    .btn-primary:focus-visible, .btn-secondary:focus-visible, .tab-btn:focus-visible, .icon-btn:focus-visible { outline-offset: 4px; }
 
     body { font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; position: relative; z-index: 1; }
     
@@ -480,6 +485,9 @@
     }
     .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; filter: grayscale(1); }
 
+    .input-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px var(--danger-alpha) !important; animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
     .cmd-item { padding: 12px 16px; border-radius: var(--radius-sm); color: var(--text-main); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-size: calc(14px * var(--font-scale, 1)); font-weight: 500; animation: cmdPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform-origin: left center;}
     .cmd-item:hover, .cmd-item.active { background: var(--primary-alpha); color: var(--primary); transform: translateX(4px); }
     @keyframes cmdPop { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -560,7 +568,7 @@
     /* Personalization: UI Density & Motion */
     html.density-compact th, html.density-compact td { padding: 8px 16px !important; font-size: calc(12px * var(--font-scale, 1)) !important; }
     html.density-compact .widget-card, html.density-compact .chart-card { padding: 16px !important; }
-    html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+    
 
     /* Native Scroll Snapping */
     .sub-tabs { scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
@@ -720,7 +728,8 @@
             </button>
             
             <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
-            <button id="btn-open-theme" class="btn-secondary" title="Advanced Theme Customizer">🎨 Theme</button>
+            <button id="btn-shortcuts" class="btn-secondary" title="Keyboard Shortcuts">⌨️ Shortcuts</button>
+            <button id="btn-personalize" class="btn-secondary" title="Personalize Workspace UI">✨ Personalize</button>
             <button id="fullscreen-btn" class="btn-secondary" title="Toggle Fullscreen">⛶ Fullscreen</button>
             <button id="logout-btn" class="btn-secondary" style="margin-left: 8px;">Log Out</button>
           </div>
@@ -1221,6 +1230,87 @@
                     </div>
                 </div>
 
+                <!-- VIEW 12: PERSONALIZE WORKSPACE -->
+                <div id="view-personalize" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Customize your workspace UI, colors, and accessibility. These apply only to your current browser.</span>
+                        <button id="btn-reset-theme-tab" class="btn-secondary" style="color: var(--danger); border-color: var(--danger-alpha);">Reset to Defaults</button>
+                    </div>
+
+                    <div class="settings-grid">
+                        <!-- Panel 1: Theme Presets -->
+                        <div class="settings-panel">
+                            <h3>Quick Theme Presets</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Instantly change the look and feel of your app.</p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="theme-presets-container">
+                                <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
+                                <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
+                                <button class="btn-secondary preset-btn" data-preset="ocean" style="font-size: 12px; padding: 6px 12px;">🌊 Ocean</button>
+                                <button class="btn-secondary preset-btn" data-preset="forest" style="font-size: 12px; padding: 6px 12px;">🌲 Forest</button>
+                                <button class="btn-secondary preset-btn" data-preset="sunset" style="font-size: 12px; padding: 6px 12px;">🌇 Sunset</button>
+                                <button class="btn-secondary preset-btn" data-preset="midnight" style="font-size: 12px; padding: 6px 12px;">🌌 Midnight</button>
+                                <button class="btn-secondary preset-btn" data-preset="coffee" style="font-size: 12px; padding: 6px 12px;">☕ Coffee</button>
+                                <button class="btn-secondary preset-btn" data-preset="cyberpunk" style="font-size: 12px; padding: 6px 12px;">🤖 Cyberpunk</button>
+                                <button class="btn-secondary preset-btn" data-preset="dracula" style="font-size: 12px; padding: 6px 12px;">🧛‍♂️ Dracula</button>
+                                <button class="btn-secondary preset-btn" data-preset="nord" style="font-size: 12px; padding: 6px 12px;">❄️ Nord</button>
+                                <button class="btn-secondary preset-btn" data-preset="neon" style="font-size: 12px; padding: 6px 12px;">🟢 Matrix</button>
+                                <button class="btn-secondary preset-btn" data-preset="rosegold" style="font-size: 12px; padding: 6px 12px;">🌸 Rose Gold</button>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Preferences -->
+                        <div class="settings-panel">
+                            <h3>Layout & Accessibility</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Adjust text size, density, and time formats.</p>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Text Size</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-secondary font-size-btn" data-scale="0.9" style="flex: 1;">Small</button>
+                                    <button class="btn-secondary font-size-btn active" data-scale="1" style="flex: 1;">Normal</button>
+                                    <button class="btn-secondary font-size-btn" data-scale="1.1" style="flex: 1;">Large</button>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
+                                <select id="default-view-select" class="input-field" style="margin: 0;">
+                                    <option value="dashboard">Dashboard Overview</option>
+                                    <option value="live">Live Tracker</option>
+                                    <option value="logs">Attendance Logs</option>
+                                    <option value="roster">Duty Roster</option>
+                                    <option value="action">Action Center</option>
+                                </select>
+                            </div>
+
+                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 16px;">
+                                <div><div style="color:var(--text-main);">Use 12-Hour Time</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">AM/PM format instead of 24h</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-time-format"><span class="slider"></span></label>
+                            </div>
+                            <div class="switch-wrap" style="justify-content: space-between;">
+                                <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Custom Colors -->
+                        <div class="settings-panel" style="grid-column: 1 / -1;">
+                            <h3>Custom Interface Colors</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Fine-tune specific UI elements.</p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Primary Accent</span><input type="color" class="color-picker-input theme-color-input" data-var="--primary" value="#6366f1"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Success Color</span><input type="color" class="color-picker-input theme-color-input" data-var="--success" value="#10b981"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Warning Color</span><input type="color" class="color-picker-input theme-color-input" data-var="--warning" value="#f59e0b"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Danger Color</span><input type="color" class="color-picker-input theme-color-input" data-var="--danger" value="#ef4444"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">App Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--bg-base" value="#09090b"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Cards & Tables</span><input type="color" class="color-picker-input theme-color-input" data-var="--card-bg" value="#18181b"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Sidebar Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--sidebar-bg" value="#18181b"></div>
+                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Header Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--header-bg" value="#09090b"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div> <!-- End Export Container -->
         </div> <!-- End Content Wrapper -->
       </main>
@@ -1319,17 +1409,39 @@
         </div>
       </div>
       
-      <div style="margin-top: 24px; margin-bottom: 8px; border-top: 1px solid var(--card-border); padding-top: 16px;">
+      <div style="margin-top: 24px; margin-bottom: 16px; border-top: 1px solid var(--card-border); padding-top: 16px;">
           <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;">Workspace Preferences</label>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Text Size</label>
+          <div style="display: flex; gap: 8px;">
+              <button class="btn-secondary font-size-btn" data-scale="0.9" style="flex: 1;">Small</button>
+              <button class="btn-secondary font-size-btn active" data-scale="1" style="flex: 1;">Normal</button>
+              <button class="btn-secondary font-size-btn" data-scale="1.1" style="flex: 1;">Large</button>
+          </div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
+          <select id="default-view-select" class="input-field" style="margin: 0;">
+              <option value="dashboard">Dashboard Overview</option>
+              <option value="live">Live Tracker</option>
+              <option value="logs">Attendance Logs</option>
+              <option value="roster">Duty Roster</option>
+              <option value="action">Action Center</option>
+          </select>
+      </div>
+
+      <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 16px;">
+          <div><div style="color:var(--text-main);">Use 12-Hour Time</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">AM/PM format instead of 24h</div></div>
+          <label class="switch"><input type="checkbox" id="toggle-time-format"><span class="slider"></span></label>
       </div>
       <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
           <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
           <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
       </div>
-      <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 16px;">
-          <div><div style="color:var(--text-main);">Reduce Motion</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Disable animations for speed</div></div>
-          <label class="switch"><input type="checkbox" id="toggle-motion"><span class="slider"></span></label>
-      </div>
+      
 
       <div style="display: flex; gap: 12px; margin-top: 12px;">
         <button id="btn-reset-theme" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Reset Defaults</button>
@@ -1379,6 +1491,17 @@
   </div>
 
   <!-- MODALS -->
+  <div id="confirm-modal" class="modal-overlay" style="z-index: 20000;">
+    <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px 32px;">
+      <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+      <h3 style="margin-bottom: 12px; color: var(--text-main);">Are you sure?</h3>
+      <p id="confirm-message" style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(14px * var(--font-scale, 1));">Action cannot be undone.</p>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-secondary" id="confirm-cancel-btn" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+        <button class="btn-primary" id="confirm-yes-btn" style="flex: 1; justify-content: center; padding: 12px; background: var(--danger); box-shadow: 0 4px 12px var(--danger-alpha);">Yes, Proceed</button>
+      </div>
+    </div>
+  </div>
   <div id="live-branch-modal" class="modal-overlay" onclick="window.closeModal(this)">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
@@ -1605,7 +1728,7 @@
         Audit Photo
         <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
       </h3>
-      <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/18181b/ef4444?text=Image+Purged/Expired'">
+      <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://placehold.co/600x400/18181b/ef4444?text=Image+Purged/Expired'">
       <div id="audit-controls" style="display:none; flex-direction:column; gap:16px; margin-top:8px;">
           <div class="modal-checkboxes">
               <label class="check-wrap"><input type="checkbox" id="modal-tshirt"> RJ T-Shirt</label>
@@ -1679,10 +1802,15 @@
     
     const minLaunchDate = new Date('2026-08-01');
 
+    // INITIALIZE GLOBAL PREFS (Time Format, Font, View)
+    const uiPrefs = JSON.parse(localStorage.getItem('rj_ui_prefs') || '{"compact":false,"fontScale":"1","startView":"dashboard","use12h":false}');
+    window.use12HourTime = uiPrefs.use12h;
+    document.documentElement.style.setProperty('--font-scale', uiPrefs.fontScale || '1');
+
     // INSTANT TAB SWITCH ON LOAD (Prevents visual delay/flash)
     (function() {
         const urlParamsLocal = new URLSearchParams(window.location.search);
-        const viewParam = urlParamsLocal.get('view');
+        const viewParam = urlParamsLocal.get('view') || uiPrefs.startView || 'dashboard'; // Reads default view
         if (viewParam) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
@@ -1892,6 +2020,32 @@
 
     window.safeHTML = (str) => typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(str) : str;
 
+    // --- PROMISE-BASED CUSTOM CONFIRM MODAL ---
+    window.customConfirm = function(msg) {
+        return new Promise(resolve => {
+            document.getElementById('confirm-message').innerText = msg;
+            const modal = document.getElementById('confirm-modal');
+            modal.style.display = 'flex';
+            
+            document.getElementById('confirm-cancel-btn').onclick = () => { 
+                window.closeModal(modal); 
+                resolve(false); 
+            };
+            document.getElementById('confirm-yes-btn').onclick = () => { 
+                window.closeModal(modal); 
+                resolve(true); 
+            };
+        });
+    };
+
+    // --- ENTER KEY FORM SUBMISSION ---
+    document.getElementById('password-input')?.addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') document.getElementById('login-btn').click(); 
+    });
+    document.getElementById('new-staff-pass')?.addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') document.getElementById('add-staff-btn').click(); 
+    });
+
     // Haptic Feedback Helper
     window.triggerHaptic = function(type = 'light') {
         if (!navigator.vibrate) return;
@@ -1965,23 +2119,55 @@
 
         function applySavedTheme() {
             const savedTheme = JSON.parse(localStorage.getItem('rj_advanced_theme') || '{}');
-            colorInputs.forEach(input => {
-                const varName = input.getAttribute('data-var');
-                if (savedTheme[varName]) {
-                    input.value = savedTheme[varName];
-                    document.documentElement.style.setProperty(varName, savedTheme[varName]);
-                    if (varName === '--primary') {
-                        document.documentElement.style.setProperty('--primary-hover', savedTheme[varName]);
-                        document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(savedTheme[varName], 0.15));
-                    }
+            
+            // Loop through ALL saved variables in localStorage (fixes hidden vars like --input-bg)
+            Object.keys(savedTheme).forEach(varName => {
+                const color = savedTheme[varName];
+                document.documentElement.style.setProperty(varName, color);
+                
+                if (varName === '--primary') {
+                    document.documentElement.style.setProperty('--primary-hover', color);
+                    document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(color, 0.15));
                 }
+                if (varName === '--success') document.documentElement.style.setProperty('--success-alpha', window.hexToRgba(color, 0.15));
+                if (varName === '--warning') document.documentElement.style.setProperty('--warning-alpha', window.hexToRgba(color, 0.15));
+                if (varName === '--danger') document.documentElement.style.setProperty('--danger-alpha', window.hexToRgba(color, 0.15));
+                
+                // Update the color picker input if it exists in the UI
+                const input = document.querySelector(`.theme-color-input[data-var="${varName}"]`);
+                if (input) input.value = color;
             });
         }
         
         applySavedTheme();
 
-        if (btnOpenTheme && themeModal) btnOpenTheme.addEventListener('click', () => themeModal.style.display = 'flex');
-        if (btnCloseTheme && themeModal) btnCloseTheme.addEventListener('click', () => themeModal.style.display = 'none');
+        // Setup new Buttons
+        document.getElementById('btn-shortcuts')?.addEventListener('click', () => {
+            document.getElementById('shortcuts-modal').style.display = 'flex';
+        });
+
+        document.getElementById('btn-personalize')?.addEventListener('click', () => {
+            // Deselect sidebar tabs & hide all views
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.app-view').forEach(v => { v.style.display = 'none'; v.classList.remove('animate-tab'); });
+            
+            // Open Personalize Tab
+            const viewEl = document.getElementById('view-personalize');
+            if (viewEl) { viewEl.style.display = 'block'; void viewEl.offsetWidth; viewEl.classList.add('animate-tab'); }
+            
+            const titleEl = document.getElementById('page-title');
+            if (titleEl) titleEl.innerText = "Personalize Workspace";
+            
+            try {
+                const url = new URL(window.location); url.searchParams.set('view', 'personalize'); window.history.pushState({}, '', url);
+            } catch (err) {}
+            
+            // Optional: Close Sidebar on Mobile automatically
+            if (window.innerWidth <= 900) {
+                const sidebar = document.getElementById('app-sidebar');
+                if (sidebar && !sidebar.classList.contains('collapsed')) sidebar.classList.add('collapsed');
+            }
+        });
 
         // Manual color picker inputs
         colorInputs.forEach(input => {
@@ -2034,33 +2220,69 @@
 
         // Apply Workspace Preferences
         const toggleDensity = document.getElementById('toggle-density');
-        const toggleMotion = document.getElementById('toggle-motion');
+        const toggleTime = document.getElementById('toggle-time-format');
+        const defaultViewSelect = document.getElementById('default-view-select');
         
-        const uiPrefs = JSON.parse(localStorage.getItem('rj_ui_prefs') || '{"compact":false,"reducedMotion":false}');
-        if (uiPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
-        if (uiPrefs.reducedMotion) { document.documentElement.classList.add('reduce-motion'); if (toggleMotion) toggleMotion.checked = true; }
+        // Refresh prefs from local storage securely
+        let currentPrefs = JSON.parse(localStorage.getItem('rj_ui_prefs') || '{"compact":false,"fontScale":"1","startView":"dashboard","use12h":false}');
         
+        // Initial state set
+        if (currentPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
+        if (toggleTime) toggleTime.checked = currentPrefs.use12h;
+        if (defaultViewSelect) defaultViewSelect.value = currentPrefs.startView || 'dashboard';
+        
+        document.querySelectorAll('.font-size-btn').forEach(b => {
+            if(b.getAttribute('data-scale') === (currentPrefs.fontScale || '1')) b.classList.add('active');
+            else b.classList.remove('active');
+        });
+
+        // --- 1. Font Size Scaler ---
+        document.querySelectorAll('.font-size-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const scale = e.target.getAttribute('data-scale');
+                document.documentElement.style.setProperty('--font-scale', scale);
+                currentPrefs.fontScale = scale;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+            });
+        });
+
+        // --- 2. Time Format Toggle (12h/24h) ---
+        if (toggleTime) {
+            toggleTime.addEventListener('change', (e) => {
+                currentPrefs.use12h = e.target.checked;
+                window.use12HourTime = e.target.checked;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+                showToast("Time format updated! Reloading...", "success");
+                setTimeout(() => location.reload(), 800);
+            });
+        }
+
+        // --- 3. Default View Dropdown ---
+        if (defaultViewSelect) {
+            defaultViewSelect.addEventListener('change', (e) => {
+                currentPrefs.startView = e.target.value;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+                showToast("Default Startup Tab Saved", "success");
+            });
+        }
+        
+        // --- 4. Compact Density Toggle ---
         if (toggleDensity) {
             toggleDensity.addEventListener('change', (e) => {
                 if (e.target.checked) document.documentElement.classList.add('density-compact');
                 else document.documentElement.classList.remove('density-compact');
-                uiPrefs.compact = e.target.checked;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(uiPrefs));
+                currentPrefs.compact = e.target.checked;
+                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
                 showToast(e.target.checked ? "Compact Mode Enabled" : "Cozy Mode Enabled", "success");
             });
         }
-        if (toggleMotion) {
-            toggleMotion.addEventListener('change', (e) => {
-                if (e.target.checked) document.documentElement.classList.add('reduce-motion');
-                else document.documentElement.classList.remove('reduce-motion');
-                uiPrefs.reducedMotion = e.target.checked;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(uiPrefs));
-                showToast("Motion preferences saved", "success");
-            });
-        }
+        
 
-        if (btnResetTheme) {
-            btnResetTheme.addEventListener('click', () => {
+        const btnResetThemeTab = document.getElementById('btn-reset-theme-tab');
+        if (btnResetThemeTab) {
+            btnResetThemeTab.addEventListener('click', () => {
                 localStorage.removeItem('rj_advanced_theme');
                 localStorage.setItem('rj_theme', 'dark');
                 colorInputs.forEach(input => {
@@ -2990,7 +3212,7 @@
                 reviewed: l.uniform_reviewed,
                 uTshirt: l.uniform_tshirt,
                 uIdcard: l.uniform_idcard,
-                time: new Date(l.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false})
+                time: new Date(l.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime})
             }));
 
             dailyLogs.forEach((l, idx) => {
@@ -3212,7 +3434,8 @@
               <div class="empty-state">
                   <div class="empty-state-icon">📭</div>
                   <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">No Logs Found</h3>
-                  <p>Try adjusting your date range or staff filters to see results.</p>
+                  <p style="margin-bottom: 16px;">Try adjusting your date range or staff filters to see results.</p>
+                  <button class="btn-secondary" onclick="document.getElementById('clear-all-filters-btn').click()">Reset All Filters</button>
               </div>
           </td></tr>`; 
           return; 
@@ -3229,10 +3452,10 @@
         const isPastDate = row.date.toDateString() !== todayStr;
         const isoDate = toLocalISO(row.date);
         
-        const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '<span style="color:var(--danger)">Missing</span>';
+        const inStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : '<span style="color:var(--danger)">Missing</span>';
         
         const outStr = row.lastOut 
-            ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) 
+            ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) 
             : (isPastDate ? '<span style="color:var(--danger); font-weight:800; background: var(--danger-alpha); padding: 2px 6px; border-radius: 4px;">Missing</span>' : '<span style="color:var(--success);">Active</span>');
             
         let statusHtml = '';
@@ -3269,14 +3492,14 @@
                 if (pl.reviewed) {
                     photosHTML += `
                     <div style="display:flex; flex-direction:column; gap:4px; align-items:center; width: 60px;">
-                        <img src="${pl.photo}" style="width: 50px; height: 50px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid var(--success);" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', ${pl.uTshirt}, ${pl.uIdcard})">
+                        <img src="${pl.photo}" loading="lazy" style="width: 50px; height: 50px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid var(--success);" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', ${pl.uTshirt}, ${pl.uIdcard})">
                         <span style="font-size: 10px; font-weight: 800; color: ${badgeColor}; text-align: center; line-height: 1;">${shortAction}</span>
                         <span style="font-size: 9px; font-weight: 600; color: var(--text-soft);">${pl.time}</span>
                     </div>`;
                 } else {
                     photosHTML += `
                     <div style="display:flex; flex-direction:column; gap:4px; align-items:center; width: 60px;">
-                        <img src="${pl.photo}" style="width: 50px; height: 50px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid var(--warning);" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', false, false)">
+                        <img src="${pl.photo}" loading="lazy" style="width: 50px; height: 50px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid var(--warning);" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', false, false)">
                         <span class="badge bg-orange" style="font-size: 9px; padding: 2px 4px; cursor:pointer;" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', false, false)">Audit</span>
                         <span style="font-size: 10px; font-weight: 800; color: ${badgeColor}; text-align: center; line-height: 1;">${shortAction}</span>
                     </div>`;
@@ -3434,8 +3657,8 @@
                 const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
                 const displayName = sObj ? sObj.name : log.employee_name;
                 
-                const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
-                const imgSrc = log.photo_capture || 'https://via.placeholder.com/50x50/18181b/f8fafc?text=?';
+                const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
+                const imgSrc = log.photo_capture || 'https://placehold.co/50x50/18181b/f8fafc?text=?';
                 
                 const timeLabel = branchId === 'transit' ? 'Started Travel' : 'In Since';
 
@@ -3560,8 +3783,8 @@
                 return `
                 <div class="audit-card" style="position: relative;">
                     ${cardCheck}
-                    <div class="audit-img-wrap" onclick="window.openAuditModal('${photo}', '${logId}', ${uTshirt}, ${uIdcard})">
-                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" onload="this.style.opacity=1" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300/18181b/a1a1aa?text=Expired'; this.style.opacity=1;">
+                    <div class="audit-img-wrap" onmousedown="window.handleLassoStart(event, '${logId}')" onmouseenter="window.handleLassoMove(event, '${logId}')" onclick="window.handleCardClick(event, '${logId}', '${photo}', ${uTshirt}, ${uIdcard})">
+                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" onload="this.style.opacity=1" onerror="this.onerror=null; this.src='https://placehold.co/400x300/18181b/a1a1aa?text=Expired'; this.style.opacity=1;">
                         <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2); z-index: 6;">${typeBadge}</span>
                         ${statusBadgeHtml}
                     </div>
@@ -3655,6 +3878,80 @@
         }
     }
 
+    let isLassoDragging = false;
+    let lassoTargetState = true;
+
+    // Failsafe to stop dragging if mouse goes up anywhere on the window
+    window.addEventListener('mouseup', () => {
+        isLassoDragging = false;
+    });
+
+    window.handleLassoStart = function(event, logId) {
+        if (event.shiftKey) {
+            event.preventDefault(); // Prevent native text/image drag behavior
+            isLassoDragging = true;
+            
+            const checkbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
+            if (checkbox) {
+                // Determine whether we are selecting or deselecting based on the first item clicked
+                lassoTargetState = !checkbox.checked;
+                checkbox.checked = lassoTargetState;
+                
+                if (lassoTargetState) selectedAuditLogIds.add(logId);
+                else selectedAuditLogIds.delete(logId);
+                
+                window.updateBulkActionBar();
+            }
+        } else if (event.ctrlKey || event.metaKey) {
+            event.preventDefault(); // Prevent text highlight while discrete clicking
+        }
+    };
+
+    window.handleLassoMove = function(event, logId) {
+        if (isLassoDragging && event.shiftKey) {
+            const checkbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
+            // Only update if the state differs (prevents unnecessary re-renders)
+            if (checkbox && checkbox.checked !== lassoTargetState) {
+                checkbox.checked = lassoTargetState;
+                
+                if (lassoTargetState) selectedAuditLogIds.add(logId);
+                else selectedAuditLogIds.delete(logId);
+                
+                window.updateBulkActionBar();
+            }
+        }
+    };
+
+    window.handleCardClick = function(event, logId, photoSrc, uTshirt, uIdcard) {
+        // Shift is now fully handled by Lasso Drag (mousedown/mouseenter); ignore click
+        if (event.shiftKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            return; 
+        }
+
+        // Ctrl / Cmd + Click: Discrete Selection Toggle Quietly
+        if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const checkbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
+            if (!checkbox) return;
+
+            const newState = !checkbox.checked;
+            checkbox.checked = newState;
+
+            if (newState) selectedAuditLogIds.add(logId);
+            else selectedAuditLogIds.delete(logId);
+            
+            window.updateBulkActionBar();
+            return;
+        }
+
+        // Normal Click: Opens the preview modal
+        window.openAuditModal(photoSrc, logId, uTshirt, uIdcard);
+    };
+
     let lastCheckedBox = null;
 
     window.toggleAuditSelection = function(logId, isChecked, event) {
@@ -3724,7 +4021,7 @@
         
         // Safety Check for massive batches
         if (selectedAuditLogIds.size > 20) {
-            if (!confirm(`You are about to bulk-approve ${selectedAuditLogIds.size} photos at once. Are you sure?`)) return;
+            if (!await window.customConfirm(`You are about to bulk-approve ${selectedAuditLogIds.size} photos at once. Are you sure?`)) return;
         }
         
         const tshirt = document.getElementById('bulk-tshirt').checked;
@@ -4075,10 +4372,10 @@
             if (currentActionTab === 'absent') {
                 statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge bg-red">Unexcused Absence</span>`;
             } else if (currentActionTab === 'late') {
-                let inTimeStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '--';
+                let inTimeStr = row.firstIn ? row.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : '--';
                 statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge bg-orange">Late In (${inTimeStr})</span>`;
             } else if (currentActionTab === 'early') {
-                let outTimeStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : '--';
+                let outTimeStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : '--';
                 statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out (${outTimeStr})</span>`;
             }
 
@@ -4351,7 +4648,7 @@
     }
 
     document.getElementById('btn-save-as-default')?.addEventListener('click', async () => {
-        if (!confirm("This will set the current board layout as the PERMANENT Default Branch for all staff shown here. Proceed?")) return;
+        if (!await window.customConfirm("This will set the current board layout as the PERMANENT Default Branch for all staff shown here. Proceed?")) return;
         
         const btn = document.getElementById('btn-save-as-default');
         const originalText = btn.innerText;
@@ -4445,7 +4742,7 @@
             rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`}</td>`;
           } else {
             const ins = dailyLogs.filter(l => l.action === 'Clock In').sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A';
+            let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A';
             rowStr += `<td><span class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1));">In: ${inTimeStr}</span></td>`;
           }
         }); 
@@ -4618,7 +4915,7 @@
     });
     
     window.deleteRoleItem = async (rowId) => { 
-      if(confirm("Remove this role?")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
+      if(await window.customConfirm("Remove this role?")) { await supabaseClient.from('roles_directory').delete().eq('id', rowId); await initialMetadataLoad(); loadSettingsData(); showToast("Role removed", "primary"); }
     };
 
     document.getElementById('add-reason-btn')?.addEventListener('click', async () => {
@@ -4662,7 +4959,7 @@
     });
 
     window.deleteReasonItem = async (rowId) => {
-        if(confirm("Remove this reason from the list?")) {
+        if(await window.customConfirm("Remove this reason from the list?")) {
             await supabaseClient.from('leave_reasons').delete().eq('id', rowId);
             await initialMetadataLoad();
             loadSettingsData();
@@ -4774,8 +5071,18 @@
             btn.disabled = false; 
         }
       } else { 
-          showToast("Name, Email, and Password are required!", "error"); 
+          if (!nameVal) document.getElementById('new-staff-name').classList.add('input-error');
+          if (!emailVal) document.getElementById('new-staff-email').classList.add('input-error');
+          if (!passVal) document.getElementById('new-staff-pass').classList.add('input-error');
+          showToast("Please fill the highlighted required fields!", "error"); 
       }
+    });
+
+    // Remove error highlights instantly when user starts typing
+    ['new-staff-name', 'new-staff-email', 'new-staff-pass'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', function() {
+            this.classList.remove('input-error');
+        });
     });
 
     window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob) => {
@@ -4893,7 +5200,7 @@
     });
     
     window.deleteStaffItem = async (rowId) => { 
-      if(confirm("Remove this staff member permanently? This will also delete their login access.")) { 
+      if(await window.customConfirm("Remove this staff member permanently? This will also delete their login access.")) { 
           const serviceKey = getServiceKey();
           if (!serviceKey) {
               showToast("Please save Service Role Key in Org Settings first to delete login access!", "error");
@@ -5012,7 +5319,7 @@
     });
 
     window.deleteBranchItem = async (rowId) => { 
-      if(confirm("Remove this branch geofence?")) { await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Geofence removed", "primary"); }
+      if(await window.customConfirm("Remove this branch geofence?")) { await supabaseClient.from('branches_directory').delete().eq('id', rowId); loadSettingsData(); showToast("Geofence removed", "primary"); }
     };
 
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
@@ -5074,8 +5381,8 @@
                 const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
                 let statusDetails = '';
                 if (currentActionTab === 'absent') statusDetails = reasonTxt ? reasonTxt : "Unexcused Absence";
-                else if (currentActionTab === 'late') statusDetails = reasonTxt ? reasonTxt : `Late In (${row.firstIn ? row.firstIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '--'})`;
-                else if (currentActionTab === 'early') statusDetails = reasonTxt ? reasonTxt : `Early Out (${row.lastOut ? row.lastOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '--'})`;
+                else if (currentActionTab === 'late') statusDetails = reasonTxt ? reasonTxt : `Late In (${row.firstIn ? row.firstIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: window.use12HourTime }) : '--'})`;
+                else if (currentActionTab === 'early') statusDetails = reasonTxt ? reasonTxt : `Early Out (${row.lastOut ? row.lastOut.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: window.use12HourTime }) : '--'})`;
 
                 const staffObj = staffMap[row.staffId];
                 const rObj = staffObj ? roleMap[staffObj.role_id] : null;
@@ -5093,7 +5400,7 @@
                 const rObj = roleMap[sObj?.role_id];
                 const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
                 const displayName = sObj ? sObj.name : log.employee_name;
-                const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
+                const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
                 exportRows.push(["In Transit (Moving)", displayName, role, timeIn]);
             });
 
@@ -5106,7 +5413,7 @@
                         const rObj = roleMap[sObj?.role_id];
                         const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
                         const displayName = sObj ? sObj.name : log.employee_name;
-                        const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12:false});
+                        const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
                         exportRows.push([b.branch_name, displayName, role, timeIn]);
                     });
                 }
@@ -5133,8 +5440,8 @@
                 let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
                 
                 return [
-                  d.date.toLocaleDateString('en-GB'), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', 
-                  d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: false}) : 'N/A', d.formattedHours, d.formattedWork, d.formattedTravel,
+                  d.date.toLocaleDateString('en-GB'), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
+                  d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', d.formattedHours, d.formattedWork, d.formattedTravel,
                   status, cleanBranches
                 ];
             });
@@ -5151,8 +5458,10 @@
         // --- TRUE EXCEL (.XLSX) EXPORT W/ AUTO-SIZING COLUMNS ---
         if (exportType === 'xlsx') {
             showToast("Generating Excel File...", "primary");
+            document.getElementById('export-btn').classList.add('is-loading');
             
-            const wsData = [
+            setTimeout(() => {
+                const wsData = [
                 [titleLine1], 
                 [titleLine2], 
                 [], 
@@ -5209,13 +5518,17 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Export");
             XLSX.writeFile(wb, `${safeFileName}.xlsx`);
+            document.getElementById('export-btn').classList.remove('is-loading');
+            }, 50);
         }
 
         // --- PERFECT TABLE PDF EXPORT ---
         if (exportType === 'pdf') {
             showToast("Generating PDF Table...", "primary");
+            document.getElementById('export-btn').classList.add('is-loading');
             
-            const { jsPDF } = window.jspdf;
+            setTimeout(() => {
+                const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape', 'pt', 'a4'); 
             const pageWidth = doc.internal.pageSize.getWidth();
             
@@ -5318,6 +5631,8 @@
             });
             
             doc.save(`${safeFileName}.pdf`);
+            document.getElementById('export-btn').classList.remove('is-loading');
+            }, 50);
         }
       });
     });
@@ -5426,25 +5741,6 @@
               localStorage.setItem('rj_sidebar_collapsed', appSidebar.classList.contains('collapsed'));
           }
         });
-    }
-
-    // Native Pull-to-Refresh Logic
-    let touchStartY = 0;
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) {
-        mainContent.addEventListener('touchstart', e => {
-            if (mainContent.scrollTop === 0) touchStartY = e.touches[0].clientY;
-        }, {passive: true});
-        mainContent.addEventListener('touchend', e => {
-            if (mainContent.scrollTop === 0 && touchStartY > 0) {
-                const touchEndY = e.changedTouches[0].clientY;
-                if (touchEndY - touchStartY > 100) { // Pulled down 100px
-                    showToast("Refreshing...", "primary", 1500);
-                    if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false);
-                }
-            }
-            touchStartY = 0;
-        }, {passive: true});
     }
 
     // =========================================================================
