@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" href="logo.png" />
   
   <!-- PWA Native App Polish -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
@@ -576,6 +577,14 @@
     .table-responsive { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
     
   .spinner-sm { width: 24px; height: 24px; border: 3px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+
+  
+  
+  body.sidebar-right .app-container { flex-direction: row-reverse; }
+  body.sidebar-right .sidebar { border-right: none; border-left: 1px solid var(--card-border); box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
+  html.light-theme body.sidebar-right .sidebar { box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
+  
+  body.no-sticky-th th, body.no-sticky-th td { position: static !important; z-index: 1 !important; }
   </style>
 </head>
 <body>
@@ -704,13 +713,7 @@
           <div class="header-title" id="page-title">Overview</div>
           <div class="header-controls">
 
-            <div class="switch-wrap">
-              Auto-Sync
-              <label class="switch" title="Enable Live Sync">
-                <input type="checkbox" id="sync-toggle" checked>
-                <span class="slider"></span>
-              </label>
-            </div>
+            
             
             <div class="dropdown" id="export-dropdown" style="display: none;">
               <button id="export-btn" class="btn-primary" data-target="export-menu">
@@ -1261,9 +1264,9 @@
                         <!-- Panel 2: Preferences -->
                         <div class="settings-panel">
                             <h3>Layout & Accessibility</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Adjust text size, density, and time formats.</p>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Adjust text size, density, and formatting.</p>
                             
-                            <div style="margin-bottom: 20px;">
+                            <div style="margin-bottom: 16px;">
                                 <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Text Size</label>
                                 <div style="display: flex; gap: 8px;">
                                     <button class="btn-secondary font-size-btn" data-scale="0.9" style="flex: 1;">Small</button>
@@ -1271,29 +1274,87 @@
                                     <button class="btn-secondary font-size-btn" data-scale="1.1" style="flex: 1;">Large</button>
                                 </div>
                             </div>
+                            
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                                <div style="flex: 1;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Date Format</label>
+                                    <select id="pref-date-format" class="input-field" style="margin: 0;">
+                                        <option value="en-GB">DD MMM YYYY (UK/IN)</option>
+                                        <option value="en-US">MM/DD/YYYY (US)</option>
+                                        <option value="fr-CA">YYYY-MM-DD (ISO)</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Week Starts On</label>
+                                    <select id="pref-week-start" class="input-field" style="margin: 0;">
+                                        <option value="1">Monday</option>
+                                        <option value="0">Sunday</option>
+                                    </select>
+                                </div>
+                            </div>
 
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Default Rows Per Page</label>
+                                <input type="number" id="pref-page-size" class="input-field" style="margin: 0;" placeholder="e.g. 50 (-1 for all)" min="-1">
+                            </div>
+
+                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
+                                <div><div style="color:var(--text-main);">Use 12-Hour Time</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">AM/PM instead of 24h</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-time-format"><span class="slider"></span></label>
+                            </div>
+                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
+                                <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
+                            </div>
+                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
+                                <div><div style="color:var(--text-main);">Right Sidebar</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Move navigation to right</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-sidebar-right"><span class="slider"></span></label>
+                            </div>
+                            <div class="switch-wrap" style="justify-content: space-between;">
+                                <div><div style="color:var(--text-main);">Sticky Headers</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Keep table headers visible</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-sticky-headers"><span class="slider"></span></label>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Workflow & Audio -->
+                        <div class="settings-panel">
+                            <h3>Workflow & Audio</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Optimize how you interact with the app.</p>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Auto-Sync Interval (Seconds)</label>
+                                <input type="number" id="pref-sync-interval" class="input-field" style="margin: 0;" placeholder="e.g. 5 (0 to disable)" min="0">
+                            </div>
+                            
                             <div style="margin-bottom: 20px;">
                                 <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
                                 <select id="default-view-select" class="input-field" style="margin: 0;">
                                     <option value="dashboard">Dashboard Overview</option>
                                     <option value="live">Live Tracker</option>
+                                    <option value="birthdays">Staff Birthdays</option>
                                     <option value="logs">Attendance Logs</option>
+                                    <option value="audits">Photo Audits</option>
+                                    <option value="stats">Staff Stats</option>
+                                    <option value="matrix">Data Matrix</option>
                                     <option value="roster">Duty Roster</option>
                                     <option value="action">Action Center</option>
+                                    <option value="settings-hr">HR Settings</option>
+                                    <option value="settings-org">Org Settings</option>
                                 </select>
                             </div>
 
-                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 16px;">
-                                <div><div style="color:var(--text-main);">Use 12-Hour Time</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">AM/PM format instead of 24h</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-time-format"><span class="slider"></span></label>
+                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
+                                <div><div style="color:var(--text-main);">Focus Mode</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Auto-collapse sidebar for more space</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-focus-mode"><span class="slider"></span></label>
                             </div>
+
                             <div class="switch-wrap" style="justify-content: space-between;">
-                                <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
+                                <div><div style="color:var(--text-main);">UI Sound Effects</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Play clicks, pops, and chimes</div></div>
+                                <label class="switch"><input type="checkbox" id="toggle-ui-sounds"><span class="slider"></span></label>
                             </div>
                         </div>
 
-                        <!-- Panel 3: Custom Colors -->
+                        <!-- Panel 4: Custom Colors -->
                         <div class="settings-panel" style="grid-column: 1 / -1;">
                             <h3>Custom Interface Colors</h3>
                             <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Fine-tune specific UI elements.</p>
@@ -1803,9 +1864,55 @@
     const minLaunchDate = new Date('2026-08-01');
 
     // INITIALIZE GLOBAL PREFS (Time Format, Font, View)
-    const uiPrefs = JSON.parse(localStorage.getItem('rj_ui_prefs') || '{"compact":false,"fontScale":"1","startView":"dashboard","use12h":false}');
+    const defaultPrefs = { compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2" };
+    const uiPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
+    
     window.use12HourTime = uiPrefs.use12h;
+    window.appDateFormat = uiPrefs.dateFormat;
+    window.appPageSize = parseInt(uiPrefs.pageSize, 10);
     document.documentElement.style.setProperty('--font-scale', uiPrefs.fontScale || '1');
+
+    // UI Sound Synthesis Engine (Zero dependencies)
+    window.playUISound = function(type = 'pop') {
+        if (!uiPrefs.uiSounds) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator(); const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            if (type === 'pop') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, ctx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); 
+                osc.start(); osc.stop(ctx.currentTime + 0.1); 
+            } else if (type === 'success') { 
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, ctx.currentTime); 
+                osc.frequency.setValueAtTime(600, ctx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.05, ctx.currentTime); gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3); 
+                osc.start(); osc.stop(ctx.currentTime + 0.3); 
+            }
+        } catch(e) {}
+    };
+
+    // Apply immediate visual CSS classes on load
+    if (uiPrefs.sidebarRight) document.body.classList.add('sidebar-right');
+    if (!uiPrefs.stickyHeaders) document.body.classList.add('no-sticky-th');
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('app-sidebar');
+        if (!sidebar) return;
+        
+        if (uiPrefs.focusMode) {
+            sidebar.classList.add('collapsed');
+        }
+
+        // Focus Mode Hover Expansion (Auto-Maximize)
+        sidebar.addEventListener('mouseenter', () => {
+            if (uiPrefs.focusMode) sidebar.classList.remove('collapsed');
+        });
+        sidebar.addEventListener('mouseleave', () => {
+            if (uiPrefs.focusMode) sidebar.classList.add('collapsed');
+        });
+    });
 
     // INSTANT TAB SWITCH ON LOAD (Prevents visual delay/flash)
     (function() {
@@ -1928,7 +2035,7 @@
         return b ? b.id : null;
     }
 
-    window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked) {
+    window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked, isReviewed) {
         window.currentActiveAuditLogId = logId; 
         document.getElementById('modal-image-src').src = imageSrc;
         const controls = document.getElementById('audit-controls');
@@ -1955,7 +2062,7 @@
             document.getElementById('modal-idcard').checked = (isIdcardChecked === true || isIdcardChecked === 'true');
             
             const btn = document.getElementById('btn-modal-audit-save');
-            btn.innerText = "Approve & Save";
+            btn.innerText = isReviewed ? "✏️ Update Audit" : "Approve & Save";
             btn.onclick = () => saveQuickAuditFromModal(logId);
         } else {
             controls.style.display = 'none';
@@ -1976,10 +2083,26 @@
             dbLogs[logIndex].uniform_idcard = idcard; 
         }
 
-        window.closeModal(document.getElementById('photo-modal'));
-        
-        // OPTIMISTIC UI UPDATE (No Full Refresh)
+        // AUTO-NEXT LOGIC (Instead of closing)
         const cardCheckbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
+        let movedToNext = false;
+        
+        if (cardCheckbox) {
+            const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none');
+            const currentIndex = allVisibleCards.indexOf(cardCheckbox.closest('.audit-card'));
+            if (currentIndex !== -1 && currentIndex + 1 < allVisibleCards.length) {
+                const nextCard = allVisibleCards[currentIndex + 1];
+                const imgWrap = nextCard.querySelector('.audit-img-wrap');
+                if (imgWrap) {
+                    imgWrap.click(); // Instantly jump to the next photo
+                    movedToNext = true;
+                }
+            }
+        }
+        
+        if (!movedToNext) {
+            window.closeModal(document.getElementById('photo-modal'));
+        }
         if (cardCheckbox) {
             const card = cardCheckbox.closest('.audit-card');
             if (card) {
@@ -2058,6 +2181,10 @@
 
     function showToast(message, type = 'primary', duration = 3000) {
       window.triggerHaptic(type === 'primary' ? 'light' : type);
+      if (typeof window.playUISound === 'function') {
+          if (type === 'success') window.playUISound('success');
+          else if (type === 'error' || type === 'primary') window.playUISound('pop');
+      }
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
@@ -2219,17 +2346,54 @@
         });
 
         // Apply Workspace Preferences
+        let currentPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
+        
         const toggleDensity = document.getElementById('toggle-density');
         const toggleTime = document.getElementById('toggle-time-format');
         const defaultViewSelect = document.getElementById('default-view-select');
-        
-        // Refresh prefs from local storage securely
-        let currentPrefs = JSON.parse(localStorage.getItem('rj_ui_prefs') || '{"compact":false,"fontScale":"1","startView":"dashboard","use12h":false}');
-        
-        // Initial state set
+        const toggleSidebarRight = document.getElementById('toggle-sidebar-right');
+        const toggleStickyHeaders = document.getElementById('toggle-sticky-headers');
+        const prefPageSize = document.getElementById('pref-page-size');
+        const prefDateFormat = document.getElementById('pref-date-format');
+        const prefWeekStart = document.getElementById('pref-week-start');
+        const toggleUiSounds = document.getElementById('toggle-ui-sounds');
+        const toggleFocusMode = document.getElementById('toggle-focus-mode');
+        const prefSyncInterval = document.getElementById('pref-sync-interval');
+
+        // Initial state mapping to Inputs
         if (currentPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
         if (toggleTime) toggleTime.checked = currentPrefs.use12h;
-        if (defaultViewSelect) defaultViewSelect.value = currentPrefs.startView || 'dashboard';
+        if (defaultViewSelect) defaultViewSelect.value = currentPrefs.startView;
+        if (toggleSidebarRight) toggleSidebarRight.checked = currentPrefs.sidebarRight;
+        if (toggleStickyHeaders) toggleStickyHeaders.checked = currentPrefs.stickyHeaders;
+        if (prefPageSize) prefPageSize.value = currentPrefs.pageSize;
+        if (prefDateFormat) prefDateFormat.value = currentPrefs.dateFormat;
+        if (prefWeekStart) prefWeekStart.value = currentPrefs.weekStart;
+        if (toggleUiSounds) toggleUiSounds.checked = currentPrefs.uiSounds;
+        if (toggleFocusMode) toggleFocusMode.checked = currentPrefs.focusMode;
+        if (prefSyncInterval) prefSyncInterval.value = currentPrefs.syncInterval;
+        
+        const saveAndReloadObj = (key, val, msg) => {
+            currentPrefs[key] = val; localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+            showToast(msg, "success"); setTimeout(() => location.reload(), 800);
+        };
+        const saveAndApplyObj = (key, val, msg, action) => {
+            currentPrefs[key] = val; localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
+            action(); showToast(msg, "success");
+        };
+
+        if (toggleSidebarRight) toggleSidebarRight.addEventListener('change', e => saveAndApplyObj('sidebarRight', e.target.checked, "Layout updated", () => e.target.checked ? document.body.classList.add('sidebar-right') : document.body.classList.remove('sidebar-right')));
+        if (toggleStickyHeaders) toggleStickyHeaders.addEventListener('change', e => saveAndApplyObj('stickyHeaders', e.target.checked, "Table headers updated", () => e.target.checked ? document.body.classList.remove('no-sticky-th') : document.body.classList.add('no-sticky-th')));
+        if (toggleUiSounds) toggleUiSounds.addEventListener('change', e => saveAndApplyObj('uiSounds', e.target.checked, "Sound settings saved", () => { uiPrefs.uiSounds = e.target.checked; if(e.target.checked) window.playUISound('pop'); }));
+        if (toggleFocusMode) toggleFocusMode.addEventListener('change', e => saveAndApplyObj('focusMode', e.target.checked, "Focus Mode toggled", () => {
+            uiPrefs.focusMode = e.target.checked;
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar) e.target.checked ? sidebar.classList.add('collapsed') : sidebar.classList.remove('collapsed');
+        }));
+        if (prefPageSize) prefPageSize.addEventListener('change', e => saveAndReloadObj('pageSize', e.target.value, "Rows per page updated! Reloading..."));
+        if (prefDateFormat) prefDateFormat.addEventListener('change', e => saveAndReloadObj('dateFormat', e.target.value, "Date format updated! Reloading..."));
+        if (prefWeekStart) prefWeekStart.addEventListener('change', e => saveAndReloadObj('weekStart', e.target.value, "Calendar week start updated! Reloading..."));
+        if (prefSyncInterval) prefSyncInterval.addEventListener('change', e => saveAndReloadObj('syncInterval', e.target.value, "Auto-Sync interval updated! Reloading..."));
         
         document.querySelectorAll('.font-size-btn').forEach(b => {
             if(b.getAttribute('data-scale') === (currentPrefs.fontScale || '1')) b.classList.add('active');
@@ -2315,11 +2479,12 @@
     }
 
     function setupRealtimeSync() {
-      const isSyncOn = document.getElementById('sync-toggle')?.checked;
+      const syncIntervalMs = parseInt(uiPrefs.syncInterval || "2", 10) * 1000;
+      const isSyncOn = syncIntervalMs > 0;
       if (isSyncOn && !realtimeSubscription) {
         const handleSync = () => {
             const currentTime = Date.now();
-            if (currentTime - lastSyncTime > 2000) {
+            if (currentTime - lastSyncTime > syncIntervalMs) {
                 lastSyncTime = currentTime;
                 if (!isUserBusy()) fetchLogsFromDatabase(true); 
             }
@@ -2337,14 +2502,7 @@
       }
     }
     
-    const syncToggle = document.getElementById('sync-toggle');
-    if(syncToggle) {
-        syncToggle.addEventListener('change', (e) => {
-            setupRealtimeSync();
-            localStorage.setItem('rj_settings', JSON.stringify({ sync: e.target.checked }));
-            showToast(e.target.checked ? "Auto-Sync Enabled & Saved" : "Auto-Sync Disabled & Saved", "success");
-        });
-    }
+    
 
     document.getElementById('sched-reason')?.addEventListener('change', (e) => {
       document.getElementById('sched-reason-custom').style.display = e.target.value === 'Custom' ? 'block' : 'none';
@@ -2609,8 +2767,11 @@
         });
     });
 
+    const getFpConfig = () => ({ locale: { firstDayOfWeek: parseInt(uiPrefs.weekStart || "1", 10) } });
+    
     const startPickerEl = document.getElementById("global-start");
     const startPicker = startPickerEl ? flatpickr(startPickerEl, { 
+        ...getFpConfig(),
         defaultDate: startDate, 
         minDate: "2026-08-01", 
         maxDate: safeMaxDate,
@@ -2628,6 +2789,7 @@
     
     const endPickerEl = document.getElementById("global-end");
     const endPicker = endPickerEl ? flatpickr(endPickerEl, { 
+        ...getFpConfig(),
         defaultDate: endDate, 
         minDate: "2026-08-01", 
         maxDate: safeMaxDate,
@@ -2643,10 +2805,10 @@
         } 
     }) : null;
 
-    if (document.getElementById("sched-start")) flatpickr("#sched-start", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
-    if (document.getElementById("sched-end")) flatpickr("#sched-end", { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
-    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
-    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
+    if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
+    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
+    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
     
     document.getElementById('filter-in-start')?.addEventListener('change', processStitchedData);
     document.getElementById('filter-in-end')?.addEventListener('change', processStitchedData);
@@ -3442,9 +3604,10 @@
       }
 
       // CLIENT-SIDE PAGINATION LOGIC
-      const pageSizeUI = 50;
-      const paginatedData = dataToRender.slice(0, (currentPage + 1) * pageSizeUI);
-      const hasMoreLogsUI = paginatedData.length < dataToRender.length;
+      const pageSizeUI = window.appPageSize || 50;
+      const isShowAll = pageSizeUI === -1;
+      const paginatedData = isShowAll ? dataToRender : dataToRender.slice(0, (currentPage + 1) * pageSizeUI);
+      const hasMoreLogsUI = isShowAll ? false : (paginatedData.length < dataToRender.length);
       
       tbody.innerHTML = paginatedData.map(row => {
         if(!row.firstIn && !row.lastOut && !row.excAbsent && !row.excLate && !row.excEarly) return ''; 
@@ -3508,7 +3671,7 @@
         }
         photosHTML += `</div>`;
 
-        const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
+        const displayDate = row.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short', year:'numeric'});
 
         return `<tr ondblclick="window.openEditTimeModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" style="cursor: pointer;" title="Double-click row to Edit Time">
           <td style="color:var(--text-soft)">${displayDate}</td>
@@ -3759,7 +3922,7 @@
         let photoCount = 0;
 
         processedData.forEach(r => {
-            const dateStr = r.date.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+            const dateStr = r.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'});
             
             const buildCard = (photo, logId, typeBadge, isReviewed, uTshirt, uIdcard, timeStr) => {
                 if (showOnlyPendingPhotos && isReviewed) return '';
@@ -3783,7 +3946,7 @@
                 return `
                 <div class="audit-card" style="position: relative;">
                     ${cardCheck}
-                    <div class="audit-img-wrap" onmousedown="window.handleLassoStart(event, '${logId}')" onmouseenter="window.handleLassoMove(event, '${logId}')" onclick="window.handleCardClick(event, '${logId}', '${photo}', ${uTshirt}, ${uIdcard})">
+                    <div class="audit-img-wrap" onmousedown="window.handleLassoStart(event, '${logId}')" onmouseenter="window.handleLassoMove(event, '${logId}')" onclick="window.handleCardClick(event, '${logId}', '${photo}', ${uTshirt}, ${uIdcard}, ${isReviewed})">
                         <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" onload="this.style.opacity=1" onerror="this.onerror=null; this.src='https://placehold.co/400x300/18181b/a1a1aa?text=Expired'; this.style.opacity=1;">
                         <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2); z-index: 6;">${typeBadge}</span>
                         ${statusBadgeHtml}
@@ -3922,7 +4085,7 @@
         }
     };
 
-    window.handleCardClick = function(event, logId, photoSrc, uTshirt, uIdcard) {
+    window.handleCardClick = function(event, logId, photoSrc, uTshirt, uIdcard, isReviewed) {
         // Shift is now fully handled by Lasso Drag (mousedown/mouseenter); ignore click
         if (event.shiftKey) {
             event.preventDefault();
@@ -3949,7 +4112,7 @@
         }
 
         // Normal Click: Opens the preview modal
-        window.openAuditModal(photoSrc, logId, uTshirt, uIdcard);
+        window.openAuditModal(photoSrc, logId, uTshirt, uIdcard, isReviewed);
     };
 
     let lastCheckedBox = null;
@@ -4275,7 +4438,7 @@
 
             window.myCharts['trend'] = new Chart(trendCanvas, {
                 type: 'line',
-                data: { labels: trendDates.map(d => new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})), 
+                data: { labels: trendDates.map(d => new Date(d).toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'})), 
                         datasets: [
                             { label: 'Present', data: presentCounts, borderColor: success, backgroundColor: gradSuccess, borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: success, pointBorderColor: '#fff', pointHoverRadius: 6 },
                             { label: 'Absent', data: absentCounts, borderColor: danger, backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, borderDash: [5, 5] },
@@ -4364,7 +4527,7 @@
 
         tbody.innerHTML = dataToRender.map(row => {
             const isoDate = toLocalISO(row.date);
-            const displayDate = row.date.toLocaleDateString('en-GB',{day:'numeric',month:'short', year:'numeric'});
+            const displayDate = row.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short', year:'numeric'});
             
             const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
 
@@ -4500,6 +4663,7 @@
     // Initialize Flatpickr for the Roster UI
     setTimeout(() => {
         flatpickr("#roster-date-picker", {
+            ...getFpConfig(),
             defaultDate: currentRosterDate,
             dateFormat: "Y-m-d",
             altInput: true,
@@ -4724,7 +4888,7 @@
       if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff selected.</td></tr>'; return; }
       
       const dateList = getDatesArrayFromFetchedLogs();
-      headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</th>`).join('');
+      headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'})}</th>`).join('');
         
       tableBody.innerHTML = filteredStaff.map(staff => {
         let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${staff.name}</td>`;
@@ -5344,10 +5508,10 @@
           reportName = `ATTENDANCE LOGS - ${logsTitles[activeSubTab] || 'ALL'}`;
         }
         
-        const sDateStr = startDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
-        const eDateStr = endDate.toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
+        const sDateStr = startDate.toLocaleDateString(window.appDateFormat, {day: '2-digit', month: 'short', year: 'numeric'});
+        const eDateStr = endDate.toLocaleDateString(window.appDateFormat, {day: '2-digit', month: 'short', year: 'numeric'});
         const titleLine1 = `RJ MOBILE | ${reportName}`;
-        const titleLine2 = isLiveView ? `(Generated: ${new Date().toLocaleString('en-GB')})` : `(${sDateStr} - ${eDateStr})`;
+        const titleLine2 = isLiveView ? `(Generated: ${new Date().toLocaleString(window.appDateFormat)})` : `(${sDateStr} - ${eDateStr})`;
         const titleString = `${titleLine1} ${titleLine2}`;
         const safeFileName = `RJ_Mobile_${reportName.replace(/ /g, '_')}`;
 
@@ -5387,7 +5551,7 @@
                 const staffObj = staffMap[row.staffId];
                 const rObj = staffObj ? roleMap[staffObj.role_id] : null;
                 const roleName = rObj ? rObj.role_name : (staffObj?.role || row.role || 'Unassigned');
-                return [row.date.toLocaleDateString('en-GB'), row.name, roleName, actionTypeStr, statusDetails];
+                return [row.date.toLocaleDateString(window.appDateFormat), row.name, roleName, actionTypeStr, statusDetails];
             });
         } else if (isLiveView) {
             columnHeaders = ["Location / Status", "Staff Name", "Role", "Timestamp"];
@@ -5440,7 +5604,7 @@
                 let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
                 
                 return [
-                  d.date.toLocaleDateString('en-GB'), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
+                  d.date.toLocaleDateString(window.appDateFormat), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
                   d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', d.formattedHours, d.formattedWork, d.formattedTravel,
                   status, cleanBranches
                 ];
