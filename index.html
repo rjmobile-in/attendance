@@ -752,12 +752,12 @@
               </div>
             </div>
             
-            <button id="btn-manual-entry" class="btn-primary" style="margin-right: 8px;">➕ Manual Entry</button>
+            
             <button id="toggle-filter-btn" class="btn-secondary" title="Toggle Filters">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Data
             </button>
             
-            <button id="reset-layout-btn" class="btn-secondary" title="Reset Widget Layout">⟲ Layout</button>
+            
             <button id="btn-shortcuts" class="btn-secondary" title="Keyboard Shortcuts">⌨️ Shortcuts</button>
             <button id="btn-personalize" class="btn-secondary" title="Personalize Workspace UI">✨ Personalize</button>
             <button id="fullscreen-btn" class="btn-secondary" title="Toggle Fullscreen">⛶ Fullscreen</button>
@@ -958,12 +958,15 @@
                         <button class="sub-tab-btn" data-filter="missing-out">⚠️ Missing Clock-Outs</button>
                         </div>
                         
-                        <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
-                            <div><div style="color:var(--text-main); font-size:12px;">Group By Day</div></div>
-                            <label class="switch" style="transform: scale(0.85); margin-bottom: 0; width: 36px; height: 20px;">
-                                <input type="checkbox" id="toggle-grouped-view" checked>
-                                <span class="slider" style="border-radius: 20px;"></span>
-                            </label>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                                <div><div style="color:var(--text-main); font-size:12px;">Group By Day</div></div>
+                                <label class="switch" style="transform: scale(0.85); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="toggle-grouped-view" checked>
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                            <button id="btn-manual-entry" class="btn-primary" style="padding: 8px 14px; font-size: 12px;">➕ Manual Entry</button>
                         </div>
                     </div>
 
@@ -1001,8 +1004,8 @@
                         </div>
                     </div>
 
-                    <div id="audit-gallery-container" style="user-select: none; -webkit-user-select: none;">
-                        <div class="audit-grid" id="audit-grid"></div>
+                    <div id="audit-gallery-container" style="user-select: none; -webkit-user-select: none; min-height: 400px; display: flex; flex-direction: column;">
+                        <div class="audit-grid" id="audit-grid" style="flex: 1;"></div>
                     </div>
                 </div>
 
@@ -1616,16 +1619,7 @@
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Staff</label>
       <select id="manual-staff" class="input-field" style="margin-top: 8px;"></select>
 
-      <div style="display: flex; gap: 16px;">
-        <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Date</label>
-          <input type="text" id="manual-date" class="input-field" style="margin-top: 8px; padding: 12px;">
-        </div>
-        <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Time</label>
-          <input type="time" id="manual-time" class="input-field" style="margin-top: 8px;">
-        </div>
-      </div>
+      
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
@@ -2767,10 +2761,6 @@
           }
         });
     }
-    
-    document.getElementById('reset-layout-btn')?.addEventListener('click', () => { 
-      localStorage.removeItem('rj_widget_order'); location.reload(); 
-    });
 
     // --- WAKE LOCK API (Prevents screen sleep on Dashboard & Live Tracker) ---
     let screenWakeLock = null;
@@ -3715,9 +3705,9 @@
 
             let firstInTime = firstInLog ? new Date(firstInLog.timestamp) : null;
             
-            // Robust check: Find the actual last Clock Out log, avoiding bugs if a Transit log or duplicate occurs after
-            let outLogsArr = dailyLogs.filter(l => l.action === 'Clock Out');
-            let actualLastOut = outLogsArr.length > 0 ? outLogsArr[outLogsArr.length - 1] : null;
+            // NEW LOGIC: Determine final state strictly based on the absolutely last recorded entry
+            let absoluteLastLog = dailyLogs.length > 0 ? dailyLogs[dailyLogs.length - 1] : null;
+            let actualLastOut = (absoluteLastLog && absoluteLastLog.action === 'Clock Out') ? absoluteLastLog : null;
             let lastOutTime = actualLastOut ? new Date(actualLastOut.timestamp) : null;
             
             // Re-assign lastOutLog so Edit buttons reference the correct ID
@@ -4344,12 +4334,9 @@
 
 
     // --- MANUAL ENTRY LOGIC ---
-    if (document.getElementById("manual-date")) {
-        flatpickr("#manual-date", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", defaultDate: "today" });
-    }
+    
     
     document.getElementById('btn-manual-entry')?.addEventListener('click', () => {
-        document.getElementById('manual-time').value = '';
         document.getElementById('manual-entry-modal').style.display = 'flex';
     });
 
@@ -4359,22 +4346,21 @@
 
     document.getElementById('btn-save-manual')?.addEventListener('click', async () => {
         const staffId = document.getElementById('manual-staff').value;
-        const dateVal = document.getElementById('manual-date').value;
-        const timeVal = document.getElementById('manual-time').value;
         const actionVal = document.getElementById('manual-action').value;
         const branchIdVal = document.getElementById('manual-branch').value;
         const tshirtVal = document.getElementById('manual-tshirt').checked;
         const idcardVal = document.getElementById('manual-idcard').checked;
 
-        if (!staffId || !branchIdVal || !dateVal || !timeVal) {
-            return showToast("Staff, Branch, Date, and Time are required!", "error");
+        if (!staffId || !branchIdVal) {
+            return showToast("Staff and Branch are required!", "error");
         }
 
         const btn = document.getElementById('btn-save-manual');
         btn.innerText = "Saving..."; btn.disabled = true;
 
         try {
-            const timestampIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
+            // Live current time autogenerate hoga yaha
+            const timestampIso = new Date().toISOString();
             const staffObj = staffMap[staffId];
             const branchObj = branchMap[branchIdVal];
             const branchName = branchObj ? branchObj.branch_name : 'Manual Entry';
