@@ -25,11 +25,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Export Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <!-- Export Libraries (Lazy Loaded dynamically via JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -993,7 +990,7 @@
                 <!-- VIEW 4: PHOTO AUDITS -->
                 <div id="view-audits" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Review check-in/out photos.</span>
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1)); display: flex; align-items: center; min-height: 42px;">Review check-in/out photos.</span>
                         <div id="gallery-filters" style="display: flex; align-items: center; gap: 12px;">
                             <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
                                 <input type="checkbox" id="master-audit-select" onchange="window.selectAllAudits(this)"> Select All Visible
@@ -1884,6 +1881,25 @@
     </div>
   </div>
 
+  <!-- COLUMN VISIBILITY MODAL -->
+  <div id="column-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h3 style="margin: 0; color: var(--text-main);">⚙️ Edit Table Columns</h3>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('column-modal'))">&times;</span>
+      </div>
+      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));">Select which columns to show or hide.</p>
+      
+      <div id="column-checkboxes-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+          <!-- Checkboxes injected here -->
+      </div>
+      
+      <div style="display: flex; margin-top: 24px;">
+        <button class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;" onclick="window.closeModal(document.getElementById('column-modal'))">Done</button>
+      </div>
+    </div>
+  </div>
+
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manage Reason</h2>
@@ -1957,6 +1973,7 @@
 
   <!-- RIGHT CLICK CONTEXT MENU -->
   <div id="custom-context-menu" class="context-menu">
+      <div class="context-menu-item" id="ctx-cols">⚙️ Edit Table Columns</div>
       <div class="context-menu-item" id="ctx-edit">✏️ Edit Timeline</div>
       <div class="context-menu-item" id="ctx-map">📍 View GPS Map</div>
       <div class="context-menu-divider"></div>
@@ -2338,10 +2355,15 @@
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
             showToast("Audit Saved", "success");
+            processStitchedData(); // FIX: Instantly refresh tables and stats without page reload
         } catch(e) { 
             showToast("Error saving audit", "error"); 
         } finally {
-            btn.innerText = "Approve & Save"; btn.disabled = false;
+            btn.disabled = false;
+            // Fix: Sirf tabhi text reset karo agar hum next photo pe nahi gaye hain
+            if (window.currentActiveAuditLogId === logId) {
+                btn.innerText = "Approve & Save"; 
+            }
         }
     };
 
@@ -3131,12 +3153,6 @@
               if (loader) { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; loader.style.opacity = '1'; }, 400); } 
           }
         }
-      if (!localStorage.getItem('rj_tour_done')) {
-            setTimeout(() => {
-                showToast("👋 Welcome! Press Cmd+K (or Ctrl+K) to open the Command Palette.", "primary", 6000);
-                localStorage.setItem('rj_tour_done', 'true');
-            }, 2000);
-        }
       } else {
         const loginScreen = document.getElementById('login-screen');
         const dashScreen = document.getElementById('dashboard');
@@ -3353,12 +3369,16 @@
       else btn.innerText = `${selectedRoleIds.size} Selected`;
     }
 
+    let roleSearchTimeout;
     document.getElementById('role-search')?.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.role-cb').forEach(cb => { 
-        const nameText = cb.nextElementSibling.innerText.toLowerCase();
-        cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
-      });
+      clearTimeout(roleSearchTimeout);
+      roleSearchTimeout = setTimeout(() => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.role-cb').forEach(cb => { 
+          const nameText = cb.nextElementSibling.innerText.toLowerCase();
+          cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+        });
+      }, 200);
     });
 
     function renderStaffFilterCheckboxes() {
@@ -3391,12 +3411,16 @@
       else btn.innerText = `${selectedStaffIds.size} Selected`;
     }
     
+    let staffSearchTimeout;
     document.getElementById('staff-search')?.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.staff-cb').forEach(cb => { 
-        const nameText = cb.nextElementSibling.innerText.toLowerCase();
-        cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
-      });
+      clearTimeout(staffSearchTimeout);
+      staffSearchTimeout = setTimeout(() => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.staff-cb').forEach(cb => { 
+          const nameText = cb.nextElementSibling.innerText.toLowerCase();
+          cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+        });
+      }, 200);
     });
 
     function renderBranchFilterCheckboxes() {
@@ -3429,12 +3453,16 @@
       else btn.innerText = `${selectedBranchIds.size} Selected`;
     }
     
+    let branchSearchTimeout;
     document.getElementById('branch-search')?.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.branch-cb').forEach(cb => { 
-        const nameText = cb.nextElementSibling.innerText.toLowerCase();
-        cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
-      });
+      clearTimeout(branchSearchTimeout);
+      branchSearchTimeout = setTimeout(() => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.branch-cb').forEach(cb => { 
+          const nameText = cb.nextElementSibling.innerText.toLowerCase();
+          cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+        });
+      }, 200);
     });
 
     async function fetchLogsFromDatabase(isAppend = false) {
@@ -3632,6 +3660,18 @@
          if(tStart && tEnd) staffStatsTracker[staff.id].dailyTargetHours = (tEnd - tStart) / 3600000;
       });
 
+      // --- MASSIVE SPEED BOOST: Pre-calculate Hash Map (O(1) Lookup) ---
+      const logsByStaffAndDate = {};
+      dbLogs.forEach(log => {
+          const sId = getStaffId(log);
+          if (!sId) return;
+          const dStr = new Date(log.timestamp).toDateString();
+          const key = `${sId}_${dStr}`;
+          if (!logsByStaffAndDate[key]) logsByStaffAndDate[key] = [];
+          logsByStaffAndDate[key].push(log);
+      });
+      // ----------------------------------------------------------------
+
       dateArray.forEach(targetDate => {
         const dateStringMatch = targetDate.toDateString();
         const isoDateStr = toLocalISO(targetDate); 
@@ -3644,11 +3684,10 @@
           if (roleId && !selectedRoleIds.has(roleId)) return;
           if (!roleId && selectedRoleIds.size < dbRoles.length) return; 
 
-          let dailyLogs = dbLogs.filter(log => {
-              const logStaffId = getStaffId(log);
-              return logStaffId === staff.id && new Date(log.timestamp).toDateString() === dateStringMatch;
-          });
-          dailyLogs.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+          // FAST LOOKUP: Instead of looping thousands of times, instantly grab the array
+          let dailyLogs = logsByStaffAndDate[`${staff.id}_${dateStringMatch}`] || [];
+          // Create a shallow copy before sorting to avoid mutating the original hash map array
+          dailyLogs = [...dailyLogs].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
 
           if (selectedBranchIds.size !== dbBranches.length) {
             const workedElsewhere = dailyLogs.length > 0 && dailyLogs.every(l => {
@@ -4517,6 +4556,16 @@
         if (typeof window.updateBulkActionBar === 'function') window.updateBulkActionBar();
     }
 
+    window.updatePendingBadgeCount = function(changeObj) {
+        const badge = document.getElementById('pending-audits-badge');
+        if (badge) {
+            let current = parseInt(badge.innerText) || 0;
+            let newVal = Math.max(0, current + changeObj);
+            badge.innerText = newVal;
+            badge.style.display = newVal > 0 ? 'inline-block' : 'none';
+        }
+    };
+
     window.saveQuickAudit = async function(logId, btnElement) {
         const tshirt = document.getElementById(`tshirt-${logId}`).checked;
         const idcard = document.getElementById(`idcard-${logId}`).checked;
@@ -4527,16 +4576,6 @@
             dbLogs[logIndex].uniform_tshirt = tshirt; 
             dbLogs[logIndex].uniform_idcard = idcard; 
         }
-
-        window.updatePendingBadgeCount = function(changeObj) {
-            const badge = document.getElementById('pending-audits-badge');
-            if (badge) {
-                let current = parseInt(badge.innerText) || 0;
-                let newVal = Math.max(0, current + changeObj);
-                badge.innerText = newVal;
-                badge.style.display = newVal > 0 ? 'inline-block' : 'none';
-            }
-        };
 
         if (btnElement) {
             const card = btnElement.closest('.audit-card');
@@ -4566,6 +4605,7 @@
         try {
             await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
             showToast("Audit Saved", "success");
+            processStitchedData(); // FIX: Instantly refresh tables and stats without page reload
         } catch(e) { 
             showToast("Error saving audit", "error"); 
             if (btnElement && showOnlyPendingPhotos) btnElement.closest('.audit-card').style.display = 'flex';
@@ -5456,15 +5496,25 @@
       const dateList = getDatesArrayFromFetchedLogs();
       headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'})}</th>`).join('');
         
+      // --- Matrix Optimization Hash Map ---
+      const matrixLogsMap = {};
+      dbLogs.forEach(log => {
+          const sId = getStaffId(log);
+          if (!sId) return;
+          const key = `${sId}_${new Date(log.timestamp).toDateString()}`;
+          if (!matrixLogsMap[key]) matrixLogsMap[key] = [];
+          matrixLogsMap[key].push(log);
+      });
+      // ------------------------------------
+
       tableBody.innerHTML = filteredStaff.map(staff => {
         let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${staff.name}</td>`;
         
         dateList.forEach(dateObj => {
           const dateStringMatch = dateObj.toDateString(); const isoDateStr = toLocalISO(dateObj);
           
-          const dailyLogs = dbLogs.filter(l => {
-              return getStaffId(l) === staff.id && new Date(l.timestamp).toDateString() === dateStringMatch;
-          });
+          // Instant O(1) Lookup instead of nested loop filtering
+          const dailyLogs = matrixLogsMap[`${staff.id}_${dateStringMatch}`] || [];
           
           if(dailyLogs.length === 0) {
             const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
@@ -6086,8 +6136,17 @@
       }
     };
 
+    // --- LAZY LOADER FOR EXPORT SCRIPTS ---
+    const loadExportScript = (src) => new Promise((resolve) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        document.head.appendChild(script);
+    });
+
     document.querySelectorAll('.dropdown-content.export-menu a').forEach(item => {
-      item.addEventListener('click', (e) => {
+      item.addEventListener('click', async (e) => {
         e.preventDefault(); document.querySelector('.export-menu').classList.remove('show');
         const exportType = e.target.getAttribute('data-export');
         
@@ -6213,6 +6272,20 @@
 
         if (exportRows.length === 0) return showToast("No data to export.", "error");
 
+        // --- HIDE COLUMNS LOGIC FOR EXPORT ---
+        const activeTable = document.querySelector('.app-view[style*="display: block"] table');
+        if (activeTable) {
+            let visibleIndices = [];
+            Array.from(activeTable.querySelectorAll('thead th')).forEach((th, idx) => {
+                if (getComputedStyle(th).display !== 'none') visibleIndices.push(idx);
+            });
+            if (visibleIndices.length > 0) {
+                columnHeaders = columnHeaders.filter((_, i) => visibleIndices.includes(i));
+                exportRows = exportRows.map(row => row.filter((_, i) => visibleIndices.includes(i)));
+            }
+        }
+        // -------------------------------------
+
         if (exportType === 'copy') {
            const clipboardText = titleString + "\n\n" + columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
            navigator.clipboard.writeText(clipboardText).then(() => showToast("Table & Header copied to clipboard!", "success"));
@@ -6221,8 +6294,10 @@
 
         // --- TRUE EXCEL (.XLSX) EXPORT W/ AUTO-SIZING COLUMNS ---
         if (exportType === 'xlsx') {
-            showToast("Generating Excel File...", "primary");
+            showToast("Loading Excel Modules...", "primary");
             document.getElementById('export-btn').classList.add('is-loading');
+            
+            await loadExportScript('https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js');
             
             setTimeout(() => {
                 const wsData = [
@@ -6288,8 +6363,11 @@
 
         // --- PERFECT TABLE PDF EXPORT ---
         if (exportType === 'pdf') {
-            showToast("Generating PDF Table...", "primary");
+            showToast("Loading PDF Modules...", "primary");
             document.getElementById('export-btn').classList.add('is-loading');
+            
+            await loadExportScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+            await loadExportScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js');
             
             setTimeout(() => {
                 const { jsPDF } = window.jspdf;
@@ -7009,6 +7087,18 @@
         e.preventDefault(); 
         activeCtxData = { staffId, name, date, inId, outId, inIso, outIso, lat, lng };
 
+        window.activeContextTable = e.target.closest('table'); // Table reference save karna
+        
+        // Filter options based on where user right-clicked (Header vs Row)
+        const isRowClick = !!staffId;
+        document.getElementById('ctx-edit').style.display = isRowClick ? 'flex' : 'none';
+        document.getElementById('ctx-delete').style.display = isRowClick ? 'flex' : 'none';
+        const divLine = document.querySelector('.context-menu-divider');
+        if (divLine) divLine.style.display = isRowClick ? 'block' : 'none';
+
+        const mapBtn = document.getElementById('ctx-map');
+        if(mapBtn) mapBtn.style.display = (isRowClick && lat && lng && lat !== 'null') ? 'flex' : 'none';
+
         ctxMenu.style.display = 'flex';
         
         // Dynamic positioning to prevent going off-screen
@@ -7025,13 +7115,76 @@
             ctxMenu.style.left = `${x}px`;
             ctxMenu.style.top = `${y}px`;
         }, 0);
-
-        const mapBtn = document.getElementById('ctx-map');
-        if(mapBtn) mapBtn.style.display = (lat && lng && lat !== 'null') ? 'flex' : 'none';
     };
+
+    // Naya Listener: Agar user Table Header ya empty area me right-click kare
+    document.addEventListener('contextmenu', (e) => {
+        const table = e.target.closest('.table-responsive table');
+        if (table && !e.target.closest('tbody tr')) {
+            e.preventDefault();
+            window.showContextMenu(e, null); // Pass null for row details
+        }
+    });
 
     document.addEventListener('click', () => { if(ctxMenu) ctxMenu.style.display = 'none'; });
     document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && ctxMenu) ctxMenu.style.display = 'none'; });
+
+    // EDIT TABLE COLUMNS LOGIC
+    document.getElementById('ctx-cols')?.addEventListener('click', () => {
+        if (!window.activeContextTable) return;
+        const thead = window.activeContextTable.querySelector('thead tr');
+        if (!thead) return;
+
+        const headers = Array.from(thead.children);
+        const container = document.getElementById('column-checkboxes-container');
+        container.innerHTML = '';
+
+        headers.forEach((th, idx) => {
+            const isVisible = getComputedStyle(th).display !== 'none';
+            // Regex clean to remove sorting arrows/emojis for the menu text
+            const title = th.innerText.replace(/[^a-zA-Z0-9 &\/]/g, '').trim() || `Column ${idx + 1}`; 
+            
+            const label = document.createElement('label');
+            label.className = 'check-wrap';
+            label.style.background = 'var(--input-bg)';
+            label.style.border = '1px solid var(--card-border)';
+            label.style.padding = '10px 16px';
+            label.style.borderRadius = 'var(--radius-md)';
+            
+            label.innerHTML = `
+                <input type="checkbox" value="${idx}" ${isVisible ? 'checked' : ''}>
+                <span>${title}</span>
+            `;
+
+            // Live Toggle Event
+            const cb = label.querySelector('input');
+            cb.addEventListener('change', (e) => {
+                const allChecked = container.querySelectorAll('input:checked');
+                // Force at least 1 column to stay visible
+                if (allChecked.length === 0) {
+                    e.preventDefault();
+                    cb.checked = true; // Revert change
+                    return showToast("At least 1 column must be visible!", "error");
+                }
+
+                const show = cb.checked;
+                const t = window.activeContextTable;
+                
+                // Toggle Header
+                const thToToggle = t.querySelector(`thead tr`).children[idx];
+                if (thToToggle) thToToggle.style.display = show ? '' : 'none';
+                
+                // Toggle all Rows in Body
+                t.querySelectorAll(`tbody tr`).forEach(row => {
+                    if (row.children[idx]) row.children[idx].style.display = show ? '' : 'none';
+                });
+            });
+
+            container.appendChild(label);
+        });
+
+        document.getElementById('column-modal').style.display = 'flex';
+    });
 
     document.getElementById('ctx-edit')?.addEventListener('click', () => {
         if(activeCtxData) window.openEditTimeModal(activeCtxData.staffId, activeCtxData.name, activeCtxData.date, activeCtxData.inId, activeCtxData.outId, activeCtxData.inIso, activeCtxData.outIso);
@@ -7074,7 +7227,7 @@
         
         const avatarDiv = document.getElementById('drawer-avatar');
         if (avatarDiv) {
-             avatarDiv.outerHTML = getAvatarHtml(staff.name, staff.profile_pic, 80).replace('style="', 'id="drawer-avatar" style="margin-bottom: 16px; ');
+             avatarDiv.outerHTML = getAvatarHtml(staff.name, staff.profile_pic, 80).replace('style="', 'id="drawer-avatar" onclick="window.viewFullProfilePic()" title="Click to view full image" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'" style="margin-bottom: 16px; cursor: pointer; transition: transform 0.2s; ');
         }
         
         const rObj = roleMap[staff.role_id];
@@ -7202,6 +7355,21 @@
         // Auto-refresh data to ensure we didn't miss anything while offline
         if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(true);
     });
+
+    // --- UI UPGRADES: FULLSCREEN PFP ---
+    window.viewFullProfilePic = function() {
+        const avatar = document.getElementById('drawer-avatar');
+        if (!avatar) return;
+        
+        // Agar avatar khud IMG tag hai, ya uske andar IMG hai dono ko handle karega
+        const img = avatar.tagName === 'IMG' ? avatar : avatar.querySelector('img');
+        
+        if (img && img.src) {
+            document.getElementById('modal-image-src').src = img.src;
+            document.getElementById('audit-controls').style.display = 'none';
+            document.getElementById('photo-modal').style.display = 'flex';
+        }
+    };
 
   </script>
 </body>
