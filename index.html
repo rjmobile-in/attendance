@@ -746,6 +746,8 @@
                 <a href="#" data-export="copy">📋 Copy Table</a>
                 <a href="#" data-export="pdf">📄 Download PDF</a>
                 <a href="#" data-export="xlsx">📈 Download Excel</a>
+                <div class="context-menu-divider" style="margin: 4px 0; height: 1px; background: var(--card-border);"></div>
+                <a href="#" data-export="custom" style="color: var(--primary);">🛠️ Custom Report Builder</a>
               </div>
             </div>
             
@@ -1131,24 +1133,44 @@
                         <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
                         <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
                         <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
+                        <button class="sub-tab-btn" data-action-filter="leaves">Leave Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
                     </div>
                     
-                    <div class="table-card">
-                    <div class="table-responsive">
-                        <table id="absent-table">
-                        <thead>
-                            <tr>
-                            <th>Date</th>
-                            <th>Staff Member</th>
-                            <th>Status & Details</th>
-                            <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="absent-tbody">
-                            <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                        </tbody>
-                        </table>
+                    <div class="table-card" id="action-table-container">
+                        <div class="table-responsive">
+                            <table id="absent-table">
+                            <thead>
+                                <tr>
+                                <th>Date</th>
+                                <th>Staff Member</th>
+                                <th>Status & Details</th>
+                                <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absent-tbody">
+                                <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                            </tbody>
+                            </table>
+                        </div>
                     </div>
+
+                    <!-- LEAVE REQUESTS TABLE -->
+                    <div class="table-card" id="leave-table-container" style="display: none;">
+                        <div class="table-responsive">
+                            <table id="leave-table">
+                            <thead>
+                                <tr>
+                                <th>Submitted On</th>
+                                <th>Staff Member</th>
+                                <th>Leave Dates</th>
+                                <th>Reason / Title</th>
+                                <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leave-tbody">
+                            </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -1175,12 +1197,12 @@
     <button id="gen-pass-btn" class="btn-secondary" title="Auto-Generate 10-Digit Password" style="padding: 10px 14px; margin: 0; justify-content: center; height: 43px; font-size: 16px;">🎲</button>
 </div>
                                 
-                                <div style="width: 100%; display: flex; gap: 12px; margin-top: 8px;">
-                                    <select id="new-staff-branch" class="input-field" style="margin:0; flex: 1.5;" title="Default Branch"></select>
-                                    <input type="text" id="new-staff-dob" class="input-field" title="Date of Birth" placeholder="Date of Birth" style="margin:0; flex: 1.5;">
-                                    <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1;">
-                                    <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1;">
-                                    <button id="add-staff-btn" class="btn-primary" style="flex: 1; justify-content: center;">Add Staff</button>
+                                <div style="width: 100%; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
+                                    <select id="new-staff-branch" class="input-field" style="margin:0; flex: 2; min-width: 140px;" title="Default Branch"></select>
+                                    <input type="text" id="new-staff-dob" class="input-field" title="Date of Birth" placeholder="DOB" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
+                                    <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
+                                    <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
+                                    <button id="add-staff-btn" class="btn-primary" style="flex: 1; min-width: 100px; justify-content: center;">Add Staff</button>
                                 </div>
                             </div>
 
@@ -1326,7 +1348,7 @@
                                     <select id="pref-date-format" class="input-field" style="margin: 0;">
                                         <option value="en-GB">DD/MM/YYYY (UK/IN)</option>
                                         <option value="en-US">MM/DD/YYYY (US)</option>
-                                        <option value="fr-CA">YYYY-MM-DD (ISO)</option>
+                                        <option value="ja-JP">YYYY/MM/DD (Global)</option>
                                     </select>
                                 </div>
                                 <div style="flex: 1;">
@@ -1634,6 +1656,17 @@
         </div>
       </div>
 
+      <div style="display: flex; gap: 16px; margin-top: 8px;">
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Date</label>
+          <input type="text" id="manual-date" class="input-field" style="margin-top: 8px;" placeholder="Select Date">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Time</label>
+          <input type="time" id="manual-time" class="input-field" style="margin-top: 8px;">
+        </div>
+      </div>
+
       <div style="margin-top: 8px; margin-bottom: 16px;">
           <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Uniform Audit (At time of entry)</label>
           <div style="display: flex; gap: 16px; margin-top: 8px;">
@@ -1900,6 +1933,35 @@
     </div>
   </div>
 
+  <!-- LEAVE REVIEW MODAL -->
+  <div id="leave-review-modal" class="modal-overlay" onclick="window.closeModal(this)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2 style="margin:0;">Review Leave Request</h2>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('leave-review-modal'))">&times;</span>
+      </div>
+      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));" id="leave-review-subtitle">Staff Name</p>
+      
+      <div style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px;">
+          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Dates Requested</div>
+          <div style="font-weight: 700; color: var(--primary); font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 12px;" id="leave-review-dates">--</div>
+          
+          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Reason / Title</div>
+          <div style="font-weight: 600; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 12px;" id="leave-review-title">--</div>
+          
+          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Detailed Description</div>
+          <div style="color: var(--text-main); font-size: calc(13px * var(--font-scale, 1)); line-height: 1.5;" id="leave-review-desc">--</div>
+      </div>
+
+      <input type="hidden" id="leave-review-id" value=""> 
+
+      <div style="display: flex; gap: 12px; margin-top: 8px;" id="leave-review-actions">
+        <button id="btn-reject-leave" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px; background: var(--danger); box-shadow: 0 4px 12px var(--danger-alpha);">Reject</button>
+        <button id="btn-approve-leave" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px; background: var(--success); box-shadow: 0 4px 12px var(--success-alpha);">Approve</button>
+      </div>
+    </div>
+  </div>
+
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manage Reason</h2>
@@ -1943,7 +2005,7 @@
   <div id="photo-modal" class="modal-overlay" onclick="window.closeModal(this)">
     <div class="modal-card" onclick="event.stopPropagation()">
       <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
-        Audit Photo
+        <span id="photo-modal-title"></span>Audit Photo</span>
         <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
       </h3>
       <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://placehold.co/600x400/18181b/ef4444?text=Image+Purged/Expired'">
@@ -1967,6 +2029,66 @@
       </div>
       <div id="cmd-results" style="padding: 8px; overflow-y: auto; max-height: 400px;">
         <!-- Results go here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM REPORT BUILDER MODAL -->
+  <div id="custom-report-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2 style="margin:0;">🛠️ Custom Report Builder</h2>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('custom-report-modal'))">&times;</span>
+      </div>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Generate detailed Daily Logs or Aggregated Summary Reports.</p>
+      
+      <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase;">1. Report Type</label>
+      <div class="sub-tabs" style="margin-top: 8px; margin-bottom: 24px; width: 100%;">
+          <button class="sub-tab-btn active" id="rep-type-daily" style="flex: 1;">📝 Detailed Daily Logs</button>
+          <button class="sub-tab-btn" id="rep-type-summary" style="flex: 1;">📊 Summary (Total/Avg)</button>
+      </div>
+
+      <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase;">2. Data Filters</label>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; margin-bottom: 24px;">
+          <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 8px;"><input type="checkbox" id="rep-filter-absent" checked> Include Absentees</label>
+          <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 8px;"><input type="checkbox" id="rep-filter-lates"> Only Lates / Early Outs</label>
+      </div>
+
+      <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase;">3. Select Columns</label>
+      <div id="rep-cols-daily" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; margin-bottom: 24px; max-height: 200px; overflow-y: auto;">
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Date" checked> Date & Day</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Staff Name" checked> Staff Name</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Role" checked> Role</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Branch"> Branch / Route</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="First In" checked> Clock In Time</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Last Out" checked> Clock Out Time</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="T-Shirt"> T-Shirt Present</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="ID Card"> ID Card Present</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Work Hours" checked> Work Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Travel Hours"> Travel Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Total Hours" checked> Total Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Status" checked> Status (Late/Excused)</label>
+      </div>
+
+      <div id="rep-cols-summary" style="display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; margin-bottom: 24px; max-height: 200px; overflow-y: auto;">
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Staff Name" checked> Staff Name</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Role" checked> Role</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Days Present" checked> Days Present</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Days Absent" checked> Days Absent</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Avg In Time"> Avg In Time</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Avg Out Time"> Avg Out Time</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Work Hours" checked> Total Work Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Travel Hours"> Total Travel Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Hours" checked> Total Overall Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Lates" checked> Lates Count</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Early" checked> Early Out Count</label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid var(--card-border); padding-top: 16px;">
+        <div style="display: flex; gap: 8px;">
+            <button id="btn-rep-pdf" class="btn-primary" style="background: var(--danger); box-shadow: 0 4px 12px var(--danger-alpha);">📄 PDF</button>
+            <button id="btn-rep-excel" class="btn-primary" style="background: var(--success); box-shadow: 0 4px 12px var(--success-alpha);">📈 Excel</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2048,6 +2170,7 @@
     let rosterMap = {}; 
 
     let dbLogs = [];
+    let dbLeaves = [];
     let exceptionsData = {}; 
     let processedData = []; 
     let missingData = [];
@@ -2057,8 +2180,31 @@
     let globalShiftEnd = "19:00";
     
     const urlParams = new URLSearchParams(window.location.search);
-    let startDate = urlParams.get('start') ? new Date(urlParams.get('start')) : new Date();
-    let endDate = urlParams.get('end') ? new Date(urlParams.get('end')) : new Date();
+    let startDate = new Date(); let endDate = new Date();
+    const rangeParam = urlParams.get('range') || localStorage.getItem('rj_active_date_range') || 'today';
+    const savedStart = localStorage.getItem('rj_custom_start');
+    const savedEnd = localStorage.getItem('rj_custom_end');
+
+    if (rangeParam === 'custom' && savedStart && savedEnd) {
+        startDate = new Date(savedStart);
+        endDate = new Date(savedEnd);
+    } else {
+        const today = new Date();
+        if (rangeParam === 'yesterday') {
+            startDate = new Date(); startDate.setDate(today.getDate() - 1);
+            endDate = new Date(); endDate.setDate(today.getDate() - 1);
+        } else if (rangeParam === '7days') {
+            startDate = new Date(); startDate.setDate(today.getDate() - 7);
+        } else if (rangeParam === 'thismonth') {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        } else if (rangeParam === 'lastmonth') {
+            startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        } else if (rangeParam === 'alltime') {
+            startDate = new Date('2026-08-01');
+        }
+        localStorage.setItem('rj_active_date_range', rangeParam);
+    }
     
     const minLaunchDate = new Date('2026-08-01');
 
@@ -2069,6 +2215,7 @@
     window.use12HourTime = uiPrefs.use12h;
     window.appDateFormat = uiPrefs.dateFormat;
     window.appPageSize = parseInt(uiPrefs.pageSize, 10);
+    window.dynamicFpFormat = window.appDateFormat === 'en-US' ? 'm/d/Y' : (window.appDateFormat === 'ja-JP' ? 'Y/m/d' : 'd/m/Y');
     document.documentElement.style.setProperty('--font-scale', uiPrefs.fontScale || '1');
 
     // UI Sound Synthesis Engine (Zero dependencies)
@@ -2247,6 +2394,7 @@
     }
 
     window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked, isReviewed) {
+        document.getElementById('photo-modal-title').innerText = "Audit Photo";
         window.currentActiveAuditLogId = logId; 
         document.getElementById('modal-image-src').src = imageSrc;
         const controls = document.getElementById('audit-controls');
@@ -2757,6 +2905,7 @@
           .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, handleSync)
           .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_exceptions' }, handleSync)
           .on('postgres_changes', { event: '*', schema: 'public', table: 'staff_roster' }, handleSync)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'leave_requests' }, handleSync)
           .subscribe();
       } else if (!isSyncOn && realtimeSubscription) {
         supabaseClient.removeChannel(realtimeSubscription);
@@ -2913,9 +3062,140 @@
           document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
           e.target.classList.add('active');
           currentActionTab = e.target.getAttribute('data-action-filter');
-          if (typeof renderAbsentTable === 'function') renderAbsentTable();
+          
+          if (currentActionTab === 'leaves') {
+              document.getElementById('action-table-container').style.display = 'none';
+              document.getElementById('leave-table-container').style.display = 'block';
+              renderLeaveTable();
+          } else {
+              document.getElementById('action-table-container').style.display = 'block';
+              document.getElementById('leave-table-container').style.display = 'none';
+              if (typeof renderAbsentTable === 'function') renderAbsentTable();
+          }
       });
     });
+
+    function renderLeaveTable() {
+        const tbody = document.getElementById('leave-tbody');
+        if(!tbody) return;
+        
+        if (dbLeaves.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">No leave requests found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dbLeaves.map(lv => {
+            const submitDate = new Date(lv.created_at).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short', year:'numeric'});
+            const sDate = new Date(lv.start_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
+            const eDate = new Date(lv.end_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
+            
+            let statusBadge = '';
+            if (lv.status === 'Approved') statusBadge = `<span class="badge bg-green">✅ Approved</span>`;
+            else if (lv.status === 'Rejected') statusBadge = `<span class="badge bg-red">❌ Rejected</span>`;
+            else statusBadge = `<span class="badge bg-orange">⏳ Pending</span>`;
+
+            const staffObj = staffMap[lv.staff_id];
+            const avatar = getAvatarHtml(lv.employee_name, staffObj?.profile_pic, 36);
+
+            // Clean data for safe inline JS
+            const safeDesc = window.safeHTML(lv.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
+            const safeTitle = window.safeHTML(lv.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}')">
+                <td style="color:var(--text-soft)">${submitDate}</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                      ${avatar}
+                      <strong style="color: var(--text-main);">${lv.employee_name}</strong>
+                  </div>
+                </td>
+                <td style="font-weight: 600;">${sDate} - ${eDate}</td>
+                <td><strong style="color: var(--primary);">${lv.reason_title}</strong></td>
+                <td>${statusBadge}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    window.openLeaveModal = function(id, name, dates, title, desc, status) {
+        document.getElementById('leave-review-id').value = id;
+        document.getElementById('leave-review-subtitle').innerText = "Requested by: " + name;
+        document.getElementById('leave-review-dates').innerText = dates;
+        document.getElementById('leave-review-title').innerText = title;
+        document.getElementById('leave-review-desc').innerHTML = desc || "No detailed description.";
+        
+        const actionRow = document.getElementById('leave-review-actions');
+        if (status === 'Pending') {
+            actionRow.style.display = 'flex';
+        } else {
+            actionRow.style.display = 'none';
+        }
+        
+        document.getElementById('leave-review-modal').style.display = 'flex';
+    };
+
+    document.getElementById('btn-approve-leave')?.addEventListener('click', () => window.processLeaveAction('Approved'));
+    document.getElementById('btn-reject-leave')?.addEventListener('click', () => window.processLeaveAction('Rejected'));
+
+    window.processLeaveAction = async function(newStatus) {
+        const id = document.getElementById('leave-review-id').value;
+        if (!id) return;
+        
+        const approveBtn = document.getElementById('btn-approve-leave');
+        const rejectBtn = document.getElementById('btn-reject-leave');
+        
+        approveBtn.disabled = true; rejectBtn.disabled = true;
+        
+        try {
+            const { error } = await supabaseClient.from('leave_requests').update({ status: newStatus }).eq('id', id);
+            if (error) throw error;
+            
+            // Local update
+            const leaveIdx = dbLeaves.findIndex(l => l.id === id);
+            if (leaveIdx !== -1) dbLeaves[leaveIdx].status = newStatus;
+            
+            showToast(`Leave Request ${newStatus}!`, newStatus === 'Approved' ? 'success' : 'primary');
+            
+            // Update UI Pending Badge instantly
+            const pendingLeaves = dbLeaves.filter(l => l.status === 'Pending').length;
+            const leaveBadge = document.getElementById('pending-leave-badge');
+            if (leaveBadge) {
+                leaveBadge.innerText = pendingLeaves;
+                leaveBadge.style.display = pendingLeaves > 0 ? 'inline-block' : 'none';
+            }
+
+            window.closeModal(document.getElementById('leave-review-modal'));
+            renderLeaveTable();
+            
+            // AUTOMATION: If Approved, insert into attendance_exceptions automatically!
+            if (newStatus === 'Approved' && leaveIdx !== -1) {
+                const lv = dbLeaves[leaveIdx];
+                let curr = new Date(lv.start_date);
+                let end = new Date(lv.end_date);
+                let inserts = [];
+                
+                while(curr <= end) {
+                   inserts.push({ 
+                       staff_id: lv.staff_id, 
+                       employee_name: lv.employee_name,
+                       date: toLocalISO(curr), 
+                       reason_id: null, 
+                       reason: lv.reason_title + " (Approved Leave)", 
+                       exception_type: 'Absent'
+                   });
+                   curr.setDate(curr.getDate() + 1);
+                }
+                if (inserts.length > 0) {
+                    await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'staff_id, date, exception_type' });
+                    fetchLogsFromDatabase(true); // Soft sync to update Missing Lists / Dashboards
+                }
+            }
+            
+        } catch(e) {
+            showToast("Failed to process leave.", "error");
+        } finally {
+            approveBtn.disabled = false; rejectBtn.disabled = false;
+        }
+    };
 
     const pendingToggleEl = document.getElementById('toggle-pending-photos');
     if (pendingToggleEl) {
@@ -3029,6 +3309,9 @@
             
             startDate = newStart;
             endDate = newEnd;
+            localStorage.setItem('rj_active_date_range', range);
+            localStorage.setItem('rj_custom_start', startDate.toISOString());
+            localStorage.setItem('rj_custom_end', endDate.toISOString());
             
             if(startPicker) startPicker.setDate(startDate);
             if(endPicker) endPicker.setDate(endDate);
@@ -3037,7 +3320,18 @@
         });
     });
 
-    const getFpConfig = () => ({ locale: { firstDayOfWeek: parseInt(uiPrefs.weekStart || "1", 10) } });
+    const getFpConfig = () => ({ 
+        locale: { firstDayOfWeek: parseInt(uiPrefs.weekStart || "1", 10) },
+        onClose: function(selectedDates, dateStr, instance) {
+            // Agar user ne limit ke bahar ki date type ki aur calendar ne box blank kar diya
+            if (!dateStr) {
+                if (typeof showToast === 'function') showToast("Date is out of range! Resetting...", "warning");
+                // Box ko khali chhodne ke bajaye, last valid date par wapas set kar do
+                instance.setDate(instance.config.defaultDate || new Date());
+            }
+        },
+        errorHandler: () => {} // Console mein unnecessary error hide karne ke liye
+    });
     
     window.checkAndSetActiveDateRange = function() {
         const today = new Date(); today.setHours(0,0,0,0);
@@ -3068,46 +3362,57 @@
     const startPickerEl = document.getElementById("global-start");
     const startPicker = startPickerEl ? flatpickr(startPickerEl, { 
         ...getFpConfig(),
+        allowInput: true,
         defaultDate: startDate, 
         minDate: "2026-08-01", 
         maxDate: safeMaxDate,
         dateFormat: "Y-m-d", 
         altInput: true, 
-        altFormat: "d M, Y", 
-        onChange: (dates) => { 
+        altFormat: window.dynamicFpFormat, 
+        onChange: (dates, dateStr, instance) => { 
             if(dates[0]) { 
                 startDate = dates[0]; 
                 window.checkAndSetActiveDateRange();
                 if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false); 
-            } 
+            } else {
+                if (typeof showToast === 'function') showToast("Invalid Date! Restoring...", "warning");
+                instance.setDate(startDate);
+            }
         } 
     }) : null;
     
     const endPickerEl = document.getElementById("global-end");
     const endPicker = endPickerEl ? flatpickr(endPickerEl, { 
         ...getFpConfig(),
+        allowInput: true,
         defaultDate: endDate, 
         minDate: "2026-08-01", 
         maxDate: safeMaxDate,
         dateFormat: "Y-m-d", 
         altInput: true, 
-        altFormat: "d M, Y", 
-        onChange: (dates) => { 
+        altFormat: window.dynamicFpFormat, 
+        onChange: (dates, dateStr, instance) => { 
             if(dates[0]) { 
                 endDate = dates[0]; 
                 window.checkAndSetActiveDateRange();
                 if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false); 
-            } 
+            } else {
+                if (typeof showToast === 'function') showToast("Invalid Date! Restoring...", "warning");
+                instance.setDate(endDate);
+            }
         } 
     }) : null;
 
     // Run once on load to highlight correct button if URL parameters set the date
     window.checkAndSetActiveDateRange();
 
-    if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
-    if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", minDate: "today" });
-    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
-    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: "d-m-Y", maxDate: "2026-12-31" });
+    const revertDate = (dates, dateStr, inst) => { if(!dates[0]) { showToast("Invalid Date! Reverting...", "warning"); inst.setDate(new Date()); } };
+    if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
+    if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
+    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "2026-12-31", allowInput: true, onChange: revertDate });
+    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "2026-12-31", allowInput: true, onChange: revertDate });
+    if (document.getElementById("manual-date")) flatpickr("#manual-date", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, defaultDate: "today", maxDate: "today", onChange: revertDate });
+    if (document.getElementById("manual-time")) flatpickr("#manual-time", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: !window.use12HourTime, disableMobile: "true" });
     
     document.getElementById('filter-in-start')?.addEventListener('change', processStitchedData);
     document.getElementById('filter-in-end')?.addEventListener('change', processStitchedData);
@@ -3510,8 +3815,14 @@
       // SILENTLY UPDATE URL QUERY PARAMS WITH FILTERS
       try {
           const url = new URL(window.location);
-          url.searchParams.set('start', toLocalISO(sDate));
-          url.searchParams.set('end', toLocalISO(eDate));
+          const activeRange = document.querySelector('.quick-date-btn.active')?.getAttribute('data-range') || 'custom';
+          url.searchParams.delete('start');
+          url.searchParams.delete('end');
+          if (activeRange !== 'custom') {
+              url.searchParams.set('range', activeRange);
+          } else {
+              url.searchParams.set('range', 'custom');
+          }
           
           let filtersActive = false;
           if (selectedStaffIds.size !== dbStaff.length) { url.searchParams.set('staff', Array.from(selectedStaffIds).join(',')); filtersActive = true; }
@@ -3582,6 +3893,39 @@
           const type = e.exception_type || 'Absent'; 
           exceptionsData[`${sId}_${e.date}_${type}`] = e;
       });
+
+      // -------------------------------------------------------------
+      // FETCH AND AUTO-REJECT LEAVES
+      // -------------------------------------------------------------
+      const { data: leavesData } = await supabaseClient.from('leave_requests').select('*').order('created_at', { ascending: false });
+      dbLeaves = leavesData || [];
+      
+      let leavesToReject = [];
+      const todayISO = toLocalISO(new Date());
+      
+      dbLeaves.forEach(lv => {
+          // If status is Pending and end_date is in the past, Auto-Reject it!
+          if (lv.status === 'Pending' && lv.end_date < todayISO) {
+              lv.status = 'Rejected';
+              lv.reason_desc = (lv.reason_desc ? lv.reason_desc + '\n\n' : '') + '[System Auto-Rejected: Date Expired]';
+              leavesToReject.push({ id: lv.id, status: 'Rejected', reason_desc: lv.reason_desc });
+          }
+      });
+
+      if (leavesToReject.length > 0) {
+          supabaseClient.from('leave_requests').upsert(leavesToReject).then(() => {
+              console.log("Auto-rejected expired leaves:", leavesToReject.length);
+          });
+      }
+      
+      // Update Pending Leave Badge
+      const pendingLeaves = dbLeaves.filter(l => l.status === 'Pending').length;
+      const leaveBadge = document.getElementById('pending-leave-badge');
+      if (leaveBadge) {
+          leaveBadge.innerText = pendingLeaves;
+          leaveBadge.style.display = pendingLeaves > 0 ? 'inline-block' : 'none';
+      }
+      // -------------------------------------------------------------
 
       localforage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
       localforage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
@@ -4050,7 +4394,7 @@
             }
             photosHTML += `</div>`;
 
-            const displayDate = row.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short', year:'numeric'});
+            const displayDate = row.date.toLocaleDateString(window.appDateFormat);
 
             const staffObj = staffMap[row.staffId];
             const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
@@ -4162,7 +4506,7 @@
 
           tbody.innerHTML = paginatedData.map(log => {
               const d = new Date(log.timestamp);
-              const displayDate = d.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short', year:'numeric'});
+              const displayDate = d.toLocaleDateString(window.appDateFormat);
               const displayTime = d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
 
               const sId = getStaffId(log);
@@ -4376,6 +4720,24 @@
     
     
     document.getElementById('btn-manual-entry')?.addEventListener('click', () => {
+        const now = new Date();
+        
+        // 1. Reset Date & Time
+        const timeEl = document.getElementById('manual-time');
+        const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        if (timeEl._flatpickr) timeEl._flatpickr.setDate(timeStr);
+        else timeEl.value = timeStr;
+        
+        const manualDateEl = document.getElementById('manual-date');
+        if (manualDateEl && manualDateEl._flatpickr) manualDateEl._flatpickr.setDate(now);
+        
+        // 2. Reset other fields to defaults
+        document.getElementById('manual-staff').value = '';
+        document.getElementById('manual-action').value = 'Clock In';
+        document.getElementById('manual-branch').value = '';
+        document.getElementById('manual-tshirt').checked = true;
+        document.getElementById('manual-idcard').checked = true;
+
         document.getElementById('manual-entry-modal').style.display = 'flex';
     });
 
@@ -4389,17 +4751,21 @@
         const branchIdVal = document.getElementById('manual-branch').value;
         const tshirtVal = document.getElementById('manual-tshirt').checked;
         const idcardVal = document.getElementById('manual-idcard').checked;
+        const dateVal = document.getElementById('manual-date').value;
+        const timeVal = document.getElementById('manual-time').value;
 
         if (!staffId || !branchIdVal) {
             return showToast("Staff and Branch are required!", "error");
+        }
+        if (!dateVal || !timeVal) {
+            return showToast("Date and Time are required!", "error");
         }
 
         const btn = document.getElementById('btn-save-manual');
         btn.innerText = "Saving..."; btn.disabled = true;
 
         try {
-            // Live current time autogenerate hoga yaha
-            const timestampIso = new Date().toISOString();
+            const timestampIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
             const staffObj = staffMap[staffId];
             const branchObj = branchMap[branchIdVal];
             const branchName = branchObj ? branchObj.branch_name : 'Manual Entry';
@@ -4492,7 +4858,7 @@
         let photoCount = 0;
 
         processedData.forEach(r => {
-            const dateStr = r.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'});
+            const dateStr = r.date.toLocaleDateString(window.appDateFormat);
             
             const buildCard = (photo, logId, typeBadge, isReviewed, uTshirt, uIdcard, timeStr) => {
                 if (showOnlyPendingPhotos && isReviewed) return '';
@@ -5029,6 +5395,21 @@
         if(trendCanvas) {
             if(window.myCharts['trend']) window.myCharts['trend'].destroy();
             
+            // Smart Date Label Formatting Logic
+            const parsedDates = trendDates.map(d => new Date(d));
+            const allSameYear = parsedDates.length > 0 && parsedDates.every(d => d.getFullYear() === parsedDates[0].getFullYear());
+            const allSameMonth = allSameYear && parsedDates.every(d => d.getMonth() === parsedDates[0].getMonth());
+            
+            const smartLabels = parsedDates.map(d => {
+                const day = d.getDate(); // Bina zero ke
+                const month = d.getMonth() + 1; // Bina zero ke
+                const year = d.getFullYear().toString().slice(-2); // Sirf last 2 digits
+                
+                if (allSameMonth) return `${day}`;
+                if (allSameYear) return window.appDateFormat === 'en-US' ? `${month}/${day}` : `${day}/${month}`;
+                return window.appDateFormat === 'en-US' ? `${month}/${day}/${year}` : (window.appDateFormat === 'ja-JP' ? `${year}/${month}/${day}` : `${day}/${month}/${year}`);
+            });
+
             const ctx = trendCanvas.getContext('2d');
             const gradSuccess = ctx.createLinearGradient(0, 0, 0, 300);
             gradSuccess.addColorStop(0, window.hexToRgba ? window.hexToRgba(success, 0.4) : 'rgba(16, 185, 129, 0.4)');
@@ -5036,7 +5417,7 @@
 
             window.myCharts['trend'] = new Chart(trendCanvas, {
                 type: 'line',
-                data: { labels: trendDates.map(d => new Date(d).toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'})), 
+                data: { labels: smartLabels, 
                         datasets: [
                             { label: 'Present', data: presentCounts, borderColor: success, backgroundColor: gradSuccess, borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: success, pointBorderColor: '#fff', pointHoverRadius: 6 },
                             { label: 'Absent', data: absentCounts, borderColor: danger, backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, borderDash: [5, 5] },
@@ -5125,7 +5506,7 @@
 
         tbody.innerHTML = dataToRender.map(row => {
             const isoDate = toLocalISO(row.date);
-            const displayDate = row.date.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short', year:'numeric'});
+            const displayDate = row.date.toLocaleDateString(window.appDateFormat);
             
             const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
 
@@ -5270,14 +5651,18 @@
     setTimeout(() => {
         flatpickr("#roster-date-picker", {
             ...getFpConfig(),
+            allowInput: true,
             defaultDate: currentRosterDate,
             dateFormat: "Y-m-d",
             altInput: true,
-            altFormat: "d M, Y",
-            onChange: (dates) => {
+            altFormat: window.dynamicFpFormat,
+            onChange: (dates, dateStr, instance) => {
                 if(dates[0]) {
                     currentRosterDate = dates[0];
                     renderDragDropRoster();
+                } else {
+                    if (typeof showToast === 'function') showToast("Invalid Date! Restoring...", "warning");
+                    instance.setDate(currentRosterDate);
                 }
             }
         });
@@ -5494,7 +5879,7 @@
       if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff selected.</td></tr>'; return; }
       
       const dateList = getDatesArrayFromFetchedLogs();
-      headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat,{day:'numeric',month:'short'})}</th>`).join('');
+      headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat)}</th>`).join('');
         
       // --- Matrix Optimization Hash Map ---
       const matrixLogsMap = {};
@@ -6149,6 +6534,39 @@
       item.addEventListener('click', async (e) => {
         e.preventDefault(); document.querySelector('.export-menu').classList.remove('show');
         const exportType = e.target.getAttribute('data-export');
+
+        // --- CUSTOM REPORT BUILDER OPENER ---
+        if (exportType === 'custom') {
+            document.getElementById('custom-report-modal').style.display = 'flex';
+            
+            // Toggle Logic inside Modal
+            document.getElementById('rep-type-daily').onclick = function() {
+                this.classList.add('active');
+                document.getElementById('rep-type-summary').classList.remove('active');
+                document.getElementById('rep-cols-daily').style.display = 'grid';
+                document.getElementById('rep-cols-summary').style.display = 'none';
+                if(typeof window.saveReportTemplate === 'function') window.saveReportTemplate();
+            };
+            document.getElementById('rep-type-summary').onclick = function() {
+                this.classList.add('active');
+                document.getElementById('rep-type-daily').classList.remove('active');
+                document.getElementById('rep-cols-summary').style.display = 'grid';
+                document.getElementById('rep-cols-daily').style.display = 'none';
+                if(typeof window.saveReportTemplate === 'function') window.saveReportTemplate();
+            };
+
+            // Load Template if saved
+            const savedTemplate = JSON.parse(localStorage.getItem('rj_custom_report_template'));
+            if (savedTemplate) {
+                if (savedTemplate.type === 'summary') document.getElementById('rep-type-summary').click();
+                document.getElementById('rep-filter-absent').checked = savedTemplate.includeAbsent;
+                document.getElementById('rep-filter-lates').checked = savedTemplate.onlyLates;
+                
+                document.querySelectorAll('.rep-col-cb').forEach(cb => cb.checked = savedTemplate.dailyCols.includes(cb.value));
+                document.querySelectorAll('.rep-col-sum-cb').forEach(cb => cb.checked = savedTemplate.sumCols.includes(cb.value));
+            }
+            return; // Stop standard export execution
+        }
         
         const isStatsView = document.getElementById('view-stats').style.display === 'block';
         const isActionView = document.getElementById('view-action').style.display === 'block';
@@ -6167,8 +6585,8 @@
           reportName = `ATTENDANCE LOGS - ${logsTitles[activeSubTab] || 'ALL'}`;
         }
         
-        const sDateStr = startDate.toLocaleDateString(window.appDateFormat, {day: '2-digit', month: 'short', year: 'numeric'});
-        const eDateStr = endDate.toLocaleDateString(window.appDateFormat, {day: '2-digit', month: 'short', year: 'numeric'});
+        const sDateStr = startDate.toLocaleDateString(window.appDateFormat);
+        const eDateStr = endDate.toLocaleDateString(window.appDateFormat);
         const titleLine1 = `RJ MOBILE | ${reportName}`;
         const titleLine2 = isLiveView ? `(Generated: ${new Date().toLocaleString(window.appDateFormat)})` : `(${sDateStr} - ${eDateStr})`;
         const titleString = `${titleLine1} ${titleLine2}`;
@@ -6514,7 +6932,7 @@
             }
             
             const diffDays = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
-            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US');
             
             return { ...staff, daysLeft: diffDays, turningAge, formattedDate };
         });
@@ -6848,15 +7266,15 @@
               <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">/</kbd> or <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${cmdText}</kbd></span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span>Toggle T-Shirt (in Photo Modal)</span>
+              <span>Toggle T-Shirt (in Modals & Bulk)</span>
               <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${tKey}</kbd>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span>Toggle ID Card (in Photo Modal)</span>
+              <span>Toggle ID Card (in Modals & Bulk)</span>
               <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${iKey}</kbd>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span>Approve & Save (in Photo Modal)</span>
+              <span>Quick Save / Approve (in Modals)</span>
               <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Enter</kbd>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
@@ -6925,7 +7343,11 @@
                     roles: Array.from(selectedRoleIds)
                 };
                 localStorage.setItem(`rj_saved_view_${slotNum}`, JSON.stringify(viewState));
-                showToast(`Workspace saved to Slot ${slotNum}!`, "success");
+                
+                // Link: Save Report Builder preferences automatically here as well
+                if (typeof window.saveReportTemplate === 'function') window.saveReportTemplate();
+                
+                showToast(`Workspace & Templates saved to Slot ${slotNum}!`, "success");
                 return;
             } 
             else if (isLoadMod && !isSaveMod) {
@@ -6988,6 +7410,13 @@
             return;
         }
 
+        // Press 'M' to open Manual Entry Modal quickly
+        if (!isTyping && e.key.toLowerCase() === 'm') {
+            e.preventDefault();
+            document.getElementById('btn-manual-entry')?.click();
+            return;
+        }
+
         // Show Shortcuts Cheat Sheet with "?"
         if (!isTyping && e.key === '?') {
             e.preventDefault();
@@ -7019,46 +7448,56 @@
             return;
         }
 
-        // 3. Photo Audit Modal Hotkeys
-        const photoModal = document.getElementById('photo-modal');
-        if (photoModal && photoModal.style.display === 'flex' && !isTyping) {
-            const tCheck = document.getElementById('modal-tshirt');
-            const iCheck = document.getElementById('modal-idcard');
-            const saveBtn = document.getElementById('btn-modal-audit-save');
+        // 3. Smart Hotkeys for ALL Uniform Checkboxes (Photo Audit, Manual Entry, Bulk Action)
+        if (!isTyping) {
+            const isTKey = e.key.toLowerCase() === uiPrefs.keyTshirt.toLowerCase();
+            const isIKey = e.key.toLowerCase() === uiPrefs.keyId.toLowerCase();
+            const isEnter = e.key === 'Enter';
 
-            // Customizable T and I toggles
-            if (e.key.toLowerCase() === uiPrefs.keyTshirt.toLowerCase() && tCheck) tCheck.checked = !tCheck.checked;
-            if (e.key.toLowerCase() === uiPrefs.keyId.toLowerCase() && iCheck) iCheck.checked = !iCheck.checked;
-
-            // Enter to Save
-            if (e.key === 'Enter' && saveBtn) {
-                e.preventDefault();
-                saveBtn.click();
-            }
-
-            // Left / Right Arrows to navigate through visible photos
-            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-                if (!window.currentActiveAuditLogId) return;
+            // A. Photo Audit Modal
+            const photoModal = document.getElementById('photo-modal');
+            if (photoModal && photoModal.style.display === 'flex') {
+                if (isTKey) document.getElementById('modal-tshirt').click();
+                if (isIKey) document.getElementById('modal-idcard').click();
+                if (isEnter) { e.preventDefault(); document.getElementById('btn-modal-audit-save')?.click(); }
                 
-                // Find the checkbox that corresponds to the currently open image
-                const currentBox = document.querySelector(`.audit-card-checkbox[value="${window.currentActiveAuditLogId}"]`);
-                if (currentBox) {
-                    const currentCard = currentBox.closest('.audit-card');
-                    // Create an array of only the cards currently visible AND not fading out
-                    const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none' && c.style.opacity !== '0');
-                    const currentIndex = allVisibleCards.indexOf(currentCard);
-
-                    if (currentIndex !== -1) {
-                        let nextIndex = e.key === 'ArrowRight' ? currentIndex + 1 : currentIndex - 1;
-                        
-                        // If a next/previous card exists, simulate a click to open it in the modal
-                        if (nextIndex >= 0 && nextIndex < allVisibleCards.length) {
-                            const nextCard = allVisibleCards[nextIndex];
-                            const imgWrap = nextCard.querySelector('.audit-img-wrap');
-                            if (imgWrap) imgWrap.click();
+                // Left / Right Arrows to navigate through visible photos
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    if (!window.currentActiveAuditLogId) return;
+                    const currentBox = document.querySelector(`.audit-card-checkbox[value="${window.currentActiveAuditLogId}"]`);
+                    if (currentBox) {
+                        const currentCard = currentBox.closest('.audit-card');
+                        const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none' && c.style.opacity !== '0');
+                        const currentIndex = allVisibleCards.indexOf(currentCard);
+                        if (currentIndex !== -1) {
+                            let nextIndex = e.key === 'ArrowRight' ? currentIndex + 1 : currentIndex - 1;
+                            if (nextIndex >= 0 && nextIndex < allVisibleCards.length) {
+                                const nextCard = allVisibleCards[nextIndex];
+                                const imgWrap = nextCard.querySelector('.audit-img-wrap');
+                                if (imgWrap) imgWrap.click();
+                            }
                         }
                     }
                 }
+                return; // Stop executing further if photo modal is open
+            }
+
+            // B. Manual Entry Modal
+            const manualModal = document.getElementById('manual-entry-modal');
+            if (manualModal && manualModal.style.display === 'flex') {
+                if (isTKey) document.getElementById('manual-tshirt').click();
+                if (isIKey) document.getElementById('manual-idcard').click();
+                if (isEnter) { e.preventDefault(); document.getElementById('btn-save-manual')?.click(); }
+                return;
+            }
+
+            // C. Bulk Action Bar (Floating at bottom)
+            const bulkBar = document.getElementById('bulk-action-bar');
+            if (bulkBar && bulkBar.classList.contains('show')) {
+                if (isTKey) document.getElementById('bulk-tshirt').click();
+                if (isIKey) document.getElementById('bulk-idcard').click();
+                if (isEnter) { e.preventDefault(); document.getElementById('btn-bulk-save')?.click(); }
+                return;
             }
         }
     });
@@ -7272,7 +7711,7 @@
             punchesContainer.innerHTML = '<div style="color:var(--text-soft); font-size:13px; text-align:center; padding: 20px;">No recent logs found.</div>';
         } else {
             punchesContainer.innerHTML = recentLogs.slice(0,5).map(r => {
-                const dateStr = r.date.toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
+                const dateStr = r.date.toLocaleDateString(window.appDateFormat);
                 let status = "On Time"; let color = "var(--success)";
                 if (r.excAbsent || r.excLate || r.excEarly) { status = "Excused"; color = "var(--primary)"; }
                 else if (!r.firstIn && !r.lastOut) { status = "Absent"; color = "var(--danger)"; }
@@ -7361,15 +7800,215 @@
         const avatar = document.getElementById('drawer-avatar');
         if (!avatar) return;
         
-        // Agar avatar khud IMG tag hai, ya uske andar IMG hai dono ko handle karega
         const img = avatar.tagName === 'IMG' ? avatar : avatar.querySelector('img');
         
         if (img && img.src) {
+            document.getElementById('photo-modal-title').innerText = "Profile Picture";
             document.getElementById('modal-image-src').src = img.src;
             document.getElementById('audit-controls').style.display = 'none';
             document.getElementById('photo-modal').style.display = 'flex';
         }
     };
+
+    // =========================================================================
+    //  CUSTOM REPORT GENERATOR LOGIC (EXCEL & PDF)
+    // =========================================================================
+    const executeCustomExport = async (format) => {
+        const isSummary = document.getElementById('rep-type-summary').classList.contains('active');
+        const includeAbsent = document.getElementById('rep-filter-absent').checked;
+        const onlyLates = document.getElementById('rep-filter-lates').checked;
+        
+        let columnHeaders = [];
+        let exportRows = [];
+        const sDateStr = startDate.toLocaleDateString(window.appDateFormat);
+        const eDateStr = endDate.toLocaleDateString(window.appDateFormat);
+        const titleLine1 = `RJ MOBILE | CUSTOM ${isSummary ? 'SUMMARY' : 'DAILY'} REPORT`;
+        const titleLine2 = `(${sDateStr} - ${eDateStr})`;
+        const safeFileName = `RJ_Custom_${isSummary ? 'Summary' : 'Daily'}`;
+
+        if (!isSummary) {
+            // DETAILED DAILY LOG
+            const selectedCols = Array.from(document.querySelectorAll('.rep-col-cb:checked')).map(cb => cb.value);
+            columnHeaders = selectedCols;
+
+            let dataToExport = processedData;
+            if (onlyLates) dataToExport = processedData.filter(r => r.isLate || r.isEarly);
+            
+            // Sort by Date then Name
+            dataToExport.sort((a,b) => a.date - b.date || a.name.localeCompare(b.name));
+
+            dataToExport.forEach(d => {
+                let status = "On Time";
+                if(d.excAbsent || d.excLate || d.excEarly) status = "Excused";
+                else if (d.isLate && d.isEarly) status = "Late & Early Out";
+                else if (d.isLate) status = "Late Arrival";
+                else if (d.isEarly) status = "Early Out";
+
+                // Uniform Extraction
+                let hasShirt = "N/A", hasId = "N/A";
+                if (d.photoLogs && d.photoLogs.length > 0) {
+                    const reviewedLogs = d.photoLogs.filter(pl => pl.reviewed);
+                    if (reviewedLogs.length > 0) {
+                        hasShirt = reviewedLogs.some(pl => !pl.uTshirt) ? "No" : "Yes";
+                        hasId = reviewedLogs.some(pl => !pl.uIdcard) ? "No" : "Yes";
+                    } else {
+                        hasShirt = "Pending"; hasId = "Pending";
+                    }
+                }
+
+                let rowData = [];
+                selectedCols.forEach(col => {
+                    if(col === "Date") rowData.push(d.date.toLocaleDateString(window.appDateFormat));
+                    if(col === "Staff Name") rowData.push(d.name);
+                    if(col === "Role") rowData.push(d.role);
+                    if(col === "Branch") rowData.push(d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-");
+                    if(col === "First In") rowData.push(d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A');
+                    if(col === "Last Out") rowData.push(d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A');
+                    if(col === "T-Shirt") rowData.push(hasShirt);
+                    if(col === "ID Card") rowData.push(hasId);
+                    if(col === "Work Hours") rowData.push(d.formattedWork);
+                    if(col === "Travel Hours") rowData.push(d.formattedTravel);
+                    if(col === "Total Hours") rowData.push(d.formattedHours);
+                    if(col === "Status") rowData.push(status);
+                });
+                exportRows.push(rowData);
+            });
+
+            // Append Absentees if requested
+            if (includeAbsent && !onlyLates) {
+                missingData.forEach(d => {
+                    let rowData = [];
+                    selectedCols.forEach(col => {
+                        if(col === "Date") rowData.push(d.date.toLocaleDateString(window.appDateFormat));
+                        if(col === "Staff Name") rowData.push(d.name);
+                        if(col === "Role") rowData.push(staffMap[d.staffId]?.role || "Unassigned");
+                        if(col === "Status") rowData.push(d.excAbsent ? "Excused Absent" : "Unexcused Absence");
+                        if(["First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "T-Shirt", "ID Card", "Branch"].includes(col)) rowData.push("-");
+                    });
+                    exportRows.push(rowData);
+                });
+            }
+
+        } else {
+            // SUMMARY REPORT
+            const selectedCols = Array.from(document.querySelectorAll('.rep-col-sum-cb:checked')).map(cb => cb.value);
+            columnHeaders = selectedCols;
+
+            let dataToExport = statsData;
+            if (onlyLates) dataToExport = statsData.filter(s => s.lateCount > 0 || s.earlyCount > 0);
+
+            dataToExport.forEach(s => {
+                const totalMins = s.sumWorkMins + s.sumTravelMins;
+                let absentDays = 0;
+                missingData.forEach(m => { if(m.staffId === s.id) absentDays++; });
+                
+                if (!includeAbsent && s.daysPresent === 0) return; // Skip if they only have absent days and it's unticked
+
+                let rowData = [];
+                selectedCols.forEach(col => {
+                    if(col === "Staff Name") rowData.push(s.name);
+                    if(col === "Role") rowData.push(s.role);
+                    if(col === "Days Present") rowData.push(s.daysPresent);
+                    if(col === "Days Absent") rowData.push(absentDays);
+                    if(col === "Avg In Time") rowData.push(formatMinsTo24h(s.sumInMins / s.daysPresent));
+                    if(col === "Avg Out Time") rowData.push(formatMinsTo24h(s.sumOutMins / s.daysOut));
+                    if(col === "Work Hours") rowData.push(formatMinsToDuration(s.sumWorkMins));
+                    if(col === "Travel Hours") rowData.push(formatMinsToDuration(s.sumTravelMins));
+                    if(col === "Total Hours") rowData.push(formatMinsToDuration(totalMins));
+                    if(col === "Total Lates") rowData.push(s.lateCount);
+                    if(col === "Total Early") rowData.push(s.earlyCount);
+                });
+                exportRows.push(rowData);
+            });
+        }
+
+        if (exportRows.length === 0) return showToast("No data matches these filters.", "error");
+
+        const btnId = format === 'pdf' ? 'btn-rep-pdf' : 'btn-rep-excel';
+        const originalText = document.getElementById(btnId).innerText;
+        document.getElementById(btnId).innerText = "Loading...";
+
+        if (format === 'xlsx') {
+            await loadExportScript('https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js');
+            const wsData = [[titleLine1], [titleLine2], [], columnHeaders, ...exportRows];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            const colWidths = columnHeaders.map((col, i) => {
+                let maxLength = col.length;
+                exportRows.forEach(row => { let cellVal = row[i] ? row[i].toString() : ""; if (cellVal.length > maxLength) maxLength = cellVal.length; });
+                return { wch: maxLength + 3 };
+            });
+            ws['!cols'] = colWidths;
+            if(!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push({ s: {r:0, c:0}, e: {r:0, c:columnHeaders.length - 1} });
+            ws['!merges'].push({ s: {r:1, c:0}, e: {r:1, c:columnHeaders.length - 1} });
+
+            for (let i in ws) {
+                if (typeof ws[i] !== 'object') continue;
+                let cell = XLSX.utils.decode_cell(i);
+                ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+                if (cell.r === 0) { ws[i].s.font = { bold: true, sz: 16, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "F37021" } }; }
+                else if (cell.r === 1) { ws[i].s.font = { bold: true, sz: 11, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "F37021" } }; }
+                else if (cell.r === 3) { ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "1E2D4A" } }; }
+            }
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "CustomReport");
+            XLSX.writeFile(wb, `${safeFileName}.xlsx`);
+        } 
+        
+        if (format === 'pdf') {
+            await loadExportScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+            await loadExportScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js');
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'pt', 'a4'); 
+            const pageWidth = doc.internal.pageSize.getWidth();
+            
+            doc.setFontSize(20); doc.setTextColor(40, 40, 40); doc.setFont("helvetica", "bold");
+            doc.text(titleLine1, pageWidth / 2, 40, { align: 'center' });
+            doc.setFontSize(11); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "normal");
+            doc.text(titleLine2, pageWidth / 2, 60, { align: 'center' });
+            
+            doc.autoTable({
+                startY: 80,
+                head: [columnHeaders],
+                body: exportRows,
+                theme: 'grid',
+                headStyles: { fillColor: [243, 112, 33], textColor: 255, fontSize: 10, fontStyle: 'bold', halign: 'center', valign: 'middle' },
+                bodyStyles: { fontSize: 9, cellPadding: 5, textColor: [50, 50, 50], halign: 'center', valign: 'middle' },
+                styles: { overflow: 'linebreak', cellWidth: 'auto' },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+                margin: { left: 20, right: 20, bottom: 30 }
+            });
+            doc.save(`${safeFileName}.pdf`);
+        }
+        
+        document.getElementById(btnId).innerText = originalText;
+        showToast("Report Exported Successfully!", "success");
+    };
+
+    document.getElementById('btn-rep-excel')?.addEventListener('click', () => executeCustomExport('xlsx'));
+    document.getElementById('btn-rep-pdf')?.addEventListener('click', () => executeCustomExport('pdf'));
+
+    window.saveReportTemplate = () => {
+        const typeSummaryEl = document.getElementById('rep-type-summary');
+        if (!typeSummaryEl) return;
+        const isSummary = typeSummaryEl.classList.contains('active');
+        const state = {
+            type: isSummary ? 'summary' : 'daily',
+            includeAbsent: document.getElementById('rep-filter-absent').checked,
+            onlyLates: document.getElementById('rep-filter-lates').checked,
+            dailyCols: Array.from(document.querySelectorAll('.rep-col-cb:checked')).map(cb => cb.value),
+            sumCols: Array.from(document.querySelectorAll('.rep-col-sum-cb:checked')).map(cb => cb.value)
+        };
+        localStorage.setItem('rj_custom_report_template', JSON.stringify(state));
+    };
+
+    // Auto-save trigger for all checkboxes inside the modal
+    document.querySelectorAll('#custom-report-modal input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', window.saveReportTemplate);
+    });
 
   </script>
 </body>
