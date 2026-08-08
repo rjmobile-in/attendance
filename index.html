@@ -5416,7 +5416,7 @@
                 const month = d.getMonth() + 1; // Bina zero ke
                 const year = d.getFullYear().toString().slice(-2); // Sirf last 2 digits
                 
-                if (allSameMonth) return `${day}`;
+                // allSameMonth wali line hata di gayi hai taaki month humesha dikhe
                 if (allSameYear) return window.appDateFormat === 'en-US' ? `${month}/${day}` : `${day}/${month}`;
                 return window.appDateFormat === 'en-US' ? `${month}/${day}/${year}` : (window.appDateFormat === 'ja-JP' ? `${year}/${month}/${day}` : `${day}/${month}/${year}`);
             });
