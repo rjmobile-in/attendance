@@ -1950,7 +1950,9 @@
           <div style="font-weight: 600; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 12px;" id="leave-review-title">--</div>
           
           <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Detailed Description</div>
-          <div style="color: var(--text-main); font-size: calc(13px * var(--font-scale, 1)); line-height: 1.5;" id="leave-review-desc">--</div>
+          <div style="color: var(--text-main); font-size: calc(13px * var(--font-scale, 1)); line-height: 1.5; margin-bottom: 12px;" id="leave-review-desc">--</div>
+          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Current Status</div>
+          <div id="leave-review-status" style="margin-top: 4px;">--</div>
       </div>
 
       <input type="hidden" id="leave-review-id" value=""> 
@@ -3101,7 +3103,7 @@
             const safeDesc = window.safeHTML(lv.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
             const safeTitle = window.safeHTML(lv.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
-            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}')">
+            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}')">
                 <td style="color:var(--text-soft)">${submitDate}</td>
                 <td>
                   <div style="display: flex; align-items: center; gap: 10px;">
@@ -3116,15 +3118,24 @@
         }).join('');
     }
 
-    window.openLeaveModal = function(id, name, dates, title, desc, status) {
+    window.openLeaveModal = function(id, name, dates, title, desc, status, rawEndDate) {
         document.getElementById('leave-review-id').value = id;
         document.getElementById('leave-review-subtitle').innerText = "Requested by: " + name;
         document.getElementById('leave-review-dates').innerText = dates;
         document.getElementById('leave-review-title').innerText = title;
         document.getElementById('leave-review-desc').innerHTML = desc || "No detailed description.";
         
+        let statusHtml = '';
+        if (status === 'Approved') statusHtml = `<span class="badge bg-green">✅ Approved</span>`;
+        else if (status === 'Rejected') statusHtml = `<span class="badge bg-red">❌ Rejected</span>`;
+        else statusHtml = `<span class="badge bg-orange">⏳ Pending</span>`;
+        document.getElementById('leave-review-status').innerHTML = statusHtml;
+        
         const actionRow = document.getElementById('leave-review-actions');
-        if (status === 'Pending') {
+        const today = new Date();
+        const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        if (status === 'Pending' || rawEndDate >= todayISO) {
             actionRow.style.display = 'flex';
         } else {
             actionRow.style.display = 'none';
@@ -5636,9 +5647,29 @@
        }
 
        try {
+           // 1. Insert into exceptions (Schedule the leave for reports/system)
            await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'staff_id, date, exception_type' });
+           
+           // 2. NEW: Insert a record into leave_requests so staff can see it in their portal history!
+           await supabaseClient.from('leave_requests').insert([{
+               staff_id: staffId,
+               employee_name: sName,
+               start_date: dStart,
+               end_date: dEnd,
+               reason_title: rName + " (Admin Scheduled)",
+               reason_desc: "This leave was manually scheduled and approved directly by the Administrator.",
+               status: 'Approved'
+           }]);
+
            window.closeModal(document.getElementById('schedule-leave-modal'));
            fetchLogsFromDatabase(true);
+           
+           // Soft refresh leave table if it's open
+           if (typeof dbLeaves !== 'undefined') {
+               dbLeaves.unshift({ id: 'temp-'+Date.now(), staff_id: staffId, employee_name: sName, start_date: dStart, end_date: dEnd, reason_title: rName, status: 'Approved', created_at: new Date().toISOString() });
+               if (document.getElementById('leave-table-container').style.display === 'block') renderLeaveTable();
+           }
+
            showToast(`Scheduled leave for ${inserts.length} days!`, "success");
        } catch(e) { showToast("Failed to schedule leave", "error"); }
        finally { btn.innerText = "Confirm Schedule"; btn.disabled = false; }
