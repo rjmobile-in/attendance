@@ -1420,12 +1420,16 @@
                             
                             <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                                 <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Auto-Sync Interval (Sec)</label>
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Auto-Sync (Sec)</label>
                                     <input type="number" id="pref-sync-interval" class="input-field" style="margin: 0;" placeholder="0 to disable" min="0">
                                 </div>
                                 <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Undo Timeout (Sec)</label>
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Undo Timer (Sec)</label>
                                     <input type="number" id="pref-undo-timer" class="input-field" style="margin: 0;" placeholder="e.g. 7" min="3" max="30">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Grace Period (Min)</label>
+                                    <input type="number" id="pref-grace-period" class="input-field" style="margin: 0;" placeholder="e.g. 5" min="0">
                                 </div>
                             </div>
                             
@@ -2209,6 +2213,9 @@
     let missingData = [];
     let statsData = [];
     
+    // --- GLOBAL EVENT BUS ---
+    window.RJEventBus = new EventTarget();
+    
     let globalShiftStart = "10:00";
     let globalShiftEnd = "19:00";
     
@@ -2242,7 +2249,7 @@
     const minLaunchDate = new Date('2026-08-01');
 
     // INITIALIZE GLOBAL PREFS (Time Format, Font, View, Shortcuts)
-    const defaultPrefs = { compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i" };
+    const defaultPrefs = { compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i", gracePeriod: "5" };
     const uiPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
     
     window.use12HourTime = uiPrefs.use12h;
@@ -2784,6 +2791,7 @@
         const toggleFocusMode = document.getElementById('toggle-focus-mode');
         const prefSyncInterval = document.getElementById('pref-sync-interval');
         const prefUndoTimer = document.getElementById('pref-undo-timer');
+        const prefGracePeriod = document.getElementById('pref-grace-period');
         const prefModSave = document.getElementById('pref-mod-save');
         const prefModLoad = document.getElementById('pref-mod-load');
         const prefKeyCmd = document.getElementById('pref-key-cmd');
@@ -2804,6 +2812,7 @@
         if (toggleFocusMode) toggleFocusMode.checked = currentPrefs.focusMode;
         if (prefSyncInterval) prefSyncInterval.value = currentPrefs.syncInterval;
         if (prefUndoTimer) prefUndoTimer.value = currentPrefs.undoTimer;
+        if (prefGracePeriod) prefGracePeriod.value = currentPrefs.gracePeriod;
         if (prefModSave) prefModSave.value = currentPrefs.modSave;
         if (prefModLoad) prefModLoad.value = currentPrefs.modLoad;
         if (prefKeyCmd) prefKeyCmd.value = currentPrefs.keyCmd;
@@ -2832,6 +2841,7 @@
         if (prefWeekStart) prefWeekStart.addEventListener('change', e => saveAndReloadObj('weekStart', e.target.value, "Calendar week start updated! Reloading..."));
         if (prefSyncInterval) prefSyncInterval.addEventListener('change', e => saveAndReloadObj('syncInterval', e.target.value, "Auto-Sync interval updated! Reloading..."));
         if (prefUndoTimer) prefUndoTimer.addEventListener('change', e => saveAndApplyObj('undoTimer', e.target.value, "Undo timeout updated", () => {}));
+        if (prefGracePeriod) prefGracePeriod.addEventListener('change', e => saveAndReloadObj('gracePeriod', e.target.value, "Grace period updated! Reloading..."));
         
         const applyShortcutObj = (key, val) => {
             currentPrefs[key] = val; uiPrefs[key] = val;
@@ -3103,21 +3113,19 @@
         }
         
         manageWakeLock(viewId); // Keep screen alive if needed
-        if (viewId === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard(); 
-        if (viewId === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
-        if (viewId === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
-        if (viewId === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
-        if (viewId === 'view-action' && typeof renderAbsentTable === 'function') {
+        
+        if (viewId === 'view-action') {
             document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelector('#action-center-tabs .sub-tab-btn[data-action-filter="absent"]').classList.add('active');
             currentActionTab = 'absent';
-            if (typeof processStitchedData === 'function') processStitchedData();
-            renderAbsentTable();
         }
-        if (viewId === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
-        if (viewId === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
-        if ((viewId === 'view-settings-hr' || viewId === 'view-settings-org') && typeof loadSettingsData === 'function') loadSettingsData();
-        if (viewId === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
+        
+        if (viewId === 'view-settings-hr' || viewId === 'view-settings-org') {
+            if (typeof loadSettingsData === 'function') loadSettingsData();
+        } else if (viewId !== 'view-birthdays' && viewId !== 'view-personalize') {
+            // Just ping the Event Bus! It will automatically figure out what to render.
+            window.RJEventBus.dispatchEvent(new CustomEvent('DATA_UPDATED'));
+        }
       });
     });
 
@@ -4148,10 +4156,12 @@
             let shiftStartStr = staff.shift_start || roleObj?.shift_start || globalShiftStart;
             let shiftEndStr = staff.shift_end || roleObj?.shift_end || globalShiftEnd;
 
+            let graceMins = parseInt(uiPrefs.gracePeriod || "5", 10);
+
             if (firstInTime) { 
               let expectedIn = parseTimeStrToDate(shiftStartStr, firstInTime);
               diffFromTargetMs = firstInTime - expectedIn;
-              expectedIn.setMinutes(expectedIn.getMinutes() + 15);
+              expectedIn.setMinutes(expectedIn.getMinutes() + graceMins);
               if (firstInTime > expectedIn) { 
                   isLateArrival = true; 
                   if (!excLate) totalLate++; 
@@ -4160,7 +4170,7 @@
 
             if (lastOutTime) {
               let expectedOut = parseTimeStrToDate(shiftEndStr, lastOutTime);
-              expectedOut.setMinutes(expectedOut.getMinutes() - 15);
+              expectedOut.setMinutes(expectedOut.getMinutes() - graceMins);
               if (lastOutTime < expectedOut) {
                   isEarlyOut = true;
                   if (!excEarly) totalEarlyDepartures++;
@@ -4280,24 +4290,24 @@
           }
       }
 
-      const vDash = document.getElementById('view-dashboard');
-      const vLogs = document.getElementById('view-logs');
-      const vAudits = document.getElementById('view-audits');
-      const vLive = document.getElementById('view-live');
-      const vAction = document.getElementById('view-action');
-      const vMatrix = document.getElementById('view-matrix');
-      const vStats = document.getElementById('view-stats');
-      
-      if (vDash && vDash.style.display !== 'none' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
-      if (vLogs && vLogs.style.display !== 'none' && typeof renderMasterTable === 'function') renderMasterTable();
-      if (vAudits && vAudits.style.display !== 'none' && typeof renderAuditGallery === 'function') renderAuditGallery();
-      if (vLive && vLive.style.display !== 'none' && typeof renderLiveBranches === 'function') renderLiveBranches();
-      if (vAction && vAction.style.display !== 'none' && typeof renderAbsentTable === 'function') renderAbsentTable();
-      const vRoster = document.getElementById('view-roster');
-      if (vRoster && vRoster.style.display !== 'none' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
-      if (vMatrix && vMatrix.style.display !== 'none' && typeof generateMatrix === 'function') generateMatrix();
-      if (vStats && vStats.style.display !== 'none' && typeof renderStaffStats === 'function') renderStaffStats();
+      // Broadcast that new data has been processed
+      window.RJEventBus.dispatchEvent(new CustomEvent('DATA_UPDATED'));
     }
+
+    // --- EVENT BUS LISTENERS ---
+    // The UI now listens to the radio station. We never have to manually call these again.
+    window.RJEventBus.addEventListener('DATA_UPDATED', () => {
+        const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-view');
+        
+        if (activeTab === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
+        if (activeTab === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
+        if (activeTab === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
+        if (activeTab === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
+        if (activeTab === 'view-action' && typeof renderAbsentTable === 'function') renderAbsentTable();
+        if (activeTab === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
+        if (activeTab === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
+        if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
+    });
 
     let isGroupedView = true;
 
@@ -5060,9 +5070,22 @@
         }
 
         try {
-            await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
-            showToast("Audit Saved", "success");
-            processStitchedData(); // FIX: Instantly refresh tables and stats without page reload
+            const updatePayload = { uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard };
+            
+            if (!navigator.onLine) {
+                // Queue for background sync
+                const queue = await localforage.getItem('rj_offline_queue') || [];
+                queue.push({ type: 'audit_update', payload: { updateData: updatePayload, ids: [logId] } });
+                await localforage.setItem('rj_offline_queue', queue);
+                showToast("Audit Saved Offline", "primary");
+            } else {
+                // Normal online save
+                const { error } = await supabaseClient.from('attendance_logs').update(updatePayload).eq('id', logId);
+                if (error) throw error;
+                showToast("Audit Saved", "success");
+            }
+            
+            processStitchedData(); // Instantly refresh tables and stats
         } catch(e) { 
             showToast("Error saving audit", "error"); 
             if (btnElement && showOnlyPendingPhotos) btnElement.closest('.audit-card').style.display = 'flex';
@@ -5240,20 +5263,29 @@
         });
 
         try {
-            const { error } = await supabaseClient
-                .from('attendance_logs')
-                .update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard })
-                .in('id', selectedArray);
+            const updatePayload = { uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard };
+            
+            if (!navigator.onLine) {
+                // Queue for background sync
+                const queue = await localforage.getItem('rj_offline_queue') || [];
+                queue.push({ type: 'audit_update', payload: { updateData: updatePayload, ids: selectedArray } });
+                await localforage.setItem('rj_offline_queue', queue);
+            } else {
+                // Normal online save
+                const { error } = await supabaseClient.from('attendance_logs')
+                    .update(updatePayload)
+                    .in('id', selectedArray);
 
-            if (error) {
-                // Rollback local state on API failure
-                dbLogs = dbLogsSnapshot;
-                throw error;
+                if (error) {
+                    dbLogs = dbLogsSnapshot; // Rollback local state
+                    throw error;
+                }
             }
 
             // Show success toast with 6-second duration and an embedded Undo button
             const undoBtnHtml = `<button onclick="window.undoBulkSave(event)" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 4px; margin-left: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Undo</button>`;
-            showToast(`Approved ${selectedArray.length} photos! ${undoBtnHtml}`, "success", 6000);
+            const msg = !navigator.onLine ? `Approved ${selectedArray.length} photos Offline! ${undoBtnHtml}` : `Approved ${selectedArray.length} photos! ${undoBtnHtml}`;
+            showToast(msg, !navigator.onLine ? "primary" : "success", 6000);
             
             selectedAuditLogIds.clear();
             
@@ -7867,14 +7899,40 @@
     });
 
     // =========================================================================
-    //  NETWORK CONNECTIVITY WATCHER
+    //  NETWORK CONNECTIVITY & OFFLINE SYNC WATCHER
     // =========================================================================
+    window.processOfflineQueue = async function() {
+        if (!navigator.onLine) return;
+        const queue = await localforage.getItem('rj_offline_queue') || [];
+        if (queue.length === 0) return;
+
+        showToast(`Syncing ${queue.length} offline actions...`, "primary");
+        
+        let remainingQueue = [];
+        for (let task of queue) {
+            try {
+                if (task.type === 'audit_update') {
+                    await supabaseClient.from('attendance_logs')
+                        .update(task.payload.updateData)
+                        .in('id', task.payload.ids);
+                }
+            } catch (e) {
+                remainingQueue.push(task); // Keep in queue if sync fails
+            }
+        }
+        
+        await localforage.setItem('rj_offline_queue', remainingQueue);
+        if (remainingQueue.length === 0) {
+            showToast("All offline changes synced!", "success");
+        } else {
+            showToast("Some offline changes failed to sync.", "warning");
+        }
+    };
+
     window.addEventListener('offline', () => {
-        showToast("You are offline! Changes will not be saved.", "error", 100000); // Stays on screen
-        document.documentElement.style.filter = 'grayscale(0.6)'; // Visual cue that the app is frozen
-        // Disable dangerous bulk buttons
-        const bulkBtn = document.getElementById('btn-bulk-save');
-        if(bulkBtn) bulkBtn.disabled = true;
+        showToast("You are offline! Approvals will save to your device and sync later.", "warning", 8000); 
+        document.documentElement.style.filter = 'grayscale(0.2)'; // Softer visual cue
+        // Notice we no longer disable the bulk button!
     });
 
     document.querySelectorAll('.table-responsive').forEach(container => {
@@ -7887,15 +7945,13 @@
     });
 
     window.addEventListener('online', () => {
-        // Clear all toasts to remove the offline warning
         document.getElementById('toast-container').innerHTML = ''; 
         document.documentElement.style.filter = 'none';
-        
-        const bulkBtn = document.getElementById('btn-bulk-save');
-        if(bulkBtn) bulkBtn.disabled = false;
-        
         showToast("Back online! Connection restored.", "success");
-        // Auto-refresh data to ensure we didn't miss anything while offline
+        
+        // Process anything the user clicked while offline
+        window.processOfflineQueue();
+        
         if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(true);
     });
 
