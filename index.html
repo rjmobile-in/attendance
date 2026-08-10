@@ -227,7 +227,7 @@
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .header-title { font-weight: 700; font-size: calc(20px * var(--font-scale, 1)); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;}
 
-    .content-wrapper { padding: 32px 40px; flex: 1; display: flex; flex-direction: column; }
+    .content-wrapper { padding: 32px 40px; flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
 
     /* =========================================================
        6. STRUCTURED FILTER BAR & WIDGETS
@@ -384,7 +384,9 @@
 
     .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
-    .chart-card h3 { font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+    .chart-card h3 { font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
+    .chart-expanded { position: fixed !important; top: 5% !important; left: 5% !important; width: 90% !important; height: 90% !important; z-index: 10000 !important; background: var(--card-bg) !important; display: flex !important; flex-direction: column !important; }
+    .chart-expanded .chart-container { height: 100% !important; flex: 1 !important; min-height: 0; }
     .chart-container { position: relative; height: 300px; width: 100%; }
 
     /* =========================================================
@@ -599,6 +601,10 @@
 
   /* Profile Drawer Styles */
   .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 25000; opacity: 0; visibility: hidden; transition: 0.3s ease; }
+  
+  /* Custom Tooltip */
+  .custom-tooltip { position: fixed; background: rgba(24, 24, 27, 0.95); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; pointer-events: none; z-index: 99999; opacity: 0; transition: opacity 0.2s; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
+  .custom-tooltip.show { opacity: 1; }
   .drawer-overlay.show { opacity: 1; visibility: visible; }
   .profile-drawer { position: fixed; top: 0; right: -400px; width: 400px; max-width: 100vw; height: 100vh; background: var(--bg-surface); border-left: 1px solid var(--card-border); z-index: 25001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.3); }
   .profile-drawer.open { right: 0; }
@@ -657,28 +663,28 @@
         <div class="tab-controls">
           <!-- Dashboards -->
           <div class="sidebar-category">Dashboards</div>
-          <button class="tab-btn active" data-view="view-dashboard" title="Overview">
+          <button class="tab-btn active" data-view="view-dashboard">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg></span> 
             <span class="tab-btn-text">Overview</span>
           </button>
           
-          <button class="tab-btn" data-view="view-live" title="Live Tracker">
+          <button class="tab-btn" data-view="view-live">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> 
             <span class="tab-btn-text">Live Tracker</span>
           </button>
-          <button class="tab-btn" data-view="view-birthdays" title="Staff Birthdays">
+          <button class="tab-btn" data-view="view-birthdays">
             <span class="tab-icon">🎂</span> 
             <span class="tab-btn-text">Staff Birthdays</span>
           </button>
 
           <!-- Records -->
           <div class="sidebar-category">Records</div>
-          <button class="tab-btn" data-view="view-logs" title="Attendance Logs">
+          <button class="tab-btn" data-view="view-logs">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
             <span class="tab-btn-text">Attendance Logs</span>
           </button>
           
-          <button class="tab-btn" data-view="view-audits" style="position: relative;" title="Photo Audits">
+          <button class="tab-btn" data-view="view-audits" style="position: relative;">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> 
             <span class="tab-btn-text">Photo Audits</span>
             <span id="pending-audits-badge" class="badge bg-orange" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
@@ -686,12 +692,12 @@
 
           <!-- Analytics -->
           <div class="sidebar-category">Analytics</div>
-          <button class="tab-btn" data-view="view-stats" title="Staff Stats">
+          <button class="tab-btn" data-view="view-stats">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
             <span class="tab-btn-text">Staff Stats</span>
           </button>
           
-          <button class="tab-btn" data-view="view-matrix" title="Attendance Matrix">
+          <button class="tab-btn" data-view="view-matrix">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> 
             <span class="tab-btn-text">Data Matrix</span>
           </button>
@@ -699,12 +705,12 @@
           <!-- Management -->
           <div class="sidebar-category">Management</div>
 
-          <button class="tab-btn" data-view="view-roster" title="Duty Roster">
+          <button class="tab-btn" data-view="view-roster">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span> 
             <span class="tab-btn-text">Duty Roster</span>
           </button>
 
-          <button class="tab-btn" data-view="view-action" style="position: relative;" title="Action Center">
+          <button class="tab-btn" data-view="view-action" style="position: relative;">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
             <span class="tab-btn-text">Action Center</span>
             <div id="action-badges" style="display:none; position: absolute; right: 12px; gap: 4px; align-items: center;">
@@ -716,12 +722,12 @@
 
           <!-- Settings -->
           <div class="sidebar-category">Settings</div>
-          <button class="tab-btn" data-view="view-settings-hr" title="HR Settings">
+          <button class="tab-btn" data-view="view-settings-hr">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
             <span class="tab-btn-text">HR Settings</span>
           </button>
           
-          <button class="tab-btn" data-view="view-settings-org" title="Org Settings">
+          <button class="tab-btn" data-view="view-settings-org">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> 
             <span class="tab-btn-text">Org Settings</span>
           </button>
@@ -783,7 +789,6 @@
                             </div>
                         </div>
                         <button id="clear-all-filters-btn" class="btn-secondary" style="color: var(--danger); border-color: var(--danger-alpha); height: fit-content; align-self: flex-end; margin-left: auto;">Reset All Filters</button>
-                        </div>
                     </div>
                 </div>
                 
@@ -921,19 +926,19 @@
                     <h3 style="margin: 24px 0 16px 0; font-size: calc(18px * var(--font-scale, 1)); font-family: 'Plus Jakarta Sans', sans-serif;">Deep Analysis</h3>
                     <div class="chart-grid">
                         <div class="chart-card">
-                            <h3>Attendance Trend</h3>
+                            <h3><span></span>Attendance Trend</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
                             <div class="chart-container"><canvas id="trendChart"></canvas></div>
                         </div>
                         <div class="chart-card">
-                            <h3>Arrival Analysis</h3>
+                            <h3><span>Arrival Analysis</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
                             <div class="chart-container"><canvas id="arrivalChart"></canvas></div>
                         </div>
                         <div class="chart-card">
-                            <h3>Top Latecomers (Unexcused)</h3>
+                            <h3><span>Top Latecomers (Unexcused)</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
                             <div class="chart-container"><canvas id="lateChart"></canvas></div>
                         </div>
                         <div class="chart-card">
-                            <h3>Role Distribution (Present)</h3>
+                            <h3><span>Role Distribution (Present)</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
                             <div class="chart-container"><canvas id="roleChart"></canvas></div>
                         </div>
                     </div>
@@ -951,10 +956,28 @@
                 <!-- VIEW 3: ATTENDANCE LOGS -->
                 <div id="view-logs" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <div class="sub-tabs" id="logs-sub-tabs" style="margin-bottom: 0;">
-                        <button class="sub-tab-btn active" data-filter="all">All Logs</button>
-                        <button class="sub-tab-btn" data-filter="late">Lates & Early Outs</button>
-                        <button class="sub-tab-btn" data-filter="missing-out">⚠️ Missing Clock-Outs</button>
+                        <div id="logs-sub-tabs" style="display: flex; gap: 12px; align-items: center; margin-bottom: 0;">
+                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                                <div><div style="color:var(--warning); font-size:12px; font-weight: 700;">Lates</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="filter-toggle-late" onchange="renderMasterTable()">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                                <div><div style="color:#f97316; font-size:12px; font-weight: 700;">Early Outs</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="filter-toggle-early" onchange="renderMasterTable()">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                                <div><div style="color:var(--danger); font-size:12px; font-weight: 700;">Missing Outs</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="filter-toggle-missing-out" onchange="renderMasterTable()">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
                         </div>
                         
                         <div style="display: flex; gap: 12px; align-items: center;">
@@ -1134,6 +1157,7 @@
                         <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
                         <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
                         <button class="sub-tab-btn" data-action-filter="leaves">Leave Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
+                        <button class="sub-tab-btn" data-action-filter="active-leaves">Active & Scheduled Leaves</button>
                     </div>
                     
                     <div class="table-card" id="action-table-container">
@@ -1141,8 +1165,8 @@
                             <table id="absent-table">
                             <thead>
                                 <tr>
-                                <th>Date</th>
-                                <th>Staff Member</th>
+                                <th onclick="window.sortActionCenter('date')" style="cursor: pointer;" title="Click to sort">Date ⇅</th>
+                                <th onclick="window.sortActionCenter('name')" style="cursor: pointer;" title="Click to sort">Staff Member ⇅</th>
                                 <th>Status & Details</th>
                                 <th>Action</th>
                                 </tr>
@@ -1160,8 +1184,8 @@
                             <table id="leave-table">
                             <thead>
                                 <tr>
-                                <th>Submitted On</th>
-                                <th>Staff Member</th>
+                                <th onclick="window.sortLeaves('date')" style="cursor: pointer;" title="Click to sort">Submitted On ⇅</th>
+                                <th onclick="window.sortLeaves('name')" style="cursor: pointer;" title="Click to sort">Staff Member ⇅</th>
                                 <th>Leave Dates</th>
                                 <th>Reason / Title</th>
                                 <th>Status</th>
@@ -1183,8 +1207,16 @@
                         
 
                         <div class="settings-panel" style="grid-column: 1 / -1;">
-                            <h3>Staff Directory & Login Credentials</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h3>Staff Directory & Login Credentials</h3>
+                                    <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; margin: 0;"><input type="checkbox" id="toggle-draft-staff" checked> Auto-Save Draft</label>
+                                    <button id="btn-clear-staff-draft" class="btn-secondary" style="font-size: 11px; padding: 6px 10px; color: var(--warning); border-color: var(--warning-alpha);">Clear Draft</button>
+                                </div>
+                            </div>
                             
                             <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
                                 <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
@@ -1208,7 +1240,7 @@
 
                             <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
                                 <table>
-                                <thead><tr><th>Staff Details</th><th>Custom Shift Time</th><th style="text-align: right;">Action</th></tr></thead>
+                                <thead><tr><th onclick="window.sortSettings('staff', 'name')" style="cursor:pointer;" title="Click to sort">Staff Details ⇅</th><th>Custom Shift Time</th><th style="text-align: right;">Action</th></tr></thead>
                                 <tbody id="staff-settings-list"></tbody>
                                 </table>
                             </div>
@@ -1243,6 +1275,7 @@
                                 <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
                             </div>
                             <table style="margin-top:24px; width: 100%;">
+                                <thead><tr><th onclick="window.sortSettings('reason', 'name')" style="cursor:pointer;" title="Click to sort">Reason Name ⇅</th><th style="text-align: right;">Action</th></tr></thead>
                                 <tbody id="reason-settings-list"></tbody>
                             </table>
                         </div>
@@ -1255,12 +1288,10 @@
                     
                     <div class="settings-grid">
                         <div class="settings-panel" style="grid-column: 1 / -1;">
-                            <h3>Supabase Auth Configuration</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Enter your Supabase <strong>service_role</strong> secret key to enable Staff Auth creation & password updates directly from this panel.</p>
-                            <div style="display:flex; flex-direction: column; gap:12px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
-                                <input type="password" id="service-role-key-input" class="input-field" placeholder="eyJh..." style="margin:0;">
-                                <button id="save-service-key-btn" class="btn-primary" style="justify-content:center;">Save Secret Key to Browser</button>
-                            </div>
+                            <h3>Supabase Auth Configuration (Secure)</h3>
+                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--success); margin-bottom: 16px;">
+                                🔒 Authentication is now handled securely via Supabase Edge Functions. No sensitive service keys are stored in the browser.
+                            </p>
                         </div>
 
                         <div class="settings-panel" style="grid-column: 1 / -1;">
@@ -1279,7 +1310,7 @@
 
                             <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
                                 <table style="width: 100%;">
-                                <thead><tr><th>Branch Details</th><th>Geofence Area</th><th style="text-align: right;">Action</th></tr></thead>
+                                <thead><tr><th onclick="window.sortSettings('branch', 'name')" style="cursor:pointer;" title="Click to sort">Branch Details ⇅</th><th>Geofence Area</th><th style="text-align: right;">Action</th></tr></thead>
                                 <tbody id="branch-settings-list"></tbody>
                                 </table>
                             </div>
@@ -1311,7 +1342,7 @@
                         <div class="settings-panel">
                             <h3>Quick Theme Presets</h3>
                             <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Instantly change the look and feel of your app.</p>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="theme-presets-container">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" class="theme-presets-container">
                                 <button class="btn-secondary preset-btn" data-preset="rjmobile" style="font-size: 12px; padding: 6px 12px; border-color: #f37021; color: #f37021;">📱 RJ Mobile</button>
                                 <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
                                 <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
@@ -1405,7 +1436,7 @@
                             
                             <div style="margin-bottom: 20px;">
                                 <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
-                                <select id="default-view-select" class="input-field" style="margin: 0;">
+                                <select class="default-view-select input-field" style="margin: 0;">
                                     <option value="dashboard">Dashboard Overview</option>
                                     <option value="live">Live Tracker</option>
                                     <option value="birthdays">Staff Birthdays</option>
@@ -1519,7 +1550,7 @@
         
         <div style="margin-bottom: 24px;">
             <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Quick Presets</label>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="theme-presets-container">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;" class="theme-presets-container">
                 <button class="btn-secondary preset-btn" data-preset="rjmobile" style="font-size: 12px; padding: 6px 12px; border-color: #f37021; color: #f37021;">📱 RJ Mobile</button>
                 <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
                 <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
@@ -1603,7 +1634,7 @@
 
       <div style="margin-bottom: 16px;">
           <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
-          <select id="default-view-select" class="input-field" style="margin: 0;">
+          <select class="default-view-select input-field" style="margin: 0;">
               <option value="dashboard">Dashboard Overview</option>
               <option value="live">Live Tracker</option>
               <option value="logs">Attendance Logs</option>
@@ -1632,8 +1663,16 @@
   <!-- MANUAL ENTRY MODAL -->
   <div id="manual-entry-modal" class="modal-overlay">
     <div class="modal-card">
-      <h2 style="margin-bottom: 8px;">Add Manual Log</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Create a direct entry if a staff member forgot to punch.</p>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+              <h2 style="margin-bottom: 8px;">Add Manual Log</h2>
+              <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Create a direct entry if a staff member forgot to punch.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+              <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 11px; margin: 0;"><input type="checkbox" id="toggle-draft-manual" checked> Auto-Save</label>
+              <button id="btn-clear-manual-draft" class="btn-secondary" style="font-size: 11px; padding: 4px 8px; color: var(--warning); border-color: var(--warning-alpha);">Clear</button>
+          </div>
+      </div>
       
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Staff</label>
       <select id="manual-staff" class="input-field" style="margin-top: 8px;"></select>
@@ -1862,22 +1901,20 @@
   </div>
 
   <div id="edit-time-modal" class="modal-overlay">
-    <div class="modal-card">
-      <h2 style="margin-bottom: 8px;">Edit Shift Timeline</h2>
+    <div class="modal-card" style="max-width: 600px;">
+      <h2 style="margin-bottom: 8px;">Master Edit Timeline</h2>
       <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="edit-time-subtitle">Updating record</p>
       
-      <div style="display: flex; flex-direction: column; gap: 16px;">
-        <div>
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Clock In Time</label>
-          <input type="time" id="edit-time-in" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
-        </div>
-        <div>
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Clock Out Time</label>
-          <input type="time" id="edit-time-out" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
-        </div>
-      </div>
+      <input type="hidden" id="edit-master-staff-id">
+      <input type="hidden" id="edit-master-date">
+      <input type="hidden" id="edit-master-staff-name">
 
-      <div style="display: flex; gap: 12px; margin-top: 24px;">
+      <div id="master-punch-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; max-height: 40vh; overflow-y: auto;">
+      </div>
+      
+      <button class="btn-secondary" id="btn-add-punch-row" style="margin-bottom: 24px; justify-content: center; width: 100%;">➕ Add New Punch</button>
+
+      <div style="display: flex; gap: 12px; margin-top: auto;">
         <button id="btn-cancel-edit-time" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button id="btn-save-edit-time" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Timeline</button>
       </div>
@@ -2105,6 +2142,7 @@
   </div>
 
   <!-- STAFF PROFILE DRAWER -->
+  <div id="custom-tooltip" class="custom-tooltip"></div>
   <div id="profile-drawer-overlay" class="drawer-overlay" onclick="window.closeStaffProfile()"></div>
   <div id="profile-drawer" class="profile-drawer">
       <div class="drawer-header">
@@ -2154,9 +2192,7 @@
       }
     });
     
-    function getServiceKey() {
-        return localStorage.getItem('rj_supabase_service_key');
-    }
+    
 
     let dbStaff = []; 
     let dbBranches = []; 
@@ -2284,6 +2320,16 @@
                 if (['logs', 'stats', 'action', 'live'].includes(viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
+            
+            const filterSec = document.getElementById('master-filter-section');
+            const filterToggleBtn = document.getElementById('toggle-filter-btn');
+            if (['settings-hr', 'settings-org', 'birthdays'].includes(viewParam)) {
+                if (filterSec) filterSec.style.display = 'none';
+                if (filterToggleBtn) filterToggleBtn.style.display = 'none';
+            } else {
+                if (filterSec) filterSec.style.display = 'flex';
+                if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
+            }
         }
     })();
     if (startDate < minLaunchDate) startDate = minLaunchDate;
@@ -2327,7 +2373,11 @@
     // Toggle Filters Drawer
     document.getElementById('toggle-filter-btn').addEventListener('click', () => {
         const drawer = document.getElementById('master-filter-section');
-        drawer.classList.toggle('collapsed');
+        if (drawer.style.display === 'none') {
+            drawer.style.display = 'flex';
+        } else {
+            drawer.style.display = 'none';
+        }
     });
 
     const toLocalISO = (d) => {
@@ -2587,6 +2637,7 @@
         
         window.hexToRgba = window.hexToRgba || function(hex, alpha) {
             if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex)) return hex;
+            if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
             let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
@@ -2728,7 +2779,7 @@
         const toggleDensity = document.getElementById('toggle-density');
         const toggleHighContrast = document.getElementById('toggle-high-contrast');
         const toggleTime = document.getElementById('toggle-time-format');
-        const defaultViewSelect = document.getElementById('default-view-select');
+        const defaultViewSelects = document.querySelectorAll('.default-view-select');
         const toggleSidebarRight = document.getElementById('toggle-sidebar-right');
         const toggleStickyHeaders = document.getElementById('toggle-sticky-headers');
         const prefPageSize = document.getElementById('pref-page-size');
@@ -2748,7 +2799,7 @@
         if (currentPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
         if (currentPrefs.highContrast) { document.documentElement.classList.add('high-contrast'); if (toggleHighContrast) toggleHighContrast.checked = true; }
         if (toggleTime) toggleTime.checked = currentPrefs.use12h;
-        if (defaultViewSelect) defaultViewSelect.value = currentPrefs.startView;
+        defaultViewSelects.forEach(sel => sel.value = currentPrefs.startView);
         if (toggleSidebarRight) toggleSidebarRight.checked = currentPrefs.sidebarRight;
         if (toggleStickyHeaders) toggleStickyHeaders.checked = currentPrefs.stickyHeaders;
         if (prefPageSize) prefPageSize.value = currentPrefs.pageSize;
@@ -2799,17 +2850,21 @@
         if (prefKeyTshirt) prefKeyTshirt.addEventListener('change', e => applyShortcutObj('keyTshirt', e.target.value.toLowerCase()));
         if (prefKeyId) prefKeyId.addEventListener('change', e => applyShortcutObj('keyId', e.target.value.toLowerCase()));
         
-        document.querySelectorAll('.font-size-btn').forEach(b => {
-            if(b.getAttribute('data-scale') === (currentPrefs.fontScale || '1')) b.classList.add('active');
-            else b.classList.remove('active');
-        });
+        // --- 1. Font Size Scaler (Synced across Panel & Modal) ---
+        const fontSizeBtns = document.querySelectorAll('.font-size-btn');
+        const syncFontBtns = (activeScale) => {
+            fontSizeBtns.forEach(b => {
+                if (b.getAttribute('data-scale') === activeScale) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+        };
+        
+        syncFontBtns(currentPrefs.fontScale || '1'); // Initialize
 
-        // --- 1. Font Size Scaler ---
-        document.querySelectorAll('.font-size-btn').forEach(btn => {
+        fontSizeBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
                 const scale = e.target.getAttribute('data-scale');
+                syncFontBtns(scale); // Visually update all font-size buttons instantly
                 document.documentElement.style.setProperty('--font-scale', scale);
                 currentPrefs.fontScale = scale;
                 localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
@@ -2827,14 +2882,16 @@
             });
         }
 
-        // --- 3. Default View Dropdown ---
-        if (defaultViewSelect) {
-            defaultViewSelect.addEventListener('change', (e) => {
-                currentPrefs.startView = e.target.value;
+        // --- 3. Default View Dropdown (Synced) ---
+        defaultViewSelects.forEach(selectEl => {
+            selectEl.addEventListener('change', (e) => {
+                const newVal = e.target.value;
+                defaultViewSelects.forEach(sel => sel.value = newVal); // Sync visually
+                currentPrefs.startView = newVal;
                 localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
                 showToast("Default Startup Tab Saved", "success");
             });
-        }
+        });
         
         // --- 4. Compact Density Toggle ---
         if (toggleHighContrast) {
@@ -3040,6 +3097,16 @@
             }
         }
         
+        const filterSec = document.getElementById('master-filter-section');
+        const filterToggleBtn = document.getElementById('toggle-filter-btn');
+        if (['view-settings-hr', 'view-settings-org', 'view-birthdays'].includes(viewId)) {
+            if (filterSec) filterSec.style.display = 'none';
+            if (filterToggleBtn) filterToggleBtn.style.display = 'none';
+        } else {
+            if (filterSec) filterSec.style.display = 'flex';
+            if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
+        }
+        
         manageWakeLock(viewId); // Keep screen alive if needed
         if (viewId === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard(); 
         if (viewId === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
@@ -3049,6 +3116,7 @@
             document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelector('#action-center-tabs .sub-tab-btn[data-action-filter="absent"]').classList.add('active');
             currentActionTab = 'absent';
+            if (typeof processStitchedData === 'function') processStitchedData();
             renderAbsentTable();
         }
         if (viewId === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
@@ -3076,6 +3144,23 @@
           }
       });
     });
+
+    let leavesSortCol = 'date';
+    let leavesSortAsc = false;
+    window.sortLeaves = function(column) {
+        if (leavesSortCol === column) leavesSortAsc = !leavesSortAsc;
+        else { leavesSortCol = column; leavesSortAsc = true; }
+        
+        dbLeaves.sort((a, b) => {
+            let valA, valB;
+            if (column === 'name') { valA = a.employee_name.toLowerCase(); valB = b.employee_name.toLowerCase(); }
+            else { valA = new Date(a.created_at).getTime(); valB = new Date(b.created_at).getTime(); }
+            if (valA < valB) return leavesSortAsc ? -1 : 1;
+            if (valA > valB) return leavesSortAsc ? 1 : -1;
+            return 0;
+        });
+        renderLeaveTable();
+    };
 
     function renderLeaveTable() {
         const tbody = document.getElementById('leave-tbody');
@@ -3177,14 +3262,16 @@
             window.closeModal(document.getElementById('leave-review-modal'));
             renderLeaveTable();
             
-            // AUTOMATION: If Approved, insert into attendance_exceptions automatically!
-            if (newStatus === 'Approved' && leaveIdx !== -1) {
+            // AUTOMATION: Sync attendance_exceptions automatically!
+            if (leaveIdx !== -1) {
                 const lv = dbLeaves[leaveIdx];
                 let curr = new Date(lv.start_date);
                 let end = new Date(lv.end_date);
+                let datesArray = [];
                 let inserts = [];
                 
                 while(curr <= end) {
+                   datesArray.push(toLocalISO(curr));
                    inserts.push({ 
                        staff_id: lv.staff_id, 
                        employee_name: lv.employee_name,
@@ -3195,8 +3282,12 @@
                    });
                    curr.setDate(curr.getDate() + 1);
                 }
-                if (inserts.length > 0) {
+                
+                if (newStatus === 'Approved' && inserts.length > 0) {
                     await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'staff_id, date, exception_type' });
+                    fetchLogsFromDatabase(true); // Soft sync to update Missing Lists / Dashboards
+                } else if (newStatus === 'Rejected' && datesArray.length > 0) {
+                    await supabaseClient.from('attendance_exceptions').delete().eq('staff_id', lv.staff_id).in('date', datesArray).eq('exception_type', 'Absent');
                     fetchLogsFromDatabase(true); // Soft sync to update Missing Lists / Dashboards
                 }
             }
@@ -3223,15 +3314,7 @@
         });
     }
 
-    // Master Logs sub-tabs
-    document.querySelectorAll('#view-logs .sub-tab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('#view-logs .sub-tab-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        activeSubTab = e.target.getAttribute('data-filter');
-        if (typeof renderMasterTable === 'function') renderMasterTable();
-      });
-    });
+    // Master Logs toggle switches are handled inline via onchange="renderMasterTable()"
 
     function toggleDropdown(targetId) {
         const boxes = ['export-menu', 'staff-dropdown-box', 'branch-dropdown-box', 'role-dropdown-box'];
@@ -3655,131 +3738,71 @@
       } catch (err) {}
     }
 
-    function renderRoleFilterCheckboxes() {
-      const container = document.getElementById('role-checkboxes');
+    function createFilterDropdown({ containerId, dataArray, selectedSet, labelKey, checkboxClass, btnTextId, allText, selectAllBtnId, deselectAllBtnId, searchInputId }) {
+      const container = document.getElementById(containerId);
       if(!container) return;
-      container.innerHTML = dbRoles.map(r => `<label class="check-wrap"><input type="checkbox" class="role-cb" value="${r.id}" ${selectedRoleIds.has(r.id) ? "checked" : ""}> <span>${r.role_name}</span></label>`).join('');
+
+      const updateBtnText = () => {
+        const btn = document.getElementById(btnTextId);
+        if(!btn) return;
+        btn.innerText = (selectedSet.size === dataArray.length && dataArray.length > 0) ? allText : `${selectedSet.size} Selected`;
+      };
+
+      container.innerHTML = dataArray.map(item => `<label class="check-wrap"><input type="checkbox" class="${checkboxClass}" value="${item.id}" ${selectedSet.has(item.id) ? "checked" : ""}> <span>${item[labelKey]}</span></label>`).join('');
       
-      document.querySelectorAll('.role-cb').forEach(cb => {
+      document.querySelectorAll(`.${checkboxClass}`).forEach(cb => {
         cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedRoleIds.add(e.target.value); else selectedRoleIds.delete(e.target.value);
-          updateRoleButtonText(); processStitchedData(); 
+          if(e.target.checked) selectedSet.add(e.target.value); else selectedSet.delete(e.target.value);
+          updateBtnText(); processStitchedData(); 
         });
       });
       
-      document.getElementById('btn-select-all-roles')?.addEventListener('click', () => {
-        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedRoleIds.add(cb.value); } }); 
-        updateRoleButtonText(); processStitchedData(); 
-      });
-      document.getElementById('btn-deselect-all-roles')?.addEventListener('click', () => {
-        document.querySelectorAll('.role-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedRoleIds.delete(cb.value); } }); 
-        updateRoleButtonText(); processStitchedData(); 
-      });
-      updateRoleButtonText();
-    }
-    
-    function updateRoleButtonText() {
-      const btn = document.getElementById('role-btn-text');
-      if(!btn) return;
-      if(selectedRoleIds.size === dbRoles.length && dbRoles.length > 0) btn.innerText = "All Roles";
-      else btn.innerText = `${selectedRoleIds.size} Selected`;
-    }
-
-    let roleSearchTimeout;
-    document.getElementById('role-search')?.addEventListener('input', (e) => {
-      clearTimeout(roleSearchTimeout);
-      roleSearchTimeout = setTimeout(() => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.role-cb').forEach(cb => { 
-          const nameText = cb.nextElementSibling.innerText.toLowerCase();
-          cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
-        });
-      }, 200);
-    });
-
-    function renderStaffFilterCheckboxes() {
-      const container = document.getElementById('staff-checkboxes');
-      if(!container) return;
-      container.innerHTML = dbStaff.map(s => `<label class="check-wrap"><input type="checkbox" class="staff-cb" value="${s.id}" ${selectedStaffIds.has(s.id) ? "checked" : ""}> <span>${s.name}</span></label>`).join('');
+      const btnSelectAll = document.getElementById(selectAllBtnId);
+      const btnDeselectAll = document.getElementById(deselectAllBtnId);
       
-      document.querySelectorAll('.staff-cb').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedStaffIds.add(e.target.value); else selectedStaffIds.delete(e.target.value);
-          updateStaffButtonText(); processStitchedData(); 
+      if (btnSelectAll && !btnSelectAll.dataset.listenerAttached) {
+        btnSelectAll.addEventListener('click', () => {
+          document.querySelectorAll(`.${checkboxClass}`).forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedSet.add(cb.value); } }); 
+          updateBtnText(); processStitchedData(); 
         });
-      });
+        btnSelectAll.dataset.listenerAttached = 'true';
+      }
       
-      document.getElementById('btn-select-all')?.addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedStaffIds.add(cb.value); } }); 
-        updateStaffButtonText(); processStitchedData(); 
-      });
-      document.getElementById('btn-deselect-all')?.addEventListener('click', () => {
-        document.querySelectorAll('.staff-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedStaffIds.delete(cb.value); } }); 
-        updateStaffButtonText(); processStitchedData(); 
-      });
-      updateStaffButtonText();
+      if (btnDeselectAll && !btnDeselectAll.dataset.listenerAttached) {
+        btnDeselectAll.addEventListener('click', () => {
+          document.querySelectorAll(`.${checkboxClass}`).forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedSet.delete(cb.value); } }); 
+          updateBtnText(); processStitchedData(); 
+        });
+        btnDeselectAll.dataset.listenerAttached = 'true';
+      }
+
+      updateBtnText();
+
+      const searchInput = document.getElementById(searchInputId);
+      if (searchInput && !searchInput.dataset.listenerAttached) {
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll(`.${checkboxClass}`).forEach(cb => { 
+              const nameText = cb.nextElementSibling.innerText.toLowerCase();
+              cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
+            });
+          }, 200);
+        });
+        searchInput.dataset.listenerAttached = 'true';
+      }
     }
 
-    function updateStaffButtonText() {
-      const btn = document.getElementById('staff-btn-text');
-      if(!btn) return;
-      if(selectedStaffIds.size === dbStaff.length && dbStaff.length > 0) btn.innerText = "All Staff Selected";
-      else btn.innerText = `${selectedStaffIds.size} Selected`;
-    }
-    
-    let staffSearchTimeout;
-    document.getElementById('staff-search')?.addEventListener('input', (e) => {
-      clearTimeout(staffSearchTimeout);
-      staffSearchTimeout = setTimeout(() => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.staff-cb').forEach(cb => { 
-          const nameText = cb.nextElementSibling.innerText.toLowerCase();
-          cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
-        });
-      }, 200);
-    });
+    // Expose updaters to the global window object so other parts of the app (like 'jumpToStaffStats') can still call them
+    window.updateRoleButtonText = () => { const btn = document.getElementById('role-btn-text'); if(btn) btn.innerText = (selectedRoleIds.size === dbRoles.length && dbRoles.length > 0) ? "All Roles" : `${selectedRoleIds.size} Selected`; };
+    window.updateStaffButtonText = () => { const btn = document.getElementById('staff-btn-text'); if(btn) btn.innerText = (selectedStaffIds.size === dbStaff.length && dbStaff.length > 0) ? "All Staff Selected" : `${selectedStaffIds.size} Selected`; };
+    window.updateBranchButtonText = () => { const btn = document.getElementById('branch-btn-text'); if(btn) btn.innerText = (selectedBranchIds.size === dbBranches.length && dbBranches.length > 0) ? "All Branches Selected" : `${selectedBranchIds.size} Selected`; };
 
-    function renderBranchFilterCheckboxes() {
-      const container = document.getElementById('branch-checkboxes');
-      if(!container) return;
-      container.innerHTML = dbBranches.map(b => `<label class="check-wrap"><input type="checkbox" class="branch-cb" value="${b.id}" ${selectedBranchIds.has(b.id) ? "checked" : ""}> <span>${b.branch_name}</span></label>`).join('');
-      
-      document.querySelectorAll('.branch-cb').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          if(e.target.checked) selectedBranchIds.add(e.target.value); else selectedBranchIds.delete(e.target.value);
-          updateBranchButtonText(); processStitchedData(); 
-        });
-      });
-      
-      document.getElementById('btn-select-all-branches')?.addEventListener('click', () => {
-        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = true; selectedBranchIds.add(cb.value); } }); 
-        updateBranchButtonText(); processStitchedData(); 
-      });
-      document.getElementById('btn-deselect-all-branches')?.addEventListener('click', () => {
-        document.querySelectorAll('.branch-cb').forEach(cb => { if(cb.parentElement.style.display !== 'none') { cb.checked = false; selectedBranchIds.delete(cb.value); } }); 
-        updateBranchButtonText(); processStitchedData(); 
-      });
-      updateBranchButtonText();
-    }
-
-    function updateBranchButtonText() {
-      const btn = document.getElementById('branch-btn-text');
-      if(!btn) return;
-      if(selectedBranchIds.size === dbBranches.length && dbBranches.length > 0) btn.innerText = "All Branches Selected";
-      else btn.innerText = `${selectedBranchIds.size} Selected`;
-    }
-    
-    let branchSearchTimeout;
-    document.getElementById('branch-search')?.addEventListener('input', (e) => {
-      clearTimeout(branchSearchTimeout);
-      branchSearchTimeout = setTimeout(() => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.branch-cb').forEach(cb => { 
-          const nameText = cb.nextElementSibling.innerText.toLowerCase();
-          cb.parentElement.style.display = nameText.includes(term) ? 'flex' : 'none'; 
-        });
-      }, 200);
-    });
+    function renderRoleFilterCheckboxes() { createFilterDropdown({ containerId: 'role-checkboxes', dataArray: dbRoles, selectedSet: selectedRoleIds, labelKey: 'role_name', checkboxClass: 'role-cb', btnTextId: 'role-btn-text', allText: 'All Roles', selectAllBtnId: 'btn-select-all-roles', deselectAllBtnId: 'btn-deselect-all-roles', searchInputId: 'role-search' }); }
+    function renderStaffFilterCheckboxes() { createFilterDropdown({ containerId: 'staff-checkboxes', dataArray: dbStaff, selectedSet: selectedStaffIds, labelKey: 'name', checkboxClass: 'staff-cb', btnTextId: 'staff-btn-text', allText: 'All Staff Selected', selectAllBtnId: 'btn-select-all', deselectAllBtnId: 'btn-deselect-all', searchInputId: 'staff-search' }); }
+    function renderBranchFilterCheckboxes() { createFilterDropdown({ containerId: 'branch-checkboxes', dataArray: dbBranches, selectedSet: selectedBranchIds, labelKey: 'branch_name', checkboxClass: 'branch-cb', btnTextId: 'branch-btn-text', allText: 'All Branches Selected', selectAllBtnId: 'btn-select-all-branches', deselectAllBtnId: 'btn-deselect-all-branches', searchInputId: 'branch-search' }); }
 
     async function fetchLogsFromDatabase(isAppend = false) {
       if (isFetchingLogs) return;
@@ -4291,6 +4314,13 @@
         renderMasterTable();
     });
 
+    ['filter-toggle-late', 'filter-toggle-early', 'filter-toggle-missing-out'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => {
+            currentPage = 0;
+            renderMasterTable();
+        });
+    });
+
     function renderMasterTable() {
       const tbody = document.getElementById('master-tbody');
       const thead = document.querySelector('#master-table thead tr');
@@ -4312,10 +4342,18 @@
           let dataToRender = [...processedData];
           const todayStr = new Date().toDateString();
 
-          if (activeSubTab === 'late') { 
-              dataToRender = processedData.filter(row => (row.isLate || row.isEarly) && row.firstIn); 
-          } else if (activeSubTab === 'missing-out') {
-              dataToRender = processedData.filter(row => row.firstIn && !row.lastOut);
+          const showLate = document.getElementById('filter-toggle-late')?.checked;
+          const showEarly = document.getElementById('filter-toggle-early')?.checked;
+          const showMissingOut = document.getElementById('filter-toggle-missing-out')?.checked;
+
+          if (showLate || showEarly || showMissingOut) { 
+              dataToRender = processedData.filter(row => {
+                  let keep = false;
+                  if (showLate && row.isLate && row.firstIn) keep = true;
+                  if (showEarly && row.isEarly && row.firstIn) keep = true;
+                  if (showMissingOut && row.firstIn && !row.lastOut) keep = true;
+                  return keep;
+              }); 
           } 
           
           if (dataToRender.length === 0) { 
@@ -4374,9 +4412,6 @@
             if(row.isEarly && !row.excEarly) actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', 'Early Departure')">Manage Reason (Early)</a>`;
 
             let mapLinkHtml = '';
-            if (row.latitude && row.longitude) {
-                mapLinkHtml = `<br><a href="https://www.google.com/maps?q=${row.latitude},${row.longitude}" target="_blank" class="action-link" style="color: var(--primary); margin-top: 4px;">📍 View GPS Check-in</a>`;
-            }
             
             let photosHTML = `<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">`;
             if (!row.photoLogs || row.photoLogs.length === 0) {
@@ -4430,9 +4465,6 @@
                           W: <span style="color:var(--success)">${row.formattedWork}</span> | T: <span style="color:var(--warning)">${row.formattedTravel}</span>
                         </div>
                     </div>
-                </div>
-                <div style="text-align:right; margin-top:4px;">
-                   <button class="icon-btn" onclick="window.openEditTimeModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" title="Edit Shift Time">✏️ Edit Time</button>
                 </div>
               </td>
               <td>${statusHtml} <br><div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); margin-top:4px; font-weight:600;">Route: ${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
@@ -4536,7 +4568,7 @@
               else if(log.action === 'Transit End') actionBadge = `<span class="badge bg-blue" style="font-size: 13px;">📍 TRANSIT END</span>`;
 
               let mapLinkHtml = (log.latitude && log.longitude)
-                  ? `<a href="https://www.google.com/maps?q=${log.latitude},${log.longitude}" target="_blank" class="action-link" style="color: var(--primary); margin-top: 6px; font-size: 11px;">📍 Open in GPS Map</a>`
+                  ? `<div style="color: var(--primary); font-size: 11px; margin-top: 6px; font-weight: 600;">📍 GPS Logged</div>`
                   : `<div style="color: var(--text-soft); font-size: 11px; margin-top: 6px;">No GPS Coordinates</div>`;
 
               let photoHtml = '';
@@ -4803,58 +4835,111 @@
         }
     });
 
-    window.openEditTimeModal = function(staffId, staffName, isoDateStr, inId, outId, inIso, outIso) {
-      activeEditStaffId = staffId; activeEditStaffName = staffName; activeEditDateStr = isoDateStr; 
-      editLogInId = inId; editLogOutId = outId;
-      document.getElementById('edit-time-subtitle').innerText = `Editing ${staffName} on ${isoDateStr}`;
+    window.openEditTimeModal = function(staffId, staffName, isoDateStr) {
+      document.getElementById('edit-master-staff-id').value = staffId;
+      document.getElementById('edit-master-staff-name').value = staffName;
+      document.getElementById('edit-master-date').value = isoDateStr;
+      document.getElementById('edit-time-subtitle').innerText = `Editing timeline for ${staffName} on ${isoDateStr}`;
       
-      const toTimeString = (iso) => {
-          if(!iso) return '';
-          let d = new Date(iso);
-          return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-      };
-      
-      document.getElementById('edit-time-in').value = toTimeString(inIso);
-      
-      let staff = staffMap[staffId];
-      let roleObj = roleMap[staff?.role_id];
-      let defaultOutStr = staff?.shift_end || roleObj?.shift_end || globalShiftEnd;
-      
-      document.getElementById('edit-time-out').value = outIso ? toTimeString(outIso) : defaultOutStr;
-      
+      const punchList = document.getElementById('master-punch-list');
+      punchList.innerHTML = '<div style="text-align:center; padding:20px;">Loading punches...</div>';
       document.getElementById('edit-time-modal').style.display = 'flex';
-    }
+
+      const sDate = new Date(isoDateStr); sDate.setHours(0,0,0,0);
+      const eDate = new Date(isoDateStr); eDate.setHours(23,59,59,999);
+      
+      supabaseClient.from('attendance_logs').select('*').eq('staff_id', staffId)
+        .gte('timestamp', sDate.toISOString()).lte('timestamp', eDate.toISOString())
+        .order('timestamp', {ascending: true}).then(({data}) => {
+            window.currentEditLogs = data || [];
+            renderPunchRows();
+        });
+    };
+
+    window.renderPunchRows = function() {
+        const punchList = document.getElementById('master-punch-list');
+        const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}">${b.branch_name}</option>`).join('');
+        
+        punchList.innerHTML = window.currentEditLogs.map((log, idx) => {
+            const timeVal = log.timestamp ? new Date(log.timestamp).toTimeString().substring(0,5) : '';
+            return `
+            <div class="punch-row" data-logid="${log.id || ''}" style="display:flex; gap:8px; align-items:center; background:var(--input-bg); padding:8px; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
+                <select class="punch-action input-field" style="margin:0; flex:1; padding:8px;">
+                    <option value="Clock In" ${log.action==='Clock In'?'selected':''}>In</option>
+                    <option value="Clock Out" ${log.action==='Clock Out'?'selected':''}>Out</option>
+                    <option value="Transit Start" ${log.action==='Transit Start'?'selected':''}>Transit Start</option>
+                    <option value="Transit End" ${log.action==='Transit End'?'selected':''}>Transit End</option>
+                </select>
+                <select class="punch-branch input-field" style="margin:0; flex:1.5; padding:8px;">
+                    <option value="">-- Branch --</option>
+                    ${branchOpts}
+                    <option value="Time Edited" ${log.branch==='Time Edited'?'selected':''}>Time Edited</option>
+                    ${!dbBranches.find(b=>b.branch_name===log.branch) && log.branch !== 'Time Edited' && log.branch ? `<option value="${log.branch}" selected>${log.branch}</option>` : ''}
+                </select>
+                <input type="time" class="punch-time input-field" value="${timeVal}" style="margin:0; flex:1; padding:8px;">
+                <button class="icon-btn" onclick="window.currentEditLogs.splice(${idx}, 1); window.renderPunchRows();" style="color:var(--danger)">🗑</button>
+            </div>`;
+        }).join('');
+        if(window.currentEditLogs.length === 0) punchList.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-soft);">No punches found. Add one below.</div>';
+    };
+
+    document.getElementById('btn-add-punch-row')?.addEventListener('click', () => {
+        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null });
+        window.renderPunchRows();
+    });
 
     document.getElementById('btn-cancel-edit-time')?.addEventListener('click', () => { window.closeModal(document.getElementById('edit-time-modal')); });
     
     document.getElementById('btn-save-edit-time')?.addEventListener('click', async () => {
-       const inVal = document.getElementById('edit-time-in').value;
-       const outVal = document.getElementById('edit-time-out').value;
        const btn = document.getElementById('btn-save-edit-time');
        btn.innerText = "Saving..."; btn.disabled = true;
+       
+       const staffId = document.getElementById('edit-master-staff-id').value;
+       const staffName = document.getElementById('edit-master-staff-name').value;
+       const isoDateStr = document.getElementById('edit-master-date').value;
+       
+       const rows = document.querySelectorAll('.punch-row');
+       let upsertData = [];
+       let hasErrors = false;
+       
+       rows.forEach(row => {
+           const logId = row.getAttribute('data-logid');
+           const action = row.querySelector('.punch-action').value;
+           const branch = row.querySelector('.punch-branch').value;
+           const timeStr = row.querySelector('.punch-time').value;
+           
+           if(!timeStr || !branch) hasErrors = true;
+           
+           const newIso = new Date(`${isoDateStr}T${timeStr}:00`).toISOString();
+           
+           let payload = {
+               staff_id: staffId, employee_name: staffName,
+               action: action, branch: branch, timestamp: newIso,
+               uniform_reviewed: true, uniform_tshirt: true, uniform_idcard: true
+           };
+           if(logId) payload.id = logId;
+           upsertData.push(payload);
+       });
+       
+       if(hasErrors) {
+           showToast("Please fill all time and branch fields.", "error");
+           btn.innerText = "Save Timeline"; btn.disabled = false;
+           return;
+       }
 
        try {
-           if(inVal && editLogInId) {
-               const newInIso = new Date(`${activeEditDateStr}T${inVal}:00`).toISOString();
-               await supabaseClient.from('attendance_logs').update({ timestamp: newInIso }).eq('id', editLogInId);
+           const sDate = new Date(isoDateStr); sDate.setHours(0,0,0,0);
+           const eDate = new Date(isoDateStr); eDate.setHours(23,59,59,999);
+           await supabaseClient.from('attendance_logs').delete().eq('staff_id', staffId)
+                .gte('timestamp', sDate.toISOString()).lte('timestamp', eDate.toISOString());
+           
+           if(upsertData.length > 0) {
+               await supabaseClient.from('attendance_logs').upsert(upsertData);
            }
-           if(outVal) {
-               const newOutIso = new Date(`${activeEditDateStr}T${outVal}:00`).toISOString();
-               
-               if(editLogOutId) {
-                   // Removed branch override so it keeps its original location data
-                   await supabaseClient.from('attendance_logs').update({ timestamp: newOutIso }).eq('id', editLogOutId);
-               } else {
-                   // If creating a missing clock out manually
-                   await supabaseClient.from('attendance_logs').insert([{
-                       staff_id: activeEditStaffId, employee_name: activeEditStaffName, 
-                       action: 'Clock Out', branch: 'Time Edited', timestamp: newOutIso
-                   }]);
-               }
-           }
+           
            window.closeModal(document.getElementById('edit-time-modal'));
-           fetchLogsFromDatabase(false); // Hard refresh to guarantee UI updates
-           showToast("Shift timeline updated!", "success");
+           fetchLogsFromDatabase(false);
+           showToast("Master timeline updated!", "success");
        } catch (err) {
            showToast("Failed to update timeline.", "error");
        } finally {
@@ -5493,6 +5578,26 @@
         }
     }
 
+    let actionSortCol = 'date';
+    let actionSortAsc = false;
+    window.sortActionCenter = function(column) {
+        if (actionSortCol === column) actionSortAsc = !actionSortAsc;
+        else { actionSortCol = column; actionSortAsc = true; }
+        
+        const sortFn = (a, b) => {
+            let valA, valB;
+            if (column === 'name') { valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); }
+            else { valA = a.date.getTime(); valB = b.date.getTime(); }
+            if (valA < valB) return actionSortAsc ? -1 : 1;
+            if (valA > valB) return actionSortAsc ? 1 : -1;
+            return 0;
+        };
+        
+        missingData.sort(sortFn);
+        processedData.sort(sortFn);
+        renderAbsentTable();
+    };
+
     function renderAbsentTable() {
         const tbody = document.getElementById('absent-tbody');
         if(!tbody) return;
@@ -5937,17 +6042,47 @@
             const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
             rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`}</td>`;
           } else {
-            const ins = dailyLogs.filter(l => l.action === 'Clock In').sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            let inTimeStr = ins.length ? new Date(ins[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A';
-            rowStr += `<td><span class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1));">In: ${inTimeStr}</span></td>`;
+            let badgesHtml = '';
+            const getLogTime = (action) => {
+                const logs = dailyLogs.filter(l => l.action === action).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+                return logs.length ? new Date(logs[0].timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : null;
+            };
+            const inTime = getLogTime('Clock In');
+            const travelTime = getLogTime('Transit Start');
+            const reachTime = getLogTime('Transit End');
+            const outTime = getLogTime('Clock Out');
+
+            if (inTime) badgesHtml += `<div class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">In: ${inTime}</div>`;
+            if (travelTime) badgesHtml += `<div class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Travel: ${travelTime}</div>`;
+            if (reachTime) badgesHtml += `<div class="badge bg-blue" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Reach: ${reachTime}</div>`;
+            if (outTime) badgesHtml += `<div class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Out: ${outTime}</div>`;
+            if (!badgesHtml) badgesHtml = `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`;
+                    
+            rowStr += `<td><div style="display: flex; flex-direction: column; align-items: flex-start;">${badgesHtml}</div></td>`;
           }
         }); 
         return rowStr + '</tr>';
       }).join('');
     }
 
+    let settingsSort = { staff: { col: '', asc: true }, branch: { col: '', asc: true }, reason: { col: '', asc: true } };
+    window.sortSettings = function(type, col) {
+        if (settingsSort[type].col === col) settingsSort[type].asc = !settingsSort[type].asc;
+        else { settingsSort[type].col = col; settingsSort[type].asc = true; }
+        loadSettingsData();
+    };
+
     async function loadSettingsData() {
       const formatTime = (t) => t ? t.substring(0, 5) : '';
+
+      let staffArr = [...(dbStaff || [])];
+      if (settingsSort.staff.col === 'name') staffArr.sort((a,b) => settingsSort.staff.asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+      
+      let branchArr = [...(dbBranches || [])];
+      if (settingsSort.branch.col === 'name') branchArr.sort((a,b) => settingsSort.branch.asc ? a.branch_name.localeCompare(b.branch_name) : b.branch_name.localeCompare(a.branch_name));
+      
+      let reasonArr = [...(dbReasons || [])];
+      if (settingsSort.reason.col === 'name') reasonArr.sort((a,b) => settingsSort.reason.asc ? a.reason_name.localeCompare(b.reason_name) : b.reason_name.localeCompare(a.reason_name));
 
       const roleTbody = document.getElementById('role-settings-list');
       if (roleTbody) {
@@ -5970,7 +6105,7 @@
 
       const reasonTbody = document.getElementById('reason-settings-list');
       if (reasonTbody) {
-          reasonTbody.innerHTML = (dbReasons || []).map(r => `<tr>
+          reasonTbody.innerHTML = reasonArr.map(r => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${r.reason_name}</strong></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <button class="edit-btn" onclick="window.openEditReason('${r.id}', '${r.reason_name.replace(/'/g, "\\'")}')">Edit</button>
@@ -5981,7 +6116,7 @@
 
       const staffTbody = document.getElementById('staff-settings-list');
       if (staffTbody) {
-          staffTbody.innerHTML = (dbStaff || []).map(s => {
+          staffTbody.innerHTML = staffArr.map(s => {
               const st = formatTime(s.shift_start);
               const en = formatTime(s.shift_end);
               const roleName = roleMap[s.role_id]?.role_name || s.role || 'No Role';
@@ -6007,7 +6142,7 @@
       
       const branchTbody = document.getElementById('branch-settings-list');
       if (branchTbody) {
-          branchTbody.innerHTML = (dbBranches || []).map(b => `<tr>
+          branchTbody.innerHTML = branchArr.map(b => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong></td>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">Lat: ${b.latitude || 'N/A'}<br>Lng: ${b.longitude || 'N/A'}<br>Radius: ${b.radius_meters || 100}m</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
@@ -6018,21 +6153,7 @@
       }
     }
     
-    const savedServiceKey = localStorage.getItem('rj_supabase_service_key') || '';
-    if (document.getElementById('service-role-key-input')) {
-        document.getElementById('service-role-key-input').value = savedServiceKey;
-    }
-
-    document.getElementById('save-service-key-btn')?.addEventListener('click', () => {
-        const key = document.getElementById('service-role-key-input').value.trim();
-        if (key) {
-            localStorage.setItem('rj_supabase_service_key', key);
-            showToast("Service Role Key saved securely in browser!", "success");
-        } else {
-            localStorage.removeItem('rj_supabase_service_key');
-            showToast("Service Role Key removed.", "primary");
-        }
-    });
+    
 
     document.getElementById('save-global-shift-btn')?.addEventListener('click', async () => {
         const st = document.getElementById('global-shift-start').value;
@@ -6223,34 +6344,16 @@
         const btn = document.getElementById('add-staff-btn'); 
         btn.innerText = "Adding User..."; 
         btn.disabled = true;
-
-        const serviceKey = getServiceKey();
-        if (!serviceKey) {
-            showToast("Please save Service Role Key in Org Settings first!", "error");
-            btn.innerText = "Add Staff"; btn.disabled = false;
-            return;
-        }
         
         try {
-          // STEP 1: Bypass JS Library & use native fetch to create Auth User via Admin API
-          const response = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
-            method: 'POST',
-            headers: {
-              'apikey': serviceKey, 
-              'Authorization': `Bearer ${serviceKey}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email: emailVal,
-              password: passVal,
-              email_confirm: true
-            })
+          // STEP 1: Securely trigger Database Function (RPC)
+          const { error: rpcError } = await supabaseClient.rpc('admin_create_user', { 
+              new_email: emailVal, 
+              new_password: passVal,
+              staff_name: nameVal
           });
-
-          if (!response.ok) {
-              const errData = await response.json();
-              throw new Error(errData.message || "Failed to create Auth User in Supabase");
-          }
+          
+          if (rpcError) throw new Error(rpcError.message);
 
           // STEP 2: Database table me Staff ki details save karein
           const rName = roleMap[roleId]?.role_name || null;
@@ -6289,6 +6392,7 @@
           
         } catch (err) { 
             console.error(err);
+            // Ye line exact error screen par dikhayegi
             showToast(`Error: ${err.message}`, "error"); 
         } finally { 
             btn.innerText = "Add Staff"; 
@@ -6348,58 +6452,24 @@
             const btn = document.getElementById('btn-save-edit-staff'); 
             btn.innerText = "Saving & Syncing Auth..."; 
             btn.disabled = true;
-
-            const serviceKey = getServiceKey();
-            if (!serviceKey) {
-                showToast("Please save Service Role Key in Org Settings first!", "error");
-                btn.innerText = "Save Changes"; btn.disabled = false;
-                return;
-            }
             
             try {
                 // 1. Get the old email to find the user in Supabase Auth
                 const { data: oldStaff } = await supabaseClient.from('staff_directory').select('email').eq('id', id).single();
                 const oldEmail = oldStaff?.email;
 
-                // 2. Fetch all Auth users to find their hidden Auth UID
-                let authUser = null;
-                const usersRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
-                    headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` }
-                });
-                
-                if (usersRes.ok) {
-                    const data = await usersRes.json();
-                    const usersList = data.users || data; 
-                    // Find the user by their old email (or new email if already updated)
-                    authUser = usersList.find(u => u.email === oldEmail) || usersList.find(u => u.email === newEmail);
+                // 2. Sync with Supabase Auth via RPC
+                if (oldEmail) {
+                    const { error: rpcError } = await supabaseClient.rpc('admin_update_user', { 
+                        target_email: oldEmail, 
+                        new_email: newEmail, 
+                        new_password: newPass,
+                        staff_name: name
+                    });
+                    if (rpcError) throw rpcError;
                 }
 
-                // 3. Sync with Supabase Auth
-                if (authUser) {
-                    // Update existing Auth User
-                    await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${authUser.id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'apikey': serviceKey,
-                            'Authorization': `Bearer ${serviceKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email: newEmail, password: newPass, email_confirm: true })
-                    });
-                } else {
-                    // Create new Auth User (if they were missing from the Auth system)
-                    await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
-                        method: 'POST',
-                        headers: {
-                            'apikey': serviceKey,
-                            'Authorization': `Bearer ${serviceKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email: newEmail, password: newPass, email_confirm: true })
-                    });
-                }
-
-                // 4. Update the staff_directory database table
+                // 3. Update the staff_directory database table
                 const rName = roleMap[roleId]?.role_name || null;
                 const defBranchId = document.getElementById('edit-staff-branch').value || null;
                 await supabaseClient.from('staff_directory').update({
@@ -6425,39 +6495,16 @@
     
     window.deleteStaffItem = async (rowId) => { 
       if(await window.customConfirm("Remove this staff member permanently? This will also delete their login access.")) { 
-          const serviceKey = getServiceKey();
-          if (!serviceKey) {
-              showToast("Please save Service Role Key in Org Settings first to delete login access!", "error");
-              return;
-          }
-
           try {
               // 1. Database se staff ka email nikalna
               const { data: staff } = await supabaseClient.from('staff_directory').select('email').eq('id', rowId).single();
               
               if (staff && staff.email) {
-                  // 2. Supabase Auth se saare users fetch karna
-                  const usersRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
-                      headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` }
-                  });
-                  
-                  if (usersRes.ok) {
-                      const data = await usersRes.json();
-                      const usersList = data.users || data;
-                      // 3. User dhoondhna jo match kare
-                      const authUser = usersList.find(u => u.email === staff.email);
-                      
-                      // 4. Agar Auth user mil gaya, toh usko Auth system se Delete karna
-                      if (authUser) {
-                          await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${authUser.id}`, {
-                              method: 'DELETE',
-                              headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` }
-                          });
-                      }
-                  }
+                  // 2. Supabase Auth se user delete karna via Secure Edge Function
+                  await supabaseClient.rpc('admin_delete_user', { target_email: staff.email });
               }
 
-              // 5. Akhir me Staff Directory (Database table) se delete karna
+              // 3. Akhir me Staff Directory (Database table) se delete karna
               await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
               
               await initialMetadataLoad(); // Refresh local cached data arrays
@@ -6612,8 +6659,16 @@
         } else if (isLiveView) {
           reportName = "LIVE TRACKER STATUS";
         } else {
-          const logsTitles = { 'all': 'ALL', 'late': 'LATES & EARLY OUTS', 'missing-out': 'MISSING CLOCK-OUTS' };
-          reportName = `ATTENDANCE LOGS - ${logsTitles[activeSubTab] || 'ALL'}`;
+          const showLate = document.getElementById('filter-toggle-late')?.checked;
+          const showEarly = document.getElementById('filter-toggle-early')?.checked;
+          const showMissingOut = document.getElementById('filter-toggle-missing-out')?.checked;
+          let logsTitle = 'ALL';
+          let parts = [];
+          if (showLate) parts.push("LATES");
+          if (showEarly) parts.push("EARLY OUTS");
+          if (showMissingOut) parts.push("MISSING CLOCK-OUTS");
+          if (parts.length > 0) logsTitle = parts.join(", ");
+          reportName = `ATTENDANCE LOGS - ${logsTitle}`;
         }
         
         const sDateStr = startDate.toLocaleDateString(window.appDateFormat);
@@ -6694,11 +6749,18 @@
             columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
             let dataToExport = processedData;
             
-            if (activeSubTab === 'late') {
-                dataToExport = processedData.filter(r => r.isLate || r.isEarly);
-            } else if (activeSubTab === 'missing-out') {
-                // Removed the date restriction for exports as well
-                dataToExport = processedData.filter(row => row.firstIn && !row.lastOut);
+            const showLate = document.getElementById('filter-toggle-late')?.checked;
+            const showEarly = document.getElementById('filter-toggle-early')?.checked;
+            const showMissingOut = document.getElementById('filter-toggle-missing-out')?.checked;
+
+            if (showLate || showEarly || showMissingOut) {
+                dataToExport = processedData.filter(row => {
+                    let keep = false;
+                    if (showLate && row.isLate) keep = true;
+                    if (showEarly && row.isEarly) keep = true;
+                    if (showMissingOut && row.firstIn && !row.lastOut) keep = true;
+                    return keep;
+                });
             }
 
             exportRows = dataToExport.map(d => {
@@ -7371,7 +7433,10 @@
                     end: endDate.toISOString(),
                     staff: Array.from(selectedStaffIds),
                     branches: Array.from(selectedBranchIds),
-                    roles: Array.from(selectedRoleIds)
+                    roles: Array.from(selectedRoleIds),
+                    filterLate: document.getElementById('filter-toggle-late')?.checked,
+                    filterEarly: document.getElementById('filter-toggle-early')?.checked,
+                    filterMissingOut: document.getElementById('filter-toggle-missing-out')?.checked
                 };
                 localStorage.setItem(`rj_saved_view_${slotNum}`, JSON.stringify(viewState));
                 
@@ -7405,6 +7470,19 @@
                         document.querySelectorAll('.staff-cb').forEach(cb => cb.checked = selectedStaffIds.has(cb.value));
                         document.querySelectorAll('.branch-cb').forEach(cb => cb.checked = selectedBranchIds.has(cb.value));
                         document.querySelectorAll('.role-cb').forEach(cb => cb.checked = selectedRoleIds.has(cb.value));
+                        
+                        if (viewState.filterLate !== undefined) {
+                            const fl = document.getElementById('filter-toggle-late');
+                            if (fl) fl.checked = viewState.filterLate;
+                        }
+                        if (viewState.filterEarly !== undefined) {
+                            const fe = document.getElementById('filter-toggle-early');
+                            if (fe) fe.checked = viewState.filterEarly;
+                        }
+                        if (viewState.filterMissingOut !== undefined) {
+                            const fm = document.getElementById('filter-toggle-missing-out');
+                            if (fm) fm.checked = viewState.filterMissingOut;
+                        }
                         
                         updateStaffButtonText();
                         updateBranchButtonText();
@@ -8041,6 +8119,106 @@
         cb.addEventListener('change', window.saveReportTemplate);
     });
 
+  document.addEventListener('mouseover', (e) => {
+        const target = e.target.closest('[title]');
+        if (target) {
+            target.setAttribute('data-custom-tooltip', target.getAttribute('title'));
+            target.removeAttribute('title');
+        }
+        const tooltipTarget = e.target.closest('[data-custom-tooltip]');
+        if (tooltipTarget) {
+            const tooltip = document.getElementById('custom-tooltip');
+            if (tooltip) {
+                tooltip.innerText = tooltipTarget.getAttribute('data-custom-tooltip');
+                tooltip.classList.add('show');
+            }
+        }
+    });
+    document.addEventListener('mousemove', (e) => {
+        const tooltip = document.getElementById('custom-tooltip');
+        if (tooltip && tooltip.classList.contains('show')) {
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+        }
+    });
+    document.addEventListener('mouseout', (e) => {
+        const tooltipTarget = e.target.closest('[data-custom-tooltip]');
+        if (tooltipTarget) {
+            const tooltip = document.getElementById('custom-tooltip');
+            if (tooltip) tooltip.classList.remove('show');
+        }
+    });
+
+    // --- MODAL DRAFT CACHING ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const staffInputs = ['new-staff-name', 'new-staff-role', 'new-staff-email', 'new-staff-pass', 'new-staff-start', 'new-staff-end', 'new-staff-dob'];
+        const roleInputs = ['new-role-name', 'new-role-start', 'new-role-end'];
+        const manualInputs = ['manual-date', 'manual-time', 'manual-staff', 'manual-action', 'manual-branch'];
+        const allDraftInputs = [...staffInputs, ...roleInputs, ...manualInputs];
+
+        const isDraftEnabled = (id) => {
+            if (staffInputs.includes(id)) return document.getElementById('toggle-draft-staff')?.checked;
+            if (manualInputs.includes(id)) return document.getElementById('toggle-draft-manual')?.checked;
+            return true; // Roles doesn't have a toggle yet, default to true
+        };
+
+        allDraftInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                // Restore only if toggle is checked
+                const savedVal = localStorage.getItem('draft_' + id);
+                if (savedVal && isDraftEnabled(id)) {
+                    if (el._flatpickr) {
+                        el._flatpickr.setDate(savedVal);
+                    } else {
+                        el.value = savedVal;
+                    }
+                }
+                const saveDraft = () => { if (isDraftEnabled(id)) localStorage.setItem('draft_' + id, el.value); };
+                el.addEventListener('input', saveDraft);
+                el.addEventListener('change', saveDraft);
+            }
+        });
+
+        const clearDrafts = (inputsArr) => {
+            inputsArr.forEach(id => {
+                localStorage.removeItem('draft_' + id);
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el._flatpickr) el._flatpickr.clear();
+                    else el.value = '';
+                }
+            });
+            showToast("Draft cleared", "primary");
+        };
+
+        document.getElementById('btn-clear-staff-draft')?.addEventListener('click', () => clearDrafts(staffInputs));
+        document.getElementById('btn-clear-manual-draft')?.addEventListener('click', () => {
+            clearDrafts(manualInputs);
+            const now = new Date();
+            const timeEl = document.getElementById('manual-time');
+            const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            if (timeEl._flatpickr) timeEl._flatpickr.setDate(timeStr); else timeEl.value = timeStr;
+            const manualDateEl = document.getElementById('manual-date');
+            if (manualDateEl && manualDateEl._flatpickr) manualDateEl._flatpickr.setDate(now);
+            document.getElementById('manual-action').value = 'Clock In';
+        });
+
+        const saveButtonsMap = {
+            'add-staff-btn': staffInputs,
+            'add-role-btn': roleInputs,
+            'btn-save-manual': manualInputs
+        };
+
+        Object.keys(saveButtonsMap).forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    saveButtonsMap[btnId].forEach(inputId => localStorage.removeItem('draft_' + inputId));
+                });
+            }
+        });
+    });
   </script>
 </body>
 </html>
