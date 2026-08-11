@@ -2286,8 +2286,9 @@
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             const dateStr = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
             
+            // Time color changed from white to --primary accent color so it stands out cleanly from the header title
             const timeWidth = window.use12HourTime ? '90px' : '70px';
-            clockEl.innerHTML = `<span style="display: inline-block; min-width: ${timeWidth}; color: var(--primary); font-weight: 500; font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums;">${timeStr}</span> <span style="color: var(--text-soft); font-weight: 400;">• ${dateStr}</span>`;
+            clockEl.innerHTML = `<span style="display: inline-block; min-width: ${timeWidth}; color: var(--primary); font-weight: 800; font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums;">${timeStr}</span> <span style="color: var(--text-soft); font-weight: 600;">• ${dateStr}</span>`;
         }
     }, 1000);
 
