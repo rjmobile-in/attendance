@@ -178,10 +178,12 @@
     /* =========================================================
        4. FORM INPUTS & DROPDOWNS
        ========================================================= */
-    .input-field { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background-color: var(--input-bg) !important; color: var(--text-main) !important; margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: calc(13px * var(--font-scale, 1)); transition: all 0.2s; color-scheme: dark; }
+    .input-field { height: 44px; width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background-color: var(--input-bg) !important; color: var(--text-main) !important; margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: calc(13px * var(--font-scale, 1)); transition: all 0.2s; color-scheme: dark; line-height: normal; }
     html.light-theme .input-field { color-scheme: light; }
     .input-field:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-glow) !important; }
-    select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px auto; }
+    select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f37021' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; cursor: pointer; padding-right: 40px; }
+    select.input-field:hover { border-color: var(--primary) !important; background-color: var(--card-bg) !important; }
+    select.input-field option { background: var(--bg-surface); color: var(--text-main); font-weight: 500; }
     
     .dropdown { position: relative; display: inline-block; }
     .dropdown-content { display: none; position: absolute; right: 0; top: calc(100% + 8px); min-width: 260px; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; z-index: 1000; box-shadow: var(--shadow-md); }
@@ -280,6 +282,23 @@
     tbody tr:hover td { background: transparent; border-bottom-color: transparent; }
     tbody tr:hover td:first-child { border-left: 3px solid var(--primary); }
     tbody tr:last-child td { border-bottom: none; }
+
+    /* =========================================================
+       UX UPGRADE: TRUE FULLSCREEN MAXIMIZER & STICKY COLUMNS
+       ========================================================= */
+    .chart-expanded, .table-expanded { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 999999 !important; display: flex !important; flex-direction: column !important; background-color: var(--bg-base) !important; border-radius: 0 !important; border: none !important; margin: 0 !important; padding: 20px !important; transform: none !important; box-shadow: none !important; }
+    .table-expanded .table-responsive { flex: 1 !important; max-height: none !important; height: auto !important; overflow-y: auto !important; }
+    .table-expanded .table-controls .table-maximizer-btn { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+    
+    /* Aggressively hide underlying UI when fullscreen */
+    body:has(.table-expanded, .chart-expanded) .sidebar,
+    body:has(.table-expanded, .chart-expanded) .header-bar,
+    body:has(.table-expanded, .chart-expanded) .filter-section,
+    body:has(.table-expanded, .chart-expanded) .sub-tabs,
+    body:has(.table-expanded, .chart-expanded) .widget-grid {
+        display: none !important;
+    }
+    .app-view:has(.table-expanded, .chart-expanded) { z-index: 999999; position: fixed; inset: 0; }
 
     /* =========================================================
        UX UPGRADE: STICKY FIRST COLUMN FOR TABLES
@@ -385,7 +404,26 @@
     .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
     .chart-card h3 { font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
-    .chart-expanded { position: fixed !important; top: 5% !important; left: 5% !important; width: 90% !important; height: 90% !important; z-index: 10000 !important; background: var(--card-bg) !important; display: flex !important; flex-direction: column !important; }
+    /* =========================================================
+       UX UPGRADE: TRUE FULLSCREEN MAXIMIZER (TABLES & CHARTS)
+       ========================================================= */
+    .chart-expanded, .table-expanded { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 999999 !important; background-color: var(--bg-base) !important; display: flex !important; flex-direction: column !important; border-radius: 0 !important; border: none !important; margin: 0 !important; padding: 24px !important; transform: none !important; }
+    .table-expanded .table-responsive { flex: 1 !important; max-height: none !important; height: auto !important; overflow-y: auto !important; }
+    .table-expanded .table-maximizer-btn { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+    
+    /* Completely wipes the UI elements under the modal for True Fullscreen */
+    body:has(.table-expanded, .chart-expanded) .sidebar,
+    body:has(.table-expanded, .chart-expanded) .header-bar,
+    body:has(.table-expanded, .chart-expanded) .filter-section,
+    body:has(.table-expanded, .chart-expanded) .sub-tabs,
+    body:has(.table-expanded, .chart-expanded) .widget-grid {
+        display: none !important;
+    }
+    .app-view:has(.table-expanded, .chart-expanded) {
+        z-index: 999999;
+        position: fixed;
+        inset: 0;
+    }
     .chart-expanded .chart-container { height: 100% !important; flex: 1 !important; min-height: 0; }
     .chart-container { position: relative; height: 300px; width: 100%; }
 
@@ -546,17 +584,17 @@
     /* --- Keyframes --- */
     @keyframes slideUpFade {
         from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
+        to { opacity: 1; transform: none; }
     }
     
     @keyframes slideRightFade {
         from { opacity: 0; transform: translateX(-15px); }
-        to { opacity: 1; transform: translateX(0); }
+        to { opacity: 1; transform: none; }
     }
     
     @keyframes popInFade {
         from { opacity: 0; transform: scale(0.96) translateY(10px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
+        to { opacity: 1; transform: none; }
     }
 
     /* =========================================================
@@ -568,7 +606,7 @@
     }
     @keyframes viewSpringIn {
         0% { opacity: 0; transform: translateY(15px) scale(0.98); filter: blur(8px); }
-        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+        100% { opacity: 1; transform: none; filter: none; }
     }
 
     /* Personalization: UI Density & Motion */
@@ -740,10 +778,13 @@
         
         <!-- HEADER -->
         <div class="header-bar">
-          <div class="header-title" id="page-title">Overview</div>
+          <div style="display: flex; flex-direction: column;">
+            <div class="header-title" id="page-title">Overview</div>
+            <div id="live-admin-clock" style="font-size: 14px; margin-top: 4px; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Loading time...</div>
+          </div>
           <div class="header-controls">
 
-            
+            <input type="text" id="global-search-bar" class="input-field quick-table-search" placeholder="Search in view..." style="margin: 0; padding: 8px 12px; height: 38px; width: 220px; font-size: 13px; border-radius: var(--radius-sm); border: 1px solid var(--card-border);">
             
             <div class="dropdown" id="export-dropdown" style="display: none;">
               <button id="export-btn" class="btn-primary" data-target="export-menu">
@@ -1230,7 +1271,7 @@
         <input type="password" id="new-staff-pass" class="input-field" placeholder="Password" style="margin:0; width: 100%; padding-right: 40px;">
         <span onclick="var inp = document.getElementById('new-staff-pass'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
     </div>
-    <button id="gen-pass-btn" class="btn-secondary" title="Auto-Generate 10-Digit Password" style="padding: 10px 14px; margin: 0; justify-content: center; height: 43px; font-size: 16px;">🎲</button>
+    <button id="gen-pass-btn" class="btn-secondary" title="Auto-Generate 10-Digit Password" style="padding: 10px 14px; margin: 0; justify-content: center; height: 44px; font-size: 18px;">🎲</button>
 </div>
                                 
                                 <div style="width: 100%; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
@@ -2226,6 +2267,97 @@
     let missingData = [];
     let statsData = [];
     
+    // --- LIVE ADMIN CLOCK ---
+    setInterval(() => {
+        const clockEl = document.getElementById('live-admin-clock');
+        if (clockEl) {
+            const now = new Date();
+            let h = now.getHours();
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            let ampm = '';
+            
+            if (window.use12HourTime) {
+                ampm = h >= 12 ? ' PM' : ' AM';
+                h = h % 12 || 12;
+            }
+            
+            const timeStr = `${String(h).padStart(2, '0')}:${m}:${s}${ampm}`;
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dateStr = `${days[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            
+            const timeWidth = window.use12HourTime ? '90px' : '70px';
+            clockEl.innerHTML = `<span style="display: inline-block; min-width: ${timeWidth}; color: var(--primary); font-weight: 500; font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums;">${timeStr}</span> <span style="color: var(--text-soft); font-weight: 400;">• ${dateStr}</span>`;
+        }
+    }, 1000);
+
+    // --- INJECT LOCAL SEARCH & MAXIMIZER INTO TABLES ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.table-card').forEach(card => {
+            // 1. Purane floating overlapping button ko remove karna
+            const oldFloatBtn = card.querySelector('.icon-btn.table-maximizer-btn');
+            if (oldFloatBtn) oldFloatBtn.remove();
+
+            // 2. Sirf ek clean control bar create karna
+            if (!card.closest('#view-settings-hr') && !card.closest('#view-settings-org') && !card.querySelector('.table-controls')) {
+                const controls = document.createElement('div');
+                controls.className = 'table-controls';
+                controls.style.display = 'flex';
+                controls.style.justifyContent = 'space-between';
+                controls.style.alignItems = 'center';
+                controls.style.gap = '16px';
+                controls.style.padding = '12px 24px';
+                controls.style.borderBottom = '1px solid var(--card-border)';
+                controls.style.background = 'var(--bg-surface)';
+                
+                const searchWrap = document.createElement('div');
+                searchWrap.style.position = 'relative';
+                searchWrap.style.flex = '1';
+                searchWrap.style.maxWidth = '300px';
+                searchWrap.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-soft)" stroke-width="2" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); z-index:5;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="quick-table-search input-field" placeholder="Search records..." style="margin: 0; height: 38px; padding: 8px 12px 8px 34px; width: 100%; font-size: 13px; border-radius: var(--radius-sm);">
+                `;
+                
+                const maxBtn = document.createElement('button');
+                maxBtn.className = 'btn-secondary table-maximizer-btn';
+                maxBtn.innerHTML = '<span style="font-size: 14px;">⛶</span> Fullscreen';
+                maxBtn.style.padding = '8px 16px';
+                maxBtn.style.fontSize = '13px';
+                maxBtn.style.whiteSpace = 'nowrap'; // Rokega text ko cut hone se
+                maxBtn.style.display = 'inline-flex';
+                maxBtn.style.alignItems = 'center';
+                maxBtn.style.gap = '6px';
+                maxBtn.onclick = () => card.classList.toggle('table-expanded');
+                
+                controls.appendChild(searchWrap);
+                controls.appendChild(maxBtn);
+                card.insertBefore(controls, card.firstChild);
+            }
+        });
+
+        // SMART TABLE SEARCH LOGIC
+        document.querySelectorAll('.quick-table-search').forEach(input => {
+            input.addEventListener('input', function() {
+                const term = this.value.trim().toLowerCase();
+                const tbody = this.closest('.table-card').querySelector('tbody');
+                if(!tbody) return;
+
+                const safeTerm = term.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&');
+                const regex = term ? new RegExp('\\b' + safeTerm, 'i') : null;
+
+                Array.from(tbody.querySelectorAll('tr')).forEach(row => {
+                    if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No leave requests') || row.innerText.includes('No Individual Punches')) return;
+                    if (!term) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = regex.test(row.innerText) ? '' : 'none';
+                    }
+                });
+            });
+        });
+    });
+
     // --- GLOBAL EVENT BUS ---
     window.RJEventBus = new EventTarget();
     
@@ -3518,8 +3650,8 @@
     const revertDate = (dates, dateStr, inst) => { if(!dates[0]) { showToast("Invalid Date! Reverting...", "warning"); inst.setDate(new Date()); } };
     if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
-    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "2026-12-31", allowInput: true, onChange: revertDate });
-    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "2026-12-31", allowInput: true, onChange: revertDate });
+    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
+    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("manual-date")) flatpickr("#manual-date", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, defaultDate: "today", maxDate: "today", onChange: revertDate });
     if (document.getElementById("manual-time")) flatpickr("#manual-time", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: !window.use12HourTime, disableMobile: "true" });
     
@@ -7171,9 +7303,50 @@
         });
     }
 
+    // --- INJECT TABLE MAXIMIZER BUTTONS ---
+    document.querySelectorAll('.table-card').forEach(card => {
+        if (!card.querySelector('.table-maximizer-btn') && !card.closest('#view-settings-hr') && !card.closest('#view-settings-org')) {
+            const btn = document.createElement('button');
+            btn.className = 'icon-btn table-maximizer-btn';
+            btn.title = 'Maximize Table';
+            btn.innerHTML = '⛶';
+            btn.style.position = 'absolute';
+            btn.style.top = '12px';
+            btn.style.right = '12px';
+            btn.style.zIndex = '50';
+            btn.style.background = 'var(--bg-surface)';
+            card.style.position = 'relative'; 
+            btn.onclick = () => card.classList.toggle('table-expanded');
+            card.appendChild(btn);
+        }
+    });
+
     // =========================================================================
     //  UX & ACCESSIBILITY (A11Y) ENHANCEMENTS
     // =========================================================================
+
+    // --- QUICK TABLE SEARCH (FRONTEND - WORD START SEQUENCE) ---
+    document.querySelectorAll('.quick-table-search').forEach(input => {
+        input.addEventListener('input', function() {
+            const term = this.value.trim().toLowerCase();
+            const activeView = document.querySelector('.app-view[style*="display: block"]') || document.querySelector('.app-view');
+            if (!activeView) return;
+            const tbody = activeView.querySelector('tbody');
+            if(!tbody) return;
+
+            const safeTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = term ? new RegExp('\\b' + safeTerm, 'i') : null;
+
+            Array.from(tbody.querySelectorAll('tr')).forEach(row => {
+                if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No leave requests') || row.innerText.includes('No Individual Punches')) return;
+                if (!term) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = regex.test(row.innerText) ? '' : 'none';
+                }
+            });
+        });
+    });
 
     // 1. Global "Clear Filters" Logic
     document.getElementById('clear-all-filters-btn')?.addEventListener('click', () => {
@@ -7592,6 +7765,14 @@
 
         // 2. Escape Key: Close Modals, Drawers & Clear Selections
         if (e.key === 'Escape') {
+            // Minimize maximized tables and charts
+            document.querySelectorAll('.table-expanded').forEach(el => el.classList.remove('table-expanded'));
+            document.querySelectorAll('.chart-expanded').forEach(el => el.classList.remove('chart-expanded'));
+
+            // Close all open dropdowns automatically
+            document.querySelectorAll('.dropdown-content.show').forEach(m => m.classList.remove('show'));
+            document.querySelectorAll('[data-target]').forEach(btn => btn.setAttribute('aria-expanded', 'false'));
+
             // Close Profile Drawer
             if (typeof window.closeStaffProfile === 'function') window.closeStaffProfile();
             
