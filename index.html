@@ -1193,10 +1193,17 @@
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and resolve exceptions.</span>
-                            <div class="switch-wrap" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                            <div class="switch-wrap" id="wrap-show-excused" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg);">
                                 <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Approved / Excused</div></div>
                                 <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
-                                    <input type="checkbox" id="toggle-show-excused" onchange="renderAbsentTable()">
+                                    <input type="checkbox" id="toggle-show-excused">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                            <div class="switch-wrap" id="wrap-past-leaves" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg); display: none;">
+                                <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Past Leaves</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="toggle-past-leaves">
                                     <span class="slider" style="border-radius: 20px;"></span>
                                 </label>
                             </div>
@@ -1209,7 +1216,7 @@
                         <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
                         <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
                         <button class="sub-tab-btn" data-action-filter="leaves">Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
-                        <button class="sub-tab-btn" data-action-filter="active-leaves">Active & Scheduled Leaves</button>
+                        <button class="sub-tab-btn" data-action-filter="active-leaves">Scheduled Leaves</button>
                     </div>
                     
                     <div class="table-card" id="action-table-container">
@@ -2103,6 +2110,7 @@
       <input type="hidden" id="exc-type" value=""> 
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button id="btn-delete-exc" class="btn-secondary" style="justify-content: center; padding: 12px; color: var(--danger); border-color: var(--danger-alpha);" title="Remove this exception">🗑️ Remove</button>
         <button id="btn-cancel-exc" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button id="btn-save-exc" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Reason</button>
       </div>
@@ -3319,6 +3327,18 @@
           document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
           e.target.classList.add('active');
           currentActionTab = e.target.getAttribute('data-action-filter');
+
+          // Contextual Toggles
+          if (currentActionTab === 'active-leaves') {
+              document.getElementById('wrap-show-excused').style.display = 'none';
+              document.getElementById('wrap-past-leaves').style.display = 'flex';
+          } else if (currentActionTab === 'leaves') {
+              document.getElementById('wrap-show-excused').style.display = 'none';
+              document.getElementById('wrap-past-leaves').style.display = 'none';
+          } else {
+              document.getElementById('wrap-show-excused').style.display = 'flex';
+              document.getElementById('wrap-past-leaves').style.display = 'none';
+          }
           
           if (currentActionTab === 'leaves') {
               document.getElementById('action-table-container').style.display = 'none';
@@ -3353,12 +3373,25 @@
         const tbody = document.getElementById('leave-tbody');
         if(!tbody) return;
         
-        if (dbLeaves.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">No requests found.</td></tr>`;
+        // Apply Global Filters
+        let filteredLeaves = dbLeaves.filter(lv => {
+            const sId = lv.staff_id;
+            if (selectedStaffIds.size !== dbStaff.length && !selectedStaffIds.has(sId)) return false;
+
+            const staffObj = staffMap[sId];
+            if (staffObj) {
+                if (selectedRoleIds.size !== dbRoles.length && !selectedRoleIds.has(staffObj.role_id)) return false;
+                if (selectedBranchIds.size !== dbBranches.length && !selectedBranchIds.has(staffObj.default_branch_id)) return false;
+            }
+            return true;
+        });
+
+        if (filteredLeaves.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">No requests match the current filters.</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = dbLeaves.map(lv => {
+        tbody.innerHTML = filteredLeaves.map(lv => {
             const submitDate = new Date(lv.created_at).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short', year:'numeric'});
             const sDate = new Date(lv.start_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
             const eDate = new Date(lv.end_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
@@ -3457,6 +3490,18 @@
                 let datesArray = [];
                 let inserts = [];
                 
+                // Smartly detect Exception Type from title
+                let autoExcType = 'Absent';
+                let cleanReason = lv.reason_title;
+                if (lv.reason_title.includes('[Late Arrival]')) { 
+                    autoExcType = 'Late Arrival'; 
+                    cleanReason = lv.reason_title.replace('[Late Arrival] ', ''); 
+                }
+                else if (lv.reason_title.includes('[Early Departure]')) { 
+                    autoExcType = 'Early Departure'; 
+                    cleanReason = lv.reason_title.replace('[Early Departure] ', ''); 
+                }
+                
                 while(curr <= end) {
                    datesArray.push(toLocalISO(curr));
                    inserts.push({ 
@@ -3464,8 +3509,8 @@
                        employee_name: lv.employee_name,
                        date: toLocalISO(curr), 
                        reason_id: null, 
-                       reason: lv.reason_title + " (Approved Leave)", 
-                       exception_type: 'Absent'
+                       reason: cleanReason, 
+                       exception_type: autoExcType
                    });
                    curr.setDate(curr.getDate() + 1);
                 }
@@ -3474,7 +3519,7 @@
                     await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'staff_id, date, exception_type' });
                     fetchLogsFromDatabase(true); // Soft sync to update Missing Lists / Dashboards
                 } else if (newStatus === 'Rejected' && datesArray.length > 0) {
-                    await supabaseClient.from('attendance_exceptions').delete().eq('staff_id', lv.staff_id).in('date', datesArray).eq('exception_type', 'Absent');
+                    await supabaseClient.from('attendance_exceptions').delete().eq('staff_id', lv.staff_id).in('date', datesArray).eq('exception_type', autoExcType);
                     fetchLogsFromDatabase(true); // Soft sync to update Missing Lists / Dashboards
                 }
             }
@@ -4104,15 +4149,22 @@
 
       dbLogs = allLogs;
 
+      // Fetch all exceptions (without date limits) to allow Future & Past toggling in Scheduled Leaves
       const { data: excData } = await supabaseClient
-        .from('attendance_exceptions').select('*')
-        .gte('date', toLocalISO(sDate)).lte('date', toLocalISO(eDate));
+        .from('attendance_exceptions').select('*');
         
+      window.allExceptionsList = excData || [];
       exceptionsData = {};
+      
+      // Populate exceptionsData strictly for the selected date range to keep Dashboard/Stats fast
+      const sIso = toLocalISO(sDate);
+      const eIso = toLocalISO(eDate);
       (excData || []).forEach(e => { 
-          const sId = e.staff_id || e.employee_name; 
-          const type = e.exception_type || 'Absent'; 
-          exceptionsData[`${sId}_${e.date}_${type}`] = e;
+          if (e.date >= sIso && e.date <= eIso) {
+              const sId = e.staff_id || e.employee_name; 
+              const type = e.exception_type || 'Absent'; 
+              exceptionsData[`${sId}_${e.date}_${type}`] = e;
+          }
       });
 
       // -------------------------------------------------------------
@@ -4493,10 +4545,14 @@
         if (activeTab === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
         if (activeTab === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
         if (activeTab === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
-        if (activeTab === 'view-action' && typeof renderAbsentTable === 'function') renderAbsentTable();
+        if (activeTab === 'view-action') {
+            if (currentActionTab === 'leaves' && typeof renderLeaveTable === 'function') renderLeaveTable();
+            else if (typeof renderAbsentTable === 'function') renderAbsentTable();
+        }
         if (activeTab === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
         if (activeTab === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
         if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
+        if (activeTab === 'view-birthdays' && typeof renderAdminBirthdays === 'function') renderAdminBirthdays();
     });
 
     let isGroupedView = true;
@@ -4513,6 +4569,13 @@
         document.getElementById(id)?.addEventListener('change', () => {
             currentPage = 0;
             renderMasterTable();
+        });
+    });
+
+    // Action Center specific toggles
+    ['toggle-show-excused', 'toggle-past-leaves'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => {
+            if (typeof renderAbsentTable === 'function') renderAbsentTable();
         });
     });
 
@@ -5832,7 +5895,9 @@
         const showExcused = document.getElementById('toggle-show-excused')?.checked;
 
         if (currentActionTab === 'absent') {
-            dataToRender = missingData.filter(r => showExcused || !r.excAbsent);
+            // Unexcused absences are in missingData, but Excused are tracked inside processedData. Merge them!
+            let allAbsences = [...missingData, ...processedData.filter(r => !r.firstIn && !r.lastOut && r.excAbsent)];
+            dataToRender = allAbsences.filter(r => showExcused || !r.excAbsent);
             actionTypeStr = 'Absent';
         } else if (currentActionTab === 'late') {
             dataToRender = processedData.filter(r => r.isLate && (showExcused || !r.excLate));
@@ -5840,7 +5905,45 @@
         } else if (currentActionTab === 'early') {
             dataToRender = processedData.filter(r => r.isEarly && (showExcused || !r.excEarly));
             actionTypeStr = 'Early Departure';
+        } else if (currentActionTab === 'active-leaves') {
+            const showPast = document.getElementById('toggle-past-leaves')?.checked;
+            const todayStr = toLocalISO(new Date());
+
+            dataToRender = (window.allExceptionsList || []).filter(exc => {
+                if (!showPast && exc.date < todayStr) return false;
+                
+                // Apply Global Filters
+                const sId = exc.staff_id;
+                if (selectedStaffIds.size !== dbStaff.length && !selectedStaffIds.has(sId)) return false;
+
+                const staffObj = staffMap[sId];
+                if (staffObj) {
+                    if (selectedRoleIds.size !== dbRoles.length && !selectedRoleIds.has(staffObj.role_id)) return false;
+                    if (selectedBranchIds.size !== dbBranches.length && !selectedBranchIds.has(staffObj.default_branch_id)) return false;
+                }
+                return true;
+            }).map(exc => {
+                const [y, m, d] = exc.date.split('-');
+                return {
+                    date: new Date(y, m - 1, d),
+                    staffId: exc.staff_id,
+                    name: staffMap[exc.staff_id]?.name || exc.employee_name,
+                    excObj: exc,
+                    excType: exc.exception_type,
+                    isoDate: exc.date
+                };
+            });
         }
+
+        // Apply dynamic sorting to whichever Action Tab is active
+        dataToRender.sort((a, b) => {
+            let valA, valB;
+            if (actionSortCol === 'name') { valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); }
+            else { valA = a.date.getTime(); valB = b.date.getTime(); }
+            if (valA < valB) return actionSortAsc ? -1 : 1;
+            if (valA > valB) return actionSortAsc ? 1 : -1;
+            return 0;
+        });
 
         if (dataToRender.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--text-soft);">No records match this category.</td></tr>`;
@@ -5851,7 +5954,7 @@
             const isoDate = toLocalISO(row.date);
             const displayDate = row.date.toLocaleDateString(window.appDateFormat);
             
-            const reasonTxt = row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
+            const reasonTxt = row.excObj?.reason || row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
 
             let statusHTML = '';
             if (currentActionTab === 'absent') {
@@ -5862,21 +5965,54 @@
             } else if (currentActionTab === 'early') {
                 let outTimeStr = row.lastOut ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : '--';
                 statusHTML = reasonTxt ? `<span class="badge bg-orange">${reasonTxt}</span>` : `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out (${outTimeStr})</span>`;
+            } else if (currentActionTab === 'active-leaves') {
+                let typeColor = row.excType === 'Absent' ? 'var(--primary)' : (row.excType === 'Late Arrival' ? 'var(--warning)' : '#f97316');
+                let typeBg = row.excType === 'Absent' ? 'var(--primary-alpha)' : (row.excType === 'Late Arrival' ? 'var(--warning-alpha)' : 'rgba(249, 115, 22, 0.15)');
+                let shortType = row.excType === 'Absent' ? 'Leave' : row.excType;
+                statusHTML = `<span class="badge" style="background: ${typeBg}; color: ${typeColor}; border: 1px solid ${typeColor}; margin-right: 8px;">${shortType}</span><span class="badge bg-green">${reasonTxt || 'Excused'}</span>`;
             }
 
+            const currentActionType = row.excType || actionTypeStr;
             const staffObj = staffMap[row.staffId];
             const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
 
-            return `<tr>
+            let rowOnClick = "";
+            let actionTd = `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${currentActionType}')">Manage Reason</a>`;
+
+            if (currentActionTab === 'active-leaves') {
+                // Link request with matching exceptions for deep modal view
+                const matchingRequest = dbLeaves.find(lv =>
+                    lv.staff_id === row.staffId &&
+                    row.isoDate >= lv.start_date &&
+                    row.isoDate <= lv.end_date &&
+                    lv.status === 'Approved'
+                );
+
+                if (matchingRequest) {
+                    const sDate = new Date(matchingRequest.start_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
+                    const eDate = new Date(matchingRequest.end_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
+                    const safeDesc = window.safeHTML(matchingRequest.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
+                    const safeTitle = window.safeHTML(matchingRequest.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    
+                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', '${matchingRequest.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}')" style="cursor:pointer;"`;
+                    actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to view details</span>`;
+                } else {
+                    // Fallback for manually generated exceptions outside of requests
+                    rowOnClick = `onclick="window.openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${currentActionType}')" style="cursor:pointer;"`;
+                    actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to edit</span>`;
+                }
+            }
+
+            return `<tr ${rowOnClick} class="${currentActionTab === 'active-leaves' ? 'leave-row-hover' : ''}">
                 <td style="color:var(--text-soft)">${displayDate}</td>
                 <td>
-                  <div style="display: flex; align-items: center; gap: 10px; cursor:pointer; transition:0.2s;" onclick="window.openStaffProfile('${row.staffId}')" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
+                  <div style="display: flex; align-items: center; gap: 10px; cursor:pointer; transition:0.2s;" onclick="event.stopPropagation(); window.openStaffProfile('${row.staffId}')" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
                       ${avatar}
                       <strong style="color: var(--text-main);">${row.name}</strong>
                   </div>
                 </td>
                 <td>${statusHTML}</td>
-                <td><a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${actionTypeStr}')">Manage Reason</a></td>
+                <td>${actionTd}</td>
             </tr>`;
         }).join('');
     }
@@ -5898,6 +6034,33 @@
     
     document.getElementById('btn-cancel-exc')?.addEventListener('click', () => { window.closeModal(document.getElementById('exception-modal')); });
     
+    document.getElementById('btn-delete-exc')?.addEventListener('click', async () => {
+        const excType = document.getElementById('exc-type').value;
+        if (await window.customConfirm(`Are you sure you want to remove this ${excType} exception?`)) {
+            const btn = document.getElementById('btn-delete-exc'); 
+            btn.innerText = "⏳"; btn.disabled = true;
+            try {
+                // Delete from Supabase
+                await supabaseClient.from('attendance_exceptions')
+                    .delete()
+                    .eq('staff_id', activeExceptionStaffId)
+                    .eq('date', activeExceptionDate)
+                    .eq('exception_type', excType);
+                
+                // Clear from local cache instantly
+                delete exceptionsData[`${activeExceptionStaffId}_${activeExceptionDate}_${excType}`];
+                
+                window.closeModal(document.getElementById('exception-modal'));
+                processStitchedData(); // Instantly refresh the table
+                showToast("Exception removed successfully", "primary");
+            } catch (err) {
+                showToast("Failed to remove exception.", "error");
+            } finally {
+                btn.innerHTML = "🗑️ Remove"; btn.disabled = false;
+            }
+        }
+    });
+
     document.getElementById('btn-save-exc')?.addEventListener('click', async () => {
       let reasonId = document.getElementById('exc-reason').value;
       let customReason = '';
