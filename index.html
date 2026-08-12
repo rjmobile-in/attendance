@@ -5991,7 +5991,13 @@
 
         tbody.innerHTML = dataToRender.map(row => {
             const isoDate = toLocalISO(row.date);
-            const displayDate = row.date.toLocaleDateString(window.appDateFormat);
+            let displayDate = row.date.toLocaleDateString(window.appDateFormat);
+            
+            // If the row was grouped into a range, format it beautifully
+            if (currentActionTab === 'active-leaves' && row.endDate && row.endDate !== row.isoDate) {
+                const eDateObj = new Date(row.endDate.split('-')[0], row.endDate.split('-')[1] - 1, row.endDate.split('-')[2]);
+                displayDate = `<div style="font-weight: 700;">${displayDate}</div> <div style="color:var(--text-soft); font-size:10px; text-transform:uppercase; margin: 2px 0;">to</div> <div style="font-weight: 700;">${eDateObj.toLocaleDateString(window.appDateFormat)}</div>`;
+            }
             
             const reasonTxt = row.excObj?.reason || row.excAbsent?.reason || row.excLate?.reason || row.excEarly?.reason || null;
 
