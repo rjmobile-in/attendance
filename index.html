@@ -1208,7 +1208,7 @@
                         <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
                         <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
                         <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
-                        <button class="sub-tab-btn" data-action-filter="leaves">Leave Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
+                        <button class="sub-tab-btn" data-action-filter="leaves">Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
                         <button class="sub-tab-btn" data-action-filter="active-leaves">Active & Scheduled Leaves</button>
                     </div>
                     
@@ -2063,7 +2063,7 @@
   <div id="leave-review-modal" class="modal-overlay" onclick="window.closeModal(this)">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <h2 style="margin:0;">Review Leave Request</h2>
+          <h2 style="margin:0;">Review Request</h2>
           <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('leave-review-modal'))">&times;</span>
       </div>
       <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));" id="leave-review-subtitle">Staff Name</p>
@@ -2246,7 +2246,10 @@
           <div style="margin-bottom: 24px;">
               <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="navigator.clipboard.writeText(document.getElementById('drawer-email').innerText).then(()=>showToast('Email Copied!', 'success'))" title="Click to Copy">📧 <span id="drawer-email" style="transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color=''">--</span></div>
               <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px;">🏢 Branch: <span id="drawer-branch" style="color: var(--text-main);">--</span></div>
-              <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">🎂 DOB: <span id="drawer-dob" style="color: var(--text-main);">--</span></div>
+              <div style="display: flex; gap: 16px; align-items: center;">
+                  <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">🎂 DOB: <span id="drawer-dob" style="color: var(--text-main);">--</span></div>
+                  <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">💼 Joined: <span id="drawer-join" style="color: var(--text-main);">--</span></div>
+              </div>
           </div>
 
           <h3 style="font-size: 14px; text-transform: uppercase; color: var(--text-soft); margin-bottom: 12px; font-weight: 700; letter-spacing: 0.5px;">Quick Stats (Selected Range)</h3>
@@ -2384,7 +2387,7 @@
                 const regex = term ? new RegExp('\\b' + safeTerm, 'i') : null;
 
                 Array.from(tbody.querySelectorAll('tr')).forEach(row => {
-                    if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No leave requests') || row.innerText.includes('No Individual Punches')) return;
+                    if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No requests') || row.innerText.includes('No Individual Punches')) return;
                     if (!term) {
                         row.style.display = '';
                     } else {
@@ -3351,7 +3354,7 @@
         if(!tbody) return;
         
         if (dbLeaves.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">No leave requests found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">No requests found.</td></tr>`;
             return;
         }
 
@@ -3433,7 +3436,7 @@
             const leaveIdx = dbLeaves.findIndex(l => l.id === id);
             if (leaveIdx !== -1) dbLeaves[leaveIdx].status = newStatus;
             
-            showToast(`Leave Request ${newStatus}!`, newStatus === 'Approved' ? 'success' : 'primary');
+            showToast(`Request ${newStatus}!`, newStatus === 'Approved' ? 'success' : 'primary');
             
             // Update UI Pending Badge instantly
             const pendingLeaves = dbLeaves.filter(l => l.status === 'Pending').length;
@@ -7418,7 +7421,7 @@
             const regex = term ? new RegExp('\\b' + safeTerm, 'i') : null;
 
             Array.from(tbody.querySelectorAll('tr')).forEach(row => {
-                if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No leave requests') || row.innerText.includes('No Individual Punches')) return;
+                if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No requests') || row.innerText.includes('No Individual Punches')) return;
                 if (!term) {
                     row.style.display = '';
                 } else {
@@ -8101,6 +8104,7 @@
         const bObj = branchMap[staff.default_branch_id];
         document.getElementById('drawer-branch').innerText = bObj ? bObj.branch_name : 'No Default Setup';
         document.getElementById('drawer-dob').innerText = staff.dob ? new Date(staff.dob).toLocaleDateString(window.appDateFormat) : 'Not Provided';
+        document.getElementById('drawer-join').innerText = staff.joining_date ? new Date(staff.joining_date).toLocaleDateString(window.appDateFormat) : 'Not Set';
 
         // Calculate Quick Stats from currently loaded data
         let daysPresent = 0, lates = 0, totalMs = 0, absent = 0;
