@@ -3407,8 +3407,13 @@
             // Clean data for safe inline JS
             const safeDesc = window.safeHTML(lv.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
             const safeTitle = window.safeHTML(lv.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            
+            let typeBadge = '';
+            const lType = lv.leave_type || 'Absent';
+            if (lType === 'Late Arrival') typeBadge = `<span class="badge bg-orange" style="margin-right: 8px; font-size: 10px;">Late</span>`;
+            else if (lType === 'Early Departure') typeBadge = `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); margin-right: 8px; font-size: 10px;">Early</span>`;
 
-            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}')">
+            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}', '${lType}', '${lv.expected_time || ''}')">
                 <td style="color:var(--text-soft)">${submitDate}</td>
                 <td>
                   <div style="display: flex; align-items: center; gap: 10px;">
@@ -3417,17 +3422,31 @@
                   </div>
                 </td>
                 <td style="font-weight: 600;">${sDate} - ${eDate}</td>
-                <td><strong style="color: var(--primary);">${lv.reason_title}</strong></td>
+                <td>${typeBadge}<strong style="color: var(--primary);">${lv.reason_title}</strong></td>
                 <td>${statusBadge}</td>
             </tr>`;
         }).join('');
     }
 
-    window.openLeaveModal = function(id, name, dates, title, desc, status, rawEndDate) {
+    window.openLeaveModal = function(id, name, dates, title, desc, status, rawEndDate, leaveType, expectedTime) {
         document.getElementById('leave-review-id').value = id;
         document.getElementById('leave-review-subtitle').innerText = "Requested by: " + name;
         document.getElementById('leave-review-dates').innerText = dates;
-        document.getElementById('leave-review-title').innerText = title;
+        
+        let displayTitle = title;
+        if (leaveType && leaveType !== 'Absent') {
+            let timeStr = expectedTime;
+            if (timeStr && window.use12HourTime && timeStr.includes(':')) {
+                let t = timeStr.split(':');
+                let h = parseInt(t[0]);
+                let ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                timeStr = `${h}:${t[1]} ${ampm}`;
+            }
+            displayTitle = `<span class="badge ${leaveType === 'Late Arrival' ? 'bg-orange' : 'bg-red'}" style="margin-right: 8px;">${leaveType}</span> ${title} ${timeStr ? `<span style="color:var(--text-soft); font-size:12px; margin-left: 8px;">(Expected: ${timeStr})</span>` : ''}`;
+        }
+        
+        document.getElementById('leave-review-title').innerHTML = displayTitle;
         document.getElementById('leave-review-desc').innerHTML = desc || "No detailed description.";
         
         let statusHtml = '';
@@ -3490,16 +3509,21 @@
                 let datesArray = [];
                 let inserts = [];
                 
-                // Smartly detect Exception Type from title
-                let autoExcType = 'Absent';
+                // Cleanly read from database columns
+                let autoExcType = lv.leave_type || 'Absent';
                 let cleanReason = lv.reason_title;
-                if (lv.reason_title.includes('[Late Arrival]')) { 
-                    autoExcType = 'Late Arrival'; 
-                    cleanReason = lv.reason_title.replace('[Late Arrival] ', ''); 
-                }
-                else if (lv.reason_title.includes('[Early Departure]')) { 
-                    autoExcType = 'Early Departure'; 
-                    cleanReason = lv.reason_title.replace('[Early Departure] ', ''); 
+                
+                // Append Expected Time cleanly to the reason for the Exceptions table
+                if (lv.expected_time) {
+                    let formattedTime = lv.expected_time;
+                    if (window.use12HourTime && lv.expected_time.includes(':')) {
+                        let timeSplit = lv.expected_time.split(':');
+                        let h = parseInt(timeSplit[0]);
+                        let ampm = h >= 12 ? 'PM' : 'AM';
+                        h = h % 12 || 12;
+                        formattedTime = `${h}:${timeSplit[1]} ${ampm}`;
+                    }
+                    cleanReason = `${lv.reason_title} (Expected: ${formattedTime})`;
                 }
                 
                 while(curr <= end) {
@@ -6039,7 +6063,10 @@
                     const safeDesc = window.safeHTML(matchingRequest.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
                     const safeTitle = window.safeHTML(matchingRequest.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
                     
-                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', '${matchingRequest.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}')" style="cursor:pointer;"`;
+                    const lType = matchingRequest.leave_type || 'Absent';
+                    const eTime = matchingRequest.expected_time || '';
+
+                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', '${matchingRequest.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}', '${lType}', '${eTime}')" style="cursor:pointer;"`;
                     actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to view details</span>`;
                 } else {
                     // Fallback for manually generated exceptions outside of requests
@@ -6182,8 +6209,8 @@
        const sName = staffMap[staffId]?.name;
 
        let baseRName = reasonId === 'Custom' ? customReason : reasonMap[reasonId]?.reason_name;
-       let rName = baseRName;
        
+       let exceptionReason = baseRName;
        if (excType !== 'Absent' && expectedTime) {
            let timeSplit = expectedTime.split(':');
            let formattedTime = expectedTime;
@@ -6193,7 +6220,7 @@
                h = h % 12 || 12;
                formattedTime = `${h}:${timeSplit[1]} ${ampm}`;
            }
-           rName = `${baseRName} (Expected: ${formattedTime})`;
+           exceptionReason = `${baseRName} (Expected: ${formattedTime})`;
        }
 
        while(curr <= end) {
@@ -6202,7 +6229,7 @@
                employee_name: sName,
                date: toLocalISO(curr), 
                reason_id: reasonId === 'Custom' ? null : reasonId, 
-               reason: rName, 
+               reason: exceptionReason, 
                exception_type: excType 
            });
            curr.setDate(curr.getDate() + 1);
@@ -6212,15 +6239,17 @@
            // 1. Insert into exceptions (Schedule the leave for reports/system)
            await supabaseClient.from('attendance_exceptions').upsert(inserts, { onConflict: 'staff_id, date, exception_type' });
            
-           // 2. NEW: Insert a record into leave_requests so staff can see it in their portal history!
+           // 2. NEW: Clean database insert into leave_requests
            await supabaseClient.from('leave_requests').insert([{
                staff_id: staffId,
                employee_name: sName,
                start_date: dStart,
                end_date: dEnd,
-               reason_title: rName + " (Admin Scheduled)",
+               reason_title: baseRName + " (Admin Scheduled)",
                reason_desc: "This leave was manually scheduled and approved directly by the Administrator.",
-               status: 'Approved'
+               status: 'Approved',
+               leave_type: excType,
+               expected_time: expectedTime || null
            }]);
 
            window.closeModal(document.getElementById('schedule-leave-modal'));
@@ -6228,7 +6257,7 @@
            
            // Soft refresh leave table if it's open
            if (typeof dbLeaves !== 'undefined') {
-               dbLeaves.unshift({ id: 'temp-'+Date.now(), staff_id: staffId, employee_name: sName, start_date: dStart, end_date: dEnd, reason_title: rName, status: 'Approved', created_at: new Date().toISOString() });
+               dbLeaves.unshift({ id: 'temp-'+Date.now(), staff_id: staffId, employee_name: sName, start_date: dStart, end_date: dEnd, reason_title: baseRName, status: 'Approved', leave_type: excType, expected_time: expectedTime || null, created_at: new Date().toISOString() });
                if (document.getElementById('leave-table-container').style.display === 'block') renderLeaveTable();
            }
 
