@@ -1087,6 +1087,7 @@
                             <th onclick="window.sortStats('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Name ⇅</th>
                             <th onclick="window.sortStats('role')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Role ⇅</th>
                             <th onclick="window.sortStats('days')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Present ⇅</th>
+                            <th onclick="window.sortStats('absent')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Absent ⇅</th>
                             <th>Avg In & Out</th>
                             <th onclick="window.sortStats('hours')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Total Hours ⇅</th>
                             <th>Work vs Travel</th>
@@ -1190,8 +1191,17 @@
                 <!-- VIEW 7: ACTION CENTER -->
                 <div id="view-action" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and resolve exceptions.</span>
-                        <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Future Leave</button>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and resolve exceptions.</span>
+                            <div class="switch-wrap" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                                <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Approved / Excused</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="toggle-show-excused" onchange="renderAbsentTable()">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Leave/Exception</button>
                     </div>
 
                     <div class="sub-tabs" id="action-center-tabs" style="margin-bottom: 24px;">
@@ -1277,6 +1287,7 @@
                                 <div style="width: 100%; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
                                     <select id="new-staff-branch" class="input-field" style="margin:0; flex: 2; min-width: 140px;" title="Default Branch"></select>
                                     <input type="text" id="new-staff-dob" class="input-field" title="Date of Birth" placeholder="DOB" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
+                                    <input type="text" id="new-staff-joining" class="input-field" title="Joining Date" placeholder="Joining Date" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
                                     <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
                                     <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
                                     <button id="add-staff-btn" class="btn-primary" style="flex: 1; min-width: 100px; justify-content: center;">Add Staff</button>
@@ -1853,8 +1864,16 @@
       <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Default Branch</label>
       <select id="edit-staff-branch" class="input-field" style="margin-top: 8px; margin-bottom: 8px;"></select>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
-      <input type="text" id="edit-staff-dob" class="input-field" placeholder="Select DOB" style="margin-top: 8px; margin-bottom: 8px;">
+      <div style="display: flex; gap: 16px; margin-top: 8px; margin-bottom: 8px;">
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
+          <input type="text" id="edit-staff-dob" class="input-field" placeholder="Select DOB" style="margin-top: 8px; margin-bottom: 0;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Joining Date</label>
+          <input type="text" id="edit-staff-joining" class="input-field" placeholder="Select Joining Date" style="margin-top: 8px; margin-bottom: 0;">
+        </div>
+      </div>
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
@@ -1976,11 +1995,28 @@
 
   <div id="schedule-leave-modal" class="modal-overlay">
     <div class="modal-card">
-      <h2 style="margin-bottom: 8px;">Schedule Future Leave</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Mark upcoming dates as an approved exception.</p>
+      <h2 style="margin-bottom: 8px;">Schedule Leave / Exception</h2>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Mark upcoming dates as an approved exception (Leave, Late, Early).</p>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Staff</label>
-      <select id="sched-staff" class="input-field" style="margin-top: 8px;"></select>
+      <div style="display: flex; gap: 16px;">
+          <div style="flex: 1;">
+              <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Staff</label>
+              <select id="sched-staff" class="input-field" style="margin-top: 8px;"></select>
+          </div>
+          <div style="flex: 1;">
+              <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Exception Type</label>
+              <select id="sched-type" class="input-field" style="margin-top: 8px;">
+                  <option value="Absent">Full Day Leave</option>
+                  <option value="Late Arrival">Late Arrival</option>
+                  <option value="Early Departure">Early Departure</option>
+              </select>
+          </div>
+      </div>
+
+      <div id="sched-time-container" style="display: none; margin-bottom: 16px;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Expected Time</label>
+          <input type="time" id="sched-expected-time" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
+      </div>
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
@@ -3652,7 +3688,9 @@
     if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
+    if (document.getElementById("new-staff-joining")) flatpickr("#new-staff-joining", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
+    if (document.getElementById("edit-staff-joining")) flatpickr("#edit-staff-joining", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("manual-date")) flatpickr("#manual-date", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, defaultDate: "today", maxDate: "today", onChange: revertDate });
     if (document.getElementById("manual-time")) flatpickr("#manual-time", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: !window.use12HourTime, disableMobile: "true" });
     
@@ -4172,9 +4210,11 @@
          
          staffStatsTracker[staff.id] = { 
              id: staff.id, name: staff.name, role: staffRoleName, 
-             daysPresent: 0, totalHoursDec: 0, lateCount: 0, earlyCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
+             daysPresent: 0, daysAbsent: 0, totalHoursDec: 0, lateCount: 0, earlyCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
              dailyTargetHours: 0, sumInMins: 0, sumOutMins: 0, daysOut: 0, sumWorkMins: 0, sumTravelMins: 0
          };
+         staff.joining_date_obj = staff.joining_date ? new Date(staff.joining_date) : new Date(minLaunchDate);
+         staff.joining_date_obj.setHours(0,0,0,0);
          
          let shiftStartStr = staff.shift_start || roleObj?.shift_start || globalShiftStart;
          let shiftEndStr = staff.shift_end || roleObj?.shift_end || globalShiftEnd;
@@ -4207,6 +4247,9 @@
 
           if (roleId && !selectedRoleIds.has(roleId)) return;
           if (!roleId && selectedRoleIds.size < dbRoles.length) return; 
+          
+          // Naye employee ke liye uski joining date se pehle ke din skip karo
+          if (targetDate < staff.joining_date_obj) return;
 
           // FAST LOOKUP: Instead of looping thousands of times, instantly grab the array
           let dailyLogs = logsByStaffAndDate[`${staff.id}_${dateStringMatch}`] || [];
@@ -4367,13 +4410,14 @@
           } else {
             if (!inStartStr && !inEndStr && !outStartStr && !outEndStr) {
                 totalMissing++; missingData.push({ date: targetDate, staffId: staff.id, name: staff.name, excAbsent: excAbsent });
+                staffStatsTracker[staff.id].daysAbsent++;
             }
           }
         });
       });
 
       processedData.sort((a,b) => b.date - a.date); missingData.sort((a,b) => b.date - a.date);
-      statsData = Object.values(staffStatsTracker).filter(s => s.daysPresent > 0 || exceptionsData[`${s.id}_${toLocalISO(startDate)}_Absent`]);
+      statsData = Object.values(staffStatsTracker).filter(s => s.daysPresent > 0 || s.daysAbsent > 0 || exceptionsData[`${s.id}_${toLocalISO(startDate)}_Absent`]);
 
       const elPresent = document.getElementById('metric-present');
       const elLate = document.getElementById('metric-late');
@@ -5569,6 +5613,7 @@
             if (column === 'name') { valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); }
             else if (column === 'role') { valA = a.role.toLowerCase(); valB = b.role.toLowerCase(); }
             else if (column === 'days') { valA = a.daysPresent; valB = b.daysPresent; }
+            else if (column === 'absent') { valA = a.daysAbsent; valB = b.daysAbsent; }
             else if (column === 'hours') { valA = a.sumWorkMins + a.sumTravelMins; valB = b.sumWorkMins + b.sumTravelMins; }
             else if (column === 'lates') { 
                 // Sum all infractions for sorting
@@ -5635,7 +5680,8 @@
                   </div>
                 </td>
                 <td><span class="role-tag">${s.role}</span></td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700;">${s.daysPresent}</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--success);">${s.daysPresent}</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--danger);">${s.daysAbsent}</td>
                 <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
                 <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary);">${formattedTotal}</td>
                 <td>
@@ -5780,14 +5826,16 @@
         let dataToRender = [];
         let actionTypeStr = '';
 
+        const showExcused = document.getElementById('toggle-show-excused')?.checked;
+
         if (currentActionTab === 'absent') {
-            dataToRender = missingData;
+            dataToRender = missingData.filter(r => showExcused || !r.excAbsent);
             actionTypeStr = 'Absent';
         } else if (currentActionTab === 'late') {
-            dataToRender = processedData.filter(r => r.isLate && !r.excLate);
+            dataToRender = processedData.filter(r => r.isLate && (showExcused || !r.excLate));
             actionTypeStr = 'Late Arrival';
         } else if (currentActionTab === 'early') {
-            dataToRender = processedData.filter(r => r.isEarly && !r.excEarly);
+            dataToRender = processedData.filter(r => r.isEarly && (showExcused || !r.excEarly));
             actionTypeStr = 'Early Departure';
         }
 
@@ -5884,10 +5932,17 @@
       finally { saveBtn.innerText = "Save Reason"; saveBtn.disabled = false; }
     });
 
+    document.getElementById('sched-type')?.addEventListener('change', (e) => {
+        document.getElementById('sched-time-container').style.display = (e.target.value === 'Absent') ? 'none' : 'block';
+    });
+
     document.getElementById('btn-open-schedule-leave')?.addEventListener('click', () => { 
         document.getElementById('sched-reason').value = dbReasons.length > 0 ? dbReasons[0].id : '';
         window.closeModal(document.getElementById('sched-reason-custom'));
         document.getElementById('sched-reason-custom').value = '';
+        document.getElementById('sched-type').value = 'Absent';
+        document.getElementById('sched-expected-time').value = '';
+        document.getElementById('sched-time-container').style.display = 'none';
         document.getElementById('schedule-leave-modal').style.display = 'flex'; 
     });
     document.getElementById('btn-cancel-sched')?.addEventListener('click', () => { window.closeModal(document.getElementById('schedule-leave-modal')); });
@@ -5896,6 +5951,8 @@
        const staffId = document.getElementById('sched-staff').value;
        const dStart = document.getElementById('sched-start').value;
        const dEnd = document.getElementById('sched-end').value;
+       const excType = document.getElementById('sched-type').value;
+       const expectedTime = document.getElementById('sched-expected-time').value;
        let reasonId = document.getElementById('sched-reason').value;
        
        let customReason = '';
@@ -5913,7 +5970,20 @@
        let inserts = [];
        const sName = staffMap[staffId]?.name;
 
-       let rName = reasonId === 'Custom' ? customReason : reasonMap[reasonId]?.reason_name;
+       let baseRName = reasonId === 'Custom' ? customReason : reasonMap[reasonId]?.reason_name;
+       let rName = baseRName;
+       
+       if (excType !== 'Absent' && expectedTime) {
+           let timeSplit = expectedTime.split(':');
+           let formattedTime = expectedTime;
+           if (window.use12HourTime) {
+               let h = parseInt(timeSplit[0]);
+               let ampm = h >= 12 ? 'PM' : 'AM';
+               h = h % 12 || 12;
+               formattedTime = `${h}:${timeSplit[1]} ${ampm}`;
+           }
+           rName = `${baseRName} (Expected: ${formattedTime})`;
+       }
 
        while(curr <= end) {
            inserts.push({ 
@@ -5922,7 +5992,7 @@
                date: toLocalISO(curr), 
                reason_id: reasonId === 'Custom' ? null : reasonId, 
                reason: rName, 
-               exception_type: 'Absent'
+               exception_type: excType 
            });
            curr.setDate(curr.getDate() + 1);
        }
@@ -6319,7 +6389,7 @@
               </td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -6555,7 +6625,8 @@
               email: emailVal, 
               password: passVal,
               default_branch_id: defBranchId,
-              dob: dobVal
+              dob: dobVal,
+              joining_date: document.getElementById('new-staff-joining').value || null
           }]);
           
           if(dbError) throw dbError;
@@ -6572,6 +6643,11 @@
           if (newDobEl) {
               if (newDobEl._flatpickr) newDobEl._flatpickr.clear();
               else newDobEl.value = '';
+          }
+          const newJoiningEl = document.getElementById('new-staff-joining');
+          if (newJoiningEl) {
+              if (newJoiningEl._flatpickr) newJoiningEl._flatpickr.clear();
+              else newJoiningEl.value = '';
           }
           
           await initialMetadataLoad(); 
@@ -6601,7 +6677,7 @@
         });
     });
 
-    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob) => {
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
         document.getElementById('edit-staff-role').value = roleId || '';
@@ -6612,11 +6688,13 @@
         if (document.getElementById('edit-staff-branch')) document.getElementById('edit-staff-branch').value = defBranchId || '';
         if (document.getElementById('edit-staff-dob')) {
             const dobEl = document.getElementById('edit-staff-dob');
-            if (dobEl._flatpickr) {
-                dobEl._flatpickr.setDate(dob || '');
-            } else {
-                dobEl.value = dob || '';
-            }
+            if (dobEl._flatpickr) dobEl._flatpickr.setDate(dob || '');
+            else dobEl.value = dob || '';
+        }
+        if (document.getElementById('edit-staff-joining')) {
+            const joinEl = document.getElementById('edit-staff-joining');
+            if (joinEl._flatpickr) joinEl._flatpickr.setDate(joiningDate || '');
+            else joinEl.value = joiningDate || '';
         }
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
@@ -6660,8 +6738,9 @@
                 // 3. Update the staff_directory database table
                 const rName = roleMap[roleId]?.role_name || null;
                 const defBranchId = document.getElementById('edit-staff-branch').value || null;
+                const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
                 await supabaseClient.from('staff_directory').update({
-                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId, dob: newDob
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate
                 }).eq('id', id);
 
                 window.closeModal(document.getElementById('edit-staff-modal'));
