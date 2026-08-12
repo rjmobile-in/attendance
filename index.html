@@ -5909,7 +5909,7 @@
             const showPast = document.getElementById('toggle-past-leaves')?.checked;
             const todayStr = toLocalISO(new Date());
 
-            dataToRender = (window.allExceptionsList || []).filter(exc => {
+            let rawExceptions = (window.allExceptionsList || []).filter(exc => {
                 if (!showPast && exc.date < todayStr) return false;
                 
                 // Apply Global Filters
@@ -5922,15 +5922,54 @@
                     if (selectedBranchIds.size !== dbBranches.length && !selectedBranchIds.has(staffObj.default_branch_id)) return false;
                 }
                 return true;
-            }).map(exc => {
-                const [y, m, d] = exc.date.split('-');
+            });
+
+            // Group continuous dates for the same staff, type, and reason
+            rawExceptions.sort((a, b) => {
+                if (a.staff_id !== b.staff_id) return a.staff_id.localeCompare(b.staff_id);
+                if (a.exception_type !== b.exception_type) return a.exception_type.localeCompare(b.exception_type);
+                const reasonA = a.reason || '';
+                const reasonB = b.reason || '';
+                if (reasonA !== reasonB) return reasonA.localeCompare(reasonB);
+                return a.date.localeCompare(b.date);
+            });
+
+            let groupedExceptions = [];
+            let currentGroup = null;
+
+            rawExceptions.forEach(exc => {
+                if (!currentGroup) {
+                    currentGroup = { ...exc, start_date: exc.date, end_date: exc.date };
+                } else {
+                    let prevDate = new Date(currentGroup.end_date.split('-')[0], currentGroup.end_date.split('-')[1] - 1, currentGroup.end_date.split('-')[2]);
+                    prevDate.setDate(prevDate.getDate() + 1);
+                    let nextExpectedDate = toLocalISO(prevDate);
+
+                    if (
+                        currentGroup.staff_id === exc.staff_id &&
+                        currentGroup.exception_type === exc.exception_type &&
+                        currentGroup.reason === exc.reason &&
+                        exc.date === nextExpectedDate
+                    ) {
+                        currentGroup.end_date = exc.date; // Extend range
+                    } else {
+                        groupedExceptions.push(currentGroup);
+                        currentGroup = { ...exc, start_date: exc.date, end_date: exc.date };
+                    }
+                }
+            });
+            if (currentGroup) groupedExceptions.push(currentGroup);
+
+            dataToRender = groupedExceptions.map(exc => {
+                const [y, m, d] = exc.start_date.split('-');
                 return {
                     date: new Date(y, m - 1, d),
                     staffId: exc.staff_id,
                     name: staffMap[exc.staff_id]?.name || exc.employee_name,
                     excObj: exc,
                     excType: exc.exception_type,
-                    isoDate: exc.date
+                    isoDate: exc.start_date,
+                    endDate: exc.end_date
                 };
             });
         }
