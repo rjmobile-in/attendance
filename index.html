@@ -803,6 +803,9 @@
             <button id="toggle-filter-btn" class="btn-secondary" title="Toggle Filters">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Data
             </button>
+            <button id="btn-refresh-data" class="btn-secondary" title="Refresh Data">
+              🔄 Refresh
+            </button>
             
             
             <button id="btn-shortcuts" class="btn-secondary" title="Keyboard Shortcuts">⌨️ Shortcuts</button>
@@ -2598,6 +2601,29 @@
             drawer.style.display = 'flex';
         } else {
             drawer.style.display = 'none';
+        }
+    });
+
+    // Soft Refresh Data
+    document.getElementById('btn-refresh-data')?.addEventListener('click', async function() {
+        // Agar pehle se loading chal rahi hai, toh click ignore karo
+        if (typeof isFetchingLogs !== 'undefined' && isFetchingLogs) return;
+        
+        const originalHtml = this.innerHTML;
+        this.innerHTML = '<span class="spinner-sm" style="width:14px; height:14px; border-width:2px; margin-right:6px; display:inline-block; vertical-align:middle;"></span> Refreshing...';
+        this.disabled = true;
+        
+        try {
+            // Direct function call (without window.) kyunki module scope same hai
+            await fetchLogsFromDatabase(false);
+            showToast('Data refreshed successfully', 'success');
+        } catch (error) {
+            console.error("Refresh Error:", error);
+            showToast('Failed to refresh data', 'error');
+        } finally {
+            // Success ho ya error, button ko humesha wapas normal state me le aao
+            this.innerHTML = originalHtml;
+            this.disabled = false;
         }
     });
 
