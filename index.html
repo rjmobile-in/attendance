@@ -2314,11 +2314,37 @@
     let missingData = [];
     let statsData = [];
     
+    // --- DAY ROLLOVER DETECTION ---
+    let currentSystemDateStr = new Date().toDateString();
+
+    function handleDayRollover() {
+        const activeBtn = document.querySelector('.quick-date-btn.active');
+        if (activeBtn) {
+            const range = activeBtn.getAttribute('data-range');
+            if (range !== 'custom' && range !== 'alltime') {
+                activeBtn.click();
+                if (typeof showToast === 'function') {
+                    showToast("Midnight crossed! Refreshing workspace for the new day...", "primary");
+                }
+            }
+        }
+        if (document.getElementById('view-birthdays')?.style.display === 'block' && typeof renderAdminBirthdays === 'function') {
+            renderAdminBirthdays();
+        }
+    }
+
     // --- LIVE ADMIN CLOCK ---
     setInterval(() => {
+        const now = new Date();
+        
+        const newlyCalculatedDateStr = now.toDateString();
+        if (currentSystemDateStr !== newlyCalculatedDateStr) {
+            currentSystemDateStr = newlyCalculatedDateStr;
+            handleDayRollover();
+        }
+
         const clockEl = document.getElementById('live-admin-clock');
         if (clockEl) {
-            const now = new Date();
             let h = now.getHours();
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
@@ -3205,6 +3231,12 @@
         if (document.visibilityState === 'visible') {
             const activeTab = document.querySelector('.tab-btn.active');
             if (activeTab) manageWakeLock(activeTab.getAttribute('data-view'));
+            
+            const nowStr = new Date().toDateString();
+            if (typeof currentSystemDateStr !== 'undefined' && currentSystemDateStr !== nowStr) {
+                currentSystemDateStr = nowStr;
+                if(typeof handleDayRollover === 'function') handleDayRollover();
+            }
         } else {
             screenWakeLock = null; // Browser auto-releases lock when hidden
         }
