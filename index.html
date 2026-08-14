@@ -29,9 +29,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>  
   
   <!-- Security & IndexedDB Caching -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
@@ -782,7 +782,7 @@
             <div class="header-title" id="page-title">Overview</div>
             <div id="live-admin-clock" style="font-size: 14px; margin-top: 4px; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Loading time...</div>
           </div>
-          <div class="header-controls">
+          <div class="header-controls" style="margin-left: auto;">
             <div class="dropdown" id="export-dropdown" style="display: none;">
               <button id="export-btn" class="btn-primary" data-target="export-menu">
                 Export <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
@@ -2495,7 +2495,7 @@
                 gain.gain.setValueAtTime(0.05, ctx.currentTime); gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3); 
                 osc.start(); osc.stop(ctx.currentTime + 0.3); 
             }
-        } catch(e) {}
+        } catch (e) { console.error(e); }
     };
 
     // Apply immediate visual CSS classes on load
@@ -2846,7 +2846,7 @@
             if (type === 'light') navigator.vibrate(15);
             else if (type === 'success') navigator.vibrate([15, 50, 15]);
             else if (type === 'error') navigator.vibrate([30, 40, 30, 40, 40]);
-        } catch (e) {}
+        } catch (e) { console.error(e); }
     };
 
     function showToast(message, type = 'primary', duration = 3000) {
@@ -2958,7 +2958,7 @@
             
             try {
                 const url = new URL(window.location); url.searchParams.set('view', 'personalize'); window.history.pushState({}, '', url);
-            } catch (err) {}
+            } catch (err) { console.error(err); }
             
             // Optional: Close Sidebar on Mobile automatically
             if (window.innerWidth <= 900) {
@@ -3929,7 +3929,7 @@
               globalShiftStart = data.setting_value.start || "10:00";
               globalShiftEnd = data.setting_value.end || "19:00";
           }
-      } catch(e) {}
+      } catch (e) { console.error(e); }
       
       if(document.getElementById('global-shift-start')) document.getElementById('global-shift-start').value = globalShiftStart;
       if(document.getElementById('global-shift-end')) document.getElementById('global-shift-end').value = globalShiftEnd;
@@ -3939,14 +3939,14 @@
           dbRoles = roleData || [];
           roleMap = {};
           dbRoles.forEach(r => roleMap[r.id] = r);
-      } catch (err) {}
+      } catch (err) { console.error(err); }
 
       try {
           const { data: reasonData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
           dbReasons = reasonData || [];
           reasonMap = {};
           dbReasons.forEach(r => reasonMap[r.id] = r);
-      } catch (err) {}
+      } catch (err) { console.error(err); }
       populateReasonDropdowns();
 
       try {
@@ -3955,21 +3955,21 @@
           dbRoster = rosterData || [];
           rosterMap = {};
           dbRoster.forEach(r => rosterMap[`${r.staff_id}_${r.date}`] = r);
-      } catch (err) {}
+      } catch (err) { console.error(err); }
 
       try {
           const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
           dbStaff = staffData || [];
           staffMap = {};
           dbStaff.forEach(s => staffMap[s.id] = s);
-      } catch (err) {}
+      } catch (err) { console.error(err); }
       
       try {
           const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
           dbBranches = branchesData || [];
           branchMap = {};
           dbBranches.forEach(b => branchMap[b.id] = b);
-      } catch (err) {}
+      } catch (err) { console.error(err); }
 
       const uParams = new URLSearchParams(window.location.search);
       selectedStaffIds = uParams.get('staff') ? new Set(uParams.get('staff').split(',')) : new Set(dbStaff.map(s => s.id));
@@ -4046,7 +4046,7 @@
           .update({ photo_capture: null })
           .eq('uniform_reviewed', true)
           .lte('timestamp', cutoffDate.toISOString());
-      } catch (err) {}
+      } catch (err) { console.error(err); }
     }
 
     function createFilterDropdown({ containerId, dataArray, selectedSet, labelKey, checkboxClass, btnTextId, allText, selectAllBtnId, deselectAllBtnId, searchInputId }) {
@@ -4194,7 +4194,7 @@
                   filterBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filter Data`;
               }
           }
-      } catch (err) {}
+      } catch (err) { console.error(err); }
 
       // FETCH ALL DATA FOR THE SELECTED RANGE
       let allLogs = [];
@@ -7699,29 +7699,6 @@
     // =========================================================================
     //  UX & ACCESSIBILITY (A11Y) ENHANCEMENTS
     // =========================================================================
-
-    // --- QUICK TABLE SEARCH (FRONTEND - WORD START SEQUENCE) ---
-    document.querySelectorAll('.quick-table-search').forEach(input => {
-        input.addEventListener('input', function() {
-            const term = this.value.trim().toLowerCase();
-            const activeView = document.querySelector('.app-view[style*="display: block"]') || document.querySelector('.app-view');
-            if (!activeView) return;
-            const tbody = activeView.querySelector('tbody');
-            if(!tbody) return;
-
-            const safeTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = term ? new RegExp('\\b' + safeTerm, 'i') : null;
-
-            Array.from(tbody.querySelectorAll('tr')).forEach(row => {
-                if(row.id === 'infinite-scroll-trigger' || row.innerText.includes('No data') || row.innerText.includes('No records') || row.innerText.includes('No requests') || row.innerText.includes('No Individual Punches')) return;
-                if (!term) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = regex.test(row.innerText) ? '' : 'none';
-                }
-            });
-        });
-    });
 
     // 1. Global "Clear Filters" Logic
     document.getElementById('clear-all-filters-btn')?.addEventListener('click', () => {
