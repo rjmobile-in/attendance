@@ -4216,9 +4216,18 @@
 
       dbLogs = allLogs;
 
-      // Fetch all exceptions (without date limits) to allow Future & Past toggling in Scheduled Leaves
-      const { data: excData } = await supabaseClient
-        .from('attendance_exceptions').select('*');
+      // Fetch all exceptions safely bypassing Supabase 1000-row limit
+      let excData = [];
+      let excOffset = 0;
+      let keepFetchingExc = true;
+      while(keepFetchingExc) {
+          const { data } = await supabaseClient.from('attendance_exceptions').select('*').range(excOffset, excOffset + 999);
+          if (data && data.length > 0) {
+              excData = [...excData, ...data];
+              excOffset += 1000;
+              if (data.length < 1000) keepFetchingExc = false;
+          } else { keepFetchingExc = false; }
+      }
         
       window.allExceptionsList = excData || [];
       exceptionsData = {};
@@ -4235,9 +4244,19 @@
       });
 
       // -------------------------------------------------------------
-      // FETCH AND AUTO-REJECT LEAVES
+      // FETCH AND AUTO-REJECT LEAVES SAFELY
       // -------------------------------------------------------------
-      const { data: leavesData } = await supabaseClient.from('leave_requests').select('*').order('created_at', { ascending: false });
+      let leavesData = [];
+      let leavesOffset = 0;
+      let keepFetchingLeaves = true;
+      while(keepFetchingLeaves) {
+          const { data } = await supabaseClient.from('leave_requests').select('*').order('created_at', { ascending: false }).range(leavesOffset, leavesOffset + 999);
+          if (data && data.length > 0) {
+              leavesData = [...leavesData, ...data];
+              leavesOffset += 1000;
+              if (data.length < 1000) keepFetchingLeaves = false;
+          } else { keepFetchingLeaves = false; }
+      }
       dbLeaves = leavesData || [];
       
       let leavesToReject = [];
@@ -4248,14 +4267,25 @@
           if (lv.status === 'Pending' && lv.end_date < todayISO) {
               lv.status = 'Rejected';
               lv.reason_desc = (lv.reason_desc ? lv.reason_desc + '\n\n' : '') + '[System Auto-Rejected: Date Expired]';
-              leavesToReject.push({ id: lv.id, status: 'Rejected', reason_desc: lv.reason_desc });
+              leavesToReject.push(lv);
           }
       });
 
       if (leavesToReject.length > 0) {
-          supabaseClient.from('leave_requests').upsert(leavesToReject).then(() => {
+          const { error } = await supabaseClient.from('leave_requests').upsert(leavesToReject);
+          if (error) {
+              console.error("Failed to auto-reject leaves:", error);
+          } else {
               console.log("Auto-rejected expired leaves:", leavesToReject.length);
-          });
+              
+              // Recalculate pending badge safely after DB confirms update
+              const currentPending = dbLeaves.filter(l => l.status === 'Pending').length;
+              const leaveBadge = document.getElementById('pending-leave-badge');
+              if (leaveBadge) {
+                  leaveBadge.innerText = currentPending;
+                  leaveBadge.style.display = currentPending > 0 ? 'inline-block' : 'none';
+              }
+          }
       }
       
       // Update Pending Leave Badge
