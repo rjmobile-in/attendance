@@ -4023,19 +4023,7 @@
         if(excReason) excReason.innerHTML = opts;
     }
 
-    async function loadFromCache() {
-      try {
-        const cachedLogs = await localforage.getItem('rj_cached_logs');
-        const cachedExceptions = await localforage.getItem('rj_cached_exceptions');
-        if (cachedLogs && cachedExceptions) {
-          dbLogs = JSON.parse(cachedLogs);
-          exceptionsData = JSON.parse(cachedExceptions);
-          processStitchedData(); 
-        }
-      } catch(e) {
-          console.warn("Cache load failed", e);
-      }
-    }
+    
 
     async function executeLazyPhotoDelete() {
       const cutoffDate = new Date(); 
@@ -4279,8 +4267,7 @@
       }
       // -------------------------------------------------------------
 
-      localforage.setItem('rj_cached_logs', JSON.stringify(dbLogs));
-      localforage.setItem('rj_cached_exceptions', JSON.stringify(exceptionsData));
+      
 
       processStitchedData();
       isFetchingLogs = false;
