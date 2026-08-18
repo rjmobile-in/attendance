@@ -749,14 +749,9 @@
             <span class="tab-btn-text">Duty Roster</span>
           </button>
 
-          <button class="tab-btn" data-view="view-action" style="position: relative; padding-right: 60px;">
+          <button class="tab-btn" data-view="view-action">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
             <span class="tab-btn-text">Action Center</span>
-            <div id="action-badges" style="display:none; position: absolute; right: 12px; gap: 4px; align-items: center;">
-              <span id="badge-absent" class="badge bg-red" title="Unexcused Absences" style="padding: 2px 5px; font-size: 9px;">0</span>
-              <span id="badge-late" class="badge bg-orange" title="Unexcused Lates" style="padding: 2px 5px; font-size: 9px;">0</span>
-              <span id="badge-early" class="badge" title="Unexcused Early Departures" style="background: rgba(249, 115, 22, 0.15); color: #f97316; padding: 2px 5px; font-size: 9px; border: 1px solid rgba(249, 115, 22, 0.3);">0</span>
-            </div>
           </button>
 
           <!-- Settings -->
@@ -2538,7 +2533,7 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['logs', 'stats', 'action', 'live'].includes(viewParam)) exportBtn.style.display = 'inline-block';
+                if (['logs', 'stats', 'action', 'live', 'matrix'].includes(viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
@@ -3342,7 +3337,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (viewId === 'view-logs' || viewId === 'view-stats' || viewId === 'view-action' || viewId === 'view-live') {
+            if (viewId === 'view-logs' || viewId === 'view-stats' || viewId === 'view-action' || viewId === 'view-live' || viewId === 'view-matrix') {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -6615,13 +6610,9 @@
                 return new Date(targetLog.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
             };
             const inTime = getLogTime('Clock In');
-            const travelTime = getLogTime('Transit Start');
-            const reachTime = getLogTime('Transit End');
             const outTime = getLogTime('Clock Out');
 
             if (inTime) badgesHtml += `<div class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">In: ${inTime}</div>`;
-            if (travelTime) badgesHtml += `<div class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Travel: ${travelTime}</div>`;
-            if (reachTime) badgesHtml += `<div class="badge bg-blue" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Reach: ${reachTime}</div>`;
             if (outTime) badgesHtml += `<div class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Out: ${outTime}</div>`;
             if (!badgesHtml) badgesHtml = `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`;
                     
@@ -7228,6 +7219,7 @@
         const isStatsView = document.getElementById('view-stats').style.display === 'block';
         const isActionView = document.getElementById('view-action').style.display === 'block';
         const isLiveView = document.getElementById('view-live').style.display === 'block';
+        const isMatrixView = document.getElementById('view-matrix').style.display === 'block';
 
         let reportName = "ATTENDANCE LOGS";
         if (isStatsView) {
@@ -7237,6 +7229,8 @@
           reportName = `ACTION CENTER - ${actionTitles[currentActionTab] || 'EXCEPTIONS'}`;
         } else if (isLiveView) {
           reportName = "LIVE TRACKER STATUS";
+        } else if (isMatrixView) {
+          reportName = "ATTENDANCE GRID MATRIX";
         } else {
           const showLate = document.getElementById('filter-toggle-late')?.checked;
           const showEarly = document.getElementById('filter-toggle-early')?.checked;
@@ -7323,6 +7317,50 @@
                         exportRows.push([b.branch_name, displayName, role, timeIn]);
                     });
                 }
+            });
+        } else if (isMatrixView) {
+            const dateList = getDatesArrayFromFetchedLogs();
+            columnHeaders = ["Staff Name", ...dateList.map(d => d.toLocaleDateString(window.appDateFormat))];
+            exportRows = [];
+            
+            const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
+            const matrixLogsMap = {};
+            dbLogs.forEach(log => {
+                const sId = getStaffId(log);
+                if (!sId) return;
+                const key = `${sId}_${new Date(log.timestamp).toDateString()}`;
+                if (!matrixLogsMap[key]) matrixLogsMap[key] = [];
+                matrixLogsMap[key].push(log);
+            });
+            
+            filteredStaff.forEach(staff => {
+                let rowData = [staff.name];
+                dateList.forEach(dateObj => {
+                    const dateStringMatch = dateObj.toDateString(); 
+                    const isoDateStr = toLocalISO(dateObj);
+                    const dailyLogs = matrixLogsMap[`${staff.id}_${dateStringMatch}`] || [];
+                    
+                    if(dailyLogs.length === 0) {
+                        const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
+                        const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
+                        rowData.push(reasonTxt ? `[${reasonTxt}]` : "No Record");
+                    } else {
+                        const getLogTime = (action) => {
+                            const logs = dailyLogs.filter(l => l.action === action).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+                            if (!logs.length) return null;
+                            const targetLog = action === 'Clock Out' ? logs[logs.length - 1] : logs[0];
+                            return new Date(targetLog.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
+                        };
+                        const inTime = getLogTime('Clock In');
+                        const outTime = getLogTime('Clock Out');
+                        
+                        let str = [];
+                        if (inTime) str.push(`In: ${inTime}`);
+                        if (outTime) str.push(`Out: ${outTime}`);
+                        rowData.push(str.join("\n") || "No Record");
+                    }
+                });
+                exportRows.push(rowData);
             });
         } else {
             columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
