@@ -800,10 +800,8 @@
             </button>
             
             
-            <button id="btn-shortcuts" class="btn-secondary" title="Keyboard Shortcuts">⌨️ Shortcuts</button>
-            <button id="btn-personalize" class="btn-secondary" title="Personalize Workspace UI">✨ Personalize</button>
             <button id="fullscreen-btn" class="btn-secondary" title="Toggle Fullscreen">⛶ Fullscreen</button>
-            <button id="logout-btn" class="btn-secondary" style="margin-left: 8px;">Log Out</button>
+            <button id="btn-personalize" class="btn-secondary" title="Account & Preferences" style="margin-left: 8px;">⚙️ My Account</button>
           </div>
         </div>
 
@@ -923,7 +921,7 @@
                 <div id="view-dashboard" class="app-view">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time metrics based on filters.</span>
-                        <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="document.getElementById('draggable-widgets').classList.toggle('hide-widgets')">Toggle Widgets</button>
+                        <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="window.toggleDashboardWidgets()">Toggle Widgets</button>
                     </div>
                     <style>
                         .hide-widgets .widget-card { display: none !important; }
@@ -1383,14 +1381,10 @@
                     </div>
                 </div>
 
-                <!-- VIEW 12: PERSONALIZE WORKSPACE -->
-                <div id="view-personalize" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Customize your workspace UI, colors, and accessibility. These apply only to your current browser.</span>
-                        <button id="btn-reset-theme-tab" class="btn-secondary" style="color: var(--danger); border-color: var(--danger-alpha);">Reset to Defaults</button>
-                    </div>
-
-                    <div class="settings-grid">
+                <button class="tab-btn" data-view="view-personalize">
+            <span class="tab-icon">⚙️</span> 
+            <span class="tab-btn-text">My Account</span>
+          </button>
                         <!-- Panel 1: Theme Presets -->
                         <div class="settings-panel">
                             <h3>Quick Theme Presets</h3>
@@ -2435,9 +2429,9 @@
     
     const urlParams = new URLSearchParams(window.location.search);
     let startDate = new Date(); let endDate = new Date();
-    const rangeParam = urlParams.get('range') || localStorage.getItem('rj_active_date_range') || 'today';
-    const savedStart = localStorage.getItem('rj_custom_start');
-    const savedEnd = localStorage.getItem('rj_custom_end');
+    const rangeParam = urlParams.get('range') || (window.isMemoryEnabled ? localStorage.getItem('rj_active_date_range') : 'today') || 'today';
+    const savedStart = window.isMemoryEnabled ? localStorage.getItem('rj_custom_start') : null;
+    const savedEnd = window.isMemoryEnabled ? localStorage.getItem('rj_custom_end') : null;
 
     if (rangeParam === 'custom' && savedStart && savedEnd) {
         startDate = new Date(savedStart);
@@ -2462,9 +2456,10 @@
     
     const minLaunchDate = new Date('2026-08-01');
 
-    // INITIALIZE GLOBAL PREFS (Time Format, Font, View, Shortcuts)
-    const defaultPrefs = { compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i", gracePeriod: "5" };
+    // INITIALIZE GLOBAL PREFS (Time Format, Font, View, Shortcuts, Memory)
+    const defaultPrefs = { memoryEnabled: true, compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i", gracePeriod: "5" };
     const uiPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
+    window.isMemoryEnabled = uiPrefs.memoryEnabled;
     
     window.use12HourTime = uiPrefs.use12h;
     window.appDateFormat = uiPrefs.dateFormat;
@@ -2587,14 +2582,31 @@
     });
 
     // Toggle Filters Drawer
+    const filterDrawer = document.getElementById('master-filter-section');
+    if (window.isMemoryEnabled && localStorage.getItem('rj_filter_drawer_closed') === 'true') {
+        if (filterDrawer) filterDrawer.style.display = 'none';
+    }
     document.getElementById('toggle-filter-btn').addEventListener('click', () => {
-        const drawer = document.getElementById('master-filter-section');
-        if (drawer.style.display === 'none') {
-            drawer.style.display = 'flex';
+        if (filterDrawer.style.display === 'none') {
+            filterDrawer.style.display = 'flex';
+            if (window.isMemoryEnabled) localStorage.removeItem('rj_filter_drawer_closed');
         } else {
-            drawer.style.display = 'none';
+            filterDrawer.style.display = 'none';
+            if (window.isMemoryEnabled) localStorage.setItem('rj_filter_drawer_closed', 'true');
         }
     });
+
+    window.toggleDashboardWidgets = function() {
+        const dw = document.getElementById('draggable-widgets');
+        if(dw) {
+            dw.classList.toggle('hide-widgets');
+            if(window.isMemoryEnabled) localStorage.setItem('rj_hide_widgets', dw.classList.contains('hide-widgets'));
+        }
+    };
+    if (window.isMemoryEnabled && localStorage.getItem('rj_hide_widgets') === 'true') {
+        const dw = document.getElementById('draggable-widgets');
+        if(dw) dw.classList.add('hide-widgets');
+    }
 
     // Soft Refresh Data
     document.getElementById('btn-refresh-data')?.addEventListener('click', async function() {
