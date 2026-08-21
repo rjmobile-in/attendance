@@ -670,6 +670,25 @@
   .drawer-stat-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px; text-align: center; flex: 1; }
   .drawer-stat-val { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; font-family: 'Plus Jakarta Sans', sans-serif;}
   .drawer-stat-lbl { font-size: 11px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; }
+  
+  /* =========================================================
+       BUG FIX: TACTILE SQUISH CLICK-LOSS
+       ========================================================= */
+    .sidebar-toggle-btn {
+        transform-origin: right center !important; /* Shrinks towards the right edge, so it stays under mouse */
+    }
+    
+    /* Adds an invisible expanded "Hit Box" around the small buttons */
+    .sidebar-toggle-btn::after, .table-maximizer-btn::after {
+        content: '';
+        position: absolute;
+        top: -20px; 
+        left: -20px; 
+        right: -20px; 
+        bottom: -20px;
+        background: transparent;
+        z-index: 1;
+    }
   </style>
 </head>
 <body>
