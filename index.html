@@ -1381,10 +1381,13 @@
                     </div>
                 </div>
 
-                <button class="tab-btn" data-view="view-personalize">
-            <span class="tab-icon">⚙️</span> 
-            <span class="tab-btn-text">My Account</span>
-          </button>
+                <!-- VIEW 10: MY ACCOUNT / PERSONALIZE -->
+                <div id="view-personalize" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Customize your workspace appearance and preferences.</span>
+                    </div>
+                    
+                    <div class="settings-grid">
                         <!-- Panel 1: Theme Presets -->
                         <div class="settings-panel">
                             <h3>Quick Theme Presets</h3>
@@ -1568,8 +1571,9 @@
                                 <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Header Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--header-bg" value="#09090b"></div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                        
+                    </div> <!-- End settings-grid -->
+                </div> <!-- End view-personalize -->
 
             </div> <!-- End Export Container -->
         </div> <!-- End Content Wrapper -->
