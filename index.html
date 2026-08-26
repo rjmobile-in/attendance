@@ -1000,12 +1000,16 @@
                             <div class="chart-container"><canvas id="arrivalChart"></canvas></div>
                         </div>
                         <div class="chart-card">
-                            <h3><span>Top Latecomers (Unexcused)</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
-                            <div class="chart-container"><canvas id="lateChart"></canvas></div>
+                            <h3><span>Productivity Split (Work vs Travel)</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
+                            <div class="chart-container"><canvas id="productivityChart"></canvas></div>
                         </div>
                         <div class="chart-card">
                             <h3><span>Role Distribution (Present)</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
                             <div class="chart-container"><canvas id="roleChart"></canvas></div>
+                        </div>
+                        <div class="chart-card">
+                            <h3><span>Branch Activity Level</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
+                            <div class="chart-container"><canvas id="branchActivityChart"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -5979,16 +5983,48 @@
             });
         }
 
-        const lateStats = [...statsData].filter(s => s.lateCount > 0).sort((a,b) => b.lateCount - a.lateCount).slice(0, 5);
-        const lateCanvas = document.getElementById('lateChart');
-        if(lateCanvas) {
-            if(window.myCharts['late']) window.myCharts['late'].destroy();
-            window.myCharts['late'] = new Chart(lateCanvas, {
-                type: 'bar',
-                data: { labels: lateStats.map(s => s.name.split(' ')[0]), 
-                        datasets: [{ label: 'Unexcused Lates', data: lateStats.map(s => s.lateCount), backgroundColor: warning, borderRadius: 6, borderSkipped: false }]
+        let totalWorkMins = 0;
+        let totalTravelMins = 0;
+        processedData.forEach(r => {
+            const mWork = r.formattedWork.match(/(-?\d+)h\s(\d+)m/);
+            if(mWork) totalWorkMins += (parseInt(mWork[1]) * 60) + parseInt(mWork[2]);
+            
+            const mTravel = r.formattedTravel.match(/(-?\d+)h\s(\d+)m/);
+            if(mTravel) totalTravelMins += (parseInt(mTravel[1]) * 60) + parseInt(mTravel[2]);
+        });
+
+        const prodCanvas = document.getElementById('productivityChart');
+        if(prodCanvas) {
+            if(window.myCharts['productivity']) window.myCharts['productivity'].destroy();
+            window.myCharts['productivity'] = new Chart(prodCanvas, {
+                type: 'doughnut',
+                data: { 
+                    labels: ['Work Hours', 'Travel Hours'], 
+                    datasets: [{ 
+                        data: [Math.floor(totalWorkMins/60), Math.floor(totalTravelMins/60)], 
+                        backgroundColor: [success, warning], 
+                        borderWidth: 2, 
+                        borderColor: 'var(--card-bg)', 
+                        hoverOffset: 4 
+                    }]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)', padding: 12, cornerRadius: 8 } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false }, ticks: { precision: 0 } } } }
+                options: { 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }, 
+                        tooltip: { 
+                            backgroundColor: 'rgba(24, 24, 27, 0.9)', 
+                            padding: 12, 
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw} hrs`;
+                                }
+                            }
+                        } 
+                    }, 
+                    cutout: '70%' 
+                }
             });
         }
 
@@ -6004,6 +6040,55 @@
                         datasets: [{ data: Object.values(roleCounts), backgroundColor: [primary, success, warning, '#8b5cf6', '#ec4899', '#14b8a6'], borderWidth: 2, borderColor: 'var(--card-bg)', hoverOffset: 4 }]
                 },
                 options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)', padding: 12, cornerRadius: 8 } } }
+            });
+        }
+
+        // --- NEW 5TH CHART: BRANCH ACTIVITY LEVEL ---
+        const branchVisits = {};
+        dbBranches.forEach(b => { branchVisits[b.branch_name] = 0; });
+        
+        dbLogs.forEach(l => {
+            if (l.branch && l.branch !== 'Time Edited') {
+                const bId = getBranchId(l);
+                const bName = branchMap[bId]?.branch_name || l.branch;
+                if (bName) {
+                    branchVisits[bName] = (branchVisits[bName] || 0) + 1;
+                }
+            }
+        });
+
+        const sortedBranches = Object.entries(branchVisits).sort((a, b) => b[1] - a[1]);
+        const branchLabels = sortedBranches.map(b => b[0]);
+        const branchDataCounts = sortedBranches.map(b => b[1]);
+
+        const branchCanvas = document.getElementById('branchActivityChart');
+        if(branchCanvas) {
+            if(window.myCharts['branchActivity']) window.myCharts['branchActivity'].destroy();
+            window.myCharts['branchActivity'] = new Chart(branchCanvas, {
+                type: 'pie',
+                data: { 
+                    labels: branchLabels, 
+                    datasets: [{ 
+                        data: branchDataCounts, 
+                        // Multiple attractive colors for different branches
+                        backgroundColor: [primary, success, warning, danger, '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#0ea5e9'], 
+                        borderWidth: 2, 
+                        borderColor: 'var(--card-bg)', 
+                        hoverOffset: 4 
+                    }]
+                },
+                options: { 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        // Legend right me dikhega jaise Role chart me dikhta hai
+                        legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } }, 
+                        tooltip: { 
+                            backgroundColor: 'rgba(24, 24, 27, 0.9)', 
+                            padding: 12, 
+                            cornerRadius: 8 
+                        } 
+                    } 
+                }
             });
         }
     }
