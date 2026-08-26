@@ -7690,7 +7690,7 @@
             }
             
             const diffDays = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
-            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US');
+            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString(window.appDateFormat);
             
             return { ...staff, daysLeft: diffDays, turningAge, formattedDate };
         });
