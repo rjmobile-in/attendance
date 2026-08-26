@@ -1065,8 +1065,10 @@
                             <tr>
                             <th>Date</th>
                             <th>Staff Member</th>
-                            <th>Timeline & Time Split</th>
-                            <th>Status & Reason</th>
+                            <th>Timeline</th>
+                            <th>Time Split</th>
+                            <th>Status</th>
+                            <th>Route</th>
                             <th>Timeline Audits</th>
                             </tr>
                         </thead>
@@ -2242,6 +2244,8 @@
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Hours" checked> Total Overall Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Lates" checked> Late Arrivals Count</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Early" checked> Early Departures Count</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="T-Shirt Violations"> T-Shirt Violations</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="ID Card Violations"> ID Card Violations</label>
       </div>
 
       <div style="display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid var(--card-border); padding-top: 16px;">
@@ -4156,7 +4160,9 @@
               masterTbody.innerHTML = Array(6).fill(`<tr>
                   <td><div class="skeleton" style="width: 80px;"></div></td>
                   <td><div class="skeleton" style="width: 150px; height: 16px; margin-bottom: 6px;"></div><br><div class="skeleton" style="width: 80px; height: 12px;"></div></td>
-                  <td><div class="skeleton" style="width: 100%; height: 30px;"></div></td>
+                  <td><div class="skeleton" style="width: 80px; height: 30px;"></div></td>
+                  <td><div class="skeleton" style="width: 80px; height: 30px;"></div></td>
+                  <td><div class="skeleton" style="width: 80px; height: 20px;"></div></td>
                   <td><div class="skeleton" style="width: 120px; height: 20px;"></div></td>
                   <td><div class="skeleton" style="width: 50px; height: 50px; border-radius: 8px;"></div></td>
               </tr>`).join('');
@@ -4730,8 +4736,10 @@
           thead.innerHTML = `
               <th onclick="window.sortLogs('date')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Date ${logsSortCol === 'date' ? (logsSortAsc ? '↑' : '↓') : '⇅'}</th>
               <th onclick="window.sortLogs('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Member ${logsSortCol === 'name' ? (logsSortAsc ? '↑' : '↓') : '⇅'}</th>
-              <th>Timeline & Time Split</th>
-              <th>Status & Reason</th>
+              <th>Timeline</th>
+              <th>Time Split</th>
+              <th>Status</th>
+              <th>Route</th>
               <th>Timeline Audits</th>
           `;
 
@@ -4804,8 +4812,7 @@
             if (!row.isLate && !row.isEarly && !row.excAbsent && !row.excLate && !row.excEarly) statusHtml = `<span class="badge bg-green">On Time</span>`;
 
             let actionLinks = '';
-            if(row.isLate && !row.excLate) actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', 'Late Arrival')">Manage Reason (Late)</a><br>`;
-            if(row.isEarly && !row.excEarly) actionLinks += `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', 'Early Departure')">Manage Reason (Early)</a>`;
+            // Manage Reason links removed
 
             let mapLinkHtml = '';
             
@@ -4850,20 +4857,17 @@
                 </div>
               </td>
               <td>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <span style="color:var(--text-soft)">In:</span> <strong>${inStr}</strong> <br>
-                        <span style="color:var(--text-soft)">Out:</span> <strong>${outStr}</strong>
-                    </div>
-                    <div style="text-align:right">
-                        <span style="font-weight:700; color:var(--primary); font-size:calc(16px * var(--font-scale, 1));">${row.formattedHours}</span><br>
-                        <div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600; margin-top:4px;">
-                          W: <span style="color:var(--success)">${row.formattedWork}</span> | T: <span style="color:var(--warning)">${row.formattedTravel}</span>
-                        </div>
-                    </div>
-                </div>
+                  <span style="color:var(--text-soft)">In:</span> <strong>${inStr}</strong> <br>
+                  <span style="color:var(--text-soft)">Out:</span> <strong>${outStr}</strong>
               </td>
-              <td>${statusHtml} <br><div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); margin-top:4px; font-weight:600;">Route: ${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
+              <td>
+                  <span style="font-weight:700; color:var(--primary); font-size:calc(16px * var(--font-scale, 1));">${row.formattedHours}</span><br>
+                  <div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600; margin-top:4px;">
+                    W: <span style="color:var(--success)">${row.formattedWork}</span> | T: <span style="color:var(--warning)">${row.formattedTravel}</span>
+                  </div>
+              </td>
+              <td>${statusHtml}</td>
+              <td><div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600;">${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
               <td>${photosHTML}</td>
             </tr>`;
           }).join('');
@@ -7510,21 +7514,18 @@
                 ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
 
                 if (cell.r === 0) {
-                    // Title Line 1 (Big, Bold, Indigo BG)
-                    ws[i].s.font = { bold: true, sz: 18, color: { rgb: "FFFFFF" } };
-                    ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
+                    ws[i].s.font = { bold: true, sz: 16, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "F37021" } }; // RJ Orange
                 } else if (cell.r === 1) {
-                    // Title Line 2 (Date line, smaller, Indigo BG)
-                    ws[i].s.font = { bold: true, sz: 12, color: { rgb: "FFFFFF" } };
-                    ws[i].s.fill = { fgColor: { rgb: "4F46E5" } };
+                    ws[i].s.font = { bold: true, sz: 11, color: { rgb: "FFFFFF" } };
+                    ws[i].s.fill = { fgColor: { rgb: "F37021" } }; // RJ Orange
                 } else if (cell.r === 3) {
-                    // Column Headers (Bold, Green BG)
                     ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                    ws[i].s.fill = { fgColor: { rgb: "10B981" } };
+                    ws[i].s.fill = { fgColor: { rgb: "1E2D4A" } }; // Dark Blue Header
                 } else if (cell.r > 3) {
                     // Data rows alternate background colors
-                    if (cell.r % 2 === 0) {
-                        ws[i].s.fill = { fgColor: { rgb: "F8FAFC" } }; // Light gray
+                    if (cell.r % 2 !== 0) {
+                        ws[i].s.fill = { fgColor: { rgb: "E2E8F0" } }; // Darker Gray alternate row
                     }
                 }
             }
@@ -7578,26 +7579,26 @@
                 body: exportRows,
                 theme: 'grid',
                 headStyles: { 
-                    fillColor: [99, 102, 241],
+                    fillColor: [243, 112, 33], // RJ Orange
                     textColor: 255, 
-                    fontSize: 11, 
+                    fontSize: 10, 
                     fontStyle: 'bold',
-                    halign: 'center', // Align Center
+                    halign: 'center', 
                     valign: 'middle'
                 },
                 bodyStyles: { 
                     fontSize: 9.5, 
                     cellPadding: 6, 
                     textColor: [50, 50, 50],
-                    halign: 'center', // Align Center
+                    halign: 'center', 
                     valign: 'middle'
                 },
                 styles: {
-                    overflow: 'linebreak', // Drops text to the next line instead of bleeding off-page
-                    cellWidth: 'auto'      // Shrinks the entire table to fit perfectly inside the A4 width
+                    overflow: 'linebreak', 
+                    cellWidth: 'auto'
                 },
                 alternateRowStyles: {
-                    fillColor: [244, 244, 250]
+                    fillColor: [226, 232, 240] // Darker Gray alternate row
                 },
                 margin: { left: 30, right: 30, bottom: 40 },
                 didDrawPage: function(data) {
@@ -8782,6 +8783,9 @@
                 if (cell.r === 0) { ws[i].s.font = { bold: true, sz: 16, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "F37021" } }; }
                 else if (cell.r === 1) { ws[i].s.font = { bold: true, sz: 11, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "F37021" } }; }
                 else if (cell.r === 3) { ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "1E2D4A" } }; }
+                else if (cell.r > 3 && cell.r % 2 !== 0) {
+                    ws[i].s.fill = { fgColor: { rgb: "E2E8F0" } }; // Darker Gray alternate row
+                }
             }
 
             const wb = XLSX.utils.book_new();
@@ -8808,9 +8812,9 @@
                 body: exportRows,
                 theme: 'grid',
                 headStyles: { fillColor: [243, 112, 33], textColor: 255, fontSize: 10, fontStyle: 'bold', halign: 'center', valign: 'middle' },
-                bodyStyles: { fontSize: 9, cellPadding: 5, textColor: [50, 50, 50], halign: 'center', valign: 'middle' },
+                bodyStyles: { fontSize: 9.5, cellPadding: 6, textColor: [50, 50, 50], halign: 'center', valign: 'middle' },
                 styles: { overflow: 'linebreak', cellWidth: 'auto' },
-                alternateRowStyles: { fillColor: [248, 250, 252] },
+                alternateRowStyles: { fillColor: [226, 232, 240] }, // Darker Gray alternate row
                 margin: { left: 20, right: 20, bottom: 30 }
             });
             doc.save(`${safeFileName}.pdf`);
