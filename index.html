@@ -4522,11 +4522,13 @@
             // Re-assign lastOutLog so Edit buttons reference the correct ID
             if (actualLastOut) lastOutLog = actualLastOut;
             
-            if (firstInTime && (inStartStr || inEndStr)) {
+            if (inStartStr || inEndStr) {
+                if (!firstInTime) return; // If filtering by In time, they MUST have clocked in
                 let minsIn = firstInTime.getHours() * 60 + firstInTime.getMinutes();
                 if (minsIn < inMinStart || minsIn > inMinEnd) return; 
             }
-            if (lastOutTime && (outStartStr || outEndStr)) {
+            if (outStartStr || outEndStr) {
+                if (!lastOutTime) return; // If filtering by Out time, they MUST have clocked out
                 let minsOut = lastOutTime.getHours() * 60 + lastOutTime.getMinutes();
                 if (minsOut < outMinStart || minsOut > outMinEnd) return; 
             }
@@ -5268,33 +5270,47 @@
     };
     window.renderPunchRows = function() {
         const punchList = document.getElementById('master-punch-list');
-        const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}">${b.branch_name}</option>`).join('');
         
         punchList.innerHTML = window.currentEditLogs.map((log, idx) => {
             const timeVal = log.timestamp ? new Date(log.timestamp).toTimeString().substring(0,5) : '';
+            const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}" ${b.branch_name === log.branch ? 'selected' : ''}>${b.branch_name}</option>`).join('');
+            
+            const hasTshirt = log.uniform_tshirt !== false; 
+            const hasIdcard = log.uniform_idcard !== false; 
+
             return `
-            <div class="punch-row" data-logid="${log.id || ''}" style="display:flex; gap:8px; align-items:center; background:var(--input-bg); padding:8px; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
-                <select class="punch-action input-field" style="margin:0; flex:1; padding:8px;">
-                    <option value="Clock In" ${log.action==='Clock In'?'selected':''}>In</option>
-                    <option value="Clock Out" ${log.action==='Clock Out'?'selected':''}>Out</option>
-                    <option value="Transit Start" ${log.action==='Transit Start'?'selected':''}>Transit Start</option>
-                    <option value="Transit End" ${log.action==='Transit End'?'selected':''}>Transit End</option>
-                </select>
-                <select class="punch-branch input-field" style="margin:0; flex:1.5; padding:8px;">
-                    <option value="">-- Branch --</option>
-                    ${branchOpts}
-                    <option value="Time Edited" ${log.branch==='Time Edited'?'selected':''}>Time Edited</option>
-                    ${!dbBranches.find(b=>b.branch_name===log.branch) && log.branch !== 'Time Edited' && log.branch ? `<option value="${log.branch}" selected>${log.branch}</option>` : ''}
-                </select>
-                <input type="time" class="punch-time input-field" value="${timeVal}" style="margin:0; flex:1; padding:8px;">
-                <button class="icon-btn" onclick="window.removePunchRow(${idx})" style="color:var(--danger)">🗑</button>
+            <div class="punch-row" data-logid="${log.id || ''}" style="display:flex; flex-direction:column; gap:8px; background:var(--input-bg); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
+                <div style="display:flex; gap:8px; align-items:center; width:100%;">
+                    <select class="punch-action input-field" style="margin:0; flex:1; padding:8px;">
+                        <option value="Clock In" ${log.action==='Clock In'?'selected':''}>In</option>
+                        <option value="Clock Out" ${log.action==='Clock Out'?'selected':''}>Out</option>
+                        <option value="Transit Start" ${log.action==='Transit Start'?'selected':''}>Transit Start</option>
+                        <option value="Transit End" ${log.action==='Transit End'?'selected':''}>Transit End</option>
+                    </select>
+                    <select class="punch-branch input-field" style="margin:0; flex:1.5; padding:8px;">
+                        <option value="">-- Branch --</option>
+                        ${branchOpts}
+                        <option value="Time Edited" ${log.branch==='Time Edited'?'selected':''}>Time Edited</option>
+                        ${!dbBranches.find(b=>b.branch_name===log.branch) && log.branch !== 'Time Edited' && log.branch ? `<option value="${log.branch}" selected>${log.branch}</option>` : ''}
+                    </select>
+                    <input type="time" class="punch-time input-field" value="${timeVal}" style="margin:0; flex:1; padding:8px;">
+                    <button class="icon-btn" onclick="window.removePunchRow(${idx})" style="color:var(--danger)">🗑</button>
+                </div>
+                <div style="display: flex; gap: 16px;">
+                    <label class="check-wrap" style="flex: 1; margin:0; padding:6px; font-size:11px; background:var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                        <input type="checkbox" class="punch-tshirt" ${hasTshirt ? 'checked' : ''}> T-Shirt
+                    </label>
+                    <label class="check-wrap" style="flex: 1; margin:0; padding:6px; font-size:11px; background:var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                        <input type="checkbox" class="punch-idcard" ${hasIdcard ? 'checked' : ''}> ID Card
+                    </label>
+                </div>
             </div>`;
         }).join('');
         if(window.currentEditLogs.length === 0) punchList.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-soft);">No punches found. Add one below.</div>';
     };
 
     document.getElementById('btn-add-punch-row')?.addEventListener('click', () => {
-        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null });
+        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null, uniform_tshirt: true, uniform_idcard: true, uniform_reviewed: true });
         window.renderPunchRows();
     });
 
@@ -5317,16 +5333,32 @@
            const action = row.querySelector('.punch-action').value;
            const branch = row.querySelector('.punch-branch').value;
            const timeStr = row.querySelector('.punch-time').value;
+           const hasTshirt = row.querySelector('.punch-tshirt').checked;
+           const hasIdcard = row.querySelector('.punch-idcard').checked;
            
            if(!timeStr || !branch) hasErrors = true;
            
            const newIso = new Date(`${isoDateStr}T${timeStr}:00`).toISOString();
            
+           // Fetch old data so we don't lose photos and branch_id
+           const existingLog = window.currentEditLogs.find(l => l.id == logId) || {};
+           const branchObj = dbBranches.find(b => b.branch_name === branch);
+           
            let payload = {
-               staff_id: staffId, employee_name: staffName,
-               action: action, branch: branch, timestamp: newIso,
-               uniform_reviewed: true, uniform_tshirt: true, uniform_idcard: true
+               staff_id: staffId, 
+               employee_name: staffName,
+               action: action, 
+               branch: branch, 
+               branch_id: branchObj ? branchObj.id : (existingLog.branch_id || null),
+               timestamp: newIso,
+               uniform_reviewed: true, 
+               uniform_tshirt: hasTshirt, 
+               uniform_idcard: hasIdcard,
+               photo_capture: existingLog.photo_capture || null,
+               latitude: existingLog.latitude || null,
+               longitude: existingLog.longitude || null
            };
+           
            if(logId) payload.id = logId;
            upsertData.push(payload);
        });
@@ -5338,19 +5370,27 @@
        }
 
        try {
-           const sDate = new Date(isoDateStr); sDate.setHours(0,0,0,0);
-           const eDate = new Date(isoDateStr); eDate.setHours(23,59,59,999);
-           await supabaseClient.from('attendance_logs').delete().eq('staff_id', staffId)
-                .gte('timestamp', sDate.toISOString()).lte('timestamp', eDate.toISOString());
+           // Find which records the user actually DELETED via the Trash bin
+           const currentIdsInDb = window.currentEditLogs.map(l => l.id).filter(id => id);
+           const idsToKeep = upsertData.map(u => u.id).filter(id => id);
+           const idsToDelete = currentIdsInDb.filter(id => !idsToKeep.includes(id));
+
+           // 1. Delete ONLY the removed ones
+           if (idsToDelete.length > 0) {
+               await supabaseClient.from('attendance_logs').delete().in('id', idsToDelete);
+           }
            
+           // 2. Safely Update/Insert the rest
            if(upsertData.length > 0) {
-               await supabaseClient.from('attendance_logs').upsert(upsertData);
+               const { error } = await supabaseClient.from('attendance_logs').upsert(upsertData);
+               if (error) throw error;
            }
            
            window.closeModal(document.getElementById('edit-time-modal'));
            fetchLogsFromDatabase(false);
            showToast("Master timeline updated!", "success");
        } catch (err) {
+           console.error("Save Timeline Error:", err);
            showToast("Failed to update timeline.", "error");
        } finally {
            btn.innerText = "Save Timeline"; btn.disabled = false;
