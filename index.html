@@ -2634,6 +2634,12 @@
                         if(branchFilt) branchFilt.style.display = 'none';
                         if(staffFilt) staffFilt.style.display = 'none';
                         timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                        
+                        // Live Tracker must strictly use Today's data
+                        setTimeout(() => {
+                            const todayBtn = document.querySelector('.quick-date-btn[data-range="today"]');
+                            if (todayBtn && !todayBtn.classList.contains('active')) todayBtn.click();
+                        }, 50);
                     } else if (['stats', 'matrix', 'action', 'audits', 'roster'].includes(viewParam)) {
                         timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
                         if (['action', 'matrix', 'stats'].includes(viewParam)) {
@@ -3506,6 +3512,12 @@
                 if(branchFilt) branchFilt.style.display = 'none';
                 if(staffFilt) staffFilt.style.display = 'none';
                 timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+
+                // Live Tracker must strictly use Today's data
+                const todayBtn = document.querySelector('.quick-date-btn[data-range="today"]');
+                if (todayBtn && !todayBtn.classList.contains('active')) {
+                    setTimeout(() => todayBtn.click(), 10);
+                }
             } 
             else if (['view-stats', 'view-matrix', 'view-action', 'view-audits', 'view-roster'].includes(viewId)) {
                 // In tabs me exact time In/Out ki filtering utni kaam nahi aati
