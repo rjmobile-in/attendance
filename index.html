@@ -573,68 +573,23 @@
        11. SMOOTH ANIMATIONS & TRANSITIONS (TABS & SUB-TABS)
        ========================================================= */
        
-    /* 1. Main Tab Views: Smooth slide up when switching sidebar tabs */
+    /* 1. Main Tab Views: Instant show */
     .app-view {
-        animation: slideUpFade 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 1;
     }
 
-    /* 2. Sub-Tab Tables: Staggered fluid wave when data re-renders */
-    tbody tr {
-        opacity: 0; /* Start hidden */
-        transform-origin: left center;
-        animation: fluidRowReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes fluidRowReveal {
-        from { opacity: 0; transform: translateX(-15px) scale(0.98); filter: blur(4px); }
-        to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0px); }
-    }
-    /* Stagger the first 6 rows, then group the rest */
-    tbody tr:nth-child(1) { animation-delay: 0.04s; }
-    tbody tr:nth-child(2) { animation-delay: 0.08s; }
-    tbody tr:nth-child(3) { animation-delay: 0.12s; }
-    tbody tr:nth-child(4) { animation-delay: 0.16s; }
-    tbody tr:nth-child(5) { animation-delay: 0.20s; }
-    tbody tr:nth-child(n+6) { animation-delay: 0.24s; }
-
-    /* 3. Dashboard Widgets & Gallery Cards: Satisfying pop-in effect */
-    .widget-card, .audit-card, .live-branch-card {
-        opacity: 0; 
-        animation: popInFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    /* Stagger the cards */
-    .widget-card:nth-child(1), .audit-card:nth-child(1), .live-branch-card:nth-child(1) { animation-delay: 0.05s; }
-    .widget-card:nth-child(2), .audit-card:nth-child(2), .live-branch-card:nth-child(2) { animation-delay: 0.10s; }
-    .widget-card:nth-child(3), .audit-card:nth-child(3), .live-branch-card:nth-child(3) { animation-delay: 0.15s; }
-    .widget-card:nth-child(4), .audit-card:nth-child(4), .live-branch-card:nth-child(4) { animation-delay: 0.20s; }
-    .widget-card:nth-child(n+5), .audit-card:nth-child(n+5), .live-branch-card:nth-child(n+5) { animation-delay: 0.25s; }
-
-    /* --- Keyframes --- */
-    @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: none; }
-    }
-    
-    @keyframes slideRightFade {
-        from { opacity: 0; transform: translateX(-15px); }
-        to { opacity: 1; transform: none; }
-    }
-    
-    @keyframes popInFade {
-        from { opacity: 0; transform: scale(0.96) translateY(10px); }
-        to { opacity: 1; transform: none; }
+    /* 2. Sub-Tab Tables & Cards: Instant render without artificial delays */
+    tbody tr, .widget-card, .audit-card, .live-branch-card {
+        opacity: 1; 
+        transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
     /* =========================================================
-       SIDEBAR TAB SWITCHING ANIMATION (FLUID BLUR REVEAL)
+       SIDEBAR TAB SWITCHING ANIMATION (INSTANT)
        ========================================================= */
-    .app-view { opacity: 0; }
     .app-view.animate-tab {
-        animation: viewSpringIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes viewSpringIn {
-        0% { opacity: 0; transform: translateY(20px) scale(0.95); filter: blur(10px); }
-        60% { opacity: 1; transform: translateY(-2px) scale(1.01); filter: blur(0px); }
-        100% { opacity: 1; transform: translateY(0) scale(1); filter: none; }
+        animation: none;
+        opacity: 1;
     }
 
     /* Personalization: UI Density & Motion */
@@ -742,38 +697,18 @@
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> 
             <span class="tab-btn-text">Live Tracker</span>
           </button>
-          <button class="tab-btn" data-view="view-birthdays">
-            <span class="tab-icon">🎂</span> 
-            <span class="tab-btn-text">Staff Birthdays</span>
-          </button>
 
-          <!-- Records -->
-          <div class="sidebar-category">Records</div>
-          <button class="tab-btn" data-view="view-logs">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
-            <span class="tab-btn-text">Attendance Logs</span>
+          <!-- Operations -->
+          <div class="sidebar-category">Operations</div>
+          <button class="tab-btn" data-view="view-branch-ops">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span> 
+            <span class="tab-btn-text">Branch Ops</span>
           </button>
           
-          <button class="tab-btn" data-view="view-audits" style="position: relative;">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> 
-            <span class="tab-btn-text">Photo Audits</span>
-            <span id="pending-audits-badge" class="badge bg-orange" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
-          </button>
-
-          <!-- Analytics -->
-          <div class="sidebar-category">Analytics</div>
-          <button class="tab-btn" data-view="view-stats">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
-            <span class="tab-btn-text">Staff Stats</span>
-          </button>
-          
-          <button class="tab-btn" data-view="view-matrix">
+          <button class="tab-btn" data-view="view-branch-matrix">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> 
-            <span class="tab-btn-text">Attendance Grid</span>
+            <span class="tab-btn-text">Branch Grid</span>
           </button>
-
-          <!-- Management -->
-          <div class="sidebar-category">Management</div>
 
           <button class="tab-btn" data-view="view-roster">
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span> 
@@ -784,6 +719,38 @@
             <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
             <span class="tab-btn-text">Action Center</span>
           </button>
+
+          <!-- Records -->
+          <div class="sidebar-category">Records</div>
+          <button class="tab-btn" data-view="view-logs">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> 
+            <span class="tab-btn-text">Attendance Logs</span>
+          </button>
+          
+          <button class="tab-btn" data-view="view-matrix">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> 
+            <span class="tab-btn-text">Attendance Grid</span>
+          </button>
+
+          <button class="tab-btn" data-view="view-audits" style="position: relative;">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> 
+            <span class="tab-btn-text">Photo Audits</span>
+            <span id="pending-audits-badge" class="badge bg-orange" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
+          </button>
+
+          <!-- Analytics & HR -->
+          <div class="sidebar-category">Analytics & Team</div>
+          <button class="tab-btn" data-view="view-stats">
+            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
+            <span class="tab-btn-text">Staff Stats</span>
+          </button>
+          
+          <button class="tab-btn" data-view="view-birthdays">
+            <span class="tab-icon">🎂</span> 
+            <span class="tab-btn-text">Staff Birthdays</span>
+          </button>
+
+
 
           <!-- Settings -->
           <div class="sidebar-category">Settings</div>
@@ -1133,6 +1100,49 @@
                     </div>
                 </div>
                 
+                <!-- VIEW 12: BRANCH OPS -->
+                <div id="view-branch-ops" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Track daily opening/closing times and averages based on staff punches.</span>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="branch-ops-table">
+                                <thead>
+                                    <tr>
+                                        <th>Branch Name</th>
+                                        <th>Days Operated</th>
+                                        <th>Avg Open Time</th>
+                                        <th>Avg Close Time</th>
+                                        <th>Today's Live Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="branch-ops-tbody">
+                                    <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 13: BRANCH GRID MATRIX -->
+                <div id="view-branch-matrix" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Daily operational timeline grid of all branches.</span>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="branch-matrix-table">
+                                <thead><tr id="branch-matrix-header"></tr></thead>
+                                <tbody id="branch-matrix-body">
+                                    <tr><td colspan="100%" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- VIEW 6: ATTENDANCE MATRIX -->
                 <div id="view-matrix" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
@@ -1535,6 +1545,8 @@
                                     <option value="audits">Photo Audits</option>
                                     <option value="stats">Staff Stats</option>
                                     <option value="matrix">Attendance Grid</option>
+                                    <option value="branch-ops">Branch Operations</option>
+                                    <option value="branch-matrix">Branch Grid</option>
                                     <option value="roster">Duty Roster</option>
                                     <option value="action">Action Center</option>
                                     <option value="settings-hr">HR Settings</option>
@@ -1734,6 +1746,8 @@
               <option value="audits">Photo Audits</option>
               <option value="stats">Staff Stats</option>
               <option value="matrix">Attendance Grid</option>
+              <option value="branch-ops">Branch Operations</option>
+<option value="branch-matrix">Branch Grid</option>
               <option value="roster">Duty Roster</option>
               <option value="action">Action Center</option>
               <option value="settings-hr">HR Settings</option>
@@ -2571,18 +2585,57 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['logs', 'stats', 'action', 'live', 'matrix'].includes(viewParam)) exportBtn.style.display = 'inline-block';
+                if (['logs', 'stats', 'action', 'live', 'matrix', 'branch-ops', 'branch-matrix'].includes(viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
             const filterSec = document.getElementById('master-filter-section');
             const filterToggleBtn = document.getElementById('toggle-filter-btn');
-            if (['settings-hr', 'settings-org', 'birthdays'].includes(viewParam)) {
+
+            if (['settings-hr', 'settings-org', 'birthdays', 'personalize'].includes(viewParam)) {
                 if (filterSec) filterSec.style.display = 'none';
                 if (filterToggleBtn) filterToggleBtn.style.display = 'none';
             } else {
                 if (filterSec) filterSec.style.display = 'flex';
                 if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
+                
+                // SMART FILTER HIDING LOGIC (Initial Load)
+                setTimeout(() => {
+                    const filterRows = document.querySelectorAll('#master-filter-section .filter-row');
+                    const dateRow1 = filterRows[0];
+                    const dateRow2 = filterRows[1];
+                    const timeFiltGroups = [
+                        document.getElementById('filter-in-start')?.closest('.filter-group'), 
+                        document.getElementById('filter-out-start')?.closest('.filter-group')
+                    ];
+                    const roleFilt = document.getElementById('role-filter-dropdown');
+                    const branchFilt = document.getElementById('branch-filter-dropdown');
+                    const staffFilt = document.getElementById('staff-filter-dropdown');
+                    
+                    if(dateRow1) dateRow1.style.display = 'flex';
+                    if(dateRow2) dateRow2.style.display = 'flex';
+                    timeFiltGroups.forEach(el => { if(el) el.style.display = 'flex'; });
+                    if(roleFilt) roleFilt.style.display = 'block';
+                    if(branchFilt) branchFilt.style.display = 'block';
+                    if(staffFilt) staffFilt.style.display = 'block';
+
+                    if (viewParam === 'branch-ops') {
+                        if(roleFilt) roleFilt.style.display = 'none';
+                        if(branchFilt) branchFilt.style.display = 'none';
+                        if(staffFilt) staffFilt.style.display = 'none';
+                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                    } else if (viewParam === 'branch-matrix') {
+                        if(roleFilt) roleFilt.style.display = 'none';
+                        if(staffFilt) staffFilt.style.display = 'none';
+                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                    } else if (viewParam === 'live') {
+                        if(dateRow1) dateRow1.style.display = 'none';
+                        if(dateRow2) dateRow2.style.display = 'none';
+                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                    } else if (['stats', 'matrix', 'action', 'audits', 'roster'].includes(viewParam)) {
+                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                    }
+                }, 100);
             }
         }
     })();
@@ -3392,7 +3445,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (viewId === 'view-logs' || viewId === 'view-stats' || viewId === 'view-action' || viewId === 'view-live' || viewId === 'view-matrix') {
+            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix'].includes(viewId)) {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -3401,12 +3454,56 @@
         
         const filterSec = document.getElementById('master-filter-section');
         const filterToggleBtn = document.getElementById('toggle-filter-btn');
-        if (['view-settings-hr', 'view-settings-org', 'view-birthdays'].includes(viewId)) {
+
+        if (['view-settings-hr', 'view-settings-org', 'view-birthdays', 'view-personalize'].includes(viewId)) {
             if (filterSec) filterSec.style.display = 'none';
             if (filterToggleBtn) filterToggleBtn.style.display = 'none';
         } else {
             if (filterSec) filterSec.style.display = 'flex';
             if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
+            
+            // SMART FILTER HIDING LOGIC
+            const filterRows = document.querySelectorAll('#master-filter-section .filter-row');
+            const dateRow1 = filterRows[0];
+            const dateRow2 = filterRows[1];
+            
+            const timeFiltGroups = [
+                document.getElementById('filter-in-start')?.closest('.filter-group'), 
+                document.getElementById('filter-out-start')?.closest('.filter-group')
+            ];
+            const roleFilt = document.getElementById('role-filter-dropdown');
+            const branchFilt = document.getElementById('branch-filter-dropdown');
+            const staffFilt = document.getElementById('staff-filter-dropdown');
+            
+            // 1. Reset all to visible first
+            if(dateRow1) dateRow1.style.display = 'flex';
+            if(dateRow2) dateRow2.style.display = 'flex';
+            timeFiltGroups.forEach(el => { if(el) el.style.display = 'flex'; });
+            if(roleFilt) roleFilt.style.display = 'block';
+            if(branchFilt) branchFilt.style.display = 'block';
+            if(staffFilt) staffFilt.style.display = 'block';
+
+            // 2. Hide specific filters based on active view
+            if (viewId === 'view-branch-ops') {
+                if(roleFilt) roleFilt.style.display = 'none';
+                if(branchFilt) branchFilt.style.display = 'none';
+                if(staffFilt) staffFilt.style.display = 'none';
+                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+            } 
+            else if (viewId === 'view-branch-matrix') {
+                if(roleFilt) roleFilt.style.display = 'none';
+                if(staffFilt) staffFilt.style.display = 'none';
+                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+            } 
+            else if (viewId === 'view-live') {
+                if(dateRow1) dateRow1.style.display = 'none';
+                if(dateRow2) dateRow2.style.display = 'none';
+                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+            } 
+            else if (['view-stats', 'view-matrix', 'view-action', 'view-audits', 'view-roster'].includes(viewId)) {
+                // In tabs me exact time In/Out ki filtering utni kaam nahi aati
+                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+            }
         }
         
         manageWakeLock(viewId); // Keep screen alive if needed
@@ -4701,6 +4798,7 @@
         }
         if (activeTab === 'view-roster' && typeof renderDragDropRoster === 'function') renderDragDropRoster();
         if (activeTab === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
+        if ((activeTab === 'view-branch-ops' || activeTab === 'view-branch-matrix') && typeof renderBranchStats === 'function') window.renderBranchStats();
         if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
         if (activeTab === 'view-birthdays' && typeof renderAdminBirthdays === 'function') renderAdminBirthdays();
     });
@@ -5948,6 +6046,205 @@
         }).join('');
     }
 
+    window.renderBranchStats = function() {
+        const tbody = document.getElementById('branch-ops-tbody');
+        if (!tbody) return;
+
+        const todayStr = new Date().toDateString();
+        const sDate = new Date(startDate); sDate.setHours(0,0,0,0);
+        const eDate = new Date(endDate); eDate.setHours(23,59,59,999);
+
+        let bStats = {};
+        dbBranches.forEach(b => {
+            bStats[b.id] = { name: b.branch_name, days: {} };
+        });
+
+        let livePresence = {}; 
+
+        const sortedLogs = [...dbLogs].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+        sortedLogs.forEach(log => {
+            const logDate = new Date(log.timestamp);
+            if (logDate < sDate || logDate > eDate) return;
+
+            const bId = getBranchId(log);
+            const sId = getStaffId(log);
+            if (!bId || !bStats[bId]) return;
+
+            const dStr = logDate.toDateString();
+            if (!bStats[bId].days[dStr]) {
+                bStats[bId].days[dStr] = { openTime: null, closeTime: null };
+            }
+
+            const dayRec = bStats[bId].days[dStr];
+            const tMs = logDate.getTime();
+
+            // Open Time: First Clock In of the day
+            if (log.action === 'Clock In') {
+                if (!dayRec.openTime || tMs < dayRec.openTime) dayRec.openTime = tMs;
+            }
+            // Close Time: Continually update to the Last Clock Out of the day
+            if (log.action === 'Clock Out') {
+                if (!dayRec.closeTime || tMs > dayRec.closeTime) dayRec.closeTime = tMs;
+            }
+
+            // Real-time tracking specifically for "Today"
+            if (dStr === todayStr) {
+                if (!livePresence[bId]) livePresence[bId] = {};
+                if (log.action === 'Clock In' || log.action === 'Transit End') {
+                    livePresence[bId][sId] = true;
+                } else if (log.action === 'Clock Out' || log.action === 'Transit Start') {
+                    livePresence[bId][sId] = false;
+                }
+            }
+        });
+
+        function formatMinsToDisplay(totalMins) {
+            if(isNaN(totalMins) || totalMins === 0) return "--";
+            let h = Math.floor(totalMins / 60) % 24;
+            let m = Math.floor(totalMins % 60);
+            let d = new Date(); d.setHours(h, m, 0);
+            return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
+        }
+
+        let html = '';
+        dbBranches.forEach(b => {
+            const data = bStats[b.id];
+            let openMinsSum = 0, openCount = 0;
+            let closeMinsSum = 0, closeCount = 0;
+            let todayStatusHtml = '<span class="badge bg-gray">No Activity Today</span>';
+
+            const sortedDates = Object.keys(data.days).sort((a,b) => new Date(b) - new Date(a));
+            let latestOpenStr = '--';
+            let latestCloseStr = '--';
+
+            sortedDates.forEach(dStr => {
+                const day = data.days[dStr];
+                let isToday = (dStr === todayStr);
+
+                if (day.openTime) {
+                    const d = new Date(day.openTime);
+                    openMinsSum += d.getHours() * 60 + d.getMinutes();
+                    openCount++;
+                    if (dStr === sortedDates[0]) latestOpenStr = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
+                }
+
+                let validClose = null;
+                let activeCount = 0;
+                if (isToday && livePresence[b.id]) {
+                    activeCount = Object.values(livePresence[b.id]).filter(v => v === true).length;
+                }
+
+                if (isToday) {
+                    if (activeCount > 0) {
+                        // Agar koi staff ander hai, to open dikhao (Close time nahi lenge)
+                        if (dStr === sortedDates[0]) {
+                            todayStatusHtml = `<span class="badge bg-green">🟢 Open (${activeCount} Staff In)</span>`;
+                            latestCloseStr = '<span style="color:var(--success);">Currently Open</span>';
+                        }
+                    } else {
+                        // Agar sab nikal gaye (0 staff)
+                        validClose = day.closeTime;
+                        if (dStr === sortedDates[0]) {
+                            todayStatusHtml = `<span class="badge bg-gray">🔴 Closed</span>`;
+                            if (validClose) latestCloseStr = new Date(validClose).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
+                            else latestCloseStr = '--';
+                        }
+                    }
+                } else {
+                    // Purane din ke liye direct absolute last clock-out le lo
+                    validClose = day.closeTime;
+                    if (dStr === sortedDates[0] && sortedDates[0] !== todayStr) {
+                        todayStatusHtml = `<span class="badge bg-gray">Inactive Today</span>`;
+                    }
+                }
+
+                if (validClose) {
+                    const d = new Date(validClose);
+                    closeMinsSum += d.getHours() * 60 + d.getMinutes();
+                    closeCount++;
+                    if (!isToday && dStr === sortedDates[0]) {
+                        latestCloseStr = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
+                    }
+                }
+            });
+
+            let avgOpen = openCount > 0 ? formatMinsToDisplay(openMinsSum / openCount) : '--';
+            let avgClose = closeCount > 0 ? formatMinsToDisplay(closeMinsSum / closeCount) : '--';
+
+            html += `<tr style="transition: 0.2s; cursor: default;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='transparent'">
+                <td>
+                  <strong style="color: var(--text-main); font-size: 14px;">${b.branch_name}</strong>
+                </td>
+                <td><span style="font-weight: 700; color: var(--primary); font-size: 14px;">${openCount}</span> <span style="color: var(--text-soft); font-size: 12px;">days</span></td>
+                <td>
+                    <div style="color:var(--success); font-weight:bold; font-size: 14px;">${avgOpen}</div>
+                    <div style="font-size:11px; color:var(--text-soft); margin-top: 4px;">Latest: <span style="color:var(--text-main); font-weight:600;">${latestOpenStr}</span></div>
+                </td>
+                <td>
+                    <div style="color:var(--danger); font-weight:bold; font-size: 14px;">${avgClose}</div>
+                    <div style="font-size:11px; color:var(--text-soft); margin-top: 4px;">Latest: <span style="color:var(--text-main); font-weight:600;">${latestCloseStr}</span></div>
+                </td>
+                <td>${todayStatusHtml}</td>
+            </tr>`;
+        });
+
+        if (!html) html = '<tr><td colspan="5" style="text-align:center; color:var(--text-soft); padding: 40px;">No branch data available for this range.</td></tr>';
+        tbody.innerHTML = html;
+
+        // --- GRID / MATRIX GENERATION LOGIC ---
+        const matrixHeader = document.getElementById('branch-matrix-header');
+        const matrixBody = document.getElementById('branch-matrix-body');
+        const dateList = getDatesArrayFromFetchedLogs();
+
+        if (matrixHeader && matrixBody) {
+            matrixHeader.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Branch Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat)}</th>`).join('');
+
+            let matrixHtml = '';
+            dbBranches.forEach(b => {
+                // Apply Branch Filter (Ignore if filtered out)
+                if (selectedBranchIds.size !== dbBranches.length && !selectedBranchIds.has(b.id)) return;
+
+                matrixHtml += `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${b.branch_name}</td>`;
+
+                dateList.forEach(dateObj => {
+                    const dStr = dateObj.toDateString();
+                    const dayRec = bStats[b.id].days[dStr];
+
+                    if (!dayRec || (!dayRec.openTime && !dayRec.closeTime)) {
+                        matrixHtml += `<td><span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Closed</span></td>`;
+                    } else {
+                        let badgesHtml = '';
+                        if (dayRec.openTime) {
+                            const openT = new Date(dayRec.openTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
+                            badgesHtml += `<div class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 4px;">Open: ${openT}</div>`;
+                        }
+                        
+                        if (dayRec.closeTime) {
+                            let closeT = new Date(dayRec.closeTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
+                            
+                            // Handling Live Today Status
+                            if (dStr === todayStr && livePresence[b.id] && Object.values(livePresence[b.id]).some(v => v === true)) {
+                                closeT = "Live...";
+                                badgesHtml += `<div class="badge bg-blue" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Close: ${closeT}</div>`;
+                            } else {
+                                badgesHtml += `<div class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Close: ${closeT}</div>`;
+                            }
+                        } else if (dStr === todayStr && livePresence[b.id] && Object.values(livePresence[b.id]).some(v => v === true)) {
+                            badgesHtml += `<div class="badge bg-blue" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Currently Live</div>`;
+                        }
+
+                        matrixHtml += `<td><div style="display: flex; flex-direction: column; align-items: flex-start;">${badgesHtml}</div></td>`;
+                    }
+                });
+                matrixHtml += `</tr>`;
+            });
+
+            if (!matrixHtml) matrixHtml = '<tr><td colspan="100%" style="text-align:center; color:var(--text-soft); padding: 40px;">No branches match current filter.</td></tr>';
+            matrixBody.innerHTML = matrixHtml;
+        }
+    };
+
     function renderAnalysisDashboard() {
         if(!processedData || processedData.length === 0) return;
         const rootStyle = getComputedStyle(document.documentElement);
@@ -6776,7 +7073,7 @@
           if(dailyLogs.length === 0) {
             const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
             const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
-            rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`}</td>`;
+            rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Absent</span>`}</td>`;
           } else {
             let badgesHtml = '';
             const getLogTime = (action) => {
@@ -6790,7 +7087,7 @@
 
             if (inTime) badgesHtml += `<div class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">In: ${inTime}</div>`;
             if (outTime) badgesHtml += `<div class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Out: ${outTime}</div>`;
-            if (!badgesHtml) badgesHtml = `<span class="badge bg-gray" style="font-size:calc(10px * var(--font-scale, 1));">No Record</span>`;
+            if (!badgesHtml) badgesHtml = `<span class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--danger-alpha); color: var(--danger); border: 1px solid var(--danger-alpha);">Absent</span>`;
                     
             rowStr += `<td><div style="display: flex; flex-direction: column; align-items: flex-start;">${badgesHtml}</div></td>`;
           }
@@ -7396,6 +7693,8 @@
         const isActionView = document.getElementById('view-action').style.display === 'block';
         const isLiveView = document.getElementById('view-live').style.display === 'block';
         const isMatrixView = document.getElementById('view-matrix').style.display === 'block';
+        const isBranchOpsView = document.getElementById('view-branch-ops').style.display === 'block';
+        const isBranchMatrixView = document.getElementById('view-branch-matrix').style.display === 'block';
 
         let reportName = "ATTENDANCE LOGS";
         if (isStatsView) {
@@ -7407,6 +7706,10 @@
           reportName = "LIVE TRACKER STATUS";
         } else if (isMatrixView) {
           reportName = "ATTENDANCE GRID MATRIX";
+        } else if (isBranchOpsView) {
+          reportName = "BRANCH OPERATIONS";
+        } else if (isBranchMatrixView) {
+          reportName = "BRANCH GRID MATRIX";
         } else {
           const showLate = document.getElementById('filter-toggle-late')?.checked;
           const showEarly = document.getElementById('filter-toggle-early')?.checked;
@@ -7538,6 +7841,12 @@
                 });
                 exportRows.push(rowData);
             });
+        } else if (isBranchOpsView || isBranchMatrixView) {
+            const table = document.getElementById(isBranchOpsView ? 'branch-ops-table' : 'branch-matrix-table');
+            columnHeaders = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
+            exportRows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
+                Array.from(tr.querySelectorAll('td')).map(td => td.innerText.replace(/\n/g, ' ').trim())
+            );
         } else {
             columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
             let dataToExport = processedData;
@@ -8061,13 +8370,17 @@
             const views = [
                 { id: 'dashboard', name: 'Dashboard Overview', icon: '📊' },
                 { id: 'live', name: 'Live Tracker', icon: '📍' },
-                { id: 'logs', name: 'Attendance Logs', icon: '📋' },
-                { id: 'audits', name: 'Photo Audits', icon: '📷' },
+                { id: 'branch-ops', name: 'Branch Operations', icon: '🏪' },
+                { id: 'branch-matrix', name: 'Branch Grid', icon: '🗺️' },
                 { id: 'roster', name: 'Duty Roster', icon: '🗓️' },
                 { id: 'action', name: 'Action Center', icon: '⚠️' },
-                { id: 'stats', name: 'Staff Stats & Payroll', icon: '📈' },
+                { id: 'logs', name: 'Attendance Logs', icon: '📋' },
+                { id: 'matrix', name: 'Attendance Grid', icon: '▦' },
+                { id: 'audits', name: 'Photo Audits', icon: '📷' },
+                { id: 'stats', name: 'Staff Stats', icon: '📈' },
+                { id: 'birthdays', name: 'Staff Birthdays', icon: '🎂' },
                 { id: 'settings-hr', name: 'HR Settings', icon: '⚙️' },
-                { id: 'settings-org', name: 'Org Settings', icon: '🏢' },
+                { id: 'settings-org', name: 'Location & Shifts', icon: '🏢' },
                 { id: 'personalize', name: 'Personalize Workspace', icon: '✨' }
             ];
 
