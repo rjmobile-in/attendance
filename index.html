@@ -2621,7 +2621,6 @@
 
                     if (viewParam === 'branch-ops') {
                         if(roleFilt) roleFilt.style.display = 'none';
-                        if(branchFilt) branchFilt.style.display = 'none';
                         if(staffFilt) staffFilt.style.display = 'none';
                         timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
                     } else if (viewParam === 'branch-matrix') {
@@ -2631,9 +2630,15 @@
                     } else if (viewParam === 'live') {
                         if(dateRow1) dateRow1.style.display = 'none';
                         if(dateRow2) dateRow2.style.display = 'none';
+                        if(roleFilt) roleFilt.style.display = 'none';
+                        if(branchFilt) branchFilt.style.display = 'none';
+                        if(staffFilt) staffFilt.style.display = 'none';
                         timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
                     } else if (['stats', 'matrix', 'action', 'audits', 'roster'].includes(viewParam)) {
                         timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                        if (['action', 'matrix', 'stats'].includes(viewParam)) {
+                            if(branchFilt) branchFilt.style.display = 'none';
+                        }
                     }
                 }, 100);
             }
@@ -3486,7 +3491,6 @@
             // 2. Hide specific filters based on active view
             if (viewId === 'view-branch-ops') {
                 if(roleFilt) roleFilt.style.display = 'none';
-                if(branchFilt) branchFilt.style.display = 'none';
                 if(staffFilt) staffFilt.style.display = 'none';
                 timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
             } 
@@ -3498,11 +3502,17 @@
             else if (viewId === 'view-live') {
                 if(dateRow1) dateRow1.style.display = 'none';
                 if(dateRow2) dateRow2.style.display = 'none';
+                if(roleFilt) roleFilt.style.display = 'none';
+                if(branchFilt) branchFilt.style.display = 'none';
+                if(staffFilt) staffFilt.style.display = 'none';
                 timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
             } 
             else if (['view-stats', 'view-matrix', 'view-action', 'view-audits', 'view-roster'].includes(viewId)) {
                 // In tabs me exact time In/Out ki filtering utni kaam nahi aati
                 timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
+                if (['view-action', 'view-matrix', 'view-stats'].includes(viewId)) {
+                    if(branchFilt) branchFilt.style.display = 'none';
+                }
             }
         }
         
@@ -6109,6 +6119,9 @@
 
         let html = '';
         dbBranches.forEach(b => {
+            // Apply Branch Filter
+            if (selectedBranchIds.size !== dbBranches.length && !selectedBranchIds.has(b.id)) return;
+
             const data = bStats[b.id];
             let openMinsSum = 0, openCount = 0;
             let closeMinsSum = 0, closeCount = 0;
@@ -6886,8 +6899,9 @@
         rosterSortables.forEach(s => s.destroy());
         rosterSortables = [];
 
-        // Generate Branch Grids
-        let branchesHtml = dbBranches.map(b => `
+        // Generate Branch Grids (Apply Branch Filter)
+        const activeBranches = dbBranches.filter(b => selectedBranchIds.size === dbBranches.length || selectedBranchIds.has(b.id));
+        let branchesHtml = activeBranches.map(b => `
             <div class="roster-branch-card">
                 <div class="roster-branch-header">
                     ${b.branch_name}
@@ -6901,11 +6915,16 @@
         unassignedList.innerHTML = '';
 
         const branchCounts = {};
-        dbBranches.forEach(b => branchCounts[b.id] = 0);
+        activeBranches.forEach(b => branchCounts[b.id] = 0);
         let unassignedCount = 0;
 
         const dateStr = toLocalISO(currentRosterDate);
-        const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
+        // Apply Staff and Role filters
+        const filteredStaff = dbStaff.filter(s => {
+            if (selectedStaffIds.size !== dbStaff.length && !selectedStaffIds.has(s.id)) return false;
+            if (selectedRoleIds.size !== dbRoles.length && !selectedRoleIds.has(s.role_id)) return false;
+            return true;
+        });
         
         // Loop through staff and assign them to correct column
         filteredStaff.forEach(staff => {
@@ -6940,14 +6959,18 @@
                 unassignedList.insertAdjacentHTML('beforeend', itemHtml);
                 unassignedCount++;
             } else {
-                document.getElementById(`list-${targetBranchId}`).insertAdjacentHTML('beforeend', itemHtml);
-                branchCounts[targetBranchId]++;
+                const listEl = document.getElementById(`list-${targetBranchId}`);
+                if (listEl) {
+                    listEl.insertAdjacentHTML('beforeend', itemHtml);
+                    branchCounts[targetBranchId]++;
+                }
             }
         });
 
         // Update UI Counts
-        dbBranches.forEach(b => {
-            document.getElementById(`count-${b.id}`).innerText = branchCounts[b.id];
+        activeBranches.forEach(b => {
+            const countEl = document.getElementById(`count-${b.id}`);
+            if (countEl) countEl.innerText = branchCounts[b.id];
         });
         document.getElementById('unassigned-count').innerText = unassignedCount;
 
@@ -7044,8 +7067,12 @@
       const tableBody = document.getElementById('matrix-body');
       if(!headerRow || !tableBody) return;
       
-      const filteredStaff = dbStaff.filter(s => selectedStaffIds.has(s.id));
-      if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff selected.</td></tr>'; return; }
+      const filteredStaff = dbStaff.filter(s => {
+          if (selectedStaffIds.size !== dbStaff.length && !selectedStaffIds.has(s.id)) return false;
+          if (selectedRoleIds.size !== dbRoles.length && !selectedRoleIds.has(s.role_id)) return false;
+          return true;
+      });
+      if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff match the current filters.</td></tr>'; return; }
       
       const dateList = getDatesArrayFromFetchedLogs();
       headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat)}</th>`).join('');
