@@ -993,28 +993,11 @@
                 <!-- VIEW 3: ATTENDANCE LOGS -->
                 <div id="view-logs" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <div id="logs-sub-tabs" style="display: flex; gap: 12px; align-items: center; margin-bottom: 0;">
-                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
-                                <div><div style="color:var(--warning); font-size:12px; font-weight: 700;">Late Arrivals</div></div>
-                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
-                                    <input type="checkbox" id="filter-toggle-late" onchange="renderMasterTable()">
-                                    <span class="slider" style="border-radius: 20px;"></span>
-                                </label>
-                            </div>
-                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
-                                <div><div style="color:#f97316; font-size:12px; font-weight: 700;">Early Departures</div></div>
-                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
-                                    <input type="checkbox" id="filter-toggle-early" onchange="renderMasterTable()">
-                                    <span class="slider" style="border-radius: 20px;"></span>
-                                </label>
-                            </div>
-                            <div class="switch-wrap" style="margin: 0; padding: 6px 12px; background: var(--input-bg);">
-                                <div><div style="color:var(--danger); font-size:12px; font-weight: 700;">Missed Clock-Outs</div></div>
-                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
-                                    <input type="checkbox" id="filter-toggle-missing-out" onchange="renderMasterTable()">
-                                    <span class="slider" style="border-radius: 20px;"></span>
-                                </label>
-                            </div>
+                        <div class="sub-tabs" id="logs-view-tabs" style="margin-bottom: 0;">
+                            <button class="sub-tab-btn active" data-log-filter="all">All Logs</button>
+                            <button class="sub-tab-btn" data-log-filter="late">Late Arrivals</button>
+                            <button class="sub-tab-btn" data-log-filter="early">Early Departures</button>
+                            <button class="sub-tab-btn" data-log-filter="missing">Missed Clock-Outs</button>
                         </div>
                         
                         <div style="display: flex; gap: 12px; align-items: center;">
@@ -1038,7 +1021,8 @@
                             <th>Staff Member</th>
                             <th>Timeline</th>
                             <th>Time Split</th>
-                            <th>Status</th>
+                            <th>Arrival</th>
+                            <th>Departure</th>
                             <th>Route</th>
                             <th>Timeline Audits</th>
                             </tr>
@@ -1089,11 +1073,14 @@
                             <th onclick="window.sortStats('hours')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Total Hours ⇅</th>
                             <th>Work vs Travel</th>
                             <th>Target vs Actual</th>
-                            <th onclick="window.sortStats('lates')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Infractions (Unexcused) ⇅</th>
+                            <th onclick="window.sortStats('lateCount')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Late ⇅</th>
+                            <th onclick="window.sortStats('earlyCount')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Early ⇅</th>
+                            <th onclick="window.sortStats('noShirt')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">No Shirt ⇅</th>
+                            <th onclick="window.sortStats('noId')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">No ID ⇅</th>
                             </tr>
                         </thead>
                         <tbody id="stats-tbody">
-                            <tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                            <tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
                         </tbody>
                         </table>
                     </div>
@@ -1635,8 +1622,8 @@
       <div style="font-weight: 800; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1));"><span id="bulk-selected-count" style="color: var(--primary); font-size: calc(18px * var(--font-scale, 1));">0</span> Selected</div>
       <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
       <div style="display: flex; gap: 16px; align-items: center;">
-          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt"> RJ T-Shirt</label>
-          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-idcard"> ID Card</label>
+          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt" checked> RJ T-Shirt</label>
+          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-idcard" checked> ID Card</label>
       </div>
       <button class="btn-primary" id="btn-bulk-save" onclick="window.executeBulkAuditSave()" style="margin-left: 8px; padding: 12px 20px;">Bulk Approve & Save</button>
   </div>
@@ -2247,7 +2234,9 @@
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Work Hours" checked> Work Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Travel Hours"> Travel Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Total Hours" checked> Total Hours</label>
-          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Status" checked> Status (Late/Excused)</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Attendance" checked> Attendance</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Arrival" checked> Arrival Status</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Departure" checked> Departure Status</label>
       </div>
 
       <div id="rep-cols-summary" style="display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; margin-bottom: 24px; max-height: 200px; overflow-y: auto;">
@@ -4286,6 +4275,7 @@
                   <td><div class="skeleton" style="width: 80px; height: 30px;"></div></td>
                   <td><div class="skeleton" style="width: 80px; height: 30px;"></div></td>
                   <td><div class="skeleton" style="width: 80px; height: 20px;"></div></td>
+                  <td><div class="skeleton" style="width: 80px; height: 20px;"></div></td>
                   <td><div class="skeleton" style="width: 120px; height: 20px;"></div></td>
                   <td><div class="skeleton" style="width: 50px; height: 50px; border-radius: 8px;"></div></td>
               </tr>`).join('');
@@ -4586,6 +4576,16 @@
             if (workedElsewhere) return; 
             dailyLogs = dailyLogs.filter(l => selectedBranchIds.has(getBranchId(l)));
           }
+
+          // Evaluate uniform compliance ONLY if the staff was present (has logs for the day)
+          if (dailyLogs.length > 0) {
+              let hasPendingAudit = dailyLogs.some(l => !l.uniform_reviewed);
+              let hasValidShirt = dailyLogs.some(l => l.uniform_reviewed && (l.uniform_tshirt === true || l.uniform_tshirt === 'true'));
+              let hasValidId = dailyLogs.some(l => l.uniform_reviewed && (l.uniform_idcard === true || l.uniform_idcard === 'true'));
+
+              if (!hasValidShirt && !hasPendingAudit) staffStatsTracker[staff.id].missedShirt++;
+              if (!hasValidId && !hasPendingAudit) staffStatsTracker[staff.id].missedId++;
+          }
           
           const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
           const excLate = exceptionsData[`${staff.id}_${isoDateStr}_Late Arrival`] || exceptionsData[`${staff.name}_${isoDateStr}_Late Arrival`];
@@ -4598,15 +4598,20 @@
             
             let workMs = 0, travelMs = 0, currentState = 'out', lastTime = null;
 
-            let photoLogs = dailyLogs.filter(l => l.photo_capture).map(l => ({
-                id: l.id,
-                action: l.action,
-                photo: l.photo_capture,
-                reviewed: l.uniform_reviewed,
-                uTshirt: l.uniform_tshirt,
-                uIdcard: l.uniform_idcard,
-                time: new Date(l.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime})
-            }));
+            let photoLogs = dailyLogs.filter(l => l.photo_capture).map(l => {
+                // Strict parsing to safely convert database 'false' strings to actual Booleans
+                const parseBool = (val) => val === true || val === 'true' || val === 1 || val === '1';
+                
+                return {
+                    id: l.id,
+                    action: l.action,
+                    photo: l.photo_capture,
+                    reviewed: parseBool(l.uniform_reviewed),
+                    uTshirt: parseBool(l.uniform_tshirt),
+                    uIdcard: parseBool(l.uniform_idcard),
+                    time: new Date(l.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime})
+                };
+            });
 
             dailyLogs.forEach((l, idx) => {
                 if (idx === 0) firstInLog = l;
@@ -4723,12 +4728,6 @@
                 
                 if(isLateArrival && !excLate) staffStatsTracker[staff.id].lateCount++;
                 if(isEarlyOut && !excEarly) staffStatsTracker[staff.id].earlyCount++;
-                
-                let missedShirtToday = photoLogs.some(pl => pl.reviewed && !pl.uTshirt);
-                let missedIdToday = photoLogs.some(pl => pl.reviewed && !pl.uIdcard);
-
-                if (missedShirtToday) staffStatsTracker[staff.id].missedShirt++;
-                if (missedIdToday) staffStatsTracker[staff.id].missedId++;
             }
             
           } else {
@@ -4829,14 +4828,18 @@
 
     document.getElementById('toggle-grouped-view')?.addEventListener('change', (e) => {
         isGroupedView = e.target.checked;
-        const subTabs = document.getElementById('logs-sub-tabs');
+        const subTabs = document.getElementById('logs-view-tabs');
         if (subTabs) subTabs.style.display = isGroupedView ? 'flex' : 'none'; // Hide sub-tabs in raw view
         currentPage = 0; // Reset pagination on switch
         renderMasterTable();
     });
 
-    ['filter-toggle-late', 'filter-toggle-early', 'filter-toggle-missing-out'].forEach(id => {
-        document.getElementById(id)?.addEventListener('change', () => {
+    let currentLogsFilter = 'all';
+    document.querySelectorAll('#logs-view-tabs .sub-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('#logs-view-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentLogsFilter = e.target.getAttribute('data-log-filter');
             currentPage = 0;
             renderMasterTable();
         });
@@ -4864,7 +4867,8 @@
               <th onclick="window.sortLogs('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Member ${logsSortCol === 'name' ? (logsSortAsc ? '↑' : '↓') : '⇅'}</th>
               <th>Timeline</th>
               <th>Time Split</th>
-              <th>Status</th>
+              <th>Arrival</th>
+              <th>Departure</th>
               <th>Route</th>
               <th>Timeline Audits</th>
           `;
@@ -4872,23 +4876,18 @@
           let dataToRender = [...processedData];
           const todayStr = new Date().toDateString();
 
-          const showLate = document.getElementById('filter-toggle-late')?.checked;
-          const showEarly = document.getElementById('filter-toggle-early')?.checked;
-          const showMissingOut = document.getElementById('filter-toggle-missing-out')?.checked;
-
-          if (showLate || showEarly || showMissingOut) { 
+          if (typeof currentLogsFilter !== 'undefined' && currentLogsFilter !== 'all') { 
               dataToRender = processedData.filter(row => {
-                  let keep = false;
-                  if (showLate && row.isLate && row.firstIn) keep = true;
-                  if (showEarly && row.isEarly && row.firstIn) keep = true;
-                  if (showMissingOut && row.firstIn && !row.lastOut) keep = true;
-                  return keep;
+                  if (currentLogsFilter === 'late' && row.isLate && row.firstIn) return true;
+                  if (currentLogsFilter === 'early' && row.isEarly && row.firstIn) return true;
+                  if (currentLogsFilter === 'missing' && row.firstIn && !row.lastOut) return true;
+                  return false;
               }); 
           } 
           
           if (dataToRender.length === 0) { 
               const isStaffEmpty = dbStaff.length === 0;
-              tbody.innerHTML = `<tr><td colspan="5">
+              tbody.innerHTML = `<tr><td colspan="8">
                   <div class="empty-state">
                       <div class="empty-state-icon">${isStaffEmpty ? '👥' : '📭'}</div>
                       <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">${isStaffEmpty ? 'No Staff Found' : 'No Logs Found'}</h3>
@@ -4927,15 +4926,24 @@
                 ? row.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) 
                 : (isPastDate ? '<span style="color:var(--danger); font-weight:800; background: var(--danger-alpha); padding: 2px 6px; border-radius: 4px;">Missing</span>' : '<span style="color:var(--success);">Active</span>');
                 
-            let statusHtml = '';
-            if (row.excAbsent) statusHtml += `<span class="badge bg-green">Excused Absent: ${row.excAbsent.reason}</span><br>`;
-            if (row.excLate) statusHtml += `<span class="badge bg-green">Excused Late: ${row.excLate.reason}</span><br>`;
-            if (row.excEarly) statusHtml += `<span class="badge bg-green">Excused Early: ${row.excEarly.reason}</span><br>`;
+            let arrivalHtml = '';
+            if (row.excLate) arrivalHtml = `<span class="badge bg-green">Excused Late: ${row.excLate.reason}</span>`;
+            else if (row.isLate) arrivalHtml = `<span class="badge bg-orange">Late In</span>`;
+            else if (row.firstIn) arrivalHtml = `<span class="badge bg-green">On Time</span>`;
+            else arrivalHtml = `<span class="badge bg-gray">Missing</span>`;
+
+            let departureHtml = '';
+            if (row.excEarly) departureHtml = `<span class="badge bg-green">Excused Early: ${row.excEarly.reason}</span>`;
+            else if (row.isEarly) departureHtml = `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">Early Out</span>`;
+            else if (row.lastOut) departureHtml = `<span class="badge bg-green">On Time</span>`;
+            else if (isPastDate && row.firstIn && !row.lastOut) departureHtml = `<span class="badge bg-red">Missing Out</span>`;
+            else if (!row.firstIn && !row.lastOut) departureHtml = `<span class="badge bg-gray">Missing</span>`;
+            else departureHtml = `<span class="badge bg-blue">Active</span>`;
             
-            if (row.isLate && !row.excLate) statusHtml += `<span class="badge bg-orange" style="margin-top:4px;">Late In</span> `;
-            if (row.isEarly && !row.excEarly) statusHtml += `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; margin-top:4px;">Early Out</span> `;
-            
-            if (!row.isLate && !row.isEarly && !row.excAbsent && !row.excLate && !row.excEarly) statusHtml = `<span class="badge bg-green">On Time</span>`;
+            if (row.excAbsent) {
+                arrivalHtml = `<span class="badge bg-green" style="white-space:normal;">Excused Absent: ${row.excAbsent.reason}</span>`;
+                departureHtml = `<span class="badge bg-green" style="white-space:normal;">Excused Absent: ${row.excAbsent.reason}</span>`;
+            }
 
             let actionLinks = '';
             // Manage Reason links removed
@@ -4992,7 +5000,8 @@
                     W: <span style="color:var(--success)">${row.formattedWork}</span> | T: <span style="color:var(--warning)">${row.formattedTravel}</span>
                   </div>
               </td>
-              <td>${statusHtml}</td>
+              <td>${arrivalHtml}</td>
+              <td>${departureHtml}</td>
               <td><div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600;">${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
               <td>${photosHTML}</td>
             </tr>`;
@@ -5987,11 +5996,10 @@
             else if (column === 'days') { valA = a.daysPresent; valB = b.daysPresent; }
             else if (column === 'absent') { valA = a.daysAbsent; valB = b.daysAbsent; }
             else if (column === 'hours') { valA = a.sumWorkMins + a.sumTravelMins; valB = b.sumWorkMins + b.sumTravelMins; }
-            else if (column === 'lates') { 
-                // Sum all infractions for sorting
-                valA = a.lateCount + a.earlyCount + a.missedShirt + a.missedId + a.missedOut; 
-                valB = b.lateCount + b.earlyCount + b.missedShirt + b.missedId + b.missedOut; 
-            }
+            else if (column === 'lateCount') { valA = a.lateCount; valB = b.lateCount; }
+            else if (column === 'earlyCount') { valA = a.earlyCount; valB = b.earlyCount; }
+            else if (column === 'noShirt') { valA = a.missedShirt; valB = b.missedShirt; }
+            else if (column === 'noId') { valA = a.missedId; valB = b.missedId; }
             
             if (valA < valB) return statsSortAsc ? -1 : 1;
             if (valA > valB) return statsSortAsc ? 1 : -1;
@@ -6034,12 +6042,10 @@
             let formattedTravel = formatMinsToDuration(s.sumTravelMins);
             let formattedTotal = formatMinsToDuration(totalMins);
 
-            let infractions = [];
-            if(s.lateCount > 0) infractions.push(`<span style="color:var(--warning)">Late: ${s.lateCount}</span>`);
-            if(s.earlyCount > 0) infractions.push(`<span style="color:#f97316">Early: ${s.earlyCount}</span>`);
-            if(s.missedShirt > 0) infractions.push(`<span style="color:var(--danger)">No Shirt: ${s.missedShirt}</span>`);
-            if(s.missedId > 0) infractions.push(`<span style="color:var(--danger)">No ID: ${s.missedId}</span>`);
-            if(s.missedOut > 0) infractions.push(`<span style="color:var(--danger)">No Out: ${s.missedOut}</span>`);
+            let lateCell = s.lateCount > 0 ? `<span style="color:var(--warning); font-weight: 800;">${s.lateCount}</span>` : `<span style="color:var(--text-soft)">0</span>`;
+            let earlyCell = s.earlyCount > 0 ? `<span style="color:#f97316; font-weight: 800;">${s.earlyCount}</span>` : `<span style="color:var(--text-soft)">0</span>`;
+            let shirtCell = s.missedShirt > 0 ? `<span style="color:var(--danger); font-weight: 800;">${s.missedShirt}</span>` : `<span style="color:var(--text-soft)">0</span>`;
+            let idCell = s.missedId > 0 ? `<span style="color:var(--danger); font-weight: 800;">${s.missedId}</span>` : `<span style="color:var(--text-soft)">0</span>`;
 
             const staffObj = dbStaff.find(st => st.id === s.id);
             const avatar = getAvatarHtml(s.name, staffObj?.profile_pic, 36);
@@ -6052,10 +6058,10 @@
                   </div>
                 </td>
                 <td><span class="role-tag">${s.role}</span></td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--success);">${s.daysPresent}</td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--danger);">${s.daysAbsent}</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--success); text-align: center;">${s.daysPresent}</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--danger); text-align: center;">${s.daysAbsent}</td>
                 <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary);">${formattedTotal}</td>
+                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary); text-align: center;">${formattedTotal}</td>
                 <td>
                   <span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600;">
                     Work: <span style="color:var(--success)">${formattedWork}</span><br>
@@ -6063,7 +6069,10 @@
                   </span>
                 </td>
                 <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${formatMinsToDuration(expectedMins)}</span></td>
-                <td style="font-size:calc(12px * var(--font-scale, 1)); font-weight:600;">${infractions.length > 0 ? infractions.join(' | ') : '✅ Perfect'}</td>
+                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${lateCell}</td>
+                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${earlyCell}</td>
+                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${shirtCell}</td>
+                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${idCell}</td>
             </tr>`;
         }).join('');
     }
@@ -7699,7 +7708,6 @@
         if (exportType === 'custom') {
             document.getElementById('custom-report-modal').style.display = 'flex';
             
-            // Toggle Logic inside Modal
             document.getElementById('rep-type-daily').onclick = function() {
                 this.classList.add('active');
                 document.getElementById('rep-type-summary').classList.remove('active');
@@ -7715,7 +7723,6 @@
                 if(typeof window.saveReportTemplate === 'function') window.saveReportTemplate();
             };
 
-            // Load Template if saved
             const savedTemplate = JSON.parse(localStorage.getItem('rj_custom_report_template'));
             if (savedTemplate) {
                 if (savedTemplate.type === 'summary') document.getElementById('rep-type-summary').click();
@@ -7725,7 +7732,7 @@
                 document.querySelectorAll('.rep-col-cb').forEach(cb => cb.checked = savedTemplate.dailyCols.includes(cb.value));
                 document.querySelectorAll('.rep-col-sum-cb').forEach(cb => cb.checked = savedTemplate.sumCols.includes(cb.value));
             }
-            return; // Stop standard export execution
+            return;
         }
         
         const isStatsView = document.getElementById('view-stats').style.display === 'block';
@@ -7734,6 +7741,7 @@
         const isMatrixView = document.getElementById('view-matrix').style.display === 'block';
         const isBranchOpsView = document.getElementById('view-branch-ops').style.display === 'block';
         const isBranchMatrixView = document.getElementById('view-branch-matrix').style.display === 'block';
+        const isLogsView = document.getElementById('view-logs').style.display === 'block';
 
         let reportName = "ATTENDANCE LOGS";
         if (isStatsView) {
@@ -7750,15 +7758,12 @@
         } else if (isBranchMatrixView) {
           reportName = "BRANCH GRID MATRIX";
         } else {
-          const showLate = document.getElementById('filter-toggle-late')?.checked;
-          const showEarly = document.getElementById('filter-toggle-early')?.checked;
-          const showMissingOut = document.getElementById('filter-toggle-missing-out')?.checked;
           let logsTitle = 'ALL';
-          let parts = [];
-          if (showLate) parts.push("LATES");
-          if (showEarly) parts.push("EARLY OUTS");
-          if (showMissingOut) parts.push("MISSING CLOCK-OUTS");
-          if (parts.length > 0) logsTitle = parts.join(", ");
+          if (typeof currentLogsFilter !== 'undefined') {
+              if (currentLogsFilter === 'late') logsTitle = 'LATE ARRIVALS';
+              if (currentLogsFilter === 'early') logsTitle = 'EARLY DEPARTURES';
+              if (currentLogsFilter === 'missing') logsTitle = 'MISSING CLOCK-OUTS';
+          }
           reportName = `ATTENDANCE LOGS - ${logsTitle}`;
         }
         
@@ -7811,25 +7816,21 @@
             columnHeaders = ["Location / Status", "Staff Name", "Role", "Timestamp"];
             exportRows = [];
             
-            // Add In Transit Staff
             liveTransitList.forEach(log => {
                 const sId = getStaffId(log);
                 const sObj = staffMap[sId];
-                const rObj = roleMap[sObj?.role_id];
-                const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
+                const role = roleMap[sObj?.role_id] ? roleMap[sObj?.role_id].role_name : (sObj?.role || 'Unassigned');
                 const displayName = sObj ? sObj.name : log.employee_name;
                 const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
                 exportRows.push(["In Transit (Moving)", displayName, role, timeIn]);
             });
 
-            // Add Branch Staff
             dbBranches.forEach(b => {
                 if (liveStaffData[b.id] && liveStaffData[b.id].logs) {
                     liveStaffData[b.id].logs.forEach(log => {
                         const sId = getStaffId(log);
                         const sObj = staffMap[sId];
-                        const rObj = roleMap[sObj?.role_id];
-                        const role = rObj ? rObj.role_name : (sObj?.role || 'Unassigned');
+                        const role = roleMap[sObj?.role_id] ? roleMap[sObj?.role_id].role_name : (sObj?.role || 'Unassigned');
                         const displayName = sObj ? sObj.name : log.employee_name;
                         const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
                         exportRows.push([b.branch_name, displayName, role, timeIn]);
@@ -7887,56 +7888,70 @@
                 Array.from(tr.querySelectorAll('td')).map(td => td.innerText.replace(/\n/g, ' ').trim())
             );
         } else {
-            columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Total Hours", "Work Hours", "Travel Hours", "Status", "Branch List"];
+            // Logs View - Fully Expanded Columns
+            columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "Attendance", "Arrival", "Departure", "T-Shirt", "ID Card", "Branch List"];
             let dataToExport = processedData;
             
-            const showLate = document.getElementById('filter-toggle-late')?.checked;
-            const showEarly = document.getElementById('filter-toggle-early')?.checked;
-            const showMissingOut = document.getElementById('filter-toggle-missing-out')?.checked;
-
-            if (showLate || showEarly || showMissingOut) {
+            if (typeof currentLogsFilter !== 'undefined' && currentLogsFilter !== 'all') {
                 dataToExport = processedData.filter(row => {
-                    let keep = false;
-                    if (showLate && row.isLate) keep = true;
-                    if (showEarly && row.isEarly) keep = true;
-                    if (showMissingOut && row.firstIn && !row.lastOut) keep = true;
-                    return keep;
+                    if (currentLogsFilter === 'late' && row.isLate) return true;
+                    if (currentLogsFilter === 'early' && row.isEarly) return true;
+                    if (currentLogsFilter === 'missing' && row.firstIn && !row.lastOut) return true;
+                    return false;
                 });
             }
 
             exportRows = dataToExport.map(d => {
-                let status = "On Time";
-                if(d.excAbsent || d.excLate || d.excEarly) status = "Excused";
-                else if (d.isLate && d.isEarly) status = "Late & Early Out";
-                else if (d.isLate) status = "Late Arrival";
-                else if (d.isEarly) status = "Early Out";
+                let attendance = "Present";
+                if(d.excAbsent) attendance = "Excused Absent";
+
+                let arrival = "On Time";
+                if(d.excLate) arrival = "Excused Late";
+                else if (d.isLate) arrival = "Late Arrival";
+
+                let departure = "On Time";
+                if(d.excEarly) departure = "Excused Early";
+                else if (d.isEarly) departure = "Early Out";
+
+                let hasShirt = "N/A", hasId = "N/A";
+                if (d.photoLogs && d.photoLogs.length > 0) {
+                    const reviewed = d.photoLogs.filter(pl => pl.reviewed);
+                    if (reviewed.length > 0) {
+                        hasShirt = reviewed.some(pl => !pl.uTshirt) ? "No" : "Yes";
+                        hasId = reviewed.some(pl => !pl.uIdcard) ? "No" : "Yes";
+                    } else {
+                        hasShirt = "Pending Audit"; hasId = "Pending Audit";
+                    }
+                }
                 
-                // Clean up Emojis & Arrows so PDF text wrapping calculates width perfectly
                 let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
                 
                 return [
-                  d.date.toLocaleDateString(window.appDateFormat), d.name, d.role, d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
-                  d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', d.formattedHours, d.formattedWork, d.formattedTravel,
-                  status, cleanBranches
+                  d.date.toLocaleDateString(window.appDateFormat), d.name, d.role, 
+                  d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
+                  d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
+                  d.formattedWork, d.formattedTravel, d.formattedHours,
+                  attendance, arrival, departure, hasShirt, hasId, cleanBranches
                 ];
             });
         }
 
         if (exportRows.length === 0) return showToast("No data to export.", "error");
 
-        // --- HIDE COLUMNS LOGIC FOR EXPORT ---
-        const activeTable = document.querySelector('.app-view[style*="display: block"] table');
-        if (activeTable) {
-            let visibleIndices = [];
-            Array.from(activeTable.querySelectorAll('thead th')).forEach((th, idx) => {
-                if (getComputedStyle(th).display !== 'none') visibleIndices.push(idx);
-            });
-            if (visibleIndices.length > 0) {
-                columnHeaders = columnHeaders.filter((_, i) => visibleIndices.includes(i));
-                exportRows = exportRows.map(row => row.filter((_, i) => visibleIndices.includes(i)));
+        // ONLY hide columns for views that don't need separated formatting (Branch Ops, Matrix, Action)
+        if (!isLogsView && !isStatsView) {
+            const activeTable = document.querySelector('.app-view[style*="display: block"] table');
+            if (activeTable) {
+                let visibleIndices = [];
+                Array.from(activeTable.querySelectorAll('thead th')).forEach((th, idx) => {
+                    if (getComputedStyle(th).display !== 'none') visibleIndices.push(idx);
+                });
+                if (visibleIndices.length > 0) {
+                    columnHeaders = columnHeaders.filter((_, i) => visibleIndices.includes(i));
+                    exportRows = exportRows.map(row => row.filter((_, i) => visibleIndices.includes(i)));
+                }
             }
         }
-        // -------------------------------------
 
         if (exportType === 'copy') {
            const clipboardText = titleString + "\n\n" + columnHeaders.join("\t") + "\n" + exportRows.map(r => r.join('\t')).join("\n");
@@ -7944,7 +7959,6 @@
            return;
         }
 
-        // --- TRUE EXCEL (.XLSX) EXPORT W/ AUTO-SIZING COLUMNS ---
         if (exportType === 'xlsx') {
             showToast("Loading Excel Modules...", "primary");
             document.getElementById('export-btn').classList.add('is-loading');
@@ -7952,65 +7966,46 @@
             await loadExportScript('https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js');
             
             setTimeout(() => {
-                const wsData = [
-                [titleLine1], 
-                [titleLine2], 
-                [], 
-                columnHeaders,
-                ...exportRows
-            ];
-            
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            
-            // Dynamically auto-size column widths based on maximum text length
-            const colWidths = columnHeaders.map((col, i) => {
-                let maxLength = col.length;
-                exportRows.forEach(row => {
-                    let cellVal = row[i] ? row[i].toString() : "";
-                    if (cellVal.length > maxLength) maxLength = cellVal.length;
-                });
-                return { wch: maxLength + 5 }; // Increased padding
-            });
-            ws['!cols'] = colWidths;
-            
-            // Merge title rows cleanly across
-            if(!ws['!merges']) ws['!merges'] = [];
-            ws['!merges'].push({ s: {r:0, c:0}, e: {r:0, c:columnHeaders.length - 1} });
-            ws['!merges'].push({ s: {r:1, c:0}, e: {r:1, c:columnHeaders.length - 1} });
-
-            // Apply Styles to Cells (Colors, Alignment, Bold)
-            for (let i in ws) {
-                if (typeof ws[i] !== 'object') continue;
-                let cell = XLSX.utils.decode_cell(i);
+                const wsData = [[titleLine1], [titleLine2], [], columnHeaders, ...exportRows];
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
                 
-                // Default alignment: Center
-                ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+                const colWidths = columnHeaders.map((col, i) => {
+                    let maxLength = col.length;
+                    exportRows.forEach(row => {
+                        let cellVal = row[i] ? row[i].toString() : "";
+                        if (cellVal.length > maxLength) maxLength = cellVal.length;
+                    });
+                    return { wch: maxLength + 5 };
+                });
+                ws['!cols'] = colWidths;
+                
+                if(!ws['!merges']) ws['!merges'] = [];
+                ws['!merges'].push({ s: {r:0, c:0}, e: {r:0, c:columnHeaders.length - 1} });
+                ws['!merges'].push({ s: {r:1, c:0}, e: {r:1, c:columnHeaders.length - 1} });
 
-                if (cell.r === 0) {
-                    ws[i].s.font = { bold: true, sz: 16, color: { rgb: "FFFFFF" } };
-                    ws[i].s.fill = { fgColor: { rgb: "F37021" } }; // RJ Orange
-                } else if (cell.r === 1) {
-                    ws[i].s.font = { bold: true, sz: 11, color: { rgb: "FFFFFF" } };
-                    ws[i].s.fill = { fgColor: { rgb: "F37021" } }; // RJ Orange
-                } else if (cell.r === 3) {
-                    ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                    ws[i].s.fill = { fgColor: { rgb: "1E2D4A" } }; // Dark Blue Header
-                } else if (cell.r > 3) {
-                    // Data rows alternate background colors
-                    if (cell.r % 2 !== 0) {
-                        ws[i].s.fill = { fgColor: { rgb: "E2E8F0" } }; // Darker Gray alternate row
+                for (let i in ws) {
+                    if (typeof ws[i] !== 'object') continue;
+                    let cell = XLSX.utils.decode_cell(i);
+                    ws[i].s = { alignment: { horizontal: "center", vertical: "center", wrapText: true } };
+
+                    if (cell.r === 0 || cell.r === 1) {
+                        ws[i].s.font = { bold: true, sz: cell.r === 0 ? 16 : 11, color: { rgb: "FFFFFF" } };
+                        ws[i].s.fill = { fgColor: { rgb: "F37021" } }; 
+                    } else if (cell.r === 3) {
+                        ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                        ws[i].s.fill = { fgColor: { rgb: "1E2D4A" } };
+                    } else if (cell.r > 3 && cell.r % 2 !== 0) {
+                        ws[i].s.fill = { fgColor: { rgb: "E2E8F0" } };
                     }
                 }
-            }
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Export");
-            XLSX.writeFile(wb, `${safeFileName}.xlsx`);
-            document.getElementById('export-btn').classList.remove('is-loading');
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Export");
+                XLSX.writeFile(wb, `${safeFileName}.xlsx`);
+                document.getElementById('export-btn').classList.remove('is-loading');
             }, 50);
         }
 
-        // --- PERFECT TABLE PDF EXPORT ---
         if (exportType === 'pdf') {
             showToast("Loading PDF Modules...", "primary");
             document.getElementById('export-btn').classList.add('is-loading');
@@ -8020,109 +8015,34 @@
             
             setTimeout(() => {
                 const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'pt', 'a4'); 
-            const pageWidth = doc.internal.pageSize.getWidth();
-            
-            // 1. Add Logo Centered
-            const existingLogo = document.querySelector('img[src="logo.png"]');
-            let startYOffset = 60;
-            if (existingLogo && existingLogo.complete) {
-                try {
-                    doc.addImage(existingLogo, 'PNG', pageWidth / 2 - 25, 20, 50, 50);
-                    startYOffset = 95;
-                } catch (e) { console.warn("Logo issue", e); }
-            }
-
-            // 2. Header Big & Bold Centered
-            doc.setFontSize(22);
-            doc.setTextColor(40, 40, 40);
-            doc.setFont("helvetica", "bold");
-            doc.text(titleLine1, pageWidth / 2, startYOffset, { align: 'center' });
-            
-            // 3. Date in Next Line
-            doc.setFontSize(12);
-            doc.setTextColor(100, 100, 100);
-            doc.setFont("helvetica", "normal");
-            doc.text(titleLine2, pageWidth / 2, startYOffset + 18, { align: 'center' });
-            
-            // Build native vector table matching Excel structure perfectly
-            doc.autoTable({
-                startY: startYOffset + 40,
-                head: [columnHeaders],
-                body: exportRows,
-                theme: 'grid',
-                headStyles: { 
-                    fillColor: [243, 112, 33], // RJ Orange
-                    textColor: 255, 
-                    fontSize: 10, 
-                    fontStyle: 'bold',
-                    halign: 'center', 
-                    valign: 'middle'
-                },
-                bodyStyles: { 
-                    fontSize: 9.5, 
-                    cellPadding: 6, 
-                    textColor: [50, 50, 50],
-                    halign: 'center', 
-                    valign: 'middle'
-                },
-                styles: {
-                    overflow: 'linebreak', 
-                    cellWidth: 'auto'
-                },
-                alternateRowStyles: {
-                    fillColor: [226, 232, 240] // Darker Gray alternate row
-                },
-                margin: { left: 30, right: 30, bottom: 40 },
-                didDrawPage: function(data) {
-                  // Footer with Page Numbers
-                  doc.setFontSize(10);
-                  doc.setTextColor(150, 150, 150);
-                  doc.text(
-                    'Page ' + doc.internal.getNumberOfPages(),
-                    pageWidth / 2,
-                    doc.internal.pageSize.getHeight() - 20,
-                    { align: 'center' }
-                  );
-                },
-                didParseCell: function(data) {
-                    // 5. Dynamic text coloring for status & stats
-                    if (data.section === 'body') {
-                        const colName = columnHeaders[data.column.index];
-                        const val = data.cell.raw;
-                        
-                        if (colName === "Status") {
-                            if (val === 'On Time') {
-                                data.cell.styles.textColor = [16, 185, 129]; // Green
-                                data.cell.styles.fontStyle = 'bold';
-                            } else if (val === 'Late Arrival' || val === 'Early Out' || val === 'Late & Early Out') {
-                                data.cell.styles.textColor = [245, 158, 11]; // Orange
-                                data.cell.styles.fontStyle = 'bold';
-                            } else if (val === 'Missing' || val === 'Unexcused') {
-                                data.cell.styles.textColor = [239, 68, 68]; // Red
-                                data.cell.styles.fontStyle = 'bold';
-                            } else if (val === 'Excused') {
-                                data.cell.styles.textColor = [99, 102, 241]; // Blue
-                                data.cell.styles.fontStyle = 'bold';
-                            }
-                        }
-                        
-                        if (colName === "OT/Shortage") {
-                            let numVal = parseFloat(val);
-                            if (numVal > 0) {
-                                data.cell.styles.textColor = [16, 185, 129]; // Green
-                                data.cell.styles.fontStyle = 'bold';
-                            } else if (numVal < 0) {
-                                data.cell.styles.textColor = [239, 68, 68];  // Red
-                                data.cell.styles.fontStyle = 'bold';
-                            }
-                        }
-                    }
+                const doc = new jsPDF('landscape', 'pt', 'a4'); 
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                const existingLogo = document.querySelector('img[src="logo.png"]');
+                let startYOffset = 60;
+                if (existingLogo && existingLogo.complete) {
+                    try { doc.addImage(existingLogo, 'PNG', pageWidth / 2 - 25, 20, 50, 50); startYOffset = 95; } catch(e){}
                 }
-            });
-            
-            doc.save(`${safeFileName}.pdf`);
-            document.getElementById('export-btn').classList.remove('is-loading');
+
+                doc.setFontSize(22); doc.setTextColor(40, 40, 40); doc.setFont("helvetica", "bold");
+                doc.text(titleLine1, pageWidth / 2, startYOffset, { align: 'center' });
+                doc.setFontSize(12); doc.setTextColor(100, 100, 100); doc.setFont("helvetica", "normal");
+                doc.text(titleLine2, pageWidth / 2, startYOffset + 18, { align: 'center' });
+                
+                doc.autoTable({
+                    startY: startYOffset + 40,
+                    head: [columnHeaders],
+                    body: exportRows,
+                    theme: 'grid',
+                    headStyles: { fillColor: [243, 112, 33], textColor: 255, fontSize: 9, fontStyle: 'bold', halign: 'center', valign: 'middle' },
+                    bodyStyles: { fontSize: 8.5, cellPadding: 4, textColor: [50, 50, 50], halign: 'center', valign: 'middle' },
+                    styles: { overflow: 'linebreak', cellWidth: 'auto' },
+                    alternateRowStyles: { fillColor: [226, 232, 240] },
+                    margin: { left: 20, right: 20, bottom: 40 }
+                });
+                
+                doc.save(`${safeFileName}.pdf`);
+                document.getElementById('export-btn').classList.remove('is-loading');
             }, 50);
         }
       });
@@ -8595,9 +8515,7 @@
                     staff: Array.from(selectedStaffIds),
                     branches: Array.from(selectedBranchIds),
                     roles: Array.from(selectedRoleIds),
-                    filterLate: document.getElementById('filter-toggle-late')?.checked,
-                    filterEarly: document.getElementById('filter-toggle-early')?.checked,
-                    filterMissingOut: document.getElementById('filter-toggle-missing-out')?.checked
+                    logsFilter: typeof currentLogsFilter !== 'undefined' ? currentLogsFilter : 'all'
                 };
                 localStorage.setItem(`rj_saved_view_${slotNum}`, JSON.stringify(viewState));
                 
@@ -8632,17 +8550,15 @@
                         document.querySelectorAll('.branch-cb').forEach(cb => cb.checked = selectedBranchIds.has(cb.value));
                         document.querySelectorAll('.role-cb').forEach(cb => cb.checked = selectedRoleIds.has(cb.value));
                         
-                        if (viewState.filterLate !== undefined) {
-                            const fl = document.getElementById('filter-toggle-late');
-                            if (fl) fl.checked = viewState.filterLate;
-                        }
-                        if (viewState.filterEarly !== undefined) {
-                            const fe = document.getElementById('filter-toggle-early');
-                            if (fe) fe.checked = viewState.filterEarly;
-                        }
-                        if (viewState.filterMissingOut !== undefined) {
-                            const fm = document.getElementById('filter-toggle-missing-out');
-                            if (fm) fm.checked = viewState.filterMissingOut;
+                        if (viewState.logsFilter !== undefined) {
+                            currentLogsFilter = viewState.logsFilter;
+                            document.querySelectorAll('#logs-view-tabs .sub-tab-btn').forEach(btn => {
+                                if (btn.getAttribute('data-log-filter') === currentLogsFilter) {
+                                    btn.classList.add('active');
+                                } else {
+                                    btn.classList.remove('active');
+                                }
+                            });
                         }
                         
                         updateStaffButtonText();
@@ -9144,17 +9060,20 @@
             let dataToExport = processedData;
             if (onlyLates) dataToExport = processedData.filter(r => r.isLate || r.isEarly);
             
-            // Sort by Date then Name
             dataToExport.sort((a,b) => a.date - b.date || a.name.localeCompare(b.name));
 
             dataToExport.forEach(d => {
-                let status = "On Time";
-                if(d.excAbsent || d.excLate || d.excEarly) status = "Excused";
-                else if (d.isLate && d.isEarly) status = "Late & Early Out";
-                else if (d.isLate) status = "Late Arrival";
-                else if (d.isEarly) status = "Early Out";
+                let attendance = "Present";
+                if(d.excAbsent) attendance = "Excused Absent";
 
-                // Uniform Extraction
+                let arrival = "On Time";
+                if(d.excLate) arrival = "Excused Late";
+                else if (d.isLate) arrival = "Late Arrival";
+
+                let departure = "On Time";
+                if(d.excEarly) departure = "Excused Early";
+                else if (d.isEarly) departure = "Early Out";
+
                 let hasShirt = "N/A", hasId = "N/A";
                 if (d.photoLogs && d.photoLogs.length > 0) {
                     const reviewedLogs = d.photoLogs.filter(pl => pl.reviewed);
@@ -9162,7 +9081,7 @@
                         hasShirt = reviewedLogs.some(pl => !pl.uTshirt) ? "No" : "Yes";
                         hasId = reviewedLogs.some(pl => !pl.uIdcard) ? "No" : "Yes";
                     } else {
-                        hasShirt = "Pending"; hasId = "Pending";
+                        hasShirt = "Pending Audit"; hasId = "Pending Audit";
                     }
                 }
 
@@ -9179,12 +9098,13 @@
                     if(col === "Work Hours") rowData.push(d.formattedWork);
                     if(col === "Travel Hours") rowData.push(d.formattedTravel);
                     if(col === "Total Hours") rowData.push(d.formattedHours);
-                    if(col === "Status") rowData.push(status);
+                    if(col === "Attendance") rowData.push(attendance);
+                    if(col === "Arrival") rowData.push(arrival);
+                    if(col === "Departure") rowData.push(departure);
                 });
                 exportRows.push(rowData);
             });
 
-            // Append Absentees if requested
             if (includeAbsent && !onlyLates) {
                 missingData.forEach(d => {
                     let rowData = [];
@@ -9192,13 +9112,13 @@
                         if(col === "Date") rowData.push(d.date.toLocaleDateString(window.appDateFormat));
                         if(col === "Staff Name") rowData.push(d.name);
                         if(col === "Role") rowData.push(staffMap[d.staffId]?.role || "Unassigned");
-                        if(col === "Status") rowData.push(d.excAbsent ? "Excused Absent" : "Unexcused Absence");
+                        if(col === "Attendance") rowData.push(d.excAbsent ? "Excused Absent" : "Unexcused Absence");
+                        if(col === "Arrival" || col === "Departure") rowData.push("Absent");
                         if(["First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "T-Shirt", "ID Card", "Branch"].includes(col)) rowData.push("-");
                     });
                     exportRows.push(rowData);
                 });
             }
-
         } else {
             // SUMMARY REPORT
             const selectedCols = Array.from(document.querySelectorAll('.rep-col-sum-cb:checked')).map(cb => cb.value);
@@ -9212,7 +9132,7 @@
                 let absentDays = 0;
                 missingData.forEach(m => { if(m.staffId === s.id) absentDays++; });
                 
-                if (!includeAbsent && s.daysPresent === 0) return; // Skip if they only have absent days and it's unticked
+                if (!includeAbsent && s.daysPresent === 0) return;
 
                 let rowData = [];
                 selectedCols.forEach(col => {
@@ -9227,6 +9147,8 @@
                     if(col === "Total Hours") rowData.push(formatMinsToDuration(totalMins));
                     if(col === "Total Lates") rowData.push(s.lateCount);
                     if(col === "Total Early") rowData.push(s.earlyCount);
+                    if(col === "T-Shirt Violations") rowData.push(s.missedShirt);
+                    if(col === "ID Card Violations") rowData.push(s.missedId);
                 });
                 exportRows.push(rowData);
             });
@@ -9261,7 +9183,7 @@
                 else if (cell.r === 1) { ws[i].s.font = { bold: true, sz: 11, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "F37021" } }; }
                 else if (cell.r === 3) { ws[i].s.font = { bold: true, color: { rgb: "FFFFFF" } }; ws[i].s.fill = { fgColor: { rgb: "1E2D4A" } }; }
                 else if (cell.r > 3 && cell.r % 2 !== 0) {
-                    ws[i].s.fill = { fgColor: { rgb: "E2E8F0" } }; // Darker Gray alternate row
+                    ws[i].s.fill = { fgColor: { rgb: "E2E8F0" } };
                 }
             }
 
@@ -9288,10 +9210,10 @@
                 head: [columnHeaders],
                 body: exportRows,
                 theme: 'grid',
-                headStyles: { fillColor: [243, 112, 33], textColor: 255, fontSize: 10, fontStyle: 'bold', halign: 'center', valign: 'middle' },
-                bodyStyles: { fontSize: 9.5, cellPadding: 6, textColor: [50, 50, 50], halign: 'center', valign: 'middle' },
+                headStyles: { fillColor: [243, 112, 33], textColor: 255, fontSize: 9, fontStyle: 'bold', halign: 'center', valign: 'middle' },
+                bodyStyles: { fontSize: 8.5, cellPadding: 4, textColor: [50, 50, 50], halign: 'center', valign: 'middle' },
                 styles: { overflow: 'linebreak', cellWidth: 'auto' },
-                alternateRowStyles: { fillColor: [226, 232, 240] }, // Darker Gray alternate row
+                alternateRowStyles: { fillColor: [226, 232, 240] },
                 margin: { left: 20, right: 20, bottom: 30 }
             });
             doc.save(`${safeFileName}.pdf`);
@@ -9300,6 +9222,9 @@
         document.getElementById(btnId).innerText = originalText;
         showToast("Report Exported Successfully!", "success");
     };
+
+    document.getElementById('btn-rep-excel')?.addEventListener('click', () => executeCustomExport('xlsx'));
+    document.getElementById('btn-rep-pdf')?.addEventListener('click', () => executeCustomExport('pdf'));
 
     document.getElementById('btn-rep-excel')?.addEventListener('click', () => executeCustomExport('xlsx'));
     document.getElementById('btn-rep-pdf')?.addEventListener('click', () => executeCustomExport('pdf'));
