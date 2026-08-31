@@ -2249,10 +2249,12 @@
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Work Hours" checked> Total Work Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Travel Hours"> Total Travel Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Hours" checked> Total Overall Hours</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="OT/Shortage" checked> OT / Shortage</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Lates" checked> Late Arrivals Count</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Early" checked> Early Departures Count</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="T-Shirt Violations"> T-Shirt Violations</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="ID Card Violations"> ID Card Violations</label>
+          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Missed Out" checked> Missed Out</label>
       </div>
 
       <div style="display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid var(--card-border); padding-top: 16px;">
@@ -6011,7 +6013,7 @@
     function renderStaffStats() {
         const tbody = document.getElementById('stats-tbody');
         if(!tbody) return;
-        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: var(--text-soft);">No data available.</td></tr>'; return; }
+        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 40px; color: var(--text-soft);">No data available.</td></tr>'; return; }
         
         tbody.innerHTML = statsData.map(s => {
             const expectedMins = Math.round(s.daysPresent * s.dailyTargetHours * 60);
@@ -6019,8 +6021,10 @@
             const diffMins = totalMins - expectedMins;
             
             let otHtml = '';
+            let otShortageFormatted = "0h 0m";
+            
             if (s.daysPresent > 0) {
-                const targetMins = expectedMins > 0 ? expectedMins : 1; // Prevent division by zero
+                const targetMins = expectedMins > 0 ? expectedMins : 1; 
                 const percent = Math.min(100, Math.max(0, (totalMins / targetMins) * 100));
                 let barColor = diffMins > 30 ? 'var(--success)' : (diffMins < -30 ? 'var(--danger)' : 'var(--primary)');
                 
@@ -6030,10 +6034,26 @@
                     </div>
                 `;
 
-                if (diffMins > 30) otHtml = `<span class="badge bg-green">OT: +${formatMinsToDuration(diffMins)}</span>` + barHtml;
-                else if (diffMins < -30) otHtml = `<span class="badge bg-red">Short: ${formatMinsToDuration(diffMins)}</span>` + barHtml;
-                else otHtml = `<span class="badge bg-gray">Balanced</span>` + barHtml;
-            } else otHtml = `-`;
+                const absDiff = Math.abs(diffMins);
+                const diffH = Math.floor(absDiff / 60);
+                const diffM = absDiff % 60;
+
+                if (diffMins > 30) {
+                    otShortageFormatted = `+${diffH}h ${diffM}m`;
+                    otHtml = `<span class="badge bg-green">OT: ${otShortageFormatted}</span>` + barHtml;
+                } else if (diffMins < -30) {
+                    otShortageFormatted = `-${diffH}h ${diffM}m`;
+                    otHtml = `<span class="badge bg-red">Short: ${otShortageFormatted}</span>` + barHtml;
+                } else {
+                    otShortageFormatted = "Balanced";
+                    otHtml = `<span class="badge bg-gray">Balanced</span>` + barHtml;
+                }
+                
+                s.otShortage = otShortageFormatted; // Save logic for Excel/PDF export
+            } else {
+                s.otShortage = "-";
+                otHtml = `-`;
+            }
             
             let avgIn = formatMinsTo24h(s.sumInMins / s.daysPresent);
             let avgOut = formatMinsTo24h(s.sumOutMins / s.daysOut);
@@ -6041,6 +6061,7 @@
             let formattedWork = formatMinsToDuration(s.sumWorkMins);
             let formattedTravel = formatMinsToDuration(s.sumTravelMins);
             let formattedTotal = formatMinsToDuration(totalMins);
+            let expectedFmt = formatMinsToDuration(expectedMins);
 
             let lateCell = s.lateCount > 0 ? `<span style="color:var(--warning); font-weight: 800;">${s.lateCount}</span>` : `<span style="color:var(--text-soft)">0</span>`;
             let earlyCell = s.earlyCount > 0 ? `<span style="color:#f97316; font-weight: 800;">${s.earlyCount}</span>` : `<span style="color:var(--text-soft)">0</span>`;
@@ -6068,7 +6089,7 @@
                     Travel: <span style="color:var(--warning)">${formattedTravel}</span>
                   </span>
                 </td>
-                <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${formatMinsToDuration(expectedMins)}</span></td>
+                <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedFmt}</span></td>
                 <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${lateCell}</td>
                 <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${earlyCell}</td>
                 <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${shirtCell}</td>
@@ -7777,17 +7798,19 @@
         let columnHeaders, exportRows;
         
         if (isStatsView) {
-            columnHeaders = ["Staff Name", "Role", "Days Present", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Late Arrivals", "Early Departs", "Missed Shirt", "Missed ID", "Missed Out"];
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Days Absent", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Late Arrivals", "Early Departs", "Missed Shirt", "Missed ID", "Missed Out"];
             exportRows = statsData.map(s => {
+                let absentDays = 0;
+                missingData.forEach(m => { if(m.staffId === s.id) absentDays++; });
                 const expectedMins = Math.round(s.daysPresent * s.dailyTargetHours * 60);
                 const totalMins = s.sumWorkMins + s.sumTravelMins;
-                const diffMins = totalMins - expectedMins;
+                
                 return [
-                    s.name, s.role, s.daysPresent, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), 
+                    s.name, s.role, s.daysPresent, absentDays, formatMinsTo24h(s.sumInMins / s.daysPresent), formatMinsTo24h(s.sumOutMins / s.daysOut), 
                     formatMinsToDuration(totalMins), 
                     formatMinsToDuration(s.sumWorkMins), 
                     formatMinsToDuration(s.sumTravelMins),
-                    formatMinsToDuration(diffMins),
+                    s.otShortage || "-",
                     s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
                 ];
             });
@@ -9145,10 +9168,12 @@
                     if(col === "Work Hours") rowData.push(formatMinsToDuration(s.sumWorkMins));
                     if(col === "Travel Hours") rowData.push(formatMinsToDuration(s.sumTravelMins));
                     if(col === "Total Hours") rowData.push(formatMinsToDuration(totalMins));
+                    if(col === "OT/Shortage") rowData.push(s.otShortage || "-");
                     if(col === "Total Lates") rowData.push(s.lateCount);
                     if(col === "Total Early") rowData.push(s.earlyCount);
                     if(col === "T-Shirt Violations") rowData.push(s.missedShirt);
                     if(col === "ID Card Violations") rowData.push(s.missedId);
+                    if(col === "Missed Out") rowData.push(s.missedOut || 0);
                 });
                 exportRows.push(rowData);
             });
@@ -9222,9 +9247,6 @@
         document.getElementById(btnId).innerText = originalText;
         showToast("Report Exported Successfully!", "success");
     };
-
-    document.getElementById('btn-rep-excel')?.addEventListener('click', () => executeCustomExport('xlsx'));
-    document.getElementById('btn-rep-pdf')?.addEventListener('click', () => executeCustomExport('pdf'));
 
     document.getElementById('btn-rep-excel')?.addEventListener('click', () => executeCustomExport('xlsx'));
     document.getElementById('btn-rep-pdf')?.addEventListener('click', () => executeCustomExport('pdf'));
