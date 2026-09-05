@@ -7360,13 +7360,13 @@
                     <div>
                         <strong style="color: var(--text-main);">${s.name}</strong><br>
                         <span class="role-tag">${roleName}</span><br>
-                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email Set'}</span>
+                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'} • 💰 ₹${s.base_salary || '0'}</span>
                     </div>
                 </div>
               </td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -7658,12 +7658,14 @@
         });
     });
 
-    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate) => {
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
         document.getElementById('edit-staff-role').value = roleId || '';
         document.getElementById('edit-staff-email').value = email || '';
         document.getElementById('edit-staff-pass').value = pass || '';
+        document.getElementById('edit-staff-phone').value = phone || '';
+        document.getElementById('edit-staff-salary').value = salary || '';
         document.getElementById('edit-staff-start').value = start || '';
         document.getElementById('edit-staff-end').value = end || '';
         if (document.getElementById('edit-staff-branch')) document.getElementById('edit-staff-branch').value = defBranchId || '';
