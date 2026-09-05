@@ -30,6 +30,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+  <!-- Flatpickr Month Plugin -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>  
   
@@ -750,6 +753,11 @@
             <span class="tab-btn-text">Staff Birthdays</span>
           </button>
 
+          <button class="tab-btn" data-view="view-payroll">
+            <span class="tab-icon">💳</span> 
+            <span class="tab-btn-text">Payroll & Salary</span>
+          </button>
+
 
 
           <!-- Settings -->
@@ -1284,6 +1292,40 @@
                     </div>
                 </div>
 
+                <!-- VIEW 14: PAYROLL & SALARY -->
+                <div id="view-payroll" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Monthly salary calculation, taxes, and payslips.</span>
+                        <div style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                            <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 800; color: var(--text-soft); text-transform: uppercase;">Select Month:</label>
+                            <input type="text" id="payroll-month-picker" class="input-field" style="margin: 0; width: 150px; padding: 8px 12px; background: var(--card-bg) !important; cursor: pointer;" placeholder="Select Month">
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="payroll-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Base Salary</th>
+                                        <th>Payable Days</th>
+                                        <th>Calculated</th>
+                                        <th>Tax (2%)</th>
+                                        <th>Adjustments</th>
+                                        <th>Net Salary</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payroll-tbody">
+                                    <tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-soft);">Select a month to load payroll.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- VIEW 8: HR SETTINGS -->
                 <div id="view-settings-hr" class="app-view" style="display: none;">
                     <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Manage people, roles, and leave reasons.</span>
@@ -1310,7 +1352,9 @@
                                 <option value="">-- Select Role --</option>
                                 </select>
                                 <input type="email" id="new-staff-email" class="input-field" placeholder="Login Email" style="margin:0; flex: 2; min-width: 150px;">
-                                <div style="display: flex; flex: 1.5; min-width: 160px; gap: 8px;">
+                                <input type="tel" id="new-staff-phone" class="input-field" placeholder="Phone No." style="margin:0; flex: 1.5; min-width: 130px;">
+                                <input type="number" id="new-staff-salary" class="input-field" placeholder="Base Salary (₹)" style="margin:0; flex: 1.5; min-width: 130px;">
+                                <div style="display: flex; flex: 1.5; min-width: 160px; gap: 8px; margin-top: 8px;">
     <div style="position: relative; flex: 1;">
         <input type="password" id="new-staff-pass" class="input-field" placeholder="Password" style="margin:0; width: 100%; padding-right: 40px;">
         <span onclick="var inp = document.getElementById('new-staff-pass'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
@@ -1927,6 +1971,17 @@
         </div>
       </div>
 
+      <div style="display: flex; gap: 16px; margin-top: 8px;">
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</label>
+          <input type="tel" id="edit-staff-phone" class="input-field" style="margin-top: 8px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Base Salary (₹)</label>
+          <input type="number" id="edit-staff-salary" class="input-field" style="margin-top: 8px;">
+        </div>
+      </div>
+
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
           <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift Start</label>
@@ -2182,6 +2237,83 @@
               <label class="check-wrap"><input type="checkbox" id="modal-idcard"> ID Card</label>
           </div>
           <button class="btn-primary" id="btn-modal-audit-save" style="justify-content:center; padding: 14px;">Approve & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYROLL ADJUSTMENT MODAL -->
+  <div id="payroll-adjust-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 8px;">Manual Adjustment</h2>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="payroll-adjust-subtitle">Update for Staff</p>
+      
+      <input type="hidden" id="adjust-staff-id">
+      <input type="hidden" id="adjust-month-year">
+
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Amount (₹)</label>
+          <input type="number" id="adjust-amount" class="input-field" style="margin-top: 8px;" placeholder="Use - for deduction, + for bonus">
+        </div>
+      </div>
+      
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; margin-top: 8px; display: block;">Reason</label>
+      <input type="text" id="adjust-reason" class="input-field" style="margin-top: 8px;" placeholder="e.g. Advance Deducted, Diwali Bonus">
+
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button id="btn-cancel-adjust" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;" onclick="window.closeModal(document.getElementById('payroll-adjust-modal'))">Cancel</button>
+        <button id="btn-save-adjust" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Adjustment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYSLIP VIEW MODAL -->
+  <div id="payslip-modal" class="modal-overlay" onclick="window.closeModal(this)">
+    <div class="modal-card" style="max-width: 600px; padding: 0; overflow: hidden; background: #fff; color: #000;" onclick="event.stopPropagation()">
+      <div style="padding: 24px; border-bottom: 2px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; background: #f8fafc;">
+          <div>
+              <h2 style="margin: 0; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800;">RJ Mobile</h2>
+              <div style="color: #64748b; font-weight: 600; margin-top: 4px; font-size: 13px;">Salary Slip - <span id="slip-month">Month Year</span></div>
+          </div>
+          <span style="color: #94a3b8; cursor: pointer; font-size: 28px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('payslip-modal'))">&times;</span>
+      </div>
+      <div style="padding: 32px 24px; display: flex; flex-direction: column; gap: 24px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Employee Name</div>
+                  <div style="font-size: 18px; font-weight: 700; color: #0f172a;" id="slip-name">--</div>
+              </div>
+              <div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Designation</div>
+                  <div style="font-size: 16px; font-weight: 600; color: #334155;" id="slip-role">--</div>
+              </div>
+          </div>
+          <div style="background: #f1f5f9; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+              <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+                  <span style="font-weight: 600; color: #475569;">Base Salary</span>
+                  <span style="font-weight: 700; color: #0f172a;" id="slip-base">₹0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+                  <span style="font-weight: 600; color: #475569;">Payable Days (<span id="slip-days-detail" style="font-size: 11px;">0/0</span>)</span>
+                  <span style="font-weight: 700; color: #0f172a;" id="slip-calc">₹0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+                  <span style="font-weight: 600; color: #ef4444;">Tax Deduction (2%)</span>
+                  <span style="font-weight: 700; color: #ef4444;" id="slip-tax">-₹0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;" id="slip-adj-row">
+                  <span style="font-weight: 600; color: #475569;">Manual Adjustment <br><span id="slip-adj-reason" style="font-size: 11px; font-weight: 400;">Reason</span></span>
+                  <span style="font-weight: 700; color: #0f172a;" id="slip-adj">₹0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 16px; background: #0f172a; color: #fff;">
+                  <span style="font-weight: 800; font-size: 18px;">NET PAYABLE</span>
+                  <span style="font-weight: 800; font-size: 18px;" id="slip-net">₹0</span>
+              </div>
+          </div>
+          <div id="slip-timestamp" style="text-align: right; color: #10b981; font-weight: 700; font-size: 13px;">✅ Paid on --</div>
+      </div>
+      <div style="display: flex; padding: 0 24px 24px 24px; gap: 12px;">
+          <button class="btn-primary" style="flex: 1; justify-content: center; background: #0f172a;" onclick="window.print()">🖨️ Print / Save PDF</button>
       </div>
     </div>
   </div>
@@ -7471,7 +7603,9 @@
               password: passVal,
               default_branch_id: defBranchId,
               dob: dobVal,
-              joining_date: document.getElementById('new-staff-joining').value || null
+              joining_date: document.getElementById('new-staff-joining').value || null,
+              phone_number: document.getElementById('new-staff-phone').value.trim() || null,
+              base_salary: document.getElementById('new-staff-salary').value ? parseFloat(document.getElementById('new-staff-salary').value) : null
           }]);
           
           if(dbError) throw dbError;
@@ -7482,6 +7616,8 @@
           if (document.getElementById('new-staff-branch')) document.getElementById('new-staff-branch').value = '';
           document.getElementById('new-staff-email').value = ''; 
           document.getElementById('new-staff-pass').value = '';
+          document.getElementById('new-staff-phone').value = ''; 
+          document.getElementById('new-staff-salary').value = '';
           document.getElementById('new-staff-start').value = ''; 
           document.getElementById('new-staff-end').value = '';
           const newDobEl = document.getElementById('new-staff-dob');
@@ -9370,6 +9506,404 @@
             }
         });
     });
+
+    // =========================================================================
+    //  PAYROLL & SALARY MANAGEMENT LOGIC
+    // =========================================================================
+    
+    // Modify Staff Editing to accept Phone and Salary
+    const originalOpenEditStaff = window.openEditStaff;
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
+        originalOpenEditStaff(id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate);
+        document.getElementById('edit-staff-phone').value = phone || '';
+        document.getElementById('edit-staff-salary').value = salary || '';
+    };
+
+    // Intercept DB Insert for Staff to include Phone/Salary
+    const originalAddStaffBtn = document.getElementById('add-staff-btn');
+    if (originalAddStaffBtn) {
+        const clone = originalAddStaffBtn.cloneNode(true);
+        originalAddStaffBtn.parentNode.replaceChild(clone, originalAddStaffBtn);
+        clone.addEventListener('click', async () => {
+            const nameVal = document.getElementById('new-staff-name').value.trim();
+            const roleId = document.getElementById('new-staff-role').value || null;
+            const emailVal = document.getElementById('new-staff-email').value.trim() || null;
+            const passVal = document.getElementById('new-staff-pass').value || null;
+            const phoneVal = document.getElementById('new-staff-phone').value.trim() || null;
+            const salaryVal = document.getElementById('new-staff-salary').value || null;
+            const dobVal = document.getElementById('new-staff-dob').value || null;
+            let startVal = document.getElementById('new-staff-start').value || null;
+            let endVal = document.getElementById('new-staff-end').value || null;
+            if(startVal && startVal.length === 5) startVal += ':00';
+            if(endVal && endVal.length === 5) endVal += ':00';
+
+            if(nameVal && emailVal && passVal) {
+                const btn = document.getElementById('add-staff-btn'); btn.innerText = "Adding User..."; btn.disabled = true;
+                try {
+                    const { error: rpcError } = await supabaseClient.rpc('admin_create_user', { new_email: emailVal, new_password: passVal, staff_name: nameVal });
+                    if (rpcError) throw new Error(rpcError.message);
+
+                    const rName = roleMap[roleId]?.role_name || null;
+                    const defBranchId = document.getElementById('new-staff-branch').value || null;
+                    const { error: dbError } = await supabaseClient.from('staff_directory').insert([{ 
+                        name: nameVal, role_id: roleId, role: rName, shift_start: startVal, shift_end: endVal, 
+                        email: emailVal, password: passVal, default_branch_id: defBranchId, dob: dobVal, 
+                        joining_date: document.getElementById('new-staff-joining').value || null,
+                        phone_number: phoneVal, base_salary: salaryVal ? parseFloat(salaryVal) : null
+                    }]);
+                    if(dbError) throw dbError;
+                    
+                    document.getElementById('new-staff-name').value = ''; document.getElementById('new-staff-role').value = '';
+                    document.getElementById('new-staff-email').value = ''; document.getElementById('new-staff-pass').value = '';
+                    document.getElementById('new-staff-phone').value = ''; document.getElementById('new-staff-salary').value = '';
+                    document.getElementById('new-staff-start').value = ''; document.getElementById('new-staff-end').value = '';
+                    if(document.getElementById('new-staff-dob')._flatpickr) document.getElementById('new-staff-dob')._flatpickr.clear();
+                    if(document.getElementById('new-staff-joining')._flatpickr) document.getElementById('new-staff-joining')._flatpickr.clear();
+                    
+                    await initialMetadataLoad(); loadSettingsData();
+                    showToast("Staff created successfully!", "success");
+                } catch (err) { showToast(`Error: ${err.message}`, "error"); }
+                finally { btn.innerText = "Add Staff"; btn.disabled = false; }
+            } else { showToast("Name, Email and Pass are required!", "error"); }
+        });
+    }
+
+    // Intercept DB Update for Staff to include Phone/Salary
+    const originalSaveEditStaffBtn = document.getElementById('btn-save-edit-staff');
+    if (originalSaveEditStaffBtn) {
+        const clone = originalSaveEditStaffBtn.cloneNode(true);
+        originalSaveEditStaffBtn.parentNode.replaceChild(clone, originalSaveEditStaffBtn);
+        clone.addEventListener('click', async () => {
+            const id = document.getElementById('edit-staff-id').value;
+            const name = document.getElementById('edit-staff-name').value.trim();
+            const roleId = document.getElementById('edit-staff-role').value || null;
+            const newEmail = document.getElementById('edit-staff-email').value.trim() || null;
+            const newPass = document.getElementById('edit-staff-pass').value || null;
+            const phoneVal = document.getElementById('edit-staff-phone').value.trim() || null;
+            const salaryVal = document.getElementById('edit-staff-salary').value || null;
+            const newDob = document.getElementById('edit-staff-dob').value || null;
+            let start = document.getElementById('edit-staff-start').value || null;
+            let end = document.getElementById('edit-staff-end').value || null;
+
+            if(start && start.length === 5) start += ':00';
+            if(end && end.length === 5) end += ':00';
+
+            if(name && newEmail && newPass) {
+                const btn = document.getElementById('btn-save-edit-staff'); btn.innerText = "Saving..."; btn.disabled = true;
+                try {
+                    const { data: oldStaff } = await supabaseClient.from('staff_directory').select('email').eq('id', id).single();
+                    const oldEmail = oldStaff?.email;
+                    if (oldEmail) {
+                        const { error: rpcError } = await supabaseClient.rpc('admin_update_user', { target_email: oldEmail, new_email: newEmail, new_password: newPass, staff_name: name });
+                        if (rpcError) throw rpcError;
+                    }
+
+                    const rName = roleMap[roleId]?.role_name || null;
+                    const defBranchId = document.getElementById('edit-staff-branch').value || null;
+                    const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
+                    await supabaseClient.from('staff_directory').update({
+                        name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, 
+                        default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate,
+                        phone_number: phoneVal, base_salary: salaryVal ? parseFloat(salaryVal) : null
+                    }).eq('id', id);
+
+                    window.closeModal(document.getElementById('edit-staff-modal'));
+                    await initialMetadataLoad(); loadSettingsData();
+                    showToast("Staff profile updated!", "success");
+                } catch(e) { showToast("Failed to update", "error"); } 
+                finally { btn.innerText = "Save Changes"; btn.disabled = false; }
+            } else { showToast("Name, Email, and Password are required!", "error"); }
+        });
+    }
+
+    // Update HR Settings Table rendering to include Phone/Salary in Edit onclick
+    const originalLoadSettingsData = window.loadSettingsData;
+    window.loadSettingsData = async function() {
+        await originalLoadSettingsData(); // Let it do its thing, then override the staff list
+        const staffTbody = document.getElementById('staff-settings-list');
+        if (staffTbody) {
+            const formatTime = (t) => t ? t.substring(0, 5) : '';
+            let staffArr = [...(dbStaff || [])];
+            if (settingsSort.staff.col === 'name') staffArr.sort((a,b) => settingsSort.staff.asc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+            
+            staffTbody.innerHTML = staffArr.map(s => {
+                const st = formatTime(s.shift_start); const en = formatTime(s.shift_end);
+                const roleName = roleMap[s.role_id]?.role_name || s.role || 'No Role';
+                const avatar = getAvatarHtml(s.name, s.profile_pic, 40);
+                return `<tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                      ${avatar}
+                      <div>
+                          <strong style="color: var(--text-main);">${s.name}</strong><br>
+                          <span class="role-tag">${roleName}</span><br>
+                          <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'} • 💰 ₹${s.base_salary || '0'}</span>
+                      </div>
+                  </div>
+                </td>
+                <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
+                <td style="text-align:right; white-space:nowrap;">
+                  <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                  <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
+                </td>
+            </tr>`}).join('');
+        }
+    };
+
+    // Setup Payroll Tab Click Event & Month Picker
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (e.currentTarget.getAttribute('data-view') === 'view-payroll') {
+                const mp = document.getElementById('payroll-month-picker');
+                
+                // Initialize Flatpickr only once
+                if (!mp._flatpickr) {
+                    flatpickr(mp, {
+                        ...getFpConfig(),
+                        plugins: [
+                            new monthSelectPlugin({
+                                shorthand: true, // "Jan", "Feb", etc.
+                                dateFormat: "Y-m", // Formatted for backend: e.g. "2026-08"
+                                altFormat: "F Y", // Displayed to user: e.g. "August 2026"
+                            })
+                        ],
+                        altInput: true,
+                        defaultDate: new Date(),
+                        onChange: function(dates, dateStr) {
+                            fetchAndRenderPayroll(dateStr);
+                        }
+                    });
+
+                    // Initial load for current month
+                    const d = new Date();
+                    const initVal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    fetchAndRenderPayroll(initVal);
+                }
+            }
+        });
+    });
+
+    let currentPayrollData = [];
+    
+    async function fetchAndRenderPayroll(monthYearStr) {
+        const tbody = document.getElementById('payroll-tbody');
+        if(!tbody) return;
+        if(!monthYearStr) return;
+        
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-soft);"><div class="spinner-sm"></div><div style="margin-top:8px;">Calculating Payroll...</div></td></tr>`;
+
+        const [year, monthStr] = monthYearStr.split('-');
+        const monthInt = parseInt(monthStr, 10);
+        const yearInt = parseInt(year, 10);
+        const daysInMonth = new Date(yearInt, monthInt, 0).getDate();
+        const displayMonthYear = `${monthStr}-${yearInt}`; // format to save in DB
+
+        const startISO = new Date(yearInt, monthInt - 1, 1).toISOString();
+        const endISO = new Date(yearInt, monthInt, 0, 23, 59, 59, 999).toISOString();
+
+        try {
+            // Fetch Logs for this specific month
+            const { data: pLogs } = await supabaseClient.from('attendance_logs')
+                .select('staff_id, timestamp, action')
+                .gte('timestamp', startISO).lte('timestamp', endISO)
+                .eq('action', 'Clock In'); // Sirf Clock In chahiye presence ginne ke liye
+
+            // Fetch Approved Leaves
+            const { data: pLeaves } = await supabaseClient.from('leave_requests')
+                .select('staff_id, start_date, end_date')
+                .eq('status', 'Approved')
+                .lte('start_date', endISO.split('T')[0])
+                .gte('end_date', startISO.split('T')[0]);
+
+            // Fetch existing Payroll Records (Adjustments/Status)
+            const { data: existingRecords } = await supabaseClient.from('payroll_records').select('*').eq('month_year', displayMonthYear);
+            const recordsMap = {};
+            if(existingRecords) existingRecords.forEach(r => recordsMap[r.staff_id] = r);
+
+            currentPayrollData = [];
+
+            // Loop through staff and calculate
+            dbStaff.forEach(staff => {
+                if (!staff.base_salary) return; // Skip if no salary defined
+
+                // Count Unique Present Days
+                const staffLogs = (pLogs || []).filter(l => getStaffId(l) === staff.id);
+                const uniqueDays = new Set(staffLogs.map(l => new Date(l.timestamp).toDateString()));
+                const presentDaysCount = uniqueDays.size;
+
+                // Count Approved Leave Days within this month
+                let paidLeaveDays = 0;
+                const staffLeaves = (pLeaves || []).filter(l => l.staff_id === staff.id);
+                staffLeaves.forEach(lv => {
+                    let curr = new Date(lv.start_date);
+                    let end = new Date(lv.end_date);
+                    while(curr <= end) {
+                        if (curr.getMonth() + 1 === monthInt && curr.getFullYear() === yearInt) {
+                            // Prevent double counting if they checked in on a leave day
+                            if (!uniqueDays.has(curr.toDateString())) {
+                                paidLeaveDays++;
+                            }
+                        }
+                        curr.setDate(curr.getDate() + 1);
+                    }
+                });
+
+                const payableDays = presentDaysCount + paidLeaveDays;
+                const calculatedSalary = Math.round((staff.base_salary / daysInMonth) * payableDays);
+                const taxAmount = Math.round(calculatedSalary * 0.02);
+
+                // Get overrides from DB if exists
+                const dbRec = recordsMap[staff.id];
+                const manualAdj = dbRec ? (dbRec.manual_adjustment_amount || 0) : 0;
+                const manualRes = dbRec ? (dbRec.manual_adjustment_reason || '') : '';
+                const status = dbRec ? dbRec.status : 'Unpaid';
+                const paidAt = dbRec ? dbRec.paid_at : null;
+
+                const netSalary = calculatedSalary - taxAmount + manualAdj;
+
+                currentPayrollData.push({
+                    staff_id: staff.id, name: staff.name, base: staff.base_salary,
+                    daysInMonth, present: presentDaysCount, paidLeaves: paidLeaveDays, payableDays,
+                    calc: calculatedSalary, tax: taxAmount,
+                    adj: manualAdj, res: manualRes, net: netSalary, status, paidAt, displayMonthYear
+                });
+            });
+
+            if (currentPayrollData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-soft);">No staff found with a Base Salary set in HR Settings.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = currentPayrollData.map(p => {
+                const adjStr = p.adj > 0 ? `<span style="color:var(--success)">+₹${p.adj}</span>` : (p.adj < 0 ? `<span style="color:var(--danger)">-₹${Math.abs(p.adj)}</span>` : `₹0`);
+                const resHtml = p.res ? `<br><span style="font-size:10px; color:var(--text-soft);">${p.res}</span>` : '';
+                
+                let statusHtml = `<span class="badge bg-red">🔴 Unpaid</span>`;
+                let actionHtml = `<button class="btn-secondary" style="padding:4px 8px; font-size:12px; margin-right:4px;" onclick="window.openAdjustment('${p.staff_id}')">✏️ Adjust</button>
+                                  <button class="btn-primary" style="padding:4px 8px; font-size:12px; background:var(--success); border-color:var(--success);" onclick="window.markSalaryPaid('${p.staff_id}')">✅ Pay</button>`;
+                
+                if (p.status === 'Paid') {
+                    const dateStr = p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-GB', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+                    statusHtml = `<span class="badge bg-green">🟢 Paid</span>${dateStr ? `<br><span style="font-size:10px; color:var(--text-soft); font-weight:600;">on ${dateStr}</span>` : ''}`;
+                    actionHtml = `<button class="btn-secondary" style="padding:4px 8px; font-size:12px; border-color:var(--primary); color:var(--primary);" onclick="window.openPayslip('${p.staff_id}')">📄 Payslip</button>`;
+                }
+
+                return `<tr>
+                    <td><strong style="color:var(--text-main);">${p.name}</strong></td>
+                    <td>₹${p.base.toLocaleString()}</td>
+                    <td><span style="font-weight:700;">${p.payableDays}</span><span style="font-size:10px; color:var(--text-soft);">/${p.daysInMonth}</span></td>
+                    <td style="color:var(--text-main); font-weight:600;">₹${p.calc.toLocaleString()}</td>
+                    <td style="color:var(--danger); font-weight:600;">-₹${p.tax.toLocaleString()}</td>
+                    <td>${adjStr}${resHtml}</td>
+                    <td><strong style="font-size:16px; color:var(--text-main);">₹${p.net.toLocaleString()}</strong></td>
+                    <td>${statusHtml}</td>
+                    <td style="white-space:nowrap;">${actionHtml}</td>
+                </tr>`;
+            }).join('');
+
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--danger);">Error loading payroll data. Database table 'payroll_records' might be missing.</td></tr>`;
+        }
+    }
+
+    window.openAdjustment = function(staffId) {
+        const p = currentPayrollData.find(x => x.staff_id === staffId);
+        if(!p) return;
+        document.getElementById('adjust-staff-id').value = p.staff_id;
+        document.getElementById('adjust-month-year').value = p.displayMonthYear;
+        document.getElementById('adjust-amount').value = p.adj !== 0 ? p.adj : '';
+        document.getElementById('adjust-reason').value = p.res;
+        document.getElementById('payroll-adjust-subtitle').innerText = `Update for ${p.name}`;
+        document.getElementById('payroll-adjust-modal').style.display = 'flex';
+    };
+
+    document.getElementById('btn-save-adjust')?.addEventListener('click', async () => {
+        const staffId = document.getElementById('adjust-staff-id').value;
+        const monthYear = document.getElementById('adjust-month-year').value;
+        const amt = parseInt(document.getElementById('adjust-amount').value || 0, 10);
+        const reason = document.getElementById('adjust-reason').value.trim();
+
+        const btn = document.getElementById('btn-save-adjust'); btn.innerText = "Saving..."; btn.disabled = true;
+        try {
+            const p = currentPayrollData.find(x => x.staff_id === staffId);
+            const net = p.calc - p.tax + amt;
+            
+            await supabaseClient.from('payroll_records').upsert({
+                month_year: monthYear, staff_id: staffId, base_salary: p.base, payable_days: p.payableDays,
+                calculated_salary: p.calc, tax_amount: p.tax, manual_adjustment_amount: amt, manual_adjustment_reason: reason,
+                net_salary: net, status: 'Unpaid'
+            }, { onConflict: 'month_year, staff_id' });
+
+            window.closeModal(document.getElementById('payroll-adjust-modal'));
+            fetchAndRenderPayroll(document.getElementById('payroll-month-picker').value);
+            showToast("Adjustment Saved!", "success");
+        } catch(e) { showToast("Failed to save adjustment", "error"); }
+        finally { btn.innerText = "Save Adjustment"; btn.disabled = false; }
+    });
+
+    window.markSalaryPaid = async function(staffId) {
+        const p = currentPayrollData.find(x => x.staff_id === staffId);
+        if(!p) return;
+        if(!await window.customConfirm(`Mark ₹${p.net.toLocaleString()} as Paid for ${p.name}?\nThis will lock the record for this month.`)) return;
+
+        try {
+            const timestampStr = new Date().toISOString();
+            await supabaseClient.from('payroll_records').upsert({
+                month_year: p.displayMonthYear, staff_id: staffId, base_salary: p.base, payable_days: p.payableDays,
+                calculated_salary: p.calc, tax_amount: p.tax, manual_adjustment_amount: p.adj, manual_adjustment_reason: p.res,
+                net_salary: p.net, status: 'Paid', paid_at: timestampStr
+            }, { onConflict: 'month_year, staff_id' });
+
+            fetchAndRenderPayroll(document.getElementById('payroll-month-picker').value);
+            showToast("Salary Marked as Paid!", "success");
+            
+            // Optionally Auto-open payslip
+            setTimeout(() => window.openPayslip(staffId), 500);
+        } catch(e) { showToast("Failed to mark as paid", "error"); }
+    };
+
+    window.openPayslip = function(staffId) {
+        const p = currentPayrollData.find(x => x.staff_id === staffId);
+        if(!p) return;
+        
+        const staffObj = staffMap[staffId];
+        const roleName = roleMap[staffObj?.role_id]?.role_name || staffObj?.role || 'Staff';
+
+        const [m, y] = p.displayMonthYear.split('-');
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const prettyMonth = `${monthNames[parseInt(m)-1]} ${y}`;
+
+        document.getElementById('slip-month').innerText = prettyMonth;
+        document.getElementById('slip-name').innerText = p.name;
+        document.getElementById('slip-role').innerText = roleName;
+        document.getElementById('slip-base').innerText = `₹${p.base.toLocaleString()}`;
+        document.getElementById('slip-days-detail').innerText = `${p.payableDays}/${p.daysInMonth}`;
+        document.getElementById('slip-calc').innerText = `₹${p.calc.toLocaleString()}`;
+        document.getElementById('slip-tax').innerText = `-₹${p.tax.toLocaleString()}`;
+        
+        const adjRow = document.getElementById('slip-adj-row');
+        if (p.adj !== 0) {
+            document.getElementById('slip-adj-reason').innerText = p.res || 'Manual Adjustment';
+            document.getElementById('slip-adj').innerText = p.adj > 0 ? `+₹${p.adj.toLocaleString()}` : `-₹${Math.abs(p.adj).toLocaleString()}`;
+            document.getElementById('slip-adj').style.color = p.adj > 0 ? '#10b981' : '#ef4444';
+            adjRow.style.display = 'flex';
+        } else {
+            adjRow.style.display = 'none';
+        }
+
+        document.getElementById('slip-net').innerText = `₹${p.net.toLocaleString()}`;
+        
+        const timestampEl = document.getElementById('slip-timestamp');
+        if (p.paidAt) {
+            const pd = new Date(p.paidAt);
+            timestampEl.innerHTML = `✅ Paid electronically on ${pd.toLocaleDateString('en-GB')} at ${pd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+        } else {
+            timestampEl.innerHTML = `⚠️ Pending Payment`;
+        }
+
+        document.getElementById('payslip-modal').style.display = 'flex';
+    };
+
   </script>
 </body>
 </html>
