@@ -4956,6 +4956,10 @@
         if ((activeTab === 'view-branch-ops' || activeTab === 'view-branch-matrix') && typeof renderBranchStats === 'function') window.renderBranchStats();
         if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
         if (activeTab === 'view-birthdays' && typeof renderAdminBirthdays === 'function') renderAdminBirthdays();
+        if (activeTab === 'view-payroll' && typeof fetchAndRenderPayroll === 'function') {
+            const mp = document.getElementById('payroll-month-picker');
+            if (mp && mp.value) fetchAndRenderPayroll(mp.value);
+        }
     });
 
     let isGroupedView = true;
@@ -7360,7 +7364,7 @@
                     <div>
                         <strong style="color: var(--text-main);">${s.name}</strong><br>
                         <span class="role-tag">${roleName}</span><br>
-                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'} • 💰 ₹${s.base_salary || '0'}</span>
+                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'}</span>
                     </div>
                 </div>
               </td>
@@ -9639,7 +9643,7 @@
                       <div>
                           <strong style="color: var(--text-main);">${s.name}</strong><br>
                           <span class="role-tag">${roleName}</span><br>
-                          <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'} • 💰 ₹${s.base_salary || '0'}</span>
+                          <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'}</span>
                       </div>
                   </div>
                 </td>
