@@ -2708,7 +2708,7 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['logs', 'stats', 'action', 'live', 'matrix', 'branch-ops', 'branch-matrix'].includes(viewParam)) exportBtn.style.display = 'inline-block';
+                if (['logs', 'stats', 'action', 'live', 'matrix', 'branch-ops', 'branch-matrix', 'payroll'].includes(viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
@@ -3579,7 +3579,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix'].includes(viewId)) {
+            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes(viewId)) {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -7364,7 +7364,7 @@
                     <div>
                         <strong style="color: var(--text-main);">${s.name}</strong><br>
                         <span class="role-tag">${roleName}</span><br>
-                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'}</span>
+                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
                     </div>
                 </div>
               </td>
@@ -7905,6 +7905,7 @@
         const isBranchOpsView = document.getElementById('view-branch-ops').style.display === 'block';
         const isBranchMatrixView = document.getElementById('view-branch-matrix').style.display === 'block';
         const isLogsView = document.getElementById('view-logs').style.display === 'block';
+        const isPayrollView = document.getElementById('view-payroll').style.display === 'block';
 
         let reportName = "ATTENDANCE LOGS";
         if (isStatsView) {
@@ -7920,6 +7921,9 @@
           reportName = "BRANCH OPERATIONS";
         } else if (isBranchMatrixView) {
           reportName = "BRANCH GRID MATRIX";
+        } else if (isPayrollView) {
+          const mp = document.getElementById('payroll-month-picker');
+          reportName = `PAYROLL & SALARY - ${mp ? mp.value : ''}`;
         } else {
           let logsTitle = 'ALL';
           if (typeof currentLogsFilter !== 'undefined') {
@@ -8052,6 +8056,23 @@
             exportRows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
                 Array.from(tr.querySelectorAll('td')).map(td => td.innerText.replace(/\n/g, ' ').trim())
             );
+        } else if (isPayrollView) {
+            columnHeaders = ["Staff Name", "Base Salary", "Payable Days", "Calculated Salary", "Tax Deduction (2%)", "Manual Adjustment", "Adjustment Reason", "Net Salary", "Status", "Paid At"];
+            exportRows = currentPayrollData.map(p => {
+                const paidAtStr = p.paidAt ? new Date(p.paidAt).toLocaleString('en-GB') : "N/A";
+                return [
+                    p.name,
+                    `${p.base.toLocaleString()}`,
+                    `${p.payableDays}/${p.daysInMonth}`,
+                    `${p.calc.toLocaleString()}`,
+                    `-${p.tax.toLocaleString()}`,
+                    p.adj !== 0 ? (p.adj > 0 ? `+${p.adj.toLocaleString()}` : `-${Math.abs(p.adj).toLocaleString()}`) : "0",
+                    p.res || "-",
+                    `${p.net.toLocaleString()}`,
+                    p.status,
+                    paidAtStr
+                ];
+            });
         } else {
             // Logs View - Fully Expanded Columns
             columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "Attendance", "Arrival", "Departure", "T-Shirt", "ID Card", "Branch List"];
@@ -8104,7 +8125,7 @@
         if (exportRows.length === 0) return showToast("No data to export.", "error");
 
         // ONLY hide columns for views that don't need separated formatting (Branch Ops, Matrix, Action)
-        if (!isLogsView && !isStatsView) {
+        if (!isLogsView && !isStatsView && !isPayrollView) {
             const activeTable = document.querySelector('.app-view[style*="display: block"] table');
             if (activeTable) {
                 let visibleIndices = [];
@@ -9643,7 +9664,7 @@
                       <div>
                           <strong style="color: var(--text-main);">${s.name}</strong><br>
                           <span class="role-tag">${roleName}</span><br>
-                          <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • 📞 ${s.phone_number || 'N/A'}</span>
+                          <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
                       </div>
                   </div>
                 </td>
