@@ -1309,6 +1309,7 @@
                                     <tr>
                                         <th>Staff Member</th>
                                         <th>Base Salary</th>
+                                        <th>Present Days</th>
                                         <th>Payable Days</th>
                                         <th>Calculated</th>
                                         <th>Tax (2%)</th>
@@ -1319,7 +1320,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="payroll-tbody">
-                                    <tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-soft);">Select a month to load payroll.</td></tr>
+                                    <tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);">Select a month to load payroll.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -2249,15 +2250,24 @@
       
       <input type="hidden" id="adjust-staff-id">
       <input type="hidden" id="adjust-month-year">
+      <input type="hidden" id="adjust-per-day-amount">
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
           <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Amount (₹)</label>
-          <input type="number" id="adjust-amount" class="input-field" style="margin-top: 8px;" placeholder="Use - for deduction, + for bonus">
+          <input type="number" id="adjust-amount" class="input-field" style="margin-top: 8px; margin-bottom: 8px;" placeholder="Use - for deduction, + for bonus">
+          
+          <!-- QUICK ACTION BUTTONS -->
+          <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+              <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px; border-color: var(--success); color: var(--success);" onclick="window.modifyAdjustment(1)">+ 1 Day Salary</button>
+              <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px; border-color: var(--danger); color: var(--danger);" onclick="window.modifyAdjustment(-1)">- 1 Day Salary</button>
+              <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px; color: var(--text-soft);" onclick="document.getElementById('adjust-amount').value = '';">Clear</button>
+              <span id="per-day-hint" style="font-size: 11px; color: var(--text-soft); align-self: center; margin-left: auto;"></span>
+          </div>
         </div>
       </div>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; margin-top: 8px; display: block;">Reason</label>
+      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; display: block;">Reason</label>
       <input type="text" id="adjust-reason" class="input-field" style="margin-top: 8px;" placeholder="e.g. Advance Deducted, Diwali Bonus">
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -2423,6 +2433,10 @@
           <div style="margin-bottom: 24px;">
               <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="navigator.clipboard.writeText(document.getElementById('drawer-email').innerText).then(()=>showToast('Email Copied!', 'success'))" title="Click to Copy">📧 <span id="drawer-email" style="transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color=''">--</span></div>
               <div style="font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 8px;">🏢 Branch: <span id="drawer-branch" style="color: var(--text-main);">--</span></div>
+              <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 8px;">
+                  <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">📞 Phone: <span id="drawer-phone" style="color: var(--text-main);">--</span></div>
+                  <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">💰 Base Salary: <span id="drawer-salary" style="color: var(--text-main);">--</span></div>
+              </div>
               <div style="display: flex; gap: 16px; align-items: center;">
                   <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">🎂 DOB: <span id="drawer-dob" style="color: var(--text-main);">--</span></div>
                   <div style="font-size: 12px; color: var(--text-soft); font-weight: 600;">💼 Joined: <span id="drawer-join" style="color: var(--text-main);">--</span></div>
@@ -8057,12 +8071,13 @@
                 Array.from(tr.querySelectorAll('td')).map(td => td.innerText.replace(/\n/g, ' ').trim())
             );
         } else if (isPayrollView) {
-            columnHeaders = ["Staff Name", "Base Salary", "Payable Days", "Calculated Salary", "Tax Deduction (2%)", "Manual Adjustment", "Adjustment Reason", "Net Salary", "Status", "Paid At"];
+            columnHeaders = ["Staff Name", "Base Salary", "Present Days", "Payable Days", "Calculated Salary", "Tax Deduction (2%)", "Manual Adjustment", "Adjustment Reason", "Net Salary", "Status", "Paid At"];
             exportRows = currentPayrollData.map(p => {
                 const paidAtStr = p.paidAt ? new Date(p.paidAt).toLocaleString('en-GB') : "N/A";
                 return [
                     p.name,
                     `${p.base.toLocaleString()}`,
+                    `${p.present}`,
                     `${p.payableDays}/${p.daysInMonth}`,
                     `${p.calc.toLocaleString()}`,
                     `-${p.tax.toLocaleString()}`,
@@ -9063,6 +9078,8 @@
         document.getElementById('drawer-branch').innerText = bObj ? bObj.branch_name : 'No Default Setup';
         document.getElementById('drawer-dob').innerText = staff.dob ? new Date(staff.dob).toLocaleDateString(window.appDateFormat) : 'Not Provided';
         document.getElementById('drawer-join').innerText = staff.joining_date ? new Date(staff.joining_date).toLocaleDateString(window.appDateFormat) : 'Not Set';
+        document.getElementById('drawer-phone').innerText = staff.phone_number || 'N/A';
+        document.getElementById('drawer-salary').innerText = staff.base_salary ? `₹${staff.base_salary.toLocaleString()}` : 'Not Set';
 
         // Calculate Quick Stats from currently loaded data
         let daysPresent = 0, lates = 0, totalMs = 0, absent = 0;
@@ -9717,7 +9734,7 @@
         if(!tbody) return;
         if(!monthYearStr) return;
         
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-soft);"><div class="spinner-sm"></div><div style="margin-top:8px;">Calculating Payroll...</div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);"><div class="spinner-sm"></div><div style="margin-top:8px;">Calculating Payroll...</div></td></tr>`;
 
         const [year, monthStr] = monthYearStr.split('-');
         const monthInt = parseInt(monthStr, 10);
@@ -9791,7 +9808,7 @@
             });
 
             if (currentPayrollData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--text-soft);">No staff found with a Base Salary set in HR Settings.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);">No staff found with a Base Salary set in HR Settings.</td></tr>`;
                 return;
             }
 
@@ -9812,6 +9829,7 @@
                 return `<tr>
                     <td><strong style="color:var(--text-main);">${p.name}</strong></td>
                     <td>₹${p.base.toLocaleString()}</td>
+                    <td><span style="font-weight:700; color:var(--success);">${p.present}</span></td>
                     <td><span style="font-weight:700;">${p.payableDays}</span><span style="font-size:10px; color:var(--text-soft);">/${p.daysInMonth}</span></td>
                     <td style="color:var(--text-main); font-weight:600;">₹${p.calc.toLocaleString()}</td>
                     <td style="color:var(--danger); font-weight:600;">-₹${p.tax.toLocaleString()}</td>
@@ -9823,19 +9841,45 @@
             }).join('');
 
         } catch (e) {
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--danger);">Error loading payroll data. Database table 'payroll_records' might be missing.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--danger);">Error loading payroll data. Database table 'payroll_records' might be missing.</td></tr>`;
         }
     }
 
     window.openAdjustment = function(staffId) {
         const p = currentPayrollData.find(x => x.staff_id === staffId);
         if(!p) return;
+        
+        const perDay = Math.round(p.base / p.daysInMonth);
+        
         document.getElementById('adjust-staff-id').value = p.staff_id;
         document.getElementById('adjust-month-year').value = p.displayMonthYear;
+        document.getElementById('adjust-per-day-amount').value = perDay;
         document.getElementById('adjust-amount').value = p.adj !== 0 ? p.adj : '';
         document.getElementById('adjust-reason').value = p.res;
+        
+        document.getElementById('per-day-hint').innerText = `(1 Day = ₹${perDay.toLocaleString()})`;
         document.getElementById('payroll-adjust-subtitle').innerText = `Update for ${p.name}`;
         document.getElementById('payroll-adjust-modal').style.display = 'flex';
+    };
+
+    window.modifyAdjustment = function(multiplier) {
+        const perDayStr = document.getElementById('adjust-per-day-amount').value;
+        if (!perDayStr) return;
+        
+        const perDayAmt = parseInt(perDayStr, 10);
+        const amtInput = document.getElementById('adjust-amount');
+        let currentAmt = parseInt(amtInput.value || 0, 10);
+        
+        // Add or minus from current value
+        currentAmt += (perDayAmt * multiplier);
+        amtInput.value = currentAmt;
+        
+        // Auto-fill reason box if it's empty
+        const reasonInput = document.getElementById('adjust-reason');
+        if (!reasonInput.value) {
+            if (currentAmt < 0) reasonInput.value = "Leave Deduction (-)";
+            else if (currentAmt > 0) reasonInput.value = "Extra Salary / Bonus (+)";
+        }
     };
 
     document.getElementById('btn-save-adjust')?.addEventListener('click', async () => {
@@ -9917,7 +9961,8 @@
         const timestampEl = document.getElementById('slip-timestamp');
         if (p.paidAt) {
             const pd = new Date(p.paidAt);
-            timestampEl.innerHTML = `✅ Paid electronically on ${pd.toLocaleDateString('en-GB')} at ${pd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+            timestam
+            pEl.innerHTML = `✅ Paid electronically on ${pd.toLocaleDateString('en-GB')} at ${pd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
         } else {
             timestampEl.innerHTML = `⚠️ Pending Payment`;
         }
