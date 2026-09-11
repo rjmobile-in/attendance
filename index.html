@@ -9758,22 +9758,16 @@
                 const uniqueDays = new Set(staffLogs.map(l => new Date(l.timestamp).toDateString()));
                 const presentDaysCount = uniqueDays.size;
 
-                // Count Approved Leave Days within this month
-                let paidLeaveDays = 0;
-                const staffLeaves = (pLeaves || []).filter(l => l.staff_id === staff.id);
-                staffLeaves.forEach(lv => {
-                    let curr = new Date(lv.start_date);
-                    let end = new Date(lv.end_date);
-                    while(curr <= end) {
-                        if (curr.getMonth() + 1 === monthInt && curr.getFullYear() === yearInt) {
-                            // Prevent double counting if they checked in on a leave day
-                            if (!uniqueDays.has(curr.toDateString())) {
-                                paidLeaveDays++;
-                            }
-                        }
-                        curr.setDate(curr.getDate() + 1);
-                    }
-                });
+                // NAYA LOGIC: Mahine me 4 chhutiya allowed hain (salary nahi kategi).
+                // 4 se zyada chhuti (absent) hone par hi paise katenge.
+                const totalAbsentDays = daysInMonth - presentDaysCount;
+                const allowedPaidLeaves = 4;
+                
+                // Maximum 4 chhutti ka paisa milega, baaki deduct ho jayengi
+                let paidLeaveDays = Math.min(totalAbsentDays, allowedPaidLeaves);
+                
+                // Agar totalAbsentDays negative ho jaye (kisi ne extra din kaam kiya ho), to usko 0 maan lein
+                if (paidLeaveDays < 0) paidLeaveDays = 0;
 
                 const payableDays = presentDaysCount + paidLeaveDays;
                 const calculatedSalary = Math.round((staff.base_salary / daysInMonth) * payableDays);
