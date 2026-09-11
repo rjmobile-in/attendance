@@ -9978,8 +9978,7 @@
         const timestampEl = document.getElementById('slip-timestamp');
         if (p.paidAt) {
             const pd = new Date(p.paidAt);
-            timestam
-            pEl.innerHTML = `✅ Paid electronically on ${pd.toLocaleDateString('en-GB')} at ${pd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+            timestampEl.innerHTML = `✅ Paid electronically on ${pd.toLocaleDateString('en-GB')} at ${pd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
         } else {
             timestampEl.innerHTML = `⚠️ Pending Payment`;
         }
