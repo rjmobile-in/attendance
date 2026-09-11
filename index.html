@@ -171,7 +171,7 @@
     input:checked + .slider:before { transform: translateX(20px); }
     .switch:active input:checked + .slider:before { transform: translateX(14px); width: 24px; }
 
-    #toast-container { position: fixed; bottom: 40px; right: 40px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+    #toast-container { position: fixed; bottom: 40px; right: 40px; z-index: 3000000; display: flex; flex-direction: column; gap: 10px; }
     .toast { 
         padding: 14px 24px; border-radius: var(--radius-md); color: #fff; font-weight: 600; 
         box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); opacity: 0; 
@@ -189,7 +189,7 @@
     .toast-success { background: var(--success); }
     .toast-error { background: var(--danger); }
 
-    #global-loader { position: fixed; inset: 0; background: rgba(9, 9, 11, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s ease; }
+    #global-loader { position: fixed; inset: 0; background: rgba(9, 9, 11, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 4000000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease, visibility 0.4s ease; }
     html.light-theme #global-loader { background: rgba(255, 255, 255, 0.7); }
     .spinner { width: 48px; height: 48px; border: 4px solid var(--card-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -417,7 +417,7 @@
     #login-screen { display: none; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-base); }
     .login-card { width: 100%; max-width: 420px; background: var(--card-bg); padding: 48px 40px; border-radius: var(--radius-lg); border: 1px solid var(--card-border); box-shadow: var(--shadow-md); text-align: center; }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeInOverlay 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;}
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeInOverlay 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;}
     @keyframes fadeInOverlay { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(16px); } }
     .modal-card { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); padding: 32px; border-radius: 24px; width: 100%; max-width: 500px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: springUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;}
     html.light-theme .modal-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
@@ -618,7 +618,7 @@
   body.no-sticky-th th, body.no-sticky-th td { position: static !important; z-index: 1 !important; }
 
   /* Context Menu Styles */
-  .context-menu { position: fixed; background: rgba(24, 24, 27, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05); display: none; flex-direction: column; min-width: 180px; z-index: 20000; padding: 6px; overflow: hidden; transform-origin: top left; animation: menuPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .context-menu { position: fixed; background: rgba(24, 24, 27, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05); display: none; flex-direction: column; min-width: 180px; z-index: 2000000; padding: 6px; overflow: hidden; transform-origin: top left; animation: menuPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     html.light-theme .context-menu { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
     @keyframes menuPop { from { opacity: 0; transform: scale(0.9) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
   .context-menu-item { padding: 10px 16px; cursor: pointer; font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; transition: 0.2s; }
@@ -627,13 +627,13 @@
   .context-menu-divider { height: 1px; background: var(--card-border); margin: 4px 0; }
 
   /* Profile Drawer Styles */
-  .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 25000; opacity: 0; visibility: hidden; transition: 0.3s ease; }
+  .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000005; opacity: 0; visibility: hidden; transition: 0.3s ease; }
   
   /* Custom Tooltip */
-  .custom-tooltip { position: fixed; background: rgba(24, 24, 27, 0.95); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; pointer-events: none; z-index: 99999; opacity: 0; transition: opacity 0.2s; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
+  .custom-tooltip { position: fixed; background: rgba(24, 24, 27, 0.95); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; pointer-events: none; z-index: 3000000; opacity: 0; transition: opacity 0.2s; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
   .custom-tooltip.show { opacity: 1; }
   .drawer-overlay.show { opacity: 1; visibility: visible; }
-  .profile-drawer { position: fixed; top: 0; right: -400px; width: 400px; max-width: 100vw; height: 100vh; background: var(--bg-surface); border-left: 1px solid var(--card-border); z-index: 25001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.3); }
+  .profile-drawer { position: fixed; top: 0; right: -400px; width: 400px; max-width: 100vw; height: 100vh; background: var(--bg-surface); border-left: 1px solid var(--card-border); z-index: 1000006; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.3); }
   .profile-drawer.open { right: 0; }
   .drawer-header { padding: 24px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: flex-start; position: relative; }
   .drawer-close { background: var(--input-bg); border: none; color: var(--text-soft); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
@@ -1131,7 +1131,7 @@
                             <table id="branch-matrix-table">
                                 <thead><tr id="branch-matrix-header"></tr></thead>
                                 <tbody id="branch-matrix-body">
-                                    <tr><td colspan="100%" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
+                                    <tr><td colspan="100" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1149,7 +1149,7 @@
                         <table id="matrix-table">
                         <thead><tr id="matrix-header"></tr></thead>
                         <tbody id="matrix-body">
-                            <tr><td colspan="100%" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                            <tr><td colspan="100" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
                         </tbody>
                         </table>
                     </div>
@@ -1906,7 +1906,7 @@
   </div>
 
   <!-- MODALS -->
-  <div id="confirm-modal" class="modal-overlay" style="z-index: 20000;">
+  <div id="confirm-modal" class="modal-overlay" style="z-index: 1000001;">
     <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px 32px;">
       <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
       <h3 style="margin-bottom: 12px; color: var(--text-main);">Are you sure?</h3>
@@ -3559,6 +3559,11 @@
             v.classList.remove('animate-tab'); // Reset animation class
         });
         
+        // FIX: Clear table searches when switching tabs to prevent data mismatch
+        document.querySelectorAll('.quick-table-search').forEach(inp => {
+            if(inp.value) { inp.value = ''; inp.dispatchEvent(new Event('input')); }
+        });
+        
         const viewId = e.currentTarget.getAttribute('data-view');
         
         // UPDATE URL TO USE QUERY PARAM ROUTING
@@ -3688,6 +3693,10 @@
           document.querySelectorAll('#action-center-tabs .sub-tab-btn').forEach(b => b.classList.remove('active'));
           e.target.classList.add('active');
           currentActionTab = e.target.getAttribute('data-action-filter');
+
+          // FIX: Clear search box when changing action sub-tabs
+          const actionSearch = document.querySelector('#view-action .quick-table-search');
+          if (actionSearch && actionSearch.value) { actionSearch.value = ''; actionSearch.dispatchEvent(new Event('input')); }
 
           // Contextual Toggles
           if (currentActionTab === 'active-leaves') {
@@ -4660,8 +4669,11 @@
       let outStartStr = outStartEl ? outStartEl.value : '';
       let outEndStr = outEndEl ? outEndEl.value : '';
       
-      let inMinStart = timeToMinutes(inStartStr) || 0; let inMinEnd = timeToMinutes(inEndStr) || 1440;
-      let outMinStart = timeToMinutes(outStartStr) || 0; let outMinEnd = timeToMinutes(outEndStr) || 1440;
+      // FIX: Check if string exists, rather than relying on || which breaks on 0
+      let inMinStart = inStartStr ? timeToMinutes(inStartStr) : 0; 
+      let inMinEnd = inEndStr ? timeToMinutes(inEndStr) : 1440;
+      let outMinStart = outStartStr ? timeToMinutes(outStartStr) : 0; 
+      let outMinEnd = outEndStr ? timeToMinutes(outEndStr) : 1440;
 
       let staffStatsTracker = {};
       filteredStaff.forEach(staff => {
@@ -4970,9 +4982,8 @@
         if ((activeTab === 'view-branch-ops' || activeTab === 'view-branch-matrix') && typeof renderBranchStats === 'function') window.renderBranchStats();
         if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
         if (activeTab === 'view-birthdays' && typeof renderAdminBirthdays === 'function') renderAdminBirthdays();
-        if (activeTab === 'view-payroll' && typeof fetchAndRenderPayroll === 'function') {
-            const mp = document.getElementById('payroll-month-picker');
-            if (mp && mp.value) fetchAndRenderPayroll(mp.value);
+        if (activeTab === 'view-payroll') {
+            if (typeof window.initPayrollPicker === 'function') window.initPayrollPicker();
         }
     });
 
@@ -5162,7 +5173,7 @@
           if (hasMoreLogsUI) {
               tbody.innerHTML += `
               <tr id="infinite-scroll-trigger">
-                  <td colspan="100%" style="text-align: center; padding: 24px; border: none; background: transparent !important;">
+                  <td colspan="100" style="text-align: center; padding: 24px; border: none; background: transparent !important;">
                       <div class="spinner-sm"></div>
                       <div style="color: var(--text-soft); font-size: 11px; margin-top: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Loading more records...</div>
                   </td>
@@ -5287,7 +5298,7 @@
           if (hasMoreLogsUI) {
               tbody.innerHTML += `
               <tr id="infinite-scroll-trigger">
-                  <td colspan="100%" style="text-align: center; padding: 24px; border: none; background: transparent !important;">
+                  <td colspan="100" style="text-align: center; padding: 24px; border: none; background: transparent !important;">
                       <div class="spinner-sm"></div>
                       <div style="color: var(--text-soft); font-size: 11px; margin-top: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Loading more records...</div>
                   </td>
@@ -5899,7 +5910,8 @@
         
         // If Shift is held and we have a previous box to reference
         if (event && event.shiftKey && lastCheckedBox) {
-            const checkboxes = Array.from(document.querySelectorAll('.audit-card-checkbox'));
+            // FIX: Only select visible checkboxes so we don't accidentally approve hidden photos
+            const checkboxes = Array.from(document.querySelectorAll('.audit-card-checkbox')).filter(cb => cb.closest('.audit-card').style.display !== 'none');
             const start = checkboxes.indexOf(lastCheckedBox);
             const end = checkboxes.indexOf(currentBox);
             
@@ -6015,9 +6027,9 @@
             
             selectedAuditLogIds.clear();
             
-            // Uncheck the master toggles on the bar for the next time it opens
-            document.getElementById('bulk-tshirt').checked = false;
-            document.getElementById('bulk-idcard').checked = false;
+            // Reset the master toggles to TRUE (Safe Default) for the next time it opens
+            document.getElementById('bulk-tshirt').checked = true;
+            document.getElementById('bulk-idcard').checked = true;
             
             // OPTIMISTIC UI UPDATE (Smoothly fade out specific cards)
             window.updatePendingBadgeCount(-selectedArray.length);
@@ -6445,7 +6457,7 @@
                 matrixHtml += `</tr>`;
             });
 
-            if (!matrixHtml) matrixHtml = '<tr><td colspan="100%" style="text-align:center; color:var(--text-soft); padding: 40px;">No branches match current filter.</td></tr>';
+            if (!matrixHtml) matrixHtml = '<tr><td colspan="100" style="text-align:center; color:var(--text-soft); padding: 40px;">No branches match current filter.</td></tr>';
             matrixBody.innerHTML = matrixHtml;
         }
     };
@@ -6843,7 +6855,7 @@
       document.getElementById('exc-staff-id').value = staffId;
       
       document.getElementById('exc-reason').value = dbReasons.length > 0 ? dbReasons[0].id : '';
-      window.closeModal(document.getElementById('exc-reason-custom'));
+      document.getElementById('exc-reason-custom').style.display = 'none';
       document.getElementById('exc-reason-custom').value = '';
 
       document.getElementById('exception-modal').style.display = 'flex';
@@ -6921,7 +6933,7 @@
 
     document.getElementById('btn-open-schedule-leave')?.addEventListener('click', () => { 
         document.getElementById('sched-reason').value = dbReasons.length > 0 ? dbReasons[0].id : '';
-        window.closeModal(document.getElementById('sched-reason-custom'));
+        document.getElementById('sched-reason-custom').style.display = 'none';
         document.getElementById('sched-reason-custom').value = '';
         document.getElementById('sched-type').value = 'Absent';
         document.getElementById('sched-expected-time').value = '';
@@ -6946,10 +6958,12 @@
        
        if(!staffId || !dStart || !dEnd) return showToast("Select staff and date range", "error");
        
+       let curr = new Date(dStart); let end = new Date(dEnd);
+       if(end < curr) return showToast("End date cannot be before Start date", "error");
+       
        const btn = document.getElementById('btn-save-sched');
        btn.innerText = "Processing..."; btn.disabled = true;
        
-       let curr = new Date(dStart); let end = new Date(dEnd);
        let inserts = [];
        const sName = staffMap[staffId]?.name;
 
@@ -7264,7 +7278,7 @@
           if (selectedRoleIds.size !== dbRoles.length && !selectedRoleIds.has(s.role_id)) return false;
           return true;
       });
-      if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff match the current filters.</td></tr>'; return; }
+      if (filteredStaff.length === 0) { tableBody.innerHTML = '<tr><td colspan="100" style="text-align:center; padding: 40px; color: var(--text-soft);">No staff match the current filters.</td></tr>'; return; }
       
       const dateList = getDatesArrayFromFetchedLogs();
       headerRow.innerHTML = '<th style="position:sticky; left:0; z-index:20;">Staff Name</th>' + dateList.map(d => `<th>${d.toLocaleDateString(window.appDateFormat)}</th>`).join('');
@@ -8371,6 +8385,8 @@
           if(appSidebar) {
               appSidebar.classList.toggle('collapsed');
               localStorage.setItem('rj_sidebar_collapsed', appSidebar.classList.contains('collapsed'));
+              // CSS animation 300ms ki hai, uske baad charts ko force resize karo
+              setTimeout(() => window.dispatchEvent(new Event('resize')), 310);
           }
         });
     }
@@ -9109,7 +9125,8 @@
         document.getElementById('drawer-stat-present').innerText = daysPresent;
         document.getElementById('drawer-stat-lates').innerText = lates;
         document.getElementById('drawer-stat-absent').innerText = absent;
-        document.getElementById('drawer-stat-hours').innerText = window.formatMsToHrMin ? window.formatMsToHrMin(totalMs) : Math.floor(totalMs/3600000) + 'h';
+        // FIX: Remove 'window.' because function is locally scoped inside the module
+        document.getElementById('drawer-stat-hours').innerText = formatMsToHrMin ? formatMsToHrMin(totalMs) : Math.floor(totalMs/3600000) + 'h';
 
         const punchesContainer = document.getElementById('drawer-recent-punches');
         if (recentLogs.length === 0) {
@@ -9359,6 +9376,7 @@
             });
         }
 
+        if (columnHeaders.length === 0) return showToast("Please select at least one column to export.", "warning");
         if (exportRows.length === 0) return showToast("No data matches these filters.", "error");
 
         const btnId = format === 'pdf' ? 'btn-rep-pdf' : 'btn-rep-excel';
@@ -9694,35 +9712,41 @@
         }
     };
 
-    // Setup Payroll Tab Click Event & Month Picker
+    window.initPayrollPicker = function() {
+        const mp = document.getElementById('payroll-month-picker');
+        if (!mp) return;
+        
+        if (!mp._flatpickr) {
+            flatpickr(mp, {
+                ...getFpConfig(),
+                plugins: [
+                    new monthSelectPlugin({
+                        shorthand: true, // "Jan", "Feb", etc.
+                        dateFormat: "Y-m", // Formatted for backend: e.g. "2026-08"
+                        altFormat: "F Y", // Displayed to user: e.g. "August 2026"
+                    })
+                ],
+                altInput: true,
+                defaultDate: new Date(),
+                onChange: function(dates, dateStr) {
+                    if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(dateStr);
+                }
+            });
+
+            // Initial load for current month
+            const d = new Date();
+            const initVal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(initVal);
+        } else if (mp.value) {
+            if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(mp.value);
+        }
+    };
+
+    // Setup Payroll Tab Click Event
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             if (e.currentTarget.getAttribute('data-view') === 'view-payroll') {
-                const mp = document.getElementById('payroll-month-picker');
-                
-                // Initialize Flatpickr only once
-                if (!mp._flatpickr) {
-                    flatpickr(mp, {
-                        ...getFpConfig(),
-                        plugins: [
-                            new monthSelectPlugin({
-                                shorthand: true, // "Jan", "Feb", etc.
-                                dateFormat: "Y-m", // Formatted for backend: e.g. "2026-08"
-                                altFormat: "F Y", // Displayed to user: e.g. "August 2026"
-                            })
-                        ],
-                        altInput: true,
-                        defaultDate: new Date(),
-                        onChange: function(dates, dateStr) {
-                            fetchAndRenderPayroll(dateStr);
-                        }
-                    });
-
-                    // Initial load for current month
-                    const d = new Date();
-                    const initVal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                    fetchAndRenderPayroll(initVal);
-                }
+                window.initPayrollPicker();
             }
         });
     });
@@ -9751,13 +9775,6 @@
                 .select('staff_id, timestamp, action')
                 .gte('timestamp', startISO).lte('timestamp', endISO)
                 .eq('action', 'Clock In'); // Sirf Clock In chahiye presence ginne ke liye
-
-            // Fetch Approved Leaves
-            const { data: pLeaves } = await supabaseClient.from('leave_requests')
-                .select('staff_id, start_date, end_date')
-                .eq('status', 'Approved')
-                .lte('start_date', endISO.split('T')[0])
-                .gte('end_date', startISO.split('T')[0]);
 
             // Fetch existing Payroll Records (Adjustments/Status)
             const { data: existingRecords } = await supabaseClient.from('payroll_records').select('*').eq('month_year', displayMonthYear);
