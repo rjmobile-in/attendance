@@ -7322,7 +7322,12 @@
           // Instant O(1) Lookup instead of nested loop filtering
           const dailyLogs = matrixLogsMap[`${staff.id}_${dateStringMatch}`] || [];
           
-          if(dailyLogs.length === 0) {
+          const joiningDate = staff.joining_date ? new Date(staff.joining_date) : new Date('2026-08-01');
+          joiningDate.setHours(0,0,0,0);
+
+          if(dateObj < joiningDate) {
+            rowStr += `<td><span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: transparent; color: var(--text-soft); border: 1px dashed var(--card-border);">Not Joined</span></td>`;
+          } else if(dailyLogs.length === 0) {
             const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
             const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
             rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Absent</span>`}</td>`;
@@ -9076,11 +9081,18 @@
         if(!activeCtxData) return;
         const { name, date, inId, outId } = activeCtxData;
         
-        if (!inId && !outId) return showToast("No logs to delete for this day.", "primary");
+        if (!inId && !outId) return showToast("No logs to delete.", "primary");
 
-        const confirm = await window.customConfirm(`Delete all clock logs for ${name} on ${date}?\n(This action cannot be undone)`);
+        let confirmMsg = isGroupedView 
+            ? `Delete all clock logs for ${name} on ${date}?\n(This action cannot be undone)` 
+            : `Delete this specific clock log for ${name}?\n(This action cannot be undone)`;
+
+        const confirm = await window.customConfirm(confirmMsg);
         if (confirm) {
-            const idsToDelete = [inId, outId].filter(id => id && id !== 'null' && id !== 'undefined'); 
+            const idsToDelete = isGroupedView 
+                ? [inId, outId].filter(id => id && id !== 'null' && id !== 'undefined')
+                : [inId].filter(id => id && id !== 'null' && id !== 'undefined');
+                
             showToast("Deleting logs...", "primary");
             try {
                 await supabaseClient.from('attendance_logs').delete().in('id', idsToDelete);
@@ -9909,13 +9921,6 @@
         // Add or minus from current value
         currentAmt += (perDayAmt * multiplier);
         amtInput.value = currentAmt;
-        
-        // Auto-fill reason box if it's empty
-        const reasonInput = document.getElementById('adjust-reason');
-        if (!reasonInput.value) {
-            if (currentAmt < 0) reasonInput.value = "Leave Deduction (-)";
-            else if (currentAmt > 0) reasonInput.value = "Extra Salary / Bonus (+)";
-        }
     };
 
     document.getElementById('btn-save-adjust')?.addEventListener('click', async () => {
