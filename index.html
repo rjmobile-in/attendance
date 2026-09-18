@@ -2772,69 +2772,16 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['logs', 'stats', 'action', 'live', 'matrix', 'branch-ops', 'branch-matrix', 'payroll'].includes(viewParam)) exportBtn.style.display = 'inline-block';
+                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
-            const filterSec = document.getElementById('master-filter-section');
-            const filterToggleBtn = document.getElementById('toggle-filter-btn');
-
-            if (['settings-hr', 'settings-org', 'birthdays', 'personalize'].includes(viewParam)) {
-                if (filterSec) filterSec.style.display = 'none';
-                if (filterToggleBtn) filterToggleBtn.style.display = 'none';
-            } else {
-                if (filterSec) filterSec.style.display = 'flex';
-                if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
-                
-                // SMART FILTER HIDING LOGIC (Initial Load)
-                setTimeout(() => {
-                    const filterRows = document.querySelectorAll('#master-filter-section .filter-row');
-                    const dateRow1 = filterRows[0];
-                    const dateRow2 = filterRows[1];
-                    const timeFiltGroups = [
-                        document.getElementById('filter-in-start')?.closest('.filter-group'), 
-                        document.getElementById('filter-out-start')?.closest('.filter-group')
-                    ];
-                    const roleFilt = document.getElementById('role-filter-dropdown');
-                    const branchFilt = document.getElementById('branch-filter-dropdown');
-                    const staffFilt = document.getElementById('staff-filter-dropdown');
-                    
-                    if(dateRow1) dateRow1.style.display = 'flex';
-                    if(dateRow2) dateRow2.style.display = 'flex';
-                    timeFiltGroups.forEach(el => { if(el) el.style.display = 'flex'; });
-                    if(roleFilt) roleFilt.style.display = 'block';
-                    if(branchFilt) branchFilt.style.display = 'block';
-                    if(staffFilt) staffFilt.style.display = 'block';
-
-                    if (viewParam === 'branch-ops') {
-                        if(roleFilt) roleFilt.style.display = 'none';
-                        if(staffFilt) staffFilt.style.display = 'none';
-                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-                    } else if (viewParam === 'branch-matrix') {
-                        if(roleFilt) roleFilt.style.display = 'none';
-                        if(staffFilt) staffFilt.style.display = 'none';
-                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-                    } else if (viewParam === 'live') {
-                        if(dateRow1) dateRow1.style.display = 'none';
-                        if(dateRow2) dateRow2.style.display = 'none';
-                        if(roleFilt) roleFilt.style.display = 'none';
-                        if(branchFilt) branchFilt.style.display = 'none';
-                        if(staffFilt) staffFilt.style.display = 'none';
-                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-                        
-                        // Live Tracker must strictly use Today's data
-                        setTimeout(() => {
-                            const todayBtn = document.querySelector('.quick-date-btn[data-range="today"]');
-                            if (todayBtn && !todayBtn.classList.contains('active')) todayBtn.click();
-                        }, 50);
-                    } else if (['stats', 'matrix', 'action', 'audits', 'roster'].includes(viewParam)) {
-                        timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-                        if (['action', 'matrix', 'stats'].includes(viewParam)) {
-                            if(branchFilt) branchFilt.style.display = 'none';
-                        }
-                    }
-                }, 100);
-            }
+            // Update filter visibility using the centralized function (with slight delay to ensure DOM is ready)
+            setTimeout(() => {
+                if (typeof updateFilterVisibility === 'function') {
+                    updateFilterVisibility('view-' + viewParam);
+                }
+            }, 50);
         }
     })();
     if (startDate < minLaunchDate) startDate = minLaunchDate;
@@ -3586,8 +3533,140 @@
             }
             const titleEl = document.getElementById('page-title');
             if (titleEl) titleEl.innerText = targetBtn.querySelector('.tab-btn-text').innerText;
+            
+            // Update filter visibility for the restored view
+            if (typeof updateFilterVisibility === 'function') {
+                updateFilterVisibility('view-' + viewParam);
+            }
         }
     });
+
+    // Contextual Filter Visibility Function
+    // Determines which filters are relevant for each view and shows/hides them accordingly
+    function updateFilterVisibility(viewId) {
+        const filterSec = document.getElementById('master-filter-section');
+        const filterToggleBtn = document.getElementById('toggle-filter-btn');
+        
+        // Get filter elements - correctly targeting the actual DOM structure
+        const filterRows = document.querySelectorAll('#master-filter-section .filter-row');
+        const dateRow1 = filterRows[0]; // Date Range + Quick Dates
+        const dateRow2 = filterRows[1]; // Start Date + End Date
+        const timeRow = filterRows[2]; // Clock-In/Out time filters + Roles/Branches/Staff
+        
+        // Time filter groups - each pair (Clock-In Start/End, Clock-Out Start/End) is separate
+        const clockInGroup = document.getElementById('filter-in-start')?.closest('.filter-group');
+        const clockOutGroup = document.getElementById('filter-out-start')?.closest('.filter-group');
+        
+        // Entity dropdown filters
+        const roleFilt = document.getElementById('role-filter-dropdown');
+        const branchFilt = document.getElementById('branch-filter-dropdown');
+        const staffFilt = document.getElementById('staff-filter-dropdown');
+        
+        // Define filter requirements for each view
+        // true = filter is relevant and should be visible
+        // false = filter is not relevant and should be hidden
+        const filterConfig = {
+            // Dashboard: All filters except time are relevant
+            'view-dashboard': { date: true, time: false, role: true, branch: true, staff: true },
+            
+            // Live Tracker: Only uses today's data, no filters needed
+            'view-live': { date: false, time: false, role: false, branch: false, staff: false },
+            
+            // Branch Operations: Only date and branch filters relevant
+            'view-branch-ops': { date: true, time: false, role: false, branch: true, staff: false },
+            
+            // Branch Matrix: Only date and branch filters relevant
+            'view-branch-matrix': { date: true, time: false, role: false, branch: true, staff: false },
+            
+            // Logs: All filters except time are relevant
+            'view-logs': { date: true, time: false, role: true, branch: true, staff: true },
+            
+            // Stats: Date, role, and staff filters relevant
+            'view-stats': { date: true, time: false, role: true, branch: false, staff: true },
+            
+            // Matrix: Date, role, and staff filters relevant
+            'view-matrix': { date: true, time: false, role: true, branch: false, staff: true },
+            
+            // Action Center: Date, role, and staff filters relevant
+            'view-action': { date: true, time: false, role: true, branch: false, staff: true },
+            
+            // Audits: Date, role, and staff filters relevant
+            'view-audits': { date: true, time: false, role: true, branch: true, staff: true },
+            
+            // Roster: Role, branch, and staff filters relevant (has its own date picker)
+            'view-roster': { date: false, time: false, role: true, branch: true, staff: true },
+            
+            // Payroll: Only staff filter relevant (has its own month picker)
+            'view-payroll': { date: false, time: false, role: false, branch: false, staff: true },
+            
+            // Customers: Date and staff filters relevant
+            'view-customers': { date: true, time: false, role: false, branch: false, staff: true },
+            
+            // Birthdays: No filters needed
+            'view-birthdays': { date: false, time: false, role: false, branch: false, staff: false },
+            
+            // Settings: No filters needed
+            'view-settings-hr': { date: false, time: false, role: false, branch: false, staff: false },
+            'view-settings-org': { date: false, time: false, role: false, branch: false, staff: false },
+            
+            // Personalize: No filters needed
+            'view-personalize': { date: false, time: false, role: false, branch: false, staff: false }
+        };
+        
+        // Get config for current view, default to no filters if not defined
+        const config = filterConfig[viewId] || { date: false, time: false, role: false, branch: false, staff: false };
+        
+        // Check if any filters are needed at all
+        const needsAnyFilter = config.date || config.time || config.role || config.branch || config.staff;
+        
+        // Show/hide entire filter section
+        if (needsAnyFilter) {
+            if (filterSec) filterSec.style.display = 'flex';
+            if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
+        } else {
+            if (filterSec) filterSec.style.display = 'none';
+            if (filterToggleBtn) filterToggleBtn.style.display = 'none';
+        }
+        
+        // Apply individual filter visibility
+        if (dateRow1) dateRow1.style.display = config.date ? 'flex' : 'none';
+        if (dateRow2) dateRow2.style.display = config.date ? 'flex' : 'none';
+        
+        // Time filters - hide entire row if time not needed, otherwise show/hide individual groups
+        if (config.time) {
+            if (clockInGroup) clockInGroup.style.display = 'flex';
+            if (clockOutGroup) clockOutGroup.style.display = 'flex';
+        } else {
+            if (clockInGroup) clockInGroup.style.display = 'none';
+            if (clockOutGroup) clockOutGroup.style.display = 'none';
+        }
+        
+        if(roleFilt) roleFilt.style.display = config.role ? 'block' : 'none';
+        if(branchFilt) branchFilt.style.display = config.branch ? 'block' : 'none';
+        if(staffFilt) staffFilt.style.display = config.staff ? 'block' : 'none';
+        
+        // Close dropdowns when their parent filters are hidden
+        if (!config.role) {
+            const roleDropdown = document.getElementById('role-dropdown-box');
+            if (roleDropdown) roleDropdown.classList.remove('show');
+        }
+        if (!config.branch) {
+            const branchDropdown = document.getElementById('branch-dropdown-box');
+            if (branchDropdown) branchDropdown.classList.remove('show');
+        }
+        if (!config.staff) {
+            const staffDropdown = document.getElementById('staff-dropdown-box');
+            if (staffDropdown) staffDropdown.classList.remove('show');
+        }
+        
+        // Special handling for Live Tracker: force today's date
+        if (viewId === 'view-live') {
+            const todayBtn = document.querySelector('.quick-date-btn[data-range="today"]');
+            if (todayBtn && !todayBtn.classList.contains('active')) {
+                setTimeout(() => todayBtn.click(), 10);
+            }
+        }
+    }
 
     // Main Tab Switcher Logic
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -3655,70 +3734,8 @@
             }
         }
         
-        const filterSec = document.getElementById('master-filter-section');
-        const filterToggleBtn = document.getElementById('toggle-filter-btn');
-
-        if (['view-settings-hr', 'view-settings-org', 'view-birthdays', 'view-personalize'].includes(viewId)) {
-            if (filterSec) filterSec.style.display = 'none';
-            if (filterToggleBtn) filterToggleBtn.style.display = 'none';
-        } else {
-            if (filterSec) filterSec.style.display = 'flex';
-            if (filterToggleBtn) filterToggleBtn.style.display = 'inline-flex';
-            
-            // SMART FILTER HIDING LOGIC
-            const filterRows = document.querySelectorAll('#master-filter-section .filter-row');
-            const dateRow1 = filterRows[0];
-            const dateRow2 = filterRows[1];
-            
-            const timeFiltGroups = [
-                document.getElementById('filter-in-start')?.closest('.filter-group'), 
-                document.getElementById('filter-out-start')?.closest('.filter-group')
-            ];
-            const roleFilt = document.getElementById('role-filter-dropdown');
-            const branchFilt = document.getElementById('branch-filter-dropdown');
-            const staffFilt = document.getElementById('staff-filter-dropdown');
-            
-            // 1. Reset all to visible first
-            if(dateRow1) dateRow1.style.display = 'flex';
-            if(dateRow2) dateRow2.style.display = 'flex';
-            timeFiltGroups.forEach(el => { if(el) el.style.display = 'flex'; });
-            if(roleFilt) roleFilt.style.display = 'block';
-            if(branchFilt) branchFilt.style.display = 'block';
-            if(staffFilt) staffFilt.style.display = 'block';
-
-            // 2. Hide specific filters based on active view
-            if (viewId === 'view-branch-ops') {
-                if(roleFilt) roleFilt.style.display = 'none';
-                if(staffFilt) staffFilt.style.display = 'none';
-                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-            } 
-            else if (viewId === 'view-branch-matrix') {
-                if(roleFilt) roleFilt.style.display = 'none';
-                if(staffFilt) staffFilt.style.display = 'none';
-                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-            } 
-            else if (viewId === 'view-live') {
-                if(dateRow1) dateRow1.style.display = 'none';
-                if(dateRow2) dateRow2.style.display = 'none';
-                if(roleFilt) roleFilt.style.display = 'none';
-                if(branchFilt) branchFilt.style.display = 'none';
-                if(staffFilt) staffFilt.style.display = 'none';
-                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-
-                // Live Tracker must strictly use Today's data
-                const todayBtn = document.querySelector('.quick-date-btn[data-range="today"]');
-                if (todayBtn && !todayBtn.classList.contains('active')) {
-                    setTimeout(() => todayBtn.click(), 10);
-                }
-            } 
-            else if (['view-stats', 'view-matrix', 'view-action', 'view-audits', 'view-roster'].includes(viewId)) {
-                // In tabs me exact time In/Out ki filtering utni kaam nahi aati
-                timeFiltGroups.forEach(el => { if(el) el.style.display = 'none'; });
-                if (['view-action', 'view-matrix', 'view-stats'].includes(viewId)) {
-                    if(branchFilt) branchFilt.style.display = 'none';
-                }
-            }
-        }
+        // Update filter visibility based on active view
+        updateFilterVisibility(viewId);
         
         manageWakeLock(viewId); // Keep screen alive if needed
         
