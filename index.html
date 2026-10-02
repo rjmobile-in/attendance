@@ -9867,7 +9867,28 @@
                 ],
                 altInput: true,
                 defaultDate: new Date(),
-                onChange: function(dates, dateStr) {
+                onChange: function(dates, dateStr, instance) {
+                    // 1. Update Global Dates automatically when month is selected
+                    if (dates.length > 0) {
+                        const selectedDate = dates[0];
+                        
+                        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+                        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+                        endDate.setHours(23, 59, 59, 999);
+                        
+                        localStorage.setItem('rj_active_date_range', 'custom');
+                        localStorage.setItem('rj_custom_start', startDate.toISOString());
+                        localStorage.setItem('rj_custom_end', endDate.toISOString());
+                        
+                        if (typeof window.checkAndSetActiveDateRange === 'function') window.checkAndSetActiveDateRange();
+                        if (typeof startPicker !== 'undefined' && startPicker) startPicker.setDate(startDate);
+                        if (typeof endPicker !== 'undefined' && endPicker) endPicker.setDate(endDate);
+                        
+                        // Fetch logs to sync top heading and background data
+                        if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false);
+                    }
+
+                    // 2. Render Payroll Data
                     if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(dateStr);
                 }
             });
