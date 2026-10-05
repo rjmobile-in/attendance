@@ -2354,6 +2354,10 @@
                   <span style="font-weight: 700; color: #0f172a;" id="slip-base">₹0</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+                  <span style="font-weight: 600; color: #475569;">Present Days</span>
+                  <span style="font-weight: 700; color: #0f172a;" id="slip-present-days">0</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
                   <span style="font-weight: 600; color: #475569;">Payable Days (<span id="slip-days-detail" style="font-size: 11px;">0/0</span>)</span>
                   <span style="font-weight: 700; color: #0f172a;" id="slip-calc">₹0</span>
               </div>
@@ -10065,6 +10069,7 @@
             
             await supabaseClient.from('payroll_records').upsert({
                 month_year: monthYear, staff_id: staffId, base_salary: p.base, payable_days: p.payableDays,
+                present_days: p.present, paid_leaves: p.paidLeaves,
                 calculated_salary: p.calc, tax_amount: p.tax, manual_adjustment_amount: amt, manual_adjustment_reason: reason,
                 net_salary: net, status: 'Unpaid'
             }, { onConflict: 'month_year, staff_id' });
@@ -10085,15 +10090,20 @@
             const timestampStr = new Date().toISOString();
             await supabaseClient.from('payroll_records').upsert({
                 month_year: p.displayMonthYear, staff_id: staffId, base_salary: p.base, payable_days: p.payableDays,
+                present_days: p.present, paid_leaves: p.paidLeaves,
                 calculated_salary: p.calc, tax_amount: p.tax, manual_adjustment_amount: p.adj, manual_adjustment_reason: p.res,
                 net_salary: p.net, status: 'Paid', paid_at: timestampStr
             }, { onConflict: 'month_year, staff_id' });
 
-            fetchAndRenderPayroll(document.getElementById('payroll-month-picker').value);
+            // Optimistically update UI so payslip shows correct data instantly
+            p.status = 'Paid';
+            p.paidAt = timestampStr;
+
+            await fetchAndRenderPayroll(document.getElementById('payroll-month-picker').value);
             showToast("Salary Marked as Paid!", "success");
             
-            // Optionally Auto-open payslip
-            setTimeout(() => window.openPayslip(staffId), 500);
+            // Open Payslip Instantly with new data
+            window.openPayslip(staffId);
         } catch(e) { showToast("Failed to mark as paid", "error"); }
     };
 
@@ -10112,6 +10122,7 @@
         document.getElementById('slip-name').innerText = p.name;
         document.getElementById('slip-role').innerText = roleName;
         document.getElementById('slip-base').innerText = `₹${p.base.toLocaleString()}`;
+        document.getElementById('slip-present-days').innerText = `${p.present}`;
         document.getElementById('slip-days-detail').innerText = `${p.payableDays}/${p.daysInMonth}`;
         document.getElementById('slip-calc').innerText = `₹${p.calc.toLocaleString()}`;
         document.getElementById('slip-tax').innerText = `-₹${p.tax.toLocaleString()}`;
