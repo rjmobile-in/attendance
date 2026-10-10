@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>RJ Mobile | Attendance Workspace</title>
   <link rel="icon" type="image/png" href="logo.png" />
    
@@ -26,14 +26,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Export Libraries (Lazy Loaded dynamically via JS) -->
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" defer></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
   <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13" defer></script>
   <!-- Flatpickr Month Plugin -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/plugins/monthSelect/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/plugins/monthSelect/index.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>  
   
   <!-- Security & IndexedDB Caching -->
@@ -661,6 +661,36 @@
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   }
   </style>
+<script>
+window.esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+window.attrJs=s=>String(s??'').replace(/[\\'"<>&\n\r]/g,c=>'\\x'+c.charCodeAt(0).toString(16).padStart(2,'0'));
+(()=>{const sel='span[onclick],div[onclick]';const set=e=>{if(!e.hasAttribute('tabindex')){e.setAttribute('tabindex','0');e.setAttribute('role','button')}};
+const mark=r=>r.querySelectorAll&&r.querySelectorAll(sel).forEach(set);
+document.addEventListener('DOMContentLoaded',()=>{mark(document);new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.matches(sel))set(n);mark(n)}))).observe(document.body,{childList:true,subtree:true})});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches(sel)){e.preventDefault();e.target.click()}});})();
+</script>
+<style id="rj-pro-polish">
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,[onclick],select,.slider{touch-action:manipulation}
+button{transition:transform .15s ease,box-shadow .2s ease,filter .2s ease,background-color .2s ease,border-color .2s ease}
+button:not(:disabled):hover{filter:brightness(1.07)}
+button:not(:disabled):active{transform:scale(.97)}
+:focus-visible{outline:2px solid var(--primary,#3b82f6);outline-offset:2px;border-radius:6px}
+input:focus,select:focus,textarea:focus,.input-field:focus{border-color:var(--primary,#3b82f6)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--primary,#3b82f6) 22%,transparent)!important;outline:none}
+table tbody tr{transition:background-color .15s ease}
+table tbody tr:hover{background:color-mix(in srgb,var(--primary,#3b82f6) 6%,transparent)}
+.modal-overlay{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,.35);border-radius:10px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(148,163,184,.6);background-clip:content-box}
+.rj-side-foot{position:sticky;bottom:0;margin-top:auto;padding:12px;display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(148,163,184,.18);background:inherit}
+.rj-side-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(148,163,184,.22);background:transparent;color:var(--text-soft,#94a3b8);font:600 13px inherit;cursor:pointer}
+.rj-side-btn:hover{color:var(--text-main,#f8fafc);background:rgba(148,163,184,.12)}
+#logout-btn:hover{color:#ef4444;border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.1)}
+.sidebar.collapsed .rj-side-btn span{display:none}.sidebar.collapsed .rj-side-btn{justify-content:center}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
 
@@ -793,7 +823,12 @@
             <span class="tab-btn-text">Location & Shifts</span>
           </button>
         </div>
-      </aside>
+      <div class="rj-side-foot">
+  <div id="action-badges" style="display:none;gap:6px;flex-wrap:wrap"><span id="badge-absent" class="badge bg-red" title="Unexcused absent"></span><span id="badge-late" class="badge bg-orange" title="Unexcused late"></span><span id="badge-early" class="badge bg-orange" title="Unexcused early"></span></div>
+  <button id="btn-shortcuts" class="rj-side-btn" type="button" aria-label="Keyboard shortcuts">⌨️ <span>Shortcuts</span></button>
+  <button id="logout-btn" class="rj-side-btn" type="button" aria-label="Log out">🚪 <span>Log out</span></button>
+</div>
+</aside>
 
       <!-- MAIN CONTENT AREA -->
       <main class="main-content">
@@ -2513,7 +2548,7 @@
   </div>
   
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlenVtYXB6bHNqbmtpdHh2c3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTY2NjUsImV4cCI6MjA5OTkzMjY2NX0.IVUZVjZUuiM9qTcKAIIxJth_zSIGJUWTaubUV4Fy0_Y';
@@ -3846,24 +3881,24 @@
             const avatar = getAvatarHtml(lv.employee_name, staffObj?.profile_pic, 36);
 
             // Clean data for safe inline JS
-            const safeDesc = window.safeHTML(lv.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
-            const safeTitle = window.safeHTML(lv.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            const safeDesc = window.attrJs(window.safeHTML(lv.reason_desc || '').replace(/\n/g, "<br>"));
+            const safeTitle = window.attrJs(window.safeHTML(lv.reason_title || ''));
             
             let typeBadge = '';
             const lType = lv.leave_type || 'Absent';
             if (lType === 'Late Arrival') typeBadge = `<span class="badge bg-orange" style="margin-right: 8px; font-size: 10px;">Late</span>`;
             else if (lType === 'Early Departure') typeBadge = `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); margin-right: 8px; font-size: 10px;">Early</span>`;
 
-            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}', '${lType}', '${lv.expected_time || ''}')">
+            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${window.attrJs(lv.employee_name)}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}', '${lType}', '${lv.expected_time || ''}')">
                 <td style="color:var(--text-soft)">${submitDate}</td>
                 <td>
                   <div style="display: flex; align-items: center; gap: 10px;">
                       ${avatar}
-                      <strong style="color: var(--text-main);">${lv.employee_name}</strong>
+                      <strong style="color: var(--text-main);">${window.esc(lv.employee_name)}</strong>
                   </div>
                 </td>
                 <td style="font-weight: 600;">${sDate} - ${eDate}</td>
-                <td>${typeBadge}<strong style="color: var(--primary);">${lv.reason_title}</strong></td>
+                <td>${typeBadge}<strong style="color: var(--primary);">${window.esc(lv.reason_title)}</strong></td>
                 <td>${statusBadge}</td>
             </tr>`;
         }).join('');
@@ -3964,7 +3999,7 @@
                         h = h % 12 || 12;
                         formattedTime = `${h}:${timeSplit[1]} ${ampm}`;
                     }
-                    cleanReason = `${lv.reason_title} (Expected: ${formattedTime})`;
+                    cleanReason = `${window.esc(lv.reason_title)} (Expected: ${formattedTime})`;
                 }
                 
                 while(curr <= end) {
@@ -4228,6 +4263,7 @@
     });
 
     async function handleAuthChange(user) {
+      if (user && (user.email||'').toLowerCase() !== 'admin@rjmobile.in') { await supabaseClient.auth.signOut(); return; }
       const loader = document.getElementById('global-loader');
       if (loader) { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; loader.style.opacity = '1'; }, 400); }
 
@@ -4366,9 +4402,9 @@
       populateBranchDropdowns(); 
       
       const schedSelect = document.getElementById('sched-staff');
-      if (schedSelect) schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      if (schedSelect) schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${window.esc(s.name)}</option>`).join('');
       const manualSelect = document.getElementById('manual-staff');
-      if (manualSelect) manualSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      if (manualSelect) manualSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${window.esc(s.name)}</option>`).join('');
 
       renderStaffFilterCheckboxes();
       renderBranchFilterCheckboxes();
@@ -4391,14 +4427,14 @@
     }
 
     function populateBranchDropdowns() {
-        const opts = '<option value="">-- No Default Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${b.branch_name}</option>`).join('');
+        const opts = '<option value="">-- No Default Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${window.esc(b.branch_name)}</option>`).join('');
         const newStaffBranch = document.getElementById('new-staff-branch');
         const editStaffBranch = document.getElementById('edit-staff-branch');
         const manualBranch = document.getElementById('manual-branch'); // New addition for Manual Entry
         
         if(newStaffBranch) newStaffBranch.innerHTML = opts;
         if(editStaffBranch) editStaffBranch.innerHTML = opts;
-        if(manualBranch) manualBranch.innerHTML = '<option value="">-- Select Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${b.branch_name}</option>`).join('');
+        if(manualBranch) manualBranch.innerHTML = '<option value="">-- Select Branch --</option>' + dbBranches.map(b => `<option value="${b.id}">${window.esc(b.branch_name)}</option>`).join('');
     }
 
     function populateReasonDropdowns() {
@@ -4818,9 +4854,9 @@
               if (!hasValidId && !hasPendingAudit) staffStatsTracker[staff.id].missedId++;
           }
           
-          const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
-          const excLate = exceptionsData[`${staff.id}_${isoDateStr}_Late Arrival`] || exceptionsData[`${staff.name}_${isoDateStr}_Late Arrival`];
-          const excEarly = exceptionsData[`${staff.id}_${isoDateStr}_Early Departure`] || exceptionsData[`${staff.name}_${isoDateStr}_Early Departure`];
+          const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${window.esc(staff.name)}_${isoDateStr}_Absent`];
+          const excLate = exceptionsData[`${staff.id}_${isoDateStr}_Late Arrival`] || exceptionsData[`${window.esc(staff.name)}_${isoDateStr}_Late Arrival`];
+          const excEarly = exceptionsData[`${staff.id}_${isoDateStr}_Early Departure`] || exceptionsData[`${window.esc(staff.name)}_${isoDateStr}_Early Departure`];
 
           if (dailyLogs.length > 0 || excAbsent || excLate || excEarly) {
             
@@ -5276,12 +5312,12 @@
             const staffObj = staffMap[row.staffId];
             const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
 
-            return `<tr ondblclick="window.openEditTimeModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" oncontextmenu="window.showContextMenu(event, '${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}', '${row.latitude || ''}', '${row.longitude || ''}')" style="cursor: pointer;" title="Double-click or Right-click row to Edit">
+            return `<tr ondblclick="window.openEditTimeModal('${row.staffId}', '${window.attrJs(row.name)}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}')" oncontextmenu="window.showContextMenu(event, '${row.staffId}', '${window.attrJs(row.name)}', '${isoDate}', '${row.firstInId || ''}', '${row.lastOutId || ''}', '${row.firstIn ? row.firstIn.toISOString() : ''}', '${row.lastOut ? row.lastOut.toISOString() : ''}', '${row.latitude || ''}', '${row.longitude || ''}')" style="cursor: pointer;" title="Double-click or Right-click row to Edit">
               <td style="color:var(--text-soft)">${displayDate}</td>
               <td>
                 <div onclick="event.stopPropagation(); window.openStaffProfile('${row.staffId}')" style="cursor:pointer; display:flex; align-items:center; gap:10px; transition: 0.2s;" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
                     ${avatar}
-                    <div><strong>${row.name}</strong><br><span class="role-tag">${row.role}</span></div>
+                    <div><strong>${window.esc(row.name)}</strong><br><span class="role-tag">${row.role}</span></div>
                 </div>
               </td>
               <td>
@@ -5509,7 +5545,7 @@
             return `
             <div class="live-branch-card" onclick="window.openLiveBranchModal('${b.id}')">
                 <div>
-                    <div class="live-branch-title">${b.branch_name}</div>
+                    <div class="live-branch-title">${window.esc(b.branch_name)}</div>
                     <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">Active Presence</div>
                 </div>
                 <div class="live-branch-count" style="color: ${countColor}">${count}</div>
@@ -5696,7 +5732,7 @@
         
         punchList.innerHTML = window.currentEditLogs.map((log, idx) => {
             const timeVal = log.timestamp ? new Date(log.timestamp).toTimeString().substring(0,5) : '';
-            const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}" ${b.branch_name === log.branch ? 'selected' : ''}>${b.branch_name}</option>`).join('');
+            const branchOpts = dbBranches.map(b => `<option value="${window.esc(b.branch_name)}" ${b.branch_name === log.branch ? 'selected' : ''}>${window.esc(b.branch_name)}</option>`).join('');
             
             const hasTshirt = log.uniform_tshirt !== false; 
             const hasIdcard = log.uniform_idcard !== false; 
@@ -5857,7 +5893,7 @@
                         ${statusBadgeHtml}
                     </div>
                     <div class="audit-details">
-                        <div><strong style="color: var(--text-main); font-size: calc(14px * var(--font-scale, 1));">${r.name}</strong><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
+                        <div><strong style="color: var(--text-main); font-size: calc(14px * var(--font-scale, 1));">${window.esc(r.name)}</strong><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
                         <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">${dateStr} • ${timeStr}</div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                           <label class="check-wrap" style="flex: 1; padding:6px; font-size:calc(12px * var(--font-scale, 1)); border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
@@ -6368,7 +6404,7 @@
                 <td>
                   <div style="display: flex; align-items: center; gap: 10px; cursor:pointer; transition:0.2s;" onclick="window.openStaffProfile('${s.id}')" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
                       ${avatar}
-                      <strong style="color: var(--text-main);">${s.name}</strong>
+                      <strong style="color: var(--text-main);">${window.esc(s.name)}</strong>
                   </div>
                 </td>
                 <td><span class="role-tag">${s.role}</span></td>
@@ -6522,7 +6558,7 @@
 
             html += `<tr style="transition: 0.2s; cursor: default;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='transparent'">
                 <td>
-                  <strong style="color: var(--text-main); font-size: 14px;">${b.branch_name}</strong>
+                  <strong style="color: var(--text-main); font-size: 14px;">${window.esc(b.branch_name)}</strong>
                 </td>
                 <td><span style="font-weight: 700; color: var(--primary); font-size: 14px;">${openCount}</span> <span style="color: var(--text-soft); font-size: 12px;">days</span></td>
                 <td>
@@ -6553,7 +6589,7 @@
                 // Apply Branch Filter (Ignore if filtered out)
                 if (selectedBranchIds.size !== dbBranches.length && !selectedBranchIds.has(b.id)) return;
 
-                matrixHtml += `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${b.branch_name}</td>`;
+                matrixHtml += `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${window.esc(b.branch_name)}</td>`;
 
                 dateList.forEach(dateObj => {
                     const dStr = dateObj.toDateString();
@@ -6934,7 +6970,7 @@
             const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
 
             let rowOnClick = "";
-            let actionTd = `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${currentActionType}')">Manage Reason</a>`;
+            let actionTd = `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${window.attrJs(row.name)}', '${isoDate}', '${currentActionType}')">Manage Reason</a>`;
 
             if (currentActionTab === 'active-leaves') {
                 // Link request with matching exceptions for deep modal view
@@ -6948,17 +6984,17 @@
                 if (matchingRequest) {
                     const sDate = new Date(matchingRequest.start_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
                     const eDate = new Date(matchingRequest.end_date).toLocaleDateString(window.appDateFormat, {day:'numeric', month:'short'});
-                    const safeDesc = window.safeHTML(matchingRequest.reason_desc || '').replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '<br>');
-                    const safeTitle = window.safeHTML(matchingRequest.reason_title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const safeDesc = window.attrJs(window.safeHTML(matchingRequest.reason_desc || '').replace(/\n/g, "<br>"));
+                    const safeTitle = window.attrJs(window.safeHTML(matchingRequest.reason_title || ''));
                     
                     const lType = matchingRequest.leave_type || 'Absent';
                     const eTime = matchingRequest.expected_time || '';
 
-                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', '${matchingRequest.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}', '${lType}', '${eTime}')" style="cursor:pointer;"`;
+                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', '${window.attrJs(matchingRequest.employee_name)}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}', '${lType}', '${eTime}')" style="cursor:pointer;"`;
                     actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to view details</span>`;
                 } else {
                     // Fallback for manually generated exceptions outside of requests
-                    rowOnClick = `onclick="window.openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${currentActionType}')" style="cursor:pointer;"`;
+                    rowOnClick = `onclick="window.openExceptionModal('${row.staffId}', '${window.attrJs(row.name)}', '${isoDate}', '${currentActionType}')" style="cursor:pointer;"`;
                     actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to edit</span>`;
                 }
             }
@@ -6968,7 +7004,7 @@
                 <td>
                   <div style="display: flex; align-items: center; gap: 10px; cursor:pointer; transition:0.2s;" onclick="event.stopPropagation(); window.openStaffProfile('${row.staffId}')" onmouseover="this.querySelector('strong').style.color='var(--primary)'; this.querySelector('strong').style.textDecoration='underline'" onmouseout="this.querySelector('strong').style.color=''; this.querySelector('strong').style.textDecoration='none'">
                       ${avatar}
-                      <strong style="color: var(--text-main);">${row.name}</strong>
+                      <strong style="color: var(--text-main);">${window.esc(row.name)}</strong>
                   </div>
                 </td>
                 <td>${statusHTML}</td>
@@ -7241,7 +7277,7 @@
         let branchesHtml = activeBranches.map(b => `
             <div class="roster-branch-card">
                 <div class="roster-branch-header">
-                    ${b.branch_name}
+                    ${window.esc(b.branch_name)}
                     <span class="badge bg-blue" id="count-${b.id}" style="font-size: 12px; padding: 4px 8px;">0</span>
                 </div>
                 <div class="roster-list" data-branch-id="${b.id}" id="list-${b.id}"></div>
@@ -7283,7 +7319,7 @@
             const itemHtml = `
                 <div class="roster-staff-item ${isOverride ? 'is-override' : ''}" data-staff-id="${staff.id}">
                     <div>
-                        <div style="font-size: calc(14px * var(--font-scale, 1)); color: var(--text-main); margin-bottom: 2px;">${staff.name}</div>
+                        <div style="font-size: calc(14px * var(--font-scale, 1)); color: var(--text-main); margin-bottom: 2px;">${window.esc(staff.name)}</div>
                         <div style="font-size: 10px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">
                             ${statusText}
                         </div>
@@ -7426,7 +7462,7 @@
       // ------------------------------------
 
       tableBody.innerHTML = filteredStaff.map(staff => {
-        let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${staff.name}</td>`;
+        let rowStr = `<tr><td style="position:sticky; left:0; background:var(--card-bg); font-weight:700; border-right:1px solid var(--card-border); z-index: 10; color: var(--text-main);">${window.esc(staff.name)}</td>`;
         
         dateList.forEach(dateObj => {
           const dateStringMatch = dateObj.toDateString(); const isoDateStr = toLocalISO(dateObj);
@@ -7440,7 +7476,7 @@
           if(dateObj < joiningDate) {
             rowStr += `<td><span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: transparent; color: var(--text-soft); border: 1px dashed var(--card-border);">Not Joined</span></td>`;
           } else if(dailyLogs.length === 0) {
-            const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
+            const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${window.esc(staff.name)}_${isoDateStr}_Absent`];
             const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
             rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Absent</span>`}</td>`;
           } else {
@@ -7526,7 +7562,7 @@
                 <div style="display: flex; align-items: center; gap: 12px;">
                     ${avatar}
                     <div>
-                        <strong style="color: var(--text-main);">${s.name}</strong><br>
+                        <strong style="color: var(--text-main);">${window.esc(s.name)}</strong><br>
                         <span class="role-tag">${roleName}</span><br>
                         <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
                     </div>
@@ -7534,7 +7570,7 @@
               </td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${window.attrJs(s.name)}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -7543,7 +7579,7 @@
       const branchTbody = document.getElementById('branch-settings-list');
       if (branchTbody) {
           branchTbody.innerHTML = branchArr.map(b => `<tr>
-              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong></td>
+              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${window.esc(b.branch_name)}</strong></td>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">Lat: ${b.latitude || 'N/A'}<br>Lng: ${b.longitude || 'N/A'}<br>Radius: ${b.radius_meters || 100}m</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <button class="edit-btn" onclick="window.openEditBranch('${b.id}', '${b.branch_name.replace(/'/g, "\\'")}', '${b.latitude || ''}', '${b.longitude || ''}', '${b.radius_meters || 100}')">Edit</button>
@@ -7768,7 +7804,6 @@
               shift_start: startVal, 
               shift_end: endVal, 
               email: emailVal, 
-              password: passVal,
               default_branch_id: defBranchId,
               dob: dobVal,
               joining_date: document.getElementById('new-staff-joining').value || null,
@@ -7865,7 +7900,7 @@
         if(start && start.length === 5) start += ':00';
         if(end && end.length === 5) end += ':00';
 
-        if(name && newEmail && newPass) {
+        if(name && newEmail) {
             const btn = document.getElementById('btn-save-edit-staff'); 
             btn.innerText = "Saving & Syncing Auth..."; 
             btn.disabled = true;
@@ -7891,7 +7926,7 @@
                 const defBranchId = document.getElementById('edit-staff-branch').value || null;
                 const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
                 await supabaseClient.from('staff_directory').update({
-                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate
                 }).eq('id', id);
 
                 window.closeModal(document.getElementById('edit-staff-modal'));
@@ -7907,7 +7942,7 @@
                 btn.disabled = false; 
             }
         } else { 
-            showToast("Name, Email, and Password are all required!", "error"); 
+            showToast("Name and Email are required!", "error"); 
         }
     });
     
@@ -8193,7 +8228,7 @@
                     const dailyLogs = matrixLogsMap[`${staff.id}_${dateStringMatch}`] || [];
                     
                     if(dailyLogs.length === 0) {
-                        const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
+                        const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${window.esc(staff.name)}_${isoDateStr}_Absent`];
                         const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
                         rowData.push(reasonTxt ? `[${reasonTxt}]` : "No Record");
                     } else {
@@ -8698,14 +8733,14 @@
 
             views.filter(v => fuzzyMatch(cleanQuery, v.name.toLowerCase()) || v.name.toLowerCase().includes(cleanQuery)).forEach(v => {
                 html += `<div class="cmd-item" onclick="if(document.querySelector('.tab-btn[data-view=\\'view-${v.id}\\']')){ document.querySelector('.tab-btn[data-view=\\'view-${v.id}\\']').click(); } else if(document.getElementById('btn-${v.id}')){ document.getElementById('btn-${v.id}').click(); } window.closeModal(document.getElementById('cmd-palette-overlay'));">
-                    <span class="cmd-icon">${v.icon}</span> Go to ${v.name}
+                    <span class="cmd-icon">${v.icon}</span> Go to ${window.esc(v.name)}
                 </div>`;
             });
 
             // 2. Search Staff Members
             dbStaff.filter(s => fuzzyMatch(cleanQuery, s.name.toLowerCase()) || s.name.toLowerCase().includes(cleanQuery)).slice(0, 8).forEach(s => {
                 html += `<div class="cmd-item" onclick="jumpToStaffStats('${s.id}');">
-                    <span class="cmd-icon">👤</span> View ${s.name}'s Attendance & Stats
+                    <span class="cmd-icon">👤</span> View ${window.esc(s.name)}'s Attendance & Stats
                 </div>`;
             });
         }
@@ -8726,7 +8761,7 @@
         
         actions.filter(a => fuzzyMatch(cleanQuery, a.name.toLowerCase()) || a.name.toLowerCase().includes(cleanQuery)).forEach(a => {
             html += `<div class="cmd-item" onclick="window.closeModal(document.getElementById('cmd-palette-overlay')); ${a.script};">
-                <span class="cmd-icon">${a.icon}</span> ${isActionMode ? '' : '> '}${a.name}
+                <span class="cmd-icon">${a.icon}</span> ${isActionMode ? '' : '> '}${window.esc(a.name)}
             </div>`;
         });
 
@@ -9752,7 +9787,7 @@
                     const defBranchId = document.getElementById('new-staff-branch').value || null;
                     const { error: dbError } = await supabaseClient.from('staff_directory').insert([{ 
                         name: nameVal, role_id: roleId, role: rName, shift_start: startVal, shift_end: endVal, 
-                        email: emailVal, password: passVal, default_branch_id: defBranchId, dob: dobVal, 
+                        email: emailVal, default_branch_id: defBranchId, dob: dobVal, 
                         joining_date: document.getElementById('new-staff-joining').value || null,
                         phone_number: phoneVal, base_salary: salaryVal ? parseFloat(salaryVal) : null
                     }]);
@@ -9793,7 +9828,7 @@
             if(start && start.length === 5) start += ':00';
             if(end && end.length === 5) end += ':00';
 
-            if(name && newEmail && newPass) {
+            if(name && newEmail) {
                 const btn = document.getElementById('btn-save-edit-staff'); btn.innerText = "Saving..."; btn.disabled = true;
                 try {
                     const { data: oldStaff } = await supabaseClient.from('staff_directory').select('email').eq('id', id).single();
@@ -9807,8 +9842,7 @@
                     const defBranchId = document.getElementById('edit-staff-branch').value || null;
                     const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
                     await supabaseClient.from('staff_directory').update({
-                        name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, 
-                        default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate,
+                        name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate,
                         phone_number: phoneVal, base_salary: salaryVal ? parseFloat(salaryVal) : null
                     }).eq('id', id);
 
@@ -9817,7 +9851,7 @@
                     showToast("Staff profile updated!", "success");
                 } catch(e) { showToast("Failed to update", "error"); } 
                 finally { btn.innerText = "Save Changes"; btn.disabled = false; }
-            } else { showToast("Name, Email, and Password are required!", "error"); }
+            } else { showToast("Name and Email are required!", "error"); }
         });
     }
 
@@ -9840,7 +9874,7 @@
                   <div style="display: flex; align-items: center; gap: 12px;">
                       ${avatar}
                       <div>
-                          <strong style="color: var(--text-main);">${s.name}</strong><br>
+                          <strong style="color: var(--text-main);">${window.esc(s.name)}</strong><br>
                           <span class="role-tag">${roleName}</span><br>
                           <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
                       </div>
@@ -9848,7 +9882,7 @@
                 </td>
                 <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
                 <td style="text-align:right; white-space:nowrap;">
-                  <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                  <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${window.attrJs(s.name)}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                   <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
                 </td>
             </tr>`}).join('');
@@ -9935,10 +9969,7 @@
 
         try {
             // Fetch Logs for this specific month
-            const { data: pLogs } = await supabaseClient.from('attendance_logs')
-                .select('staff_id, timestamp, action')
-                .gte('timestamp', startISO).lte('timestamp', endISO)
-                .eq('action', 'Clock In'); // Sirf Clock In chahiye presence ginne ke liye
+            let pLogs = []; for (let off = 0; ; off += 1000) { const { data: pg, error: pe } = await supabaseClient.from('attendance_logs').select('staff_id, timestamp, action').gte('timestamp', startISO).lte('timestamp', endISO).eq('action', 'Clock In').order('timestamp').range(off, off + 999); if (pe) throw pe; if (!pg || !pg.length) break; pLogs = pLogs.concat(pg); if (pg.length < 1000) break; }
 
             // Fetch existing Payroll Records (Adjustments/Status)
             const { data: existingRecords } = await supabaseClient.from('payroll_records').select('*').eq('month_year', displayMonthYear);
@@ -10008,7 +10039,7 @@
                 }
 
                 return `<tr>
-                    <td><strong style="color:var(--text-main);">${p.name}</strong></td>
+                    <td><strong style="color:var(--text-main);">${window.esc(p.name)}</strong></td>
                     <td>₹${p.base.toLocaleString()}</td>
                     <td><span style="font-weight:700; color:var(--success);">${p.present}</span></td>
                     <td><span style="font-weight:700;">${p.payableDays}</span><span style="font-size:10px; color:var(--text-soft);">/${p.daysInMonth}</span></td>
@@ -10039,7 +10070,7 @@
         document.getElementById('adjust-reason').value = p.res;
         
         document.getElementById('per-day-hint').innerText = `(1 Day = ₹${perDay.toLocaleString()})`;
-        document.getElementById('payroll-adjust-subtitle').innerText = `Update for ${p.name}`;
+        document.getElementById('payroll-adjust-subtitle').innerText = `Update for ${window.esc(p.name)}`;
         document.getElementById('payroll-adjust-modal').style.display = 'flex';
     };
 
@@ -10084,7 +10115,7 @@
     window.markSalaryPaid = async function(staffId) {
         const p = currentPayrollData.find(x => x.staff_id === staffId);
         if(!p) return;
-        if(!await window.customConfirm(`Mark ₹${p.net.toLocaleString()} as Paid for ${p.name}?\nThis will lock the record for this month.`)) return;
+        if(!await window.customConfirm(`Mark ₹${p.net.toLocaleString()} as Paid for ${window.esc(p.name)}?\nThis will lock the record for this month.`)) return;
 
         try {
             const timestampStr = new Date().toISOString();
