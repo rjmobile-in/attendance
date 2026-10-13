@@ -7534,7 +7534,7 @@
               </td>
               <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}',  '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -7752,7 +7752,7 @@
           // STEP 1: Securely trigger Database Function (RPC)
           const { error: rpcError } = await supabaseClient.rpc('admin_create_user', { 
               new_email: emailVal, 
-              new_
+              new_password: passVal,
               staff_name: nameVal
           });
           
@@ -7768,7 +7768,7 @@
               shift_start: startVal, 
               shift_end: endVal, 
               email: emailVal, 
-              
+              password: passVal,
               default_branch_id: defBranchId,
               dob: dobVal,
               joining_date: document.getElementById('new-staff-joining').value || null,
@@ -7826,12 +7826,12 @@
         });
     });
 
-    window.openEditStaff = (id, name, roleId, start, end, email, defBranchId, dob, joiningDate, phone, salary) => {
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
         document.getElementById('edit-staff-role').value = roleId || '';
         document.getElementById('edit-staff-email').value = email || '';
-        document.getElementById('edit-staff-pass').value = ''; // Always blank for security
+        document.getElementById('edit-staff-pass').value = pass || '';
         document.getElementById('edit-staff-phone').value = phone || '';
         document.getElementById('edit-staff-salary').value = salary || '';
         document.getElementById('edit-staff-start').value = start || '';
@@ -7880,7 +7880,7 @@
                     const { error: rpcError } = await supabaseClient.rpc('admin_update_user', { 
                         target_email: oldEmail, 
                         new_email: newEmail, 
-                        new_
+                        new_password: newPass,
                         staff_name: name
                     });
                     if (rpcError) throw rpcError;
@@ -7891,7 +7891,7 @@
                 const defBranchId = document.getElementById('edit-staff-branch').value || null;
                 const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
                 await supabaseClient.from('staff_directory').update({
-                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail,  default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate
                 }).eq('id', id);
 
                 window.closeModal(document.getElementById('edit-staff-modal'));
@@ -9718,8 +9718,8 @@
     
     // Modify Staff Editing to accept Phone and Salary
     const originalOpenEditStaff = window.openEditStaff;
-    window.openEditStaff = (id, name, roleId, start, end, email, defBranchId, dob, joiningDate, phone, salary) => {
-        originalOpenEditStaff(id, name, roleId, start, end, email, defBranchId, dob, joiningDate);
+    window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
+        originalOpenEditStaff(id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate);
         document.getElementById('edit-staff-phone').value = phone || '';
         document.getElementById('edit-staff-salary').value = salary || '';
     };
@@ -9745,14 +9745,14 @@
             if(nameVal && emailVal && passVal) {
                 const btn = document.getElementById('add-staff-btn'); btn.innerText = "Adding User..."; btn.disabled = true;
                 try {
-                    const { error: rpcError } = await supabaseClient.rpc('admin_create_user', { new_email: emailVal, new_ staff_name: nameVal });
+                    const { error: rpcError } = await supabaseClient.rpc('admin_create_user', { new_email: emailVal, new_password: passVal, staff_name: nameVal });
                     if (rpcError) throw new Error(rpcError.message);
 
                     const rName = roleMap[roleId]?.role_name || null;
                     const defBranchId = document.getElementById('new-staff-branch').value || null;
                     const { error: dbError } = await supabaseClient.from('staff_directory').insert([{ 
                         name: nameVal, role_id: roleId, role: rName, shift_start: startVal, shift_end: endVal, 
-                        email: emailVal,  default_branch_id: defBranchId, dob: dobVal, 
+                        email: emailVal, password: passVal, default_branch_id: defBranchId, dob: dobVal, 
                         joining_date: document.getElementById('new-staff-joining').value || null,
                         phone_number: phoneVal, base_salary: salaryVal ? parseFloat(salaryVal) : null
                     }]);
@@ -9799,7 +9799,7 @@
                     const { data: oldStaff } = await supabaseClient.from('staff_directory').select('email').eq('id', id).single();
                     const oldEmail = oldStaff?.email;
                     if (oldEmail) {
-                        const { error: rpcError } = await supabaseClient.rpc('admin_update_user', { target_email: oldEmail, new_email: newEmail, new_ staff_name: name });
+                        const { error: rpcError } = await supabaseClient.rpc('admin_update_user', { target_email: oldEmail, new_email: newEmail, new_password: newPass, staff_name: name });
                         if (rpcError) throw rpcError;
                     }
 
@@ -9807,7 +9807,7 @@
                     const defBranchId = document.getElementById('edit-staff-branch').value || null;
                     const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
                     await supabaseClient.from('staff_directory').update({
-                        name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail,  
+                        name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, password: newPass, 
                         default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate,
                         phone_number: phoneVal, base_salary: salaryVal ? parseFloat(salaryVal) : null
                     }).eq('id', id);
@@ -9848,7 +9848,7 @@
                 </td>
                 <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
                 <td style="text-align:right; white-space:nowrap;">
-                  <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}',  '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                  <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                   <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
                 </td>
             </tr>`}).join('');
