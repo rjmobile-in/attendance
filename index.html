@@ -47,26 +47,26 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --bg-base: #0a1023; 
-      --bg-surface: #121b33;
-      --card-bg: #121b33; 
-      --card-border: #1e2d4a;
+      --bg-base: #09090b; 
+      --bg-surface: #18181b;
+      --card-bg: #18181b; 
+      --card-border: #27272a;
       
-      --primary: #f37021; 
-      --primary-hover: #d9621a; 
-      --primary-glow: rgba(243, 112, 33, 0.25);
-      --primary-alpha: rgba(243, 112, 33, 0.15);
+      --primary: #6366f1; 
+      --primary-hover: #4f46e5; 
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --primary-alpha: rgba(99, 102, 241, 0.15);
       --shadow-glow: 0 0 20px var(--primary-glow);
       --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       
-      --text-main: #f8fafc; 
-      --text-soft: #94a3b8;
+      --text-main: #f4f4f5; 
+      --text-soft: #a1a1aa;
       
       --success: #10b981; --success-alpha: rgba(16, 185, 129, 0.15);
       --danger: #ef4444; --danger-alpha: rgba(239, 68, 68, 0.15);
       --warning: #eab308; --warning-alpha: rgba(234, 179, 8, 0.15);
       
-      --input-bg: #0a1023; 
+      --input-bg: #09090b; 
       --hover-bg: rgba(255, 255, 255, 0.08);
       --selected-bg: var(--primary-alpha);
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -74,25 +74,24 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 20px;
-      
-      --font-scale: 1;
     }
 
     html.light-theme {
-      --bg-base: #f1f5f9; 
+      --bg-base: #f4f4f5; 
       --bg-surface: #ffffff;
       --card-bg: #ffffff; 
-      --card-border: #e2e8f0;
+      --card-border: #e4e4e7;
       
       --primary: #4f46e5; 
       --primary-hover: #4338ca; 
+      --primary-glow: rgba(79, 70, 229, 0.2);
       --primary-alpha: rgba(79, 70, 229, 0.1);
       
-      --text-main: #0f172a; 
-      --text-soft: #64748b; 
+      --text-main: #18181b; 
+      --text-soft: #52525b; 
       
-      --input-bg: #f8fafc; 
-      --hover-bg: rgba(0, 0, 0, 0.06);
+      --input-bg: #ffffff; 
+      --hover-bg: rgba(0, 0, 0, 0.05);
       --selected-bg: var(--primary-alpha);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
@@ -112,10 +111,10 @@
     *:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 2px; transition: outline-offset 0.1s ease; }
     .btn-primary:focus-visible, .btn-secondary:focus-visible, .tab-btn:focus-visible, .icon-btn:focus-visible { outline-offset: 4px; }
 
-    body { font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; position: relative; z-index: 1; }
+    body { font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); font-size: 14px; min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; position: relative; z-index: 1; }
     
     .bg-blobs { position: fixed; inset: -20%; z-index: -1; overflow: hidden; pointer-events: none; background: var(--bg-base); }
-    .bg-blobs::before, .bg-blobs::after { content: ""; position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.2; animation: floatBlob 25s infinite alternate ease-in-out; }
+    .bg-blobs::before, .bg-blobs::after { content: ""; display: none; position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.2; animation: floatBlob 25s infinite alternate ease-in-out; }
     .bg-blobs::before { width: 50vw; height: 50vw; background: var(--primary); top: 10%; left: -10%; }
     .bg-blobs::after { width: 40vw; height: 40vw; background: #a855f7; bottom: 10%; right: -5%; animation-delay: -12s; }
     @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(15%, 20%) scale(1.2); } }
@@ -125,30 +124,30 @@
     /* =========================================================
        2. TYPOGRAPHY & BUTTONS
        ========================================================= */
-    .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); box-shadow: 0 4px 12px var(--primary-glow); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: 0 4px 12px var(--primary-glow); }
     .btn-primary { position: relative; overflow: hidden; }
     .btn-primary::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%); opacity: 0; transform: scale(0.5); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
     .btn-primary:hover:not(:disabled)::after { opacity: 1; transform: scale(1); }
     .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow), 0 0 10px var(--primary); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
     
-    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: calc(13px * var(--font-scale, 1)); }
+    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
     .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .icon-btn { background: transparent; border: none; color: var(--text-soft); cursor: pointer; font-size: calc(13px * var(--font-scale, 1)); transition: 0.2s; padding: 6px 10px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; }
+    .icon-btn { background: transparent; border: none; color: var(--text-soft); cursor: pointer; font-size: 13px; transition: 0.2s; padding: 6px 10px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; }
     .icon-btn:hover { background: var(--input-bg); color: var(--primary); border-color: var(--card-border); }
     
-    .badge { padding: 4px 10px; border-radius: 6px; font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.3px; text-transform: uppercase;}
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.3px; text-transform: uppercase;}
     .bg-green { background: var(--success-alpha); color: var(--success); }
     .bg-red { background: var(--danger-alpha); color: var(--danger); }
     .bg-orange { background: var(--warning-alpha); color: var(--warning); }
     .bg-blue { background: var(--primary-alpha); color: var(--primary); }
     .bg-gray { background: var(--bg-base); color: var(--text-soft); border: 1px solid var(--card-border); }
     
-    .action-link { color: var(--primary); font-size: calc(12px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
+    .action-link { color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
     .action-link:hover { color: var(--primary-hover); text-decoration: underline; }
-    .role-tag { font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
+    .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
 
     /* =========================================================
        TACTILE BUTTON SQUISH (APPLE FEEL)
@@ -161,7 +160,7 @@
     /* =========================================================
        3. TOGGLES & LOADERS
        ========================================================= */
-    .switch-wrap { display: flex; align-items: center; gap: 10px; font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; color: var(--text-main); background: var(--bg-base); padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
+    .switch-wrap { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-main); background: var(--bg-base); padding: 8px 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--card-border); transition: background-color 0.3s; border-radius: 24px; }
@@ -178,7 +177,7 @@
         transform: translateX(120%) scale(0.8) rotateX(10deg); /* 3D starting position */
         transform-origin: center right;
         transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-        font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 10px; 
+        font-size: 14px; display: flex; align-items: center; gap: 10px; 
         position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); 
         backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
     }
@@ -197,7 +196,7 @@
     /* =========================================================
        4. FORM INPUTS & DROPDOWNS
        ========================================================= */
-    .input-field { height: 44px; width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background-color: var(--input-bg) !important; color: var(--text-main) !important; margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: calc(13px * var(--font-scale, 1)); transition: all 0.2s; color-scheme: dark; line-height: normal; }
+    .input-field { height: 44px; width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background-color: var(--input-bg) !important; color: var(--text-main) !important; margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.2s; color-scheme: dark; line-height: normal; }
     html.light-theme .input-field { color-scheme: light; }
     .input-field { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); } /* Add this line to make the lift smooth */
     .input-field:focus { 
@@ -205,7 +204,7 @@
         box-shadow: 0 8px 20px var(--primary-glow), 0 0 0 2px var(--primary-alpha) !important; 
         transform: translateY(-2px); /* Makes the input levitate */
     }
-    select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f37021' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; cursor: pointer; padding-right: 40px; }
+    select.input-field { appearance: none; -moz-appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; cursor: pointer; padding-right: 40px; }
     select.input-field:hover { border-color: var(--primary) !important; background-color: var(--card-bg) !important; }
     select.input-field option { background: var(--bg-surface); color: var(--text-main); font-weight: 500; }
     
@@ -214,13 +213,13 @@
     .dropdown-content.show { display: block; animation: dropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes dropIn { from {opacity:0; transform: translateY(-10px) scale(0.98);} to {opacity:1; transform:translateY(0) scale(1);} }
     
-    .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-weight: 500; border-radius: var(--radius-sm); transition: 0.2s; font-size: calc(13px * var(--font-scale, 1));}
+    .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-weight: 500; border-radius: var(--radius-sm); transition: 0.2s; font-size: 13px;}
     .dropdown-content.export-menu a:hover { background-color: var(--primary-alpha); color: var(--primary); }
 
     .multi-select-actions { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
-    .multi-select-actions button { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none; background: var(--input-bg); color: var(--text-main); font-size: calc(12px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s;}
+    .multi-select-actions button { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
     .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary); }
-    .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 10px 8px; border-radius: var(--radius-sm); transition: 0.2s; font-size: calc(13px * var(--font-scale, 1));}
+    .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 10px 8px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 13px;}
     .check-wrap:hover { background: var(--input-bg); color: var(--primary); }
     /* Premium Animated Checkboxes */
     .check-wrap input { 
@@ -249,17 +248,17 @@
     #dashboard { display: none; height: 100vh; width: 100vw; }
     .app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
     
-    .sidebar { width: 280px; background: rgba(24, 24, 27, 0.55); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-right: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 24px 16px; z-index: 100; flex-shrink: 0; position: relative; }
-    html.light-theme .sidebar { background: rgba(255, 255, 255, 0.65); border-right: 1px solid rgba(0,0,0,0.05); box-shadow: 10px 0 30px rgba(0,0,0,0.03); }
+    .sidebar { width: 280px; background: var(--card-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-right: 1px solid var(--card-border); box-shadow: 10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 24px 16px; z-index: 100; flex-shrink: 0; position: relative; }
+    html.light-theme .sidebar { background: #ffffff; border-right: 1px solid rgba(0,0,0,0.05); box-shadow: 10px 0 30px rgba(0,0,0,0.03); }
     .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 32px 8px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px; }
     .sidebar-brand img { height: 36px; object-fit: contain; }
-    .brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(18px * var(--font-scale, 1)); font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-    .brand-subtitle { font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600;}
+    .brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .brand-subtitle { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600;}
     
     .tab-controls { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-right: 8px; }
-    .sidebar-category { font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px 8px; }
+    .sidebar-category { font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px 8px; }
     
-    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 16px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; transition: all 0.2s; font-size: calc(14px * var(--font-scale, 1)); display: flex; align-items: center; gap: 12px; }
+    .tab-btn { background: transparent; border: none; color: var(--text-soft); font-weight: 600; padding: 12px 16px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; transition: all 0.2s; font-size: 14px; display: flex; align-items: center; gap: 12px; }
     .tab-btn { position: relative; overflow: hidden; }
     .tab-btn::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0); width: 4px; height: 60%; background: var(--primary); border-radius: 0 4px 4px 0; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; }
     .tab-btn:hover { background: var(--hover-bg, var(--input-bg)); color: var(--text-main); transform: translateX(4px); }
@@ -269,10 +268,10 @@
 
     .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; background: var(--bg-base); position: relative; }
     
-    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(9, 9, 11, 0.5); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 200; position: sticky; top: 0; }
-    html.light-theme .header-bar { background: rgba(255, 255, 255, 0.65); border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: var(--bg-base); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 200; position: sticky; top: 0; }
+    html.light-theme .header-bar { background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .header-title { font-weight: 700; font-size: calc(20px * var(--font-scale, 1)); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;}
+    .header-title { font-weight: 700; font-size: 20px; color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;}
 
     .content-wrapper { padding: 32px 40px; flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
 
@@ -284,15 +283,15 @@
     
     .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
-    .filter-group label { font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;}
+    .filter-group label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;}
     
     .quick-dates { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); flex-wrap: wrap; }
-    .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .quick-date-btn:hover { color: var(--text-main); background: var(--hover-bg, var(--bg-surface)); }
     .quick-date-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sub-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); width: fit-content;}
-    .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .sub-tab-btn:hover { color: var(--text-main); background: var(--hover-bg, var(--card-bg)); }
     .sub-tab-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary); border-color: var(--card-border); box-shadow: var(--shadow-sm); }
 
@@ -300,16 +299,16 @@
     .sortable-drag { cursor: grabbing !important; opacity: 1 !important; background: var(--card-bg) !important; border: 1px solid var(--primary) !important; box-shadow: 0 15px 30px rgba(0,0,0,0.3), var(--shadow-glow) !important; z-index: 9999 !important; border-radius: var(--radius-sm); }
     .sortable-chosen { border-color: var(--primary) !important; z-index: 100; }
     .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
-    .widget-card { background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--radius-lg); padding: 24px; cursor: grab; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; overflow: hidden; isolation: isolate; }
-    html.light-theme .widget-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.05); }
+    .widget-card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; cursor: grab; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; overflow: hidden; isolation: isolate; }
+    html.light-theme .widget-card { background: #ffffff; border-color: rgba(0,0,0,0.05); }
     .widget-card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--primary-alpha), transparent 40%); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: -1; }
     .widget-card:hover::before { opacity: 1; }
     .widget-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.4), var(--shadow-glow); border-color: rgba(99, 102, 241, 0.5); }
     .widget-card:active { cursor: grabbing; }
     .widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .widget-title { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); text-transform: uppercase; font-weight: 700; pointer-events: none; letter-spacing: 0.5px;}
-    .metric-value { font-size: calc(36px * var(--font-scale, 1)); font-weight: 800; background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; pointer-events: none; line-height: 1.1; letter-spacing: -0.5px;}
-    .drag-handle { color: var(--text-soft); opacity: 0.3; cursor: grab; transition: 0.2s; font-size: calc(18px * var(--font-scale, 1)); line-height: 1;}
+    .widget-title { font-size: 12px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; pointer-events: none; letter-spacing: 0.5px;}
+    .metric-value { font-size: 36px; font-weight: 800; background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; pointer-events: none; line-height: 1.1; letter-spacing: -0.5px;}
+    .drag-handle { color: var(--text-soft); opacity: 0.3; cursor: grab; transition: 0.2s; font-size: 18px; line-height: 1;}
     .widget-card:hover .drag-handle { opacity: 1; color: var(--primary); }
 
     .table-card { background: var(--table-bg, var(--card-bg)); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm);}
@@ -325,13 +324,13 @@
     th { 
         position: sticky; top: 0; 
         background: var(--bg-surface); 
-        color: var(--text-soft); font-weight: 700; font-size: calc(11px * var(--font-scale, 1)); 
+        color: var(--text-soft); font-weight: 700; font-size: 11px; 
         text-transform: uppercase; padding: 16px 24px; 
         border-bottom: 1px solid var(--card-border); 
         z-index: 10; letter-spacing: 0.5px;
     }
     html.light-theme th { background: #ffffff; border-color: rgba(0,0,0,0.05); }
-    td { padding: 16px 24px; border-bottom: 1px solid var(--card-border); vertical-align: middle; font-size: calc(13px * var(--font-scale, 1)); color: var(--text-main); }
+    td { padding: 16px 24px; border-bottom: 1px solid var(--card-border); vertical-align: middle; font-size: 13px; color: var(--text-main); }
     
     tbody tr:hover { background: var(--hover-bg, var(--input-bg)); }
     tbody tr:hover td:first-child { border-left: 3px solid var(--primary); }
@@ -386,8 +385,8 @@
     /* =========================================================
        7. SETTINGS PANELS & AUDIT GALLERY
        ========================================================= */
-    .bulk-action-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(24, 24, 27, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--primary); border-radius: var(--radius-lg); padding: 16px 24px; display: flex; align-items: center; gap: 24px; box-shadow: var(--shadow-glow), 0 10px 40px rgba(0,0,0,0.5); z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    html.light-theme .bulk-action-bar { background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
+    .bulk-action-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--primary); border-radius: var(--radius-lg); padding: 16px 24px; display: flex; align-items: center; gap: 24px; box-shadow: var(--shadow-glow), 0 10px 40px rgba(0,0,0,0.5); z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    html.light-theme .bulk-action-bar { background: #ffffff; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
     .bulk-action-bar.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; }
     .audit-card-checkbox { position: absolute; top: 12px; left: 12px; z-index: 10; width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.5); border-radius: 4px; }
     
@@ -400,15 +399,15 @@
     .audit-img-wrap::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 5; pointer-events: none; }
     .audit-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s, opacity 0.5s ease-in-out; cursor: pointer; opacity: 0; position: relative; z-index: 2; }
     .audit-img-wrap:hover .audit-img { transform: scale(1.05); }
-    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(9, 9, 11, 0.8); color: #fff; font-size: calc(11px * var(--font-scale, 1)); padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(9, 9, 11, 0.8); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
     .audit-details { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
     .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .settings-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
-    .settings-panel h3 { font-size: calc(16px * var(--font-scale, 1)); margin-bottom: 12px; color: var(--text-main); }
-    .del-btn { color: var(--danger); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; font-size: calc(12px * var(--font-scale, 1));}
+    .settings-panel h3 { font-size: 16px; margin-bottom: 12px; color: var(--text-main); }
+    .del-btn { color: var(--danger); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 12px;}
     .del-btn:hover { background: var(--danger-alpha); border-color: var(--danger-alpha); }
-    .edit-btn { color: var(--primary); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; margin-right: 6px; font-size: calc(12px * var(--font-scale, 1));}
+    .edit-btn { color: var(--primary); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; margin-right: 6px; font-size: 12px;}
     .edit-btn:hover { background: var(--primary-alpha); border-color: var(--primary-alpha); }
 
     /* =========================================================
@@ -419,21 +418,21 @@
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeInOverlay 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;}
     @keyframes fadeInOverlay { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(16px); } }
-    .modal-card { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); padding: 32px; border-radius: 24px; width: 100%; max-width: 500px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: springUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;}
-    html.light-theme .modal-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+    .modal-card { background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); padding: 32px; border-radius: 24px; width: 100%; max-width: 500px; border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: springUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;}
+    html.light-theme .modal-card { background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
     @keyframes springUp { from { transform: translateY(40px) scale(0.85); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
     .modal-overlay.closing { animation: fadeOutOverlay 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; }
     .modal-overlay.closing .modal-card { animation: springDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; }
     @keyframes fadeOutOverlay { from { opacity: 1; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); } to { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); } }
     @keyframes springDown { from { transform: translateY(0) scale(1); opacity: 1; } to { transform: translateY(20px) scale(0.95); opacity: 0; } }
     
-    .modal-card h2, .modal-card h3 { color: var(--text-main); font-size: calc(20px * var(--font-scale, 1)); }
+    .modal-card h2, .modal-card h3 { color: var(--text-main); font-size: 20px; }
     .modal-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: var(--bg-base); }
     .modal-checkboxes { display: flex; justify-content: space-around; background: var(--input-bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
 
     .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .chart-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
-    .chart-card h3 { font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
+    .chart-card h3 { font-size: 14px; margin-bottom: 20px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
     /* =========================================================
        UX UPGRADE: TRUE FULLSCREEN MAXIMIZER (TABLES & CHARTS)
        ========================================================= */
@@ -461,14 +460,14 @@
     .branch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
     .live-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; }
     .live-branch-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.5), var(--shadow-glow); border-color: rgba(99, 102, 241, 0.4); }
-    .live-branch-title { font-size: calc(18px * var(--font-scale, 1)); font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-    .live-branch-count { font-size: calc(32px * var(--font-scale, 1)); font-weight: 800; color: var(--primary); }
+    .live-branch-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .live-branch-count { font-size: 32px; font-weight: 800; color: var(--primary); }
     
     .live-staff-list { display: flex; flex-direction: column; gap: 12px; }
     .live-staff-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
     .live-staff-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: var(--bg-base); }
     .live-staff-info { flex: 1; }
-    .live-staff-name { font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); }
+    .live-staff-name { font-weight: 700; color: var(--text-main); font-size: 15px; }
 
     /* =========================================================
        SIDEBAR MINIMIZE ANIMATION (GEMINI STYLE)
@@ -501,12 +500,6 @@
     .sidebar.collapsed .tab-btn { padding-left: 0; padding-right: 0; justify-content: center; }
     .sidebar.collapsed #action-badges { position: absolute; right: 4px; top: 4px; transform: scale(0.65); transform-origin: top right; flex-direction: column !important; gap: 2px; }
 
-    .color-picker-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); margin-bottom: 12px; }
-    .color-picker-label { font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; color: var(--text-main); }
-    .color-picker-input { appearance: none; -webkit-appearance: none; border: 2px solid var(--card-border); width: 36px; height: 36px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; background: transparent; transition: 0.2s; }
-    .color-picker-input:hover { transform: scale(1.05); }
-    .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-picker-input::-webkit-color-swatch { border: none; border-radius: 50%; }
 
     /* =========================================================
        10. DRAG & DROP ROSTER
@@ -514,9 +507,9 @@
     .roster-board { display: flex; gap: 20px; height: calc(100vh - 220px); align-items: flex-start; }
     .roster-branches { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; align-content: start; overflow-y: auto; height: 100%; padding-right: 8px;}
     .roster-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); display: flex; flex-direction: column; max-height: 50vh;}
-    .roster-branch-header { padding: 12px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--primary); border-radius: var(--radius-md) var(--radius-md) 0 0; display: flex; justify-content: space-between; align-items: center; font-size: calc(14px * var(--font-scale, 1));}
+    .roster-branch-header { padding: 12px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--primary); border-radius: var(--radius-md) var(--radius-md) 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 14px;}
     .roster-list { flex: 1; padding: 12px; overflow-y: auto; min-height: 120px; display: flex; flex-direction: column; gap: 8px; }
-    .roster-staff-item { background: var(--input-bg); border: 1px solid var(--card-border); padding: 10px 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; cursor: grab; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, background 0.25s; will-change: transform; }
+    .roster-staff-item { background: var(--input-bg); border: 1px solid var(--card-border); padding: 10px 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; cursor: grab; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, background 0.25s; will-change: transform; }
     .roster-staff-item:hover { transform: translateY(-3px); box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4); background: var(--card-bg); border-color: rgba(255,255,255,0.1); }
     .roster-staff-item:not(.sortable-chosen):active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); transition: transform 0.1s; cursor: grabbing; }
     .roster-staff-item.is-override { border-left: 3px solid var(--warning); }
@@ -562,7 +555,7 @@
     .input-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px var(--danger-alpha) !important; animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
-    .cmd-item { padding: 12px 16px; border-radius: var(--radius-sm); color: var(--text-main); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-size: calc(14px * var(--font-scale, 1)); font-weight: 500; animation: cmdPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform-origin: left center;}
+    .cmd-item { padding: 12px 16px; border-radius: var(--radius-sm); color: var(--text-main); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-size: 14px; font-weight: 500; animation: cmdPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform-origin: left center;}
     .cmd-item:hover, .cmd-item.active { background: var(--primary-alpha); color: var(--primary); transform: translateX(4px); }
     @keyframes cmdPop { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .cmd-item:nth-child(1) { animation-delay: 0.05s; }
@@ -595,11 +588,6 @@
         opacity: 1;
     }
 
-    /* Personalization: UI Density & Motion */
-    html.density-compact th, html.density-compact td { padding: 8px 16px !important; font-size: calc(12px * var(--font-scale, 1)) !important; }
-    html.density-compact .widget-card, html.density-compact .chart-card { padding: 16px !important; }
-    html.high-contrast * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-    html.high-contrast .widget-card, html.high-contrast .sidebar, html.high-contrast .header-bar, html.high-contrast .modal-card, html.high-contrast .dropdown-content { background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; }
     
 
     /* Native Scroll Snapping */
@@ -611,17 +599,12 @@
 
   
   
-  body.sidebar-right .app-container { flex-direction: row-reverse; }
-  body.sidebar-right .sidebar { border-right: none; border-left: 1px solid var(--card-border); box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
-  html.light-theme body.sidebar-right .sidebar { box-shadow: -10px 0 30px rgba(0,0,0,0.03); }
-  
-  body.no-sticky-th th, body.no-sticky-th td { position: static !important; z-index: 1 !important; }
 
   /* Context Menu Styles */
-  .context-menu { position: fixed; background: rgba(24, 24, 27, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05); display: none; flex-direction: column; min-width: 180px; z-index: 2000000; padding: 6px; overflow: hidden; transform-origin: top left; animation: menuPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    html.light-theme .context-menu { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+  .context-menu { position: fixed; background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05); display: none; flex-direction: column; min-width: 180px; z-index: 2000000; padding: 6px; overflow: hidden; transform-origin: top left; animation: menuPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    html.light-theme .context-menu { background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
     @keyframes menuPop { from { opacity: 0; transform: scale(0.9) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  .context-menu-item { padding: 10px 16px; cursor: pointer; font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+  .context-menu-item { padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; transition: 0.2s; }
   .context-menu-item:hover { background: var(--hover-bg, var(--primary-alpha)); color: var(--primary); }
   .context-menu-item.text-danger:hover { color: var(--danger); background: var(--danger-alpha); }
   .context-menu-divider { height: 1px; background: var(--card-border); margin: 4px 0; }
@@ -671,8 +654,8 @@
   <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" alt="RJ Mobile Logo" style="height: 48px; object-fit: contain; margin-bottom: 24px;" onerror="this.style.display='none'">
-        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; margin-bottom: 8px;">Workspace Login</h2>
-        <p style="color: var(--text-soft); margin-bottom: 32px; font-size: calc(14px * var(--font-scale, 1));">Secure admin access.</p>
+        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px;">Workspace Login</h2>
+        <p style="color: var(--text-soft); margin-bottom: 32px; font-size: 14px;">Secure admin access.</p>
         
         <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
         
@@ -681,8 +664,8 @@
             <span onclick="var inp = document.getElementById('password-input'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
         </div>
         
-        <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: calc(14px * var(--font-scale, 1));">Log In</button>
-        <div id="error-msg" style="color: var(--danger); margin-top: 16px; display: none; background: var(--danger-alpha); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--danger-alpha); font-size: calc(13px * var(--font-scale, 1)); font-weight: 600;">Error</div>
+        <button id="login-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 16px; font-size: 14px;">Log In</button>
+        <div id="error-msg" style="color: var(--danger); margin-top: 16px; display: none; background: var(--danger-alpha); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--danger-alpha); font-size: 13px; font-weight: 600;">Error</div>
     </div>
   </div>
 
@@ -828,7 +811,7 @@
             
             
             <button id="fullscreen-btn" class="btn-secondary" title="Toggle Fullscreen">⛶ Fullscreen</button>
-            <button id="btn-personalize" class="btn-secondary" title="Account & Preferences" style="margin-left: 8px;">⚙️ My Account</button>
+            <button id="btn-theme-toggle" class="btn-secondary" title="Switch theme" style="margin-left: 8px;">☀️ Light</button>
           </div>
         </div>
 
@@ -895,7 +878,7 @@
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
                             <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="role-dropdown-box">
-                                <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
+                                <input type="text" id="role-search" class="input-field" placeholder="Search role..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
                                 <div class="multi-select-actions">
                                     <button id="btn-select-all-roles">Select All</button>
                                     <button id="btn-deselect-all-roles">Clear All</button>
@@ -911,7 +894,7 @@
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
                             <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="branch-dropdown-box">
-                                <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
+                                <input type="text" id="branch-search" class="input-field" placeholder="Search branch..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
                                 <div class="multi-select-actions">
                                     <button id="btn-select-all-branches">Select All</button>
                                     <button id="btn-deselect-all-branches">Clear All</button>
@@ -927,7 +910,7 @@
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
                             <div class="dropdown-content" style="top: calc(100% + 4px); right: 0;" id="staff-dropdown-box">
-                                <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: calc(13px * var(--font-scale, 1));">
+                                <input type="text" id="staff-search" class="input-field" placeholder="Search staff..." style="margin-bottom: 12px; padding: 10px; font-size: 13px;">
                                 <div class="multi-select-actions">
                                     <button id="btn-select-all">Select All</button>
                                     <button id="btn-deselect-all">Clear All</button>
@@ -947,7 +930,7 @@
                 <!-- VIEW 1: DASHBOARD -->
                 <div id="view-dashboard" class="app-view">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time metrics based on filters.</span>
+                        <span style="color: var(--text-soft); font-size: 13px;">Real-time metrics based on filters.</span>
                         <button class="btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="window.toggleDashboardWidgets()">Toggle Widgets</button>
                     </div>
                     <style>
@@ -985,7 +968,7 @@
                         </div>
                     </div>
 
-                    <h3 style="margin: 24px 0 16px 0; font-size: calc(18px * var(--font-scale, 1)); font-family: 'Plus Jakarta Sans', sans-serif;">Deep Analysis</h3>
+                    <h3 style="margin: 24px 0 16px 0; font-size: 18px; font-family: 'Plus Jakarta Sans', sans-serif;">Deep Analysis</h3>
                     <div class="chart-grid">
                         <div class="chart-card">
                             <h3><span></span>Attendance Trend</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
@@ -1013,7 +996,7 @@
                 <!-- VIEW 2: LIVE TRACKER -->
                 <div id="view-live" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                    <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Real-time view of staff currently clocked in today.</span>
+                    <span style="color: var(--text-soft); font-size: 13px;">Real-time view of staff currently clocked in today.</span>
                     </div>
                     
                     <div class="branch-grid" id="live-branch-grid"></div>
@@ -1067,7 +1050,7 @@
                 <!-- VIEW 4: PHOTO AUDITS -->
                 <div id="view-audits" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1)); display: flex; align-items: center; min-height: 42px;">Review check-in/out photos.</span>
+                        <span style="color: var(--text-soft); font-size: 13px; display: flex; align-items: center; min-height: 42px;">Review check-in/out photos.</span>
                         <div id="gallery-filters" style="display: flex; align-items: center; gap: 12px;">
                             <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
                                 <input type="checkbox" id="master-audit-select" onchange="window.selectAllAudits(this)"> Select All Visible
@@ -1086,7 +1069,7 @@
                 <!-- VIEW: CUSTOMER LOGS -->
                 <div id="view-customers" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Track walkouts and expected customers submitted by your staff.</span>
+                        <span style="color: var(--text-soft); font-size: 13px;">Track walkouts and expected customers submitted by your staff.</span>
                     </div>
 
                     <div class="table-card">
@@ -1112,7 +1095,7 @@
                 <!-- VIEW 5: STAFF STATS -->
                 <div id="view-stats" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                    <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Aggregated metrics for the selected date range. Good for Payroll prep.</span>
+                    <span style="color: var(--text-soft); font-size: 13px;">Aggregated metrics for the selected date range. Good for Payroll prep.</span>
                     </div>
 
                     <div class="table-card" id="stats-export-container">
@@ -1145,7 +1128,7 @@
                 <!-- VIEW 12: BRANCH OPS -->
                 <div id="view-branch-ops" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Track daily opening/closing times and averages based on staff punches.</span>
+                        <span style="color: var(--text-soft); font-size: 13px;">Track daily opening/closing times and averages based on staff punches.</span>
                     </div>
 
                     <div class="table-card">
@@ -1171,7 +1154,7 @@
                 <!-- VIEW 13: BRANCH GRID MATRIX -->
                 <div id="view-branch-matrix" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Daily operational timeline grid of all branches.</span>
+                        <span style="color: var(--text-soft); font-size: 13px;">Daily operational timeline grid of all branches.</span>
                     </div>
                     <div class="table-card">
                         <div class="table-responsive">
@@ -1188,7 +1171,7 @@
                 <!-- VIEW 6: ATTENDANCE MATRIX -->
                 <div id="view-matrix" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                    <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Showing dates derived from currently loaded logs.</span>
+                    <span style="color: var(--text-soft); font-size: 13px;">Showing dates derived from currently loaded logs.</span>
                     </div>
 
                     <div class="table-card">
@@ -1206,7 +1189,7 @@
                 <!-- VIEW 11: BIRTHDAYS -->
                 <div id="view-birthdays" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Upcoming staff celebrations. DOB is managed in HR Settings.</span>
+                        <span style="color: var(--text-soft); font-size: 13px;">Upcoming staff celebrations. DOB is managed in HR Settings.</span>
                     </div>
                     
                     <div class="widget-grid" id="bday-top-cards" style="grid-template-columns: 1fr;">
@@ -1218,10 +1201,10 @@
                             
                             <div class="badge bg-blue" style="margin-bottom: 12px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Next Celebration</div>
                             <div id="admin-next-bday-emoji" style="font-size: 48px; position: relative; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: -5px;">🎉</div>
-                            <div id="admin-next-bday-name" style="font-size: calc(24px * var(--font-scale, 1)); font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
+                            <div id="admin-next-bday-name" style="font-size: 24px; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
                             <div id="admin-next-bday-date" style="color: #f1f5f9; margin-bottom: 8px; font-weight: 600; position: relative; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">--</div>
                             <div id="admin-next-bday-age" class="role-tag" style="position: relative; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">--</div>
-                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: #fff; background: var(--primary); box-shadow: 0 4px 15px rgba(243, 112, 33, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
+                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: #fff; background: var(--primary); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
                         </div>
                     </div>
 
@@ -1238,12 +1221,12 @@
                 <div id="view-roster" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
                         <div style="display: flex; gap: 16px; align-items: center;">
-                            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Drag & Drop staff to assign them for the selected date.</span>
+                            <span style="color: var(--text-soft); font-size: 13px;">Drag & Drop staff to assign them for the selected date.</span>
                         </div>
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <button id="btn-save-as-default" class="btn-primary" title="Make current board layout the permanent default for everyone">📌 Save as Default</button>
                             <div style="display: flex; gap: 12px; align-items: center; background: var(--card-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
+                                <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
                                 <input type="text" id="roster-date-picker" class="input-field" style="margin: 0; width: 140px; padding: 8px 12px; background: var(--input-bg) !important; border-color: var(--card-border);" placeholder="Select Date" />
                             </div>
                         </div>
@@ -1256,10 +1239,10 @@
                         
                         <div class="roster-sidebar">
                             <div class="roster-sidebar-header">
-                                <div style="font-weight: 800; font-size: calc(15px * var(--font-scale, 1)); color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                                <div style="font-weight: 800; font-size: 15px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
                                     Staff Pool <span class="badge bg-gray" id="unassigned-count">0</span>
                                 </div>
-                                <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); margin-top: 6px; font-weight: 500;">Unassigned staff. Drag here to remove overrides.</div>
+                                <div style="font-size: 11px; color: var(--text-soft); margin-top: 6px; font-weight: 500;">Unassigned staff. Drag here to remove overrides.</div>
                             </div>
                             <div class="roster-list" id="roster-unassigned-list" data-branch-id="unassigned">
                                 <!-- Unassigned staff injected here -->
@@ -1274,7 +1257,7 @@
                 <div id="view-action" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Manage missing staff and resolve exceptions.</span>
+                            <span style="color: var(--text-soft); font-size: 13px;">Manage missing staff and resolve exceptions.</span>
                             <div class="switch-wrap" id="wrap-show-excused" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg);">
                                 <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Approved / Excused</div></div>
                                 <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
@@ -1342,9 +1325,9 @@
                 <!-- VIEW 14: PAYROLL & SALARY -->
                 <div id="view-payroll" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Monthly salary calculation, taxes, and payslips.</span>
+                        <span style="color: var(--text-soft); font-size: 13px;">Monthly salary calculation, taxes, and payslips.</span>
                         <div style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                            <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 800; color: var(--text-soft); text-transform: uppercase;">Select Month:</label>
+                            <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase;">Select Month:</label>
                             <input type="text" id="payroll-month-picker" class="input-field" style="margin: 0; width: 150px; padding: 8px 12px; background: var(--card-bg) !important; cursor: pointer;" placeholder="Select Month">
                         </div>
                     </div>
@@ -1376,7 +1359,7 @@
 
                 <!-- VIEW 8: HR SETTINGS -->
                 <div id="view-settings-hr" class="app-view" style="display: none;">
-                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Manage people, roles, and leave reasons.</span>
+                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: 13px;">Manage people, roles, and leave reasons.</span>
                     
                     <div class="settings-grid">
 
@@ -1386,7 +1369,7 @@
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                 <div>
                                     <h3>Staff Directory & Login Credentials</h3>
-                                    <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
+                                    <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
                                 </div>
                                 <div style="display: flex; gap: 8px; align-items: center;">
                                     <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; margin: 0;"><input type="checkbox" id="toggle-draft-staff" checked> Auto-Save Draft</label>
@@ -1430,7 +1413,7 @@
 
                         <div class="settings-panel">
                             <h3>Role Configuration</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
                             
                             <div style="display:flex; flex-direction:column; gap:12px; background: var(--bg-base); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
                                 <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0;">
@@ -1451,7 +1434,7 @@
 
                         <div class="settings-panel">
                             <h3>Leave/Exception Reasons</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
                             <div style="display:flex; flex-direction: column; gap:12px;">
                                 <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
                                 <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
@@ -1466,14 +1449,14 @@
 
                 <!-- VIEW 9: ORG SETTINGS -->
                 <div id="view-settings-org" class="app-view" style="display: none;">
-                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Manage physical branches and organization-wide defaults.</span>
+                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: 13px;">Manage physical branches and organization-wide defaults.</span>
                     
                     <div class="settings-grid">
                         
 
                         <div class="settings-panel" style="grid-column: 1 / -1;">
                             <h3>Geofence Branch Configuration</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Set GPS targets. Staff must be inside the radius of one of these branches to clock in.</p>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Set GPS targets. Staff must be inside the radius of one of these branches to clock in.</p>
                             
                             <div style="display:flex; flex-direction: column; gap:12px; margin-top: 16px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
                                 <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name" style="margin:0;">
@@ -1495,11 +1478,11 @@
 
                         <div class="settings-panel">
                             <h3>Global Shift Time Defaults</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
                             <div style="display:flex; flex-direction: column; gap:12px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
+                                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
                                 <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
+                                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
                                 <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
                                 <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center; margin-top: 8px;">Save to Database</button>
                             </div>
@@ -1507,201 +1490,6 @@
                     </div>
                 </div>
 
-                <!-- VIEW 10: MY ACCOUNT / PERSONALIZE -->
-                <div id="view-personalize" class="app-view" style="display: none;">
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: calc(13px * var(--font-scale, 1));">Customize your workspace appearance and preferences.</span>
-                    </div>
-                    
-                    <div class="settings-grid">
-                        <!-- Panel 1: Theme Presets -->
-                        <div class="settings-panel">
-                            <h3>Quick Theme Presets</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Instantly change the look and feel of your app.</p>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" class="theme-presets-container">
-                                <button class="btn-secondary preset-btn" data-preset="rjmobile" style="font-size: 12px; padding: 6px 12px; border-color: #f37021; color: #f37021;">📱 RJ Mobile</button>
-                                <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
-                                <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
-                                <button class="btn-secondary preset-btn" data-preset="ocean" style="font-size: 12px; padding: 6px 12px;">🌊 Ocean</button>
-                                <button class="btn-secondary preset-btn" data-preset="forest" style="font-size: 12px; padding: 6px 12px;">🌲 Forest</button>
-                                <button class="btn-secondary preset-btn" data-preset="sunset" style="font-size: 12px; padding: 6px 12px;">🌇 Sunset</button>
-                                <button class="btn-secondary preset-btn" data-preset="midnight" style="font-size: 12px; padding: 6px 12px;">🌌 Midnight</button>
-                                <button class="btn-secondary preset-btn" data-preset="coffee" style="font-size: 12px; padding: 6px 12px;">☕ Coffee</button>
-                                <button class="btn-secondary preset-btn" data-preset="cyberpunk" style="font-size: 12px; padding: 6px 12px;">🤖 Cyberpunk</button>
-                                <button class="btn-secondary preset-btn" data-preset="dracula" style="font-size: 12px; padding: 6px 12px;">🧛‍♂️ Dracula</button>
-                                <button class="btn-secondary preset-btn" data-preset="nord" style="font-size: 12px; padding: 6px 12px;">❄️ Nord</button>
-                                <button class="btn-secondary preset-btn" data-preset="neon" style="font-size: 12px; padding: 6px 12px;">🟢 Matrix</button>
-                                <button class="btn-secondary preset-btn" data-preset="rosegold" style="font-size: 12px; padding: 6px 12px;">🌸 Rose Gold</button>
-                            </div>
-                        </div>
-
-                        <!-- Panel 2: Preferences -->
-                        <div class="settings-panel">
-                            <h3>Layout & Accessibility</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Adjust text size, density, and formatting.</p>
-                            
-                            <div style="margin-bottom: 16px;">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Text Size</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="btn-secondary font-size-btn" data-scale="0.9" style="flex: 1;">Small</button>
-                                    <button class="btn-secondary font-size-btn active" data-scale="1" style="flex: 1;">Normal</button>
-                                    <button class="btn-secondary font-size-btn" data-scale="1.1" style="flex: 1;">Large</button>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-                                <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Date Format</label>
-                                    <select id="pref-date-format" class="input-field" style="margin: 0;">
-                                        <option value="en-GB">DD/MM/YYYY (UK/IN)</option>
-                                        <option value="en-US">MM/DD/YYYY (US)</option>
-                                        <option value="ja-JP">YYYY/MM/DD (Global)</option>
-                                    </select>
-                                </div>
-                                <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Week Starts On</label>
-                                    <select id="pref-week-start" class="input-field" style="margin: 0;">
-                                        <option value="1">Monday</option>
-                                        <option value="0">Sunday</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div style="margin-bottom: 16px;">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Default Rows Per Page</label>
-                                <input type="number" id="pref-page-size" class="input-field" style="margin: 0;" placeholder="e.g. 50 (-1 for all)" min="-1">
-                            </div>
-
-                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
-                                <div><div style="color:var(--text-main);">Use 12-Hour Time</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">AM/PM instead of 24h</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-time-format"><span class="slider"></span></label>
-                            </div>
-                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
-                                <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
-                            </div>
-                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
-                                <div><div style="color:var(--text-main);">High Contrast</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Removes transparency for legibility</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-high-contrast"><span class="slider"></span></label>
-                            </div>
-                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
-                                <div><div style="color:var(--text-main);">Right Sidebar</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Move navigation to right</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-sidebar-right"><span class="slider"></span></label>
-                            </div>
-                            <div class="switch-wrap" style="justify-content: space-between;">
-                                <div><div style="color:var(--text-main);">Sticky Headers</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Keep table headers visible</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-sticky-headers"><span class="slider"></span></label>
-                            </div>
-                        </div>
-
-                        <!-- Panel 3: Workflow & Audio -->
-                        <div class="settings-panel">
-                            <h3>Workflow & Audio</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Optimize how you interact with the app.</p>
-                            
-                            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-                                <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Auto-Sync (Sec)</label>
-                                    <input type="number" id="pref-sync-interval" class="input-field" style="margin: 0;" placeholder="0 to disable" min="0">
-                                </div>
-                                <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Undo Timer (Sec)</label>
-                                    <input type="number" id="pref-undo-timer" class="input-field" style="margin: 0;" placeholder="e.g. 7" min="3" max="30">
-                                </div>
-                                <div style="flex: 1;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Grace Period (Min)</label>
-                                    <input type="number" id="pref-grace-period" class="input-field" style="margin: 0;" placeholder="e.g. 5" min="0">
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 20px;">
-                                <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
-                                <select class="default-view-select input-field" style="margin: 0;">
-                                    <option value="dashboard">Dashboard Overview</option>
-                                    <option value="live">Live Tracker</option>
-                                    <option value="birthdays">Staff Birthdays</option>
-                                    <option value="logs">Attendance Logs</option>
-                                    <option value="audits">Photo Audits</option>
-                                    <option value="stats">Staff Stats</option>
-                                    <option value="matrix">Attendance Grid</option>
-                                    <option value="branch-ops">Branch Operations</option>
-                                    <option value="branch-matrix">Branch Grid</option>
-                                    <option value="roster">Duty Roster</option>
-                                    <option value="action">Action Center</option>
-                                    <option value="settings-hr">HR Settings</option>
-                                    <option value="settings-org">Location & Shifts</option>
-                                </select>
-                            </div>
-
-                            <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
-                                <div><div style="color:var(--text-main);">Focus Mode</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Auto-collapse sidebar for more space</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-focus-mode"><span class="slider"></span></label>
-                            </div>
-
-                            <div class="switch-wrap" style="justify-content: space-between;">
-                                <div><div style="color:var(--text-main);">UI Sound Effects</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Play clicks, pops, and chimes</div></div>
-                                <label class="switch"><input type="checkbox" id="toggle-ui-sounds"><span class="slider"></span></label>
-                            </div>
-                        </div>
-
-                        <!-- Panel: Custom Shortcuts & Workspaces -->
-                        <div class="settings-panel" style="grid-column: 1 / -1;">
-                            <h3>Custom Keyboard Shortcuts & Saved Views</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Map your own keys. Use the <strong>Save</strong> and <strong>Load</strong> modifiers with numbers (1-9) to instantly switch between your favorite filtered views.</p>
-                            
-                            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
-                                <div style="flex: 1; min-width: 200px;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px; color: var(--success);">Save View Modifier</label>
-                                    <select id="pref-mod-save" class="input-field" style="margin: 0;">
-                                        <option value="Alt">Alt + [1-9]</option>
-                                        <option value="Ctrl">Ctrl/Cmd + [1-9]</option>
-                                        <option value="Shift">Shift + [1-9]</option>
-                                    </select>
-                                </div>
-                                <div style="flex: 1; min-width: 200px;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px; color: var(--primary);">Load View Modifier</label>
-                                    <select id="pref-mod-load" class="input-field" style="margin: 0;">
-                                        <option value="Shift">Shift + [1-9]</option>
-                                        <option value="Ctrl">Ctrl/Cmd + [1-9]</option>
-                                        <option value="Alt">Alt + [1-9]</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 150px;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Command Palette Key</label>
-                                    <input type="text" id="pref-key-cmd" class="input-field" style="margin: 0;" maxlength="1" placeholder="e.g. k">
-                                </div>
-                                <div style="flex: 1; min-width: 150px;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Toggle T-Shirt Check</label>
-                                    <input type="text" id="pref-key-tshirt" class="input-field" style="margin: 0;" maxlength="1" placeholder="e.g. t">
-                                </div>
-                                <div style="flex: 1; min-width: 150px;">
-                                    <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Toggle ID Check</label>
-                                    <input type="text" id="pref-key-id" class="input-field" style="margin: 0;" maxlength="1" placeholder="e.g. i">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Panel 4: Custom Colors -->
-                        <div class="settings-panel" style="grid-column: 1 / -1;">
-                            <h3>Custom Interface Colors</h3>
-                            <p style="font-size: calc(12px * var(--font-scale, 1)); color: var(--text-soft); margin-bottom: 16px;">Fine-tune specific UI elements.</p>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Primary Accent</span><input type="color" class="color-picker-input theme-color-input" data-var="--primary" value="#6366f1"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Success Color</span><input type="color" class="color-picker-input theme-color-input" data-var="--success" value="#10b981"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Warning Color</span><input type="color" class="color-picker-input theme-color-input" data-var="--warning" value="#f59e0b"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Danger Color</span><input type="color" class="color-picker-input theme-color-input" data-var="--danger" value="#ef4444"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">App Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--bg-base" value="#09090b"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Cards & Tables</span><input type="color" class="color-picker-input theme-color-input" data-var="--card-bg" value="#18181b"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Sidebar Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--sidebar-bg" value="#18181b"></div>
-                                <div class="color-picker-row" style="margin:0;"><span class="color-picker-label">Header Background</span><input type="color" class="color-picker-input theme-color-input" data-var="--header-bg" value="#09090b"></div>
-                            </div>
-                        </div>
-                        
-                    </div> <!-- End settings-grid -->
-                </div> <!-- End view-personalize -->
 
             </div> <!-- End Export Container -->
         </div> <!-- End Content Wrapper -->
@@ -1711,7 +1499,7 @@
 
   <!-- FLOATING BULK ACTION BAR -->
   <div id="bulk-action-bar" class="bulk-action-bar">
-      <div style="font-weight: 800; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1));"><span id="bulk-selected-count" style="color: var(--primary); font-size: calc(18px * var(--font-scale, 1));">0</span> Selected</div>
+      <div style="font-weight: 800; color: var(--text-main); font-size: 14px;"><span id="bulk-selected-count" style="color: var(--primary); font-size: 18px;">0</span> Selected</div>
       <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
       <div style="display: flex; gap: 16px; align-items: center;">
           <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt" checked> RJ T-Shirt</label>
@@ -1720,144 +1508,13 @@
       <button class="btn-primary" id="btn-bulk-save" onclick="window.executeBulkAuditSave()" style="margin-left: 8px; padding: 12px 20px;">Bulk Approve & Save</button>
   </div>
 
-  <!-- THEME CUSTOMIZER MODAL -->
-  <div id="theme-modal" class="modal-overlay" onclick="window.closeModal(this)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <h2 style="margin:0;">Theme Customizer</h2>
-          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('theme-modal'))">&times;</span>
-      </div>
-      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));">Personalize the colors of your workspace.</p>
-      
-      <div style="max-height: 50vh; overflow-y: auto; padding-right: 8px; overflow-x: hidden;">
-        
-        <div style="margin-bottom: 24px;">
-            <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Quick Presets</label>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;" class="theme-presets-container">
-                <button class="btn-secondary preset-btn" data-preset="rjmobile" style="font-size: 12px; padding: 6px 12px; border-color: #f37021; color: #f37021;">📱 RJ Mobile</button>
-                <button class="btn-secondary preset-btn" data-preset="dark" style="font-size: 12px; padding: 6px 12px;">🌙 Dark</button>
-                <button class="btn-secondary preset-btn" data-preset="light" style="font-size: 12px; padding: 6px 12px;">☀️ Light</button>
-                <button class="btn-secondary preset-btn" data-preset="ocean" style="font-size: 12px; padding: 6px 12px;">🌊 Ocean</button>
-                <button class="btn-secondary preset-btn" data-preset="forest" style="font-size: 12px; padding: 6px 12px;">🌲 Forest</button>
-                <button class="btn-secondary preset-btn" data-preset="sunset" style="font-size: 12px; padding: 6px 12px;">🌇 Sunset</button>
-                <button class="btn-secondary preset-btn" data-preset="midnight" style="font-size: 12px; padding: 6px 12px;">🌌 Midnight</button>
-                <button class="btn-secondary preset-btn" data-preset="coffee" style="font-size: 12px; padding: 6px 12px;">☕ Coffee</button>
-                <button class="btn-secondary preset-btn" data-preset="cyberpunk" style="font-size: 12px; padding: 6px 12px;">🤖 Cyberpunk</button>
-                <button class="btn-secondary preset-btn" data-preset="dracula" style="font-size: 12px; padding: 6px 12px;">🧛‍♂️ Dracula</button>
-                <button class="btn-secondary preset-btn" data-preset="nord" style="font-size: 12px; padding: 6px 12px;">❄️ Nord</button>
-                <button class="btn-secondary preset-btn" data-preset="neon" style="font-size: 12px; padding: 6px 12px;">🟢 Matrix</button>
-                <button class="btn-secondary preset-btn" data-preset="rosegold" style="font-size: 12px; padding: 6px 12px;">🌸 Rose Gold</button>
-            </div>
-        </div>
-
-        <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Custom Colors</label>
-        
-        <div class="color-picker-row">
-            <span class="color-picker-label">Primary Accent</span>
-            <input type="color" id="theme-primary" class="color-picker-input theme-color-input" data-var="--primary" value="#f37021">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">App Background</span>
-            <input type="color" id="theme-bg" class="color-picker-input theme-color-input" data-var="--bg-base" value="#0a1023">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Sidebar Background</span>
-            <input type="color" id="theme-sidebar" class="color-picker-input theme-color-input" data-var="--sidebar-bg" value="#121b33">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Header Background</span>
-            <input type="color" id="theme-header" class="color-picker-input theme-color-input" data-var="--header-bg" value="#0a1023">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Cards & Tables</span>
-            <input type="color" id="theme-card" class="color-picker-input theme-color-input" data-var="--card-bg" value="#121b33">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Main Text</span>
-            <input type="color" id="theme-text" class="color-picker-input theme-color-input" data-var="--text-main" value="#f8fafc">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Secondary Text (Subtitles)</span>
-            <input type="color" id="theme-text-soft" class="color-picker-input theme-color-input" data-var="--text-soft" value="#94a3b8">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Card & Table Borders</span>
-            <input type="color" id="theme-border" class="color-picker-input theme-color-input" data-var="--card-border" value="#1e2d4a">
-        </div>
-
-        <div style="margin-top: 16px; margin-bottom: 8px;">
-            <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;">Status & Badges</label>
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Success (Present/On Time)</span>
-            <input type="color" id="theme-success" class="color-picker-input theme-color-input" data-var="--success" value="#10b981">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Warning (Late/Transit)</span>
-            <input type="color" id="theme-warning" class="color-picker-input theme-color-input" data-var="--warning" value="#f59e0b">
-        </div>
-        <div class="color-picker-row">
-            <span class="color-picker-label">Danger (Absent/Missing)</span>
-            <input type="color" id="theme-danger" class="color-picker-input theme-color-input" data-var="--danger" value="#ef4444">
-        </div>
-      </div>
-      
-      <div style="margin-top: 24px; margin-bottom: 16px; border-top: 1px solid var(--card-border); padding-top: 16px;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); letter-spacing: 0.5px;">Workspace Preferences</label>
-      </div>
-
-      <div style="margin-bottom: 16px;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Text Size</label>
-          <div style="display: flex; gap: 8px;">
-              <button class="btn-secondary font-size-btn" data-scale="0.9" style="flex: 1;">Small</button>
-              <button class="btn-secondary font-size-btn active" data-scale="1" style="flex: 1;">Normal</button>
-              <button class="btn-secondary font-size-btn" data-scale="1.1" style="flex: 1;">Large</button>
-          </div>
-      </div>
-
-      <div style="margin-bottom: 16px;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); text-transform: uppercase; font-weight: 700; color: var(--text-soft); display: block; margin-bottom: 8px;">Startup Landing Tab</label>
-          <select class="default-view-select input-field" style="margin: 0;">
-              <option value="dashboard">Dashboard Overview</option>
-              <option value="live">Live Tracker</option>
-              <option value="birthdays">Staff Birthdays</option>
-              <option value="logs">Attendance Logs</option>
-              <option value="audits">Photo Audits</option>
-              <option value="stats">Staff Stats</option>
-              <option value="matrix">Attendance Grid</option>
-              <option value="branch-ops">Branch Operations</option>
-<option value="branch-matrix">Branch Grid</option>
-              <option value="roster">Duty Roster</option>
-              <option value="action">Action Center</option>
-              <option value="settings-hr">HR Settings</option>
-              <option value="settings-org">Location & Shifts</option>
-          </select>
-      </div>
-
-      <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 16px;">
-          <div><div style="color:var(--text-main);">Use 12-Hour Time</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">AM/PM format instead of 24h</div></div>
-          <label class="switch"><input type="checkbox" id="toggle-time-format"><span class="slider"></span></label>
-      </div>
-      <div class="switch-wrap" style="justify-content: space-between; margin-bottom: 12px;">
-          <div><div style="color:var(--text-main);">Compact Density</div><div style="font-size:11px; color:var(--text-soft); font-weight:500;">Fit more rows on screen</div></div>
-          <label class="switch"><input type="checkbox" id="toggle-density"><span class="slider"></span></label>
-      </div>
-      
-
-      <div style="display: flex; gap: 12px; margin-top: 12px;">
-        <button id="btn-reset-theme" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Reset Defaults</button>
-        <button id="btn-close-theme" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Done</button>
-      </div>
-    </div>
-  </div>
-
   <!-- MANUAL ENTRY MODAL -->
   <div id="manual-entry-modal" class="modal-overlay">
     <div class="modal-card">
       <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
               <h2 style="margin-bottom: 8px;">Add Manual Log</h2>
-              <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Create a direct entry if a staff member forgot to punch.</p>
+              <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;">Create a direct entry if a staff member forgot to punch.</p>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
               <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 11px; margin: 0;"><input type="checkbox" id="toggle-draft-manual" checked> Auto-Save</label>
@@ -1865,14 +1522,14 @@
           </div>
       </div>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Staff</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Select Staff</label>
       <select id="manual-staff" class="input-field" style="margin-top: 8px;"></select>
 
       
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Action Type</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Action Type</label>
           <select id="manual-action" class="input-field" style="margin-top: 8px;">
               <option value="Clock In">🟢 Clock In</option>
               <option value="Clock Out">🔴 Clock Out</option>
@@ -1881,24 +1538,24 @@
           </select>
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Branch Location</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Branch Location</label>
           <select id="manual-branch" class="input-field" style="margin-top: 8px;"></select>
         </div>
       </div>
 
       <div style="display: flex; gap: 16px; margin-top: 8px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Date</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Date</label>
           <input type="text" id="manual-date" class="input-field" style="margin-top: 8px;" placeholder="Select Date">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Time</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Time</label>
           <input type="time" id="manual-time" class="input-field" style="margin-top: 8px;">
         </div>
       </div>
 
       <div style="margin-top: 8px; margin-bottom: 16px;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Uniform Audit (At time of entry)</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Uniform Audit (At time of entry)</label>
           <div style="display: flex; gap: 16px; margin-top: 8px;">
               <label class="check-wrap" style="flex: 1; background: var(--bg-base); border: 1px solid var(--card-border); padding: 12px; border-radius: var(--radius-sm);"><input type="checkbox" id="manual-tshirt" checked> T-Shirt Present</label>
               <label class="check-wrap" style="flex: 1; background: var(--bg-base); border: 1px solid var(--card-border); padding: 12px; border-radius: var(--radius-sm);"><input type="checkbox" id="manual-idcard" checked> ID Card Present</label>
@@ -1919,7 +1576,7 @@
         <h3 style="margin: 0; color: var(--text-main);">⌨️ Keyboard Shortcuts</h3>
         <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('shortcuts-modal'))">&times;</span>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 12px; font-size: calc(13px * var(--font-scale, 1));">
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
           <span>Open Command Palette</span>
           <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">/</kbd> or <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Cmd+K</kbd></span>
@@ -1957,7 +1614,7 @@
     <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px 32px;">
       <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
       <h3 style="margin-bottom: 12px; color: var(--text-main);">Are you sure?</h3>
-      <p id="confirm-message" style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(14px * var(--font-scale, 1));">Action cannot be undone.</p>
+      <p id="confirm-message" style="color: var(--text-soft); margin-bottom: 24px; font-size: 14px;">Action cannot be undone.</p>
       <div style="display: flex; gap: 12px;">
         <button class="btn-secondary" id="confirm-cancel-btn" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button class="btn-primary" id="confirm-yes-btn" style="flex: 1; justify-content: center; padding: 12px; background: var(--danger); box-shadow: 0 4px 12px var(--danger-alpha);">Yes, Proceed</button>
@@ -1969,11 +1626,11 @@
       <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
           <div>
               <h2 id="live-modal-title" style="margin-bottom: 4px;">Branch Name</h2>
-              <p style="color: var(--success); font-weight: 600; font-size: calc(13px * var(--font-scale, 1));" id="live-modal-subtitle">0 Staff Currently In</p>
+              <p style="color: var(--success); font-weight: 600; font-size: 13px;" id="live-modal-subtitle">0 Staff Currently In</p>
           </div>
           <div style="display: flex; gap: 12px; align-items: center;">
               <button class="btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="window.copyLiveList()">📋 Copy List</button>
-              <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('live-branch-modal'))">&times;</span>
+              <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('live-branch-modal'))">&times;</span>
           </div>
       </div>
       <div class="live-staff-list" id="live-staff-container"></div>
@@ -1985,33 +1642,33 @@
       <h2 style="margin-bottom: 8px;">Edit Staff Details</h2>
       <input type="hidden" id="edit-staff-id">
       
-      <label for="edit-staff-name" style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
+      <label for="edit-staff-name" style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Full Name</label>
       <input type="text" id="edit-staff-name" class="input-field" style="margin-top: 8px;">
       
-      <label for="edit-staff-role" style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
+      <label for="edit-staff-role" style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Assign Role</label>
       <select id="edit-staff-role" class="input-field" style="margin-top: 8px;"></select>
 
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Default Branch</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Default Branch</label>
       <select id="edit-staff-branch" class="input-field" style="margin-top: 8px; margin-bottom: 8px;"></select>
       
       <div style="display: flex; gap: 16px; margin-top: 8px; margin-bottom: 8px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Date of Birth</label>
           <input type="text" id="edit-staff-dob" class="input-field" placeholder="Select DOB" style="margin-top: 8px; margin-bottom: 0;">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Joining Date</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Joining Date</label>
           <input type="text" id="edit-staff-joining" class="input-field" placeholder="Select Joining Date" style="margin-top: 8px; margin-bottom: 0;">
         </div>
       </div>
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Login Email</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Login Email</label>
           <input type="email" id="edit-staff-email" class="input-field" style="margin-top: 8px;">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
           <div style="position: relative; margin-top: 8px;">
               <input type="password" id="edit-staff-pass" class="input-field" style="margin: 0; width: 100%; padding-right: 40px;">
               <span onclick="var inp = document.getElementById('edit-staff-pass'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
@@ -2021,22 +1678,22 @@
 
       <div style="display: flex; gap: 16px; margin-top: 8px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</label>
           <input type="tel" id="edit-staff-phone" class="input-field" style="margin-top: 8px;">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Base Salary (₹)</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Base Salary (₹)</label>
           <input type="number" id="edit-staff-salary" class="input-field" style="margin-top: 8px;">
         </div>
       </div>
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift Start</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift Start</label>
           <input type="time" id="edit-staff-start" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift End</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Staff Shift End</label>
           <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
       </div>
@@ -2052,16 +1709,16 @@
       <h2 style="margin-bottom: 8px;">Edit Role</h2>
       <input type="hidden" id="edit-role-id">
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Name</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Name</label>
       <input type="text" id="edit-role-name" class="input-field" style="margin-top: 8px;">
       
       <div style="display: flex; gap: 16px; margin-top: 8px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift Start</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift Start</label>
           <input type="time" id="edit-role-start" class="input-field" style="margin-top: 8px;" title="Leave blank for global default">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift End</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Role Shift End</label>
           <input type="time" id="edit-role-end" class="input-field" style="margin-top: 8px;" title="Leave blank for global default">
         </div>
       </div>
@@ -2077,7 +1734,7 @@
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Leave Reason</h2>
       <input type="hidden" id="edit-reason-id">
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Reason Name</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Reason Name</label>
       <input type="text" id="edit-reason-name" class="input-field" style="margin-top: 8px;">
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-reason" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
@@ -2090,20 +1747,20 @@
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Branch Geofence</h2>
       <input type="hidden" id="edit-branch-id">
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Branch Name</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Branch Name</label>
       <input type="text" id="edit-branch-name" class="input-field" style="margin-top: 8px;">
       
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Latitude</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Latitude</label>
           <input type="number" id="edit-branch-lat" class="input-field" style="margin-top: 8px;">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Longitude</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Longitude</label>
           <input type="number" id="edit-branch-lng" class="input-field" style="margin-top: 8px;">
         </div>
       </div>
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Radius (Meters)</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Radius (Meters)</label>
       <input type="number" id="edit-branch-radius" class="input-field" style="margin-top: 8px;">
 
       <div style="display: flex; gap: 12px; margin-top: 16px;">
@@ -2116,7 +1773,7 @@
   <div id="edit-time-modal" class="modal-overlay">
     <div class="modal-card" style="max-width: 600px;">
       <h2 style="margin-bottom: 8px;">Edit Shift Record</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="edit-time-subtitle">Updating record</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="edit-time-subtitle">Updating record</p>
       
       <input type="hidden" id="edit-master-staff-id">
       <input type="hidden" id="edit-master-date">
@@ -2137,15 +1794,15 @@
   <div id="schedule-leave-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Schedule Leave / Exception</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Mark upcoming dates as an approved exception (Leave, Late, Early).</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;">Mark upcoming dates as an approved exception (Leave, Late, Early).</p>
       
       <div style="display: flex; gap: 16px;">
           <div style="flex: 1;">
-              <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Staff</label>
+              <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Staff</label>
               <select id="sched-staff" class="input-field" style="margin-top: 8px;"></select>
           </div>
           <div style="flex: 1;">
-              <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Exception Type</label>
+              <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Exception Type</label>
               <select id="sched-type" class="input-field" style="margin-top: 8px;">
                   <option value="Absent">Full Day Leave</option>
                   <option value="Late Arrival">Late Arrival</option>
@@ -2155,22 +1812,22 @@
       </div>
 
       <div id="sched-time-container" style="display: none; margin-bottom: 16px;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Expected Time</label>
+          <label style="font-size: 11px; color: var(--warning); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Expected Time</label>
           <input type="time" id="sched-expected-time" class="input-field" style="margin-top: 8px; margin-bottom: 0;">
       </div>
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
           <input type="text" id="sched-start" class="input-field" style="margin-top: 8px; padding: 12px;">
         </div>
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
           <input type="text" id="sched-end" class="input-field" style="margin-top: 8px; padding: 12px;">
         </div>
       </div>
 
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
       <select id="sched-reason" class="input-field" style="margin-top: 8px;"></select>
       <input type="text" id="sched-reason-custom" class="input-field" placeholder="Type custom reason..." style="margin-top: 8px; display: none;">
 
@@ -2188,7 +1845,7 @@
           <h3 style="margin: 0; color: var(--text-main);">⚙️ Edit Table Columns</h3>
           <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('column-modal'))">&times;</span>
       </div>
-      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));">Select which columns to show or hide.</p>
+      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: 13px;">Select which columns to show or hide.</p>
       
       <div id="column-checkboxes-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
           <!-- Checkboxes injected here -->
@@ -2205,20 +1862,20 @@
     <div class="modal-card" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <h2 style="margin:0;">Review Request</h2>
-          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('leave-review-modal'))">&times;</span>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('leave-review-modal'))">&times;</span>
       </div>
-      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: calc(13px * var(--font-scale, 1));" id="leave-review-subtitle">Staff Name</p>
+      <p style="color: var(--text-soft); margin-bottom: 16px; font-size: 13px;" id="leave-review-subtitle">Staff Name</p>
       
       <div style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px;">
-          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Dates Requested</div>
-          <div style="font-weight: 700; color: var(--primary); font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 12px;" id="leave-review-dates">--</div>
+          <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Dates Requested</div>
+          <div style="font-weight: 700; color: var(--primary); font-size: 14px; margin-bottom: 12px;" id="leave-review-dates">--</div>
           
-          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Reason / Title</div>
-          <div style="font-weight: 600; color: var(--text-main); font-size: calc(14px * var(--font-scale, 1)); margin-bottom: 12px;" id="leave-review-title">--</div>
+          <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Reason / Title</div>
+          <div style="font-weight: 600; color: var(--text-main); font-size: 14px; margin-bottom: 12px;" id="leave-review-title">--</div>
           
-          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Detailed Description</div>
-          <div style="color: var(--text-main); font-size: calc(13px * var(--font-scale, 1)); line-height: 1.5; margin-bottom: 12px;" id="leave-review-desc">--</div>
-          <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Current Status</div>
+          <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Detailed Description</div>
+          <div style="color: var(--text-main); font-size: 13px; line-height: 1.5; margin-bottom: 12px;" id="leave-review-desc">--</div>
+          <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Current Status</div>
           <div id="leave-review-status" style="margin-top: 4px;">--</div>
       </div>
 
@@ -2234,9 +1891,9 @@
   <div id="exception-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manage Reason</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="exc-subtitle">Update record</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="exc-subtitle">Update record</p>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Reason</label>
       <select id="exc-reason" class="input-field" style="margin-top: 8px;"></select>
       <input type="text" id="exc-reason-custom" class="input-field" placeholder="Type custom reason (e.g. Heavy Traffic)..." style="margin-top: 8px; display: none;">
       
@@ -2255,12 +1912,12 @@
   <div id="roster-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Edit Shift Location</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="roster-subtitle">Assigning branch</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="roster-subtitle">Assigning branch</p>
       
       <input type="hidden" id="roster-staff-id">
       <input type="hidden" id="roster-date">
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Branch</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Select Branch</label>
       <select id="roster-branch-select" class="input-field" style="margin-top: 8px;"></select>
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -2276,7 +1933,7 @@
     <div class="modal-card" onclick="event.stopPropagation()">
       <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
         <span id="photo-modal-title"></span>
-        <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
+        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
       </h3>
       <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://placehold.co/600x400/18181b/ef4444?text=Image+Purged/Expired'">
       <div id="audit-controls" style="display:none; flex-direction:column; gap:16px; margin-top:8px;">
@@ -2293,7 +1950,7 @@
   <div id="payroll-adjust-modal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="margin-bottom: 8px;">Manual Adjustment</h2>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));" id="payroll-adjust-subtitle">Update for Staff</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;" id="payroll-adjust-subtitle">Update for Staff</p>
       
       <input type="hidden" id="adjust-staff-id">
       <input type="hidden" id="adjust-month-year">
@@ -2301,7 +1958,7 @@
 
       <div style="display: flex; gap: 16px;">
         <div style="flex: 1;">
-          <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Amount (₹)</label>
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Amount (₹)</label>
           <input type="number" id="adjust-amount" class="input-field" style="margin-top: 8px; margin-bottom: 8px;" placeholder="Use - for deduction, + for bonus">
           
           <!-- QUICK ACTION BUTTONS -->
@@ -2314,7 +1971,7 @@
         </div>
       </div>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase; display: block;">Reason</label>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; display: block;">Reason</label>
       <input type="text" id="adjust-reason" class="input-field" style="margin-top: 8px;" placeholder="e.g. Advance Deducted, Diwali Bonus">
 
       <div style="display: flex; gap: 12px; margin-top: 24px;">
@@ -2401,23 +2058,23 @@
     <div class="modal-card" style="max-width: 600px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <h2 style="margin:0;">🛠️ Custom Report Builder</h2>
-          <span style="color: var(--text-soft); cursor: pointer; font-size: calc(24px * var(--font-scale, 1)); font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('custom-report-modal'))">&times;</span>
+          <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('custom-report-modal'))">&times;</span>
       </div>
-      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: calc(13px * var(--font-scale, 1));">Generate detailed Daily Logs or Aggregated Summary Reports.</p>
+      <p style="color: var(--text-soft); margin-bottom: 24px; font-size: 13px;">Generate detailed Daily Logs or Aggregated Summary Reports.</p>
       
-      <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase;">1. Report Type</label>
+      <label style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase;">1. Report Type</label>
       <div class="sub-tabs" style="margin-top: 8px; margin-bottom: 24px; width: 100%;">
           <button class="sub-tab-btn active" id="rep-type-daily" style="flex: 1;">📝 Detailed Daily Logs</button>
           <button class="sub-tab-btn" id="rep-type-summary" style="flex: 1;">📊 Summary (Total/Avg)</button>
       </div>
 
-      <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase;">2. Data Filters</label>
+      <label style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase;">2. Data Filters</label>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; margin-bottom: 24px;">
           <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 8px;"><input type="checkbox" id="rep-filter-absent" checked> Include Absentees</label>
           <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 8px;"><input type="checkbox" id="rep-filter-lates"> Only Late Arrivals / Early Departures</label>
       </div>
 
-      <label style="font-size: calc(11px * var(--font-scale, 1)); font-weight: 700; color: var(--text-soft); text-transform: uppercase;">3. Select Columns</label>
+      <label style="font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase;">3. Select Columns</label>
       <div id="rep-cols-daily" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; margin-bottom: 24px; max-height: 200px; overflow-y: auto;">
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Date" checked> Date & Day</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Staff Name" checked> Staff Name</label>
@@ -2704,16 +2361,15 @@
     
     const minLaunchDate = new Date('2026-08-01');
 
-    // INITIALIZE GLOBAL PREFS (Time Format, Font, View, Shortcuts, Memory)
-    const defaultPrefs = { memoryEnabled: true, compact: false, fontScale: "1", startView: "dashboard", use12h: false, sidebarRight: false, stickyHeaders: true, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, focusMode: false, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i", gracePeriod: "5" };
-    const uiPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
+    // FIXED APP DEFAULTS (no user-configurable preferences)
+    const defaultPrefs = { memoryEnabled: true, startView: "dashboard", use12h: false, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i", gracePeriod: "5" };
+    const uiPrefs = { ...defaultPrefs };
     window.isMemoryEnabled = uiPrefs.memoryEnabled;
     
     window.use12HourTime = uiPrefs.use12h;
     window.appDateFormat = uiPrefs.dateFormat;
     window.appPageSize = parseInt(uiPrefs.pageSize, 10);
     window.dynamicFpFormat = window.appDateFormat === 'en-US' ? 'm/d/Y' : (window.appDateFormat === 'ja-JP' ? 'Y/m/d' : 'd/m/Y');
-    document.documentElement.style.setProperty('--font-scale', uiPrefs.fontScale || '1');
 
     // UI Sound Synthesis Engine (Zero dependencies)
     window.playUISound = function(type = 'pop') {
@@ -2736,26 +2392,6 @@
         } catch (e) { console.error(e); }
     };
 
-    // Apply immediate visual CSS classes on load
-    if (uiPrefs.sidebarRight) document.body.classList.add('sidebar-right');
-    if (!uiPrefs.stickyHeaders) document.body.classList.add('no-sticky-th');
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const sidebar = document.getElementById('app-sidebar');
-        if (!sidebar) return;
-        
-        if (uiPrefs.focusMode) {
-            sidebar.classList.add('collapsed');
-        }
-
-        // Focus Mode Hover Expansion (Auto-Maximize)
-        sidebar.addEventListener('mouseenter', () => {
-            if (uiPrefs.focusMode) sidebar.classList.remove('collapsed');
-        });
-        sidebar.addEventListener('mouseleave', () => {
-            if (uiPrefs.focusMode) sidebar.classList.add('collapsed');
-        });
-    });
 
     // INSTANT TAB SWITCH ON LOAD (Prevents visual delay/flash)
     (function() {
@@ -3122,14 +2758,8 @@
       }, duration);
     }
 
-    // --- ADVANCED THEME CUSTOMIZER WITH PRESETS (SAFE MODE) ---
+    // --- DARK / LIGHT THEME TOGGLE ---
     try {
-        const themeModal = document.getElementById('theme-modal');
-        const colorInputs = document.querySelectorAll('.theme-color-input');
-        const btnCloseTheme = document.getElementById('btn-close-theme');
-        const btnResetTheme = document.getElementById('btn-reset-theme');
-        const presetBtns = document.querySelectorAll('.preset-btn');
-        
         window.hexToRgba = window.hexToRgba || function(hex, alpha) {
             if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex)) return hex;
             if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
@@ -3137,301 +2767,38 @@
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
 
-        const themePresets = {
-            dark: { class: 'dark', fp: 'dark', vars: { '--primary': '#6366f1', '--bg-base': '#09090b', '--sidebar-bg': '#18181b', '--header-bg': '#09090b', '--table-bg': '#18181b', '--card-bg': '#18181b', '--card-border': '#27272a', '--input-bg': '#09090b', '--text-main': '#f4f4f5' } },
-            light: { class: 'light-theme', fp: 'light', vars: { '--primary': '#4f46e5', '--bg-base': '#f1f5f9', '--sidebar-bg': '#ffffff', '--header-bg': '#ffffff', '--table-bg': '#ffffff', '--card-bg': '#ffffff', '--card-border': '#e2e8f0', '--input-bg': '#f8fafc', '--text-main': '#0f172a' } },
-            ocean: { class: 'dark', fp: 'dark', vars: { '--primary': '#0ea5e9', '--bg-base': '#082f49', '--sidebar-bg': '#0c4a6e', '--header-bg': '#082f49', '--table-bg': '#0c4a6e', '--card-bg': '#0c4a6e', '--card-border': '#0369a1', '--input-bg': '#082f49', '--text-main': '#f0f9ff' } },
-            forest: { class: 'dark', fp: 'dark', vars: { '--primary': '#10b981', '--bg-base': '#022c22', '--sidebar-bg': '#064e3b', '--header-bg': '#022c22', '--table-bg': '#064e3b', '--card-bg': '#064e3b', '--card-border': '#047857', '--input-bg': '#022c22', '--text-main': '#ecfdf5' } },
-            sunset: { class: 'dark', fp: 'dark', vars: { '--primary': '#f43f5e', '--bg-base': '#2a0a18', '--sidebar-bg': '#4c0519', '--header-bg': '#2a0a18', '--table-bg': '#4c0519', '--card-bg': '#4c0519', '--card-border': '#881337', '--input-bg': '#2a0a18', '--text-main': '#fff1f2' } },
-            midnight: { class: 'dark', fp: 'dark', vars: { '--primary': '#a855f7', '--bg-base': '#171026', '--sidebar-bg': '#2e1065', '--header-bg': '#171026', '--table-bg': '#2e1065', '--card-bg': '#2e1065', '--card-border': '#4c1d95', '--input-bg': '#171026', '--text-main': '#f5f3ff' } },
-            coffee: { class: 'dark', fp: 'dark', vars: { '--primary': '#d97706', '--bg-base': '#292524', '--sidebar-bg': '#44403c', '--header-bg': '#292524', '--table-bg': '#44403c', '--card-bg': '#44403c', '--card-border': '#57534e', '--input-bg': '#292524', '--text-main': '#fafaf9' } },
-            cyberpunk: { class: 'dark', fp: 'dark', vars: { '--primary': '#f0abfc', '--bg-base': '#0f172a', '--sidebar-bg': '#1e1b4b', '--header-bg': '#0f172a', '--table-bg': '#1e1b4b', '--card-bg': '#1e1b4b', '--card-border': '#3b0764', '--input-bg': '#0f172a', '--text-main': '#f8fafc' } },
-            dracula: { class: 'dark', fp: 'dark', vars: { '--primary': '#ff79c6', '--bg-base': '#282a36', '--sidebar-bg': '#44475a', '--header-bg': '#282a36', '--table-bg': '#44475a', '--card-bg': '#44475a', '--card-border': '#6272a4', '--input-bg': '#282a36', '--text-main': '#f8f8f2' } },
-            nord: { class: 'dark', fp: 'dark', vars: { '--primary': '#88c0d0', '--bg-base': '#2e3440', '--sidebar-bg': '#3b4252', '--header-bg': '#2e3440', '--table-bg': '#3b4252', '--card-bg': '#3b4252', '--card-border': '#434c5e', '--input-bg': '#2e3440', '--text-main': '#eceff4' } },
-            neon: { class: 'dark', fp: 'dark', vars: { '--primary': '#39ff14', '--bg-base': '#000000', '--sidebar-bg': '#0a0a0a', '--header-bg': '#000000', '--table-bg': '#0a0a0a', '--card-bg': '#0a0a0a', '--card-border': '#111111', '--input-bg': '#000000', '--text-main': '#ffffff' } },
-            rosegold: { class: 'dark', fp: 'dark', vars: { '--primary': '#e0bfb8', '--bg-base': '#2a2426', '--sidebar-bg': '#3a3234', '--header-bg': '#2a2426', '--table-bg': '#3a3234', '--card-bg': '#3a3234', '--card-border': '#4a4043', '--input-bg': '#2a2426', '--text-main': '#f9f6f6' } },
-            rjmobile: { class: 'dark', fp: 'dark', vars: { '--primary': '#f37021', '--bg-base': '#0a1023', '--sidebar-bg': '#121b33', '--header-bg': '#0a1023', '--table-bg': '#121b33', '--card-bg': '#121b33', '--card-border': '#1e2d4a', '--input-bg': '#0a1023', '--text-main': '#f8fafc' } }
-        };
+        // Clean up leftovers from the removed personalization settings
+        ['rj_advanced_theme', 'rj_ui_prefs'].forEach(k => localStorage.removeItem(k));
 
-        function updateBaseThemeClass(className, fpTheme) {
-            if (className === 'light-theme') {
-                document.documentElement.classList.add('light-theme');
-                localStorage.setItem('rj_theme', 'light');
-            } else {
-                document.documentElement.classList.remove('light-theme');
-                localStorage.setItem('rj_theme', 'dark');
+        const themeBtn = document.getElementById('btn-theme-toggle');
+        const fpThemeLink = document.getElementById('flatpickr-theme');
+        const isLight = () => document.documentElement.classList.contains('light-theme');
+
+        const syncThemeUI = () => {
+            if (themeBtn) {
+                themeBtn.innerHTML = isLight() ? '🌙 Dark' : '☀️ Light';
+                themeBtn.title = isLight() ? 'Switch to dark theme' : 'Switch to light theme';
             }
-            const fpEl = document.getElementById('flatpickr-theme');
-            if (fpEl) fpEl.href = `https://npmcdn.com/flatpickr/dist/themes/${fpTheme}.css`;
-            Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim();
+            if (fpThemeLink) fpThemeLink.href = `https://npmcdn.com/flatpickr/dist/themes/${isLight() ? 'light' : 'dark'}.css`;
+        };
+        syncThemeUI();
+
+        themeBtn?.addEventListener('click', () => {
+            const light = !isLight();
+            document.documentElement.classList.toggle('light-theme', light);
+            localStorage.setItem('rj_theme', light ? 'light' : 'dark');
+            syncThemeUI();
+            if (typeof Chart !== 'undefined') Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim();
             if (typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
-        }
+        });
 
-        function applySavedTheme() {
-            const savedTheme = JSON.parse(localStorage.getItem('rj_advanced_theme') || '{}');
-            
-            // Loop through ALL saved variables in localStorage (fixes hidden vars like --input-bg)
-            Object.keys(savedTheme).forEach(varName => {
-                const color = savedTheme[varName];
-                document.documentElement.style.setProperty(varName, color);
-                
-                if (varName === '--primary') {
-                    document.documentElement.style.setProperty('--primary-hover', color);
-                    document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(color, 0.15));
-                }
-                if (varName === '--success') document.documentElement.style.setProperty('--success-alpha', window.hexToRgba(color, 0.15));
-                if (varName === '--warning') document.documentElement.style.setProperty('--warning-alpha', window.hexToRgba(color, 0.15));
-                if (varName === '--danger') document.documentElement.style.setProperty('--danger-alpha', window.hexToRgba(color, 0.15));
-                
-                // Update the color picker input if it exists in the UI
-                const input = document.querySelector(`.theme-color-input[data-var="${varName}"]`);
-                if (input) input.value = color;
-            });
-        }
-        
-        applySavedTheme();
-
-        // Setup new Buttons
         document.getElementById('btn-shortcuts')?.addEventListener('click', () => {
             document.getElementById('shortcuts-modal').style.display = 'flex';
         });
-
-        document.getElementById('btn-personalize')?.addEventListener('click', () => {
-            // Deselect sidebar tabs & hide all views
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.app-view').forEach(v => { v.style.display = 'none'; v.classList.remove('animate-tab'); });
-            
-            // Open Personalize Tab
-            const viewEl = document.getElementById('view-personalize');
-            if (viewEl) { viewEl.style.display = 'block'; void viewEl.offsetWidth; viewEl.classList.add('animate-tab'); }
-            
-            const titleEl = document.getElementById('page-title');
-            if (titleEl) titleEl.innerText = "Personalize Workspace";
-            
-            try {
-                const url = new URL(window.location); url.searchParams.set('view', 'personalize'); window.history.pushState({}, '', url);
-            } catch (err) { console.error(err); }
-            
-            // Optional: Close Sidebar on Mobile automatically
-            if (window.innerWidth <= 900) {
-                const sidebar = document.getElementById('app-sidebar');
-                if (sidebar && !sidebar.classList.contains('collapsed')) sidebar.classList.add('collapsed');
-            }
-        });
-
-        // Manual color picker inputs
-        colorInputs.forEach(input => {
-            input.addEventListener('input', (e) => {
-                const varName = e.target.getAttribute('data-var');
-                const newColor = e.target.value;
-                document.documentElement.style.setProperty(varName, newColor);
-                if (varName === '--primary') {
-                    document.documentElement.style.setProperty('--primary-hover', newColor);
-                    document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(newColor, 0.15));
-                }
-                const savedTheme = JSON.parse(localStorage.getItem('rj_advanced_theme') || '{}');
-                savedTheme[varName] = newColor;
-                localStorage.setItem('rj_advanced_theme', JSON.stringify(savedTheme));
-            });
-        });
-
-        // Preset button clicks
-        presetBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const presetKey = e.target.getAttribute('data-preset');
-                const preset = themePresets[presetKey];
-                if (!preset) return;
-                
-                updateBaseThemeClass(preset.class, preset.fp);
-                
-                const savedTheme = JSON.parse(localStorage.getItem('rj_advanced_theme') || '{}');
-                
-                Object.keys(preset.vars).forEach(varName => {
-                    const newColor = preset.vars[varName];
-                    document.documentElement.style.setProperty(varName, newColor);
-                    
-                    if (varName === '--primary') {
-                        document.documentElement.style.setProperty('--primary-hover', newColor);
-                        document.documentElement.style.setProperty('--primary-alpha', window.hexToRgba(newColor, 0.15));
-                    }
-                    if (varName === '--success') document.documentElement.style.setProperty('--success-alpha', window.hexToRgba(newColor, 0.15));
-                    if (varName === '--warning') document.documentElement.style.setProperty('--warning-alpha', window.hexToRgba(newColor, 0.15));
-                    if (varName === '--danger') document.documentElement.style.setProperty('--danger-alpha', window.hexToRgba(newColor, 0.15));
-                    savedTheme[varName] = newColor;
-                    
-                    const input = document.querySelector(`.theme-color-input[data-var="${varName}"]`);
-                    if (input) input.value = newColor;
-                });
-                
-                localStorage.setItem('rj_advanced_theme', JSON.stringify(savedTheme));
-                showToast(`Applied ${presetKey} theme!`, "success");
-            });
-        });
-
-        // Apply Workspace Preferences
-        let currentPrefs = { ...defaultPrefs, ...JSON.parse(localStorage.getItem('rj_ui_prefs') || '{}') };
-        
-        const toggleDensity = document.getElementById('toggle-density');
-        const toggleHighContrast = document.getElementById('toggle-high-contrast');
-        const toggleTime = document.getElementById('toggle-time-format');
-        const defaultViewSelects = document.querySelectorAll('.default-view-select');
-        const toggleSidebarRight = document.getElementById('toggle-sidebar-right');
-        const toggleStickyHeaders = document.getElementById('toggle-sticky-headers');
-        const prefPageSize = document.getElementById('pref-page-size');
-        const prefDateFormat = document.getElementById('pref-date-format');
-        const prefWeekStart = document.getElementById('pref-week-start');
-        const toggleUiSounds = document.getElementById('toggle-ui-sounds');
-        const toggleFocusMode = document.getElementById('toggle-focus-mode');
-        const prefSyncInterval = document.getElementById('pref-sync-interval');
-        const prefUndoTimer = document.getElementById('pref-undo-timer');
-        const prefGracePeriod = document.getElementById('pref-grace-period');
-        const prefModSave = document.getElementById('pref-mod-save');
-        const prefModLoad = document.getElementById('pref-mod-load');
-        const prefKeyCmd = document.getElementById('pref-key-cmd');
-        const prefKeyTshirt = document.getElementById('pref-key-tshirt');
-        const prefKeyId = document.getElementById('pref-key-id');
-
-        // Initial state mapping to Inputs
-        if (currentPrefs.compact) { document.documentElement.classList.add('density-compact'); if (toggleDensity) toggleDensity.checked = true; }
-        if (currentPrefs.highContrast) { document.documentElement.classList.add('high-contrast'); if (toggleHighContrast) toggleHighContrast.checked = true; }
-        if (toggleTime) toggleTime.checked = currentPrefs.use12h;
-        defaultViewSelects.forEach(sel => sel.value = currentPrefs.startView);
-        if (toggleSidebarRight) toggleSidebarRight.checked = currentPrefs.sidebarRight;
-        if (toggleStickyHeaders) toggleStickyHeaders.checked = currentPrefs.stickyHeaders;
-        if (prefPageSize) prefPageSize.value = currentPrefs.pageSize;
-        if (prefDateFormat) prefDateFormat.value = currentPrefs.dateFormat;
-        if (prefWeekStart) prefWeekStart.value = currentPrefs.weekStart;
-        if (toggleUiSounds) toggleUiSounds.checked = currentPrefs.uiSounds;
-        if (toggleFocusMode) toggleFocusMode.checked = currentPrefs.focusMode;
-        if (prefSyncInterval) prefSyncInterval.value = currentPrefs.syncInterval;
-        if (prefUndoTimer) prefUndoTimer.value = currentPrefs.undoTimer;
-        if (prefGracePeriod) prefGracePeriod.value = currentPrefs.gracePeriod;
-        if (prefModSave) prefModSave.value = currentPrefs.modSave;
-        if (prefModLoad) prefModLoad.value = currentPrefs.modLoad;
-        if (prefKeyCmd) prefKeyCmd.value = currentPrefs.keyCmd;
-        if (prefKeyTshirt) prefKeyTshirt.value = currentPrefs.keyTshirt;
-        if (prefKeyId) prefKeyId.value = currentPrefs.keyId;
-        
-        const saveAndReloadObj = (key, val, msg) => {
-            currentPrefs[key] = val; localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-            showToast(msg, "success"); setTimeout(() => location.reload(), 800);
-        };
-        const saveAndApplyObj = (key, val, msg, action) => {
-            currentPrefs[key] = val; localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-            action(); showToast(msg, "success");
-        };
-
-        if (toggleSidebarRight) toggleSidebarRight.addEventListener('change', e => saveAndApplyObj('sidebarRight', e.target.checked, "Layout updated", () => e.target.checked ? document.body.classList.add('sidebar-right') : document.body.classList.remove('sidebar-right')));
-        if (toggleStickyHeaders) toggleStickyHeaders.addEventListener('change', e => saveAndApplyObj('stickyHeaders', e.target.checked, "Table headers updated", () => e.target.checked ? document.body.classList.remove('no-sticky-th') : document.body.classList.add('no-sticky-th')));
-        if (toggleUiSounds) toggleUiSounds.addEventListener('change', e => saveAndApplyObj('uiSounds', e.target.checked, "Sound settings saved", () => { uiPrefs.uiSounds = e.target.checked; if(e.target.checked) window.playUISound('pop'); }));
-        if (toggleFocusMode) toggleFocusMode.addEventListener('change', e => saveAndApplyObj('focusMode', e.target.checked, "Focus Mode toggled", () => {
-            uiPrefs.focusMode = e.target.checked;
-            const sidebar = document.getElementById('app-sidebar');
-            if (sidebar) e.target.checked ? sidebar.classList.add('collapsed') : sidebar.classList.remove('collapsed');
-        }));
-        if (prefPageSize) prefPageSize.addEventListener('change', e => saveAndReloadObj('pageSize', e.target.value, "Rows per page updated! Reloading..."));
-        if (prefDateFormat) prefDateFormat.addEventListener('change', e => saveAndReloadObj('dateFormat', e.target.value, "Date format updated! Reloading..."));
-        if (prefWeekStart) prefWeekStart.addEventListener('change', e => saveAndReloadObj('weekStart', e.target.value, "Calendar week start updated! Reloading..."));
-        if (prefSyncInterval) prefSyncInterval.addEventListener('change', e => saveAndReloadObj('syncInterval', e.target.value, "Auto-Sync interval updated! Reloading..."));
-        if (prefUndoTimer) prefUndoTimer.addEventListener('change', e => saveAndApplyObj('undoTimer', e.target.value, "Undo timeout updated", () => {}));
-        if (prefGracePeriod) prefGracePeriod.addEventListener('change', e => saveAndReloadObj('gracePeriod', e.target.value, "Grace period updated! Reloading..."));
-        
-        const applyShortcutObj = (key, val) => {
-            currentPrefs[key] = val; uiPrefs[key] = val;
-            localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-            if(typeof window.renderShortcutsModal === 'function') window.renderShortcutsModal();
-            showToast("Shortcut updated", "success");
-        };
-        if (prefModSave) prefModSave.addEventListener('change', e => applyShortcutObj('modSave', e.target.value));
-        if (prefModLoad) prefModLoad.addEventListener('change', e => applyShortcutObj('modLoad', e.target.value));
-        if (prefKeyCmd) prefKeyCmd.addEventListener('change', e => applyShortcutObj('keyCmd', e.target.value.toLowerCase()));
-        if (prefKeyTshirt) prefKeyTshirt.addEventListener('change', e => applyShortcutObj('keyTshirt', e.target.value.toLowerCase()));
-        if (prefKeyId) prefKeyId.addEventListener('change', e => applyShortcutObj('keyId', e.target.value.toLowerCase()));
-        
-        // --- 1. Font Size Scaler (Synced across Panel & Modal) ---
-        const fontSizeBtns = document.querySelectorAll('.font-size-btn');
-        const syncFontBtns = (activeScale) => {
-            fontSizeBtns.forEach(b => {
-                if (b.getAttribute('data-scale') === activeScale) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-        };
-        
-        syncFontBtns(currentPrefs.fontScale || '1'); // Initialize
-
-        fontSizeBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const scale = e.target.getAttribute('data-scale');
-                syncFontBtns(scale); // Visually update all font-size buttons instantly
-                document.documentElement.style.setProperty('--font-scale', scale);
-                currentPrefs.fontScale = scale;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-            });
-        });
-
-        // --- 2. Time Format Toggle (12h/24h) ---
-        if (toggleTime) {
-            toggleTime.addEventListener('change', (e) => {
-                currentPrefs.use12h = e.target.checked;
-                window.use12HourTime = e.target.checked;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-                showToast("Time format updated! Reloading...", "success");
-                setTimeout(() => location.reload(), 800);
-            });
-        }
-
-        // --- 3. Default View Dropdown (Synced) ---
-        defaultViewSelects.forEach(selectEl => {
-            selectEl.addEventListener('change', (e) => {
-                const newVal = e.target.value;
-                defaultViewSelects.forEach(sel => sel.value = newVal); // Sync visually
-                currentPrefs.startView = newVal;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-                showToast("Default Startup Tab Saved", "success");
-            });
-        });
-        
-        // --- 4. Compact Density Toggle ---
-        if (toggleHighContrast) {
-            toggleHighContrast.addEventListener('change', (e) => {
-                if (e.target.checked) document.documentElement.classList.add('high-contrast');
-                else document.documentElement.classList.remove('high-contrast');
-                currentPrefs.highContrast = e.target.checked;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-            });
-        }
-        if (toggleDensity) {
-            toggleDensity.addEventListener('change', (e) => {
-                if (e.target.checked) document.documentElement.classList.add('density-compact');
-                else document.documentElement.classList.remove('density-compact');
-                currentPrefs.compact = e.target.checked;
-                localStorage.setItem('rj_ui_prefs', JSON.stringify(currentPrefs));
-                showToast(e.target.checked ? "Compact Mode Enabled" : "Cozy Mode Enabled", "success");
-            });
-        }
-        
-
-        const btnResetThemeTab = document.getElementById('btn-reset-theme-tab');
-        if (btnResetThemeTab) {
-            btnResetThemeTab.addEventListener('click', () => {
-                localStorage.removeItem('rj_advanced_theme');
-                localStorage.setItem('rj_theme', 'dark');
-                colorInputs.forEach(input => {
-                    const varName = input.getAttribute('data-var');
-                    document.documentElement.style.removeProperty(varName);
-                    if (varName === '--primary') {
-                        document.documentElement.style.removeProperty('--primary-hover');
-                        document.documentElement.style.removeProperty('--primary-alpha');
-                    }
-                });
-                showToast("Theme reset. Reloading page...", "primary");
-                setTimeout(() => location.reload(), 1000);
-            });
-        }
     } catch (err) {
-        console.error("Theme Customizer setup failed:", err);
+        console.error("Theme toggle setup failed:", err);
     }
-    // --- END SAFE THEME LOGIC ---
+    // --- END THEME TOGGLE ---
 
     
 
@@ -3611,10 +2978,8 @@
             
             // Settings: No filters needed
             'view-settings-hr': { date: false, time: false, role: false, branch: false, staff: false },
-            'view-settings-org': { date: false, time: false, role: false, branch: false, staff: false },
+            'view-settings-org': { date: false, time: false, role: false, branch: false, staff: false }
             
-            // Personalize: No filters needed
-            'view-personalize': { date: false, time: false, role: false, branch: false, staff: false }
         };
         
         // Get config for current view, default to no filters if not defined
@@ -3751,7 +3116,7 @@
         
         if (viewId === 'view-settings-hr' || viewId === 'view-settings-org') {
             if (typeof loadSettingsData === 'function') loadSettingsData();
-        } else if (viewId !== 'view-birthdays' && viewId !== 'view-personalize') {
+        } else if (viewId !== 'view-birthdays') {
             // Just ping the Event Bus! It will automatically figure out what to render.
             window.RJEventBus.dispatchEvent(new CustomEvent('DATA_UPDATED'));
         }
@@ -5289,14 +4654,14 @@
                   <span style="color:var(--text-soft)">Out:</span> <strong>${outStr}</strong>
               </td>
               <td>
-                  <span style="font-weight:700; color:var(--primary); font-size:calc(16px * var(--font-scale, 1));">${row.formattedHours}</span><br>
-                  <div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600; margin-top:4px;">
+                  <span style="font-weight:700; color:var(--primary); font-size:16px;">${row.formattedHours}</span><br>
+                  <div style="font-size:11px; color:var(--text-soft); font-weight:600; margin-top:4px;">
                     W: <span style="color:var(--success)">${row.formattedWork}</span> | T: <span style="color:var(--warning)">${row.formattedTravel}</span>
                   </div>
               </td>
               <td>${arrivalHtml}</td>
               <td>${departureHtml}</td>
-              <td><div style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600;">${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
+              <td><div style="font-size:11px; color:var(--text-soft); font-weight:600;">${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
               <td>${photosHTML}</td>
             </tr>`;
           }).join('');
@@ -5492,7 +4857,7 @@
             <div class="live-branch-card" style="background: var(--warning-alpha); border-color: var(--warning);" onclick="window.openLiveBranchModal('transit')">
                 <div>
                     <div class="live-branch-title" style="color: var(--warning);">🚗 In Transit</div>
-                    <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">Currently On The Way</div>
+                    <div style="font-size: 13px; color: var(--text-soft); font-weight: 600;">Currently On The Way</div>
                 </div>
                 <div class="live-branch-count" style="color: var(--warning);">${liveTransitList.length}</div>
             </div>`;
@@ -5510,7 +4875,7 @@
             <div class="live-branch-card" onclick="window.openLiveBranchModal('${b.id}')">
                 <div>
                     <div class="live-branch-title">${b.branch_name}</div>
-                    <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">Active Presence</div>
+                    <div style="font-size: 13px; color: var(--text-soft); font-weight: 600;">Active Presence</div>
                 </div>
                 <div class="live-branch-count" style="color: ${countColor}">${count}</div>
             </div>
@@ -5560,11 +4925,11 @@
                     <img src="${imgSrc}" class="live-staff-img" alt="Photo">
                     <div class="live-staff-info">
                         <div class="live-staff-name">${displayName}</div>
-                        <div style="font-size: calc(12px * var(--font-scale, 1)); color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
+                        <div style="font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
                     </div>
                     <div style="text-align: right;">
-                        <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 700; text-transform: uppercase;">${timeLabel}</div>
-                        <div style="font-weight: 800; font-size: calc(16px * var(--font-scale, 1)); color: var(--success);">${timeIn}</div>
+                        <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">${timeLabel}</div>
+                        <div style="font-weight: 800; font-size: 16px; color: var(--success);">${timeIn}</div>
                     </div>
                 </div>
                 `;
@@ -5857,11 +5222,11 @@
                         ${statusBadgeHtml}
                     </div>
                     <div class="audit-details">
-                        <div><strong style="color: var(--text-main); font-size: calc(14px * var(--font-scale, 1));">${r.name}</strong><br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
-                        <div style="font-size: calc(11px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 600;">${dateStr} • ${timeStr}</div>
+                        <div><strong style="color: var(--text-main); font-size: 14px;">${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
+                        <div style="font-size: 11px; color: var(--text-soft); font-weight: 600;">${dateStr} • ${timeStr}</div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:calc(12px * var(--font-scale, 1)); border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:calc(12px * var(--font-scale, 1)); border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}" ${iChecked}> ID Card</label>
+                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
+                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}" ${iChecked}> ID Card</label>
                         </div>
                         ${btnHtml}
                     </div>
@@ -6372,21 +5737,21 @@
                   </div>
                 </td>
                 <td><span class="role-tag">${s.role}</span></td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--success); text-align: center;">${s.daysPresent}</td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--danger); text-align: center;">${s.daysAbsent}</td>
-                <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
-                <td style="font-size:calc(16px * var(--font-scale, 1)); font-weight:700; color:var(--primary); text-align: center;">${formattedTotal}</td>
+                <td style="font-size:16px; font-weight:700; color:var(--success); text-align: center;">${s.daysPresent}</td>
+                <td style="font-size:16px; font-weight:700; color:var(--danger); text-align: center;">${s.daysAbsent}</td>
+                <td><span style="font-size:12px; color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
+                <td style="font-size:16px; font-weight:700; color:var(--primary); text-align: center;">${formattedTotal}</td>
                 <td>
-                  <span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight:600;">
+                  <span style="font-size:12px; color:var(--text-soft); font-weight:600;">
                     Work: <span style="color:var(--success)">${formattedWork}</span><br>
                     Travel: <span style="color:var(--warning)">${formattedTravel}</span>
                   </span>
                 </td>
-                <td>${otHtml} <br><span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedFmt}</span></td>
-                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${lateCell}</td>
-                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${earlyCell}</td>
-                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${shirtCell}</td>
-                <td style="font-size:calc(15px * var(--font-scale, 1)); text-align: center;">${idCell}</td>
+                <td>${otHtml} <br><span style="font-size:11px; color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedFmt}</span></td>
+                <td style="font-size:15px; text-align: center;">${lateCell}</td>
+                <td style="font-size:15px; text-align: center;">${earlyCell}</td>
+                <td style="font-size:15px; text-align: center;">${shirtCell}</td>
+                <td style="font-size:15px; text-align: center;">${idCell}</td>
             </tr>`;
         }).join('');
     }
@@ -6560,12 +5925,12 @@
                     const dayRec = bStats[b.id].days[dStr];
 
                     if (!dayRec || (!dayRec.openTime && !dayRec.closeTime)) {
-                        matrixHtml += `<td><span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Closed</span></td>`;
+                        matrixHtml += `<td><span class="badge" style="font-size:10px; background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Closed</span></td>`;
                     } else {
                         let badgesHtml = '';
                         if (dayRec.openTime) {
                             const openT = new Date(dayRec.openTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12: window.use12HourTime});
-                            badgesHtml += `<div class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 4px;">Open: ${openT}</div>`;
+                            badgesHtml += `<div class="badge bg-green" style="font-size:10px; margin-bottom: 4px;">Open: ${openT}</div>`;
                         }
                         
                         if (dayRec.closeTime) {
@@ -6574,12 +5939,12 @@
                             // Handling Live Today Status
                             if (dStr === todayStr && livePresence[b.id] && Object.values(livePresence[b.id]).some(v => v === true)) {
                                 closeT = "Live...";
-                                badgesHtml += `<div class="badge bg-blue" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Close: ${closeT}</div>`;
+                                badgesHtml += `<div class="badge bg-blue" style="font-size:10px; margin-bottom: 2px;">Close: ${closeT}</div>`;
                             } else {
-                                badgesHtml += `<div class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Close: ${closeT}</div>`;
+                                badgesHtml += `<div class="badge bg-red" style="font-size:10px; margin-bottom: 2px;">Close: ${closeT}</div>`;
                             }
                         } else if (dStr === todayStr && livePresence[b.id] && Object.values(livePresence[b.id]).some(v => v === true)) {
-                            badgesHtml += `<div class="badge bg-blue" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Currently Live</div>`;
+                            badgesHtml += `<div class="badge bg-blue" style="font-size:10px; margin-bottom: 2px;">Currently Live</div>`;
                         }
 
                         matrixHtml += `<td><div style="display: flex; flex-direction: column; align-items: flex-start;">${badgesHtml}</div></td>`;
@@ -7283,7 +6648,7 @@
             const itemHtml = `
                 <div class="roster-staff-item ${isOverride ? 'is-override' : ''}" data-staff-id="${staff.id}">
                     <div>
-                        <div style="font-size: calc(14px * var(--font-scale, 1)); color: var(--text-main); margin-bottom: 2px;">${staff.name}</div>
+                        <div style="font-size: 14px; color: var(--text-main); margin-bottom: 2px;">${staff.name}</div>
                         <div style="font-size: 10px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">
                             ${statusText}
                         </div>
@@ -7438,11 +6803,11 @@
           joiningDate.setHours(0,0,0,0);
 
           if(dateObj < joiningDate) {
-            rowStr += `<td><span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: transparent; color: var(--text-soft); border: 1px dashed var(--card-border);">Not Joined</span></td>`;
+            rowStr += `<td><span class="badge" style="font-size:10px; background: transparent; color: var(--text-soft); border: 1px dashed var(--card-border);">Not Joined</span></td>`;
           } else if(dailyLogs.length === 0) {
             const excObj = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
             const reasonTxt = excObj ? (reasonMap[excObj.reason_id]?.reason_name || excObj.reason) : null;
-            rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:calc(10px * var(--font-scale, 1));">${reasonTxt}</span>` : `<span class="badge" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Absent</span>`}</td>`;
+            rowStr += `<td>${reasonTxt ? `<span class="badge bg-orange" style="font-size:10px;">${reasonTxt}</span>` : `<span class="badge" style="font-size:10px; background: var(--input-bg); color: var(--text-soft); border: 1px solid var(--card-border);">Absent</span>`}</td>`;
           } else {
             let badgesHtml = '';
             const getLogTime = (action) => {
@@ -7454,9 +6819,9 @@
             const inTime = getLogTime('Clock In');
             const outTime = getLogTime('Clock Out');
 
-            if (inTime) badgesHtml += `<div class="badge bg-green" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">In: ${inTime}</div>`;
-            if (outTime) badgesHtml += `<div class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); margin-bottom: 2px;">Out: ${outTime}</div>`;
-            if (!badgesHtml) badgesHtml = `<span class="badge bg-red" style="font-size:calc(10px * var(--font-scale, 1)); background: var(--danger-alpha); color: var(--danger); border: 1px solid var(--danger-alpha);">Absent</span>`;
+            if (inTime) badgesHtml += `<div class="badge bg-green" style="font-size:10px; margin-bottom: 2px;">In: ${inTime}</div>`;
+            if (outTime) badgesHtml += `<div class="badge bg-red" style="font-size:10px; margin-bottom: 2px;">Out: ${outTime}</div>`;
+            if (!badgesHtml) badgesHtml = `<span class="badge bg-red" style="font-size:10px; background: var(--danger-alpha); color: var(--danger); border: 1px solid var(--danger-alpha);">Absent</span>`;
                     
             rowStr += `<td><div style="display: flex; flex-direction: column; align-items: flex-start;">${badgesHtml}</div></td>`;
           }
@@ -7492,7 +6857,7 @@
               return `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <strong style="color: var(--text-main);">${r.role_name}</strong><br>
-                <span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">
+                <span style="font-size:12px; color:var(--text-soft); font-weight: 600;">
                   ${st ? `${st} - ${en}` : 'Using Global Default'}
                 </span>
               </td>
@@ -7528,11 +6893,11 @@
                     <div>
                         <strong style="color: var(--text-main);">${s.name}</strong><br>
                         <span class="role-tag">${roleName}</span><br>
-                        <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
+                        <span style="font-size:11px; color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
                     </div>
                 </div>
               </td>
-              <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
+              <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
                 <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
@@ -7544,7 +6909,7 @@
       if (branchTbody) {
           branchTbody.innerHTML = branchArr.map(b => `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong></td>
-              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">Lat: ${b.latitude || 'N/A'}<br>Lng: ${b.longitude || 'N/A'}<br>Radius: ${b.radius_meters || 100}m</span></td>
+              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">Lat: ${b.latitude || 'N/A'}<br>Lng: ${b.longitude || 'N/A'}<br>Radius: ${b.radius_meters || 100}m</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
                 <button class="edit-btn" onclick="window.openEditBranch('${b.id}', '${b.branch_name.replace(/'/g, "\\'")}', '${b.latitude || ''}', '${b.longitude || ''}', '${b.radius_meters || 100}')">Edit</button>
                 <button class="del-btn" onclick="window.deleteBranchItem('${b.id}')">Remove</button>
@@ -8469,7 +7834,7 @@
         const countdownEl = document.getElementById('admin-next-bday-countdown');
         if (nextBday.daysLeft === 0) {
             countdownEl.innerText = "It's Today! 🎂🎉";
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#f37021', '#10b981', '#f59e0b'] });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#10b981', '#f59e0b'] });
         } else if (nextBday.daysLeft === 1) {
             countdownEl.innerText = "Tomorrow!";
         } else {
@@ -8494,11 +7859,11 @@
                 <div style="display: flex; align-items: center; gap: 12px;">
                     ${avatarHtml}
                     <div>
-                        <div style="font-weight: 700; color: var(--text-main); font-size: calc(15px * var(--font-scale, 1)); display: flex; align-items: center; gap: 8px;">
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 15px; display: flex; align-items: center; gap: 8px;">
                             ${displayName} 
                             <span class="role-tag" ${isCurrentUser ? `style="background: var(--success-alpha); color: var(--success); border-color: var(--success-alpha);"` : ''}>Turning ${staff.turningAge}</span>
                         </div>
-                        <div style="font-size: calc(13px * var(--font-scale, 1)); color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
+                        <div style="font-size: 13px; color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
                     </div>
                 </div>
                 <div class="badge ${tagClass}" style="font-size: 12px; padding: 6px 12px;">${tagText}</div>
@@ -8692,8 +8057,7 @@
                 { id: 'stats', name: 'Staff Stats', icon: '📈' },
                 { id: 'birthdays', name: 'Staff Birthdays', icon: '🎂' },
                 { id: 'settings-hr', name: 'HR Settings', icon: '⚙️' },
-                { id: 'settings-org', name: 'Location & Shifts', icon: '🏢' },
-                { id: 'personalize', name: 'Personalize Workspace', icon: '✨' }
+                { id: 'settings-org', name: 'Location & Shifts', icon: '🏢' }
             ];
 
             views.filter(v => fuzzyMatch(cleanQuery, v.name.toLowerCase()) || v.name.toLowerCase().includes(cleanQuery)).forEach(v => {
@@ -8712,15 +8076,13 @@
 
         // 3. System Actions
         const actions = [
-            { name: 'Personalize Workspace (Theme)', icon: '🎨', script: "document.getElementById('btn-personalize')?.click()" },
+            { name: 'Toggle Dark / Light Theme', icon: '🌓', script: "document.getElementById('btn-theme-toggle')?.click()" },
             { name: 'Export Data Menu', icon: '📥', script: "document.getElementById('export-btn')?.click()" },
             { name: 'Reset All Filters', icon: '🧹', script: "document.getElementById('clear-all-filters-btn')?.click()" },
             { name: 'Toggle Fullscreen', icon: '⛶', script: "document.getElementById('fullscreen-btn')?.click()" },
             { name: 'View Keyboard Shortcuts', icon: '⌨️', script: "document.getElementById('btn-shortcuts')?.click()" },
             { name: 'Toggle Sidebar', icon: '🗂️', script: "document.getElementById('sidebar-toggle')?.click()" },
             { name: 'Refresh Data', icon: '🔄', script: "if(typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(true)" },
-            { name: 'Toggle Focus Mode', icon: '🎯', script: "const cb = document.getElementById('toggle-focus-mode'); if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }" },
-            { name: 'Toggle High Contrast', icon: '🌓', script: "const cb = document.getElementById('toggle-high-contrast'); if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }" },
             { name: 'Log Out', icon: '🚪', script: "document.getElementById('logout-btn')?.click()" }
         ];
         
@@ -8777,7 +8139,7 @@
             <h3 style="margin: 0; color: var(--text-main);">⌨️ Keyboard Shortcuts</h3>
             <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('shortcuts-modal'))">&times;</span>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 12px; font-size: calc(13px * var(--font-scale, 1));">
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
             
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
               <span style="color: var(--success); font-weight: bold;">Save Current Filter View</span>
@@ -9842,11 +9204,11 @@
                       <div>
                           <strong style="color: var(--text-main);">${s.name}</strong><br>
                           <span class="role-tag">${roleName}</span><br>
-                          <span style="font-size:calc(11px * var(--font-scale, 1)); color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
+                          <span style="font-size:11px; color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
                       </div>
                   </div>
                 </td>
-                <td><span style="font-size:calc(12px * var(--font-scale, 1)); color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
+                <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
                 <td style="text-align:right; white-space:nowrap;">
                   <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '${s.password || ''}', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
                   <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
