@@ -3565,13 +3565,14 @@
     // Run once on load to highlight correct button if URL parameters set the date
     window.checkAndSetActiveDateRange();
 
+    const allowEmptyDate = () => {}; // optional date fields: clearing is valid, no revert/toast
     const revertDate = (dates, dateStr, inst) => { if(!dates[0]) { showToast("Invalid Date! Reverting...", "warning"); inst.setDate(new Date()); } };
     if (document.getElementById("sched-start")) flatpickr("#sched-start", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
     if (document.getElementById("sched-end")) flatpickr("#sched-end", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, minDate: "today", allowInput: true, onChange: revertDate });
-    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
-    if (document.getElementById("new-staff-joining")) flatpickr("#new-staff-joining", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
-    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
-    if (document.getElementById("edit-staff-joining")) flatpickr("#edit-staff-joining", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: revertDate });
+    if (document.getElementById("new-staff-dob")) flatpickr("#new-staff-dob", { ...getFpConfig(), onClose: () => {}, dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: allowEmptyDate });
+    if (document.getElementById("new-staff-joining")) flatpickr("#new-staff-joining", { ...getFpConfig(), onClose: () => {}, dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: allowEmptyDate });
+    if (document.getElementById("edit-staff-dob")) flatpickr("#edit-staff-dob", { ...getFpConfig(), onClose: () => {}, dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: allowEmptyDate });
+    if (document.getElementById("edit-staff-joining")) flatpickr("#edit-staff-joining", { ...getFpConfig(), onClose: () => {}, dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, maxDate: "today", allowInput: true, onChange: allowEmptyDate });
     if (document.getElementById("manual-date")) flatpickr("#manual-date", { ...getFpConfig(), dateFormat: "Y-m-d", altInput: true, altFormat: window.dynamicFpFormat, defaultDate: "today", maxDate: "today", onChange: revertDate });
     if (document.getElementById("manual-time")) flatpickr("#manual-time", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: !window.use12HourTime, disableMobile: "true" });
     
