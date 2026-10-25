@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#070707" media="(prefers-color-scheme: dark)">
   
   <script>
     (() => {
@@ -23,17 +23,17 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Export Libraries (Lazy Loaded dynamically via JS) -->
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" defer></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <link id="flatpickr-theme" rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13" defer></script>
   <!-- Flatpickr Month Plugin -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/plugins/monthSelect/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/plugins/monthSelect/index.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>  
   
   <!-- Security & IndexedDB Caching -->
@@ -47,56 +47,65 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --bg-base: #09090b; 
-      --bg-surface: #18181b;
-      --card-bg: #18181b; 
-      --card-border: #27272a;
-      
-      --primary: #6366f1; 
-      --primary-hover: #4f46e5; 
-      --primary-glow: rgba(99, 102, 241, 0.25);
-      --primary-alpha: rgba(99, 102, 241, 0.15);
-      --shadow-glow: 0 0 20px var(--primary-glow);
-      --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      
-      --text-main: #f4f4f5; 
+      /* RJ Mobile gold theme (matches the public Branches page) */
+      --bg-base: #070707;
+      --bg-surface: #121212;
+      --card-bg: #121212;
+      --card-border: #262626;
+
+      --primary: #d4af37;
+      --primary-hover: #b8932b;
+      --primary-text: #e6c35a;
+      --on-gold: #151100;
+      --primary-glow: rgba(212, 175, 55, 0.28);
+      --primary-alpha: rgba(212, 175, 55, 0.12);
+      --shadow-glow: 0 0 18px rgba(212, 175, 55, 0.14);
+      --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+
+      --text-main: #ffffff;
       --text-soft: #a1a1aa;
-      
-      --success: #10b981; --success-alpha: rgba(16, 185, 129, 0.15);
-      --danger: #ef4444; --danger-alpha: rgba(239, 68, 68, 0.15);
-      --warning: #eab308; --warning-alpha: rgba(234, 179, 8, 0.15);
-      
-      --input-bg: #09090b; 
-      --hover-bg: rgba(255, 255, 255, 0.08);
+
+      --success: #34d399; --success-alpha: rgba(52, 211, 153, 0.13);
+      --danger: #f87171; --danger-alpha: rgba(248, 113, 113, 0.14);
+      --warning: #f59e0b; --warning-alpha: rgba(245, 158, 11, 0.15);
+
+      --input-bg: #1a1a1a;
+      --hover-bg: rgba(212, 175, 55, 0.07);
       --selected-bg: var(--primary-alpha);
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 20px;
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.55);
+      --radius-sm: 12px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
     }
 
     html.light-theme {
-      --bg-base: #f4f4f5; 
+      --bg-base: #faf8f3;
       --bg-surface: #ffffff;
-      --card-bg: #ffffff; 
-      --card-border: #e4e4e7;
-      
-      --primary: #4f46e5; 
-      --primary-hover: #4338ca; 
-      --primary-glow: rgba(79, 70, 229, 0.2);
-      --primary-alpha: rgba(79, 70, 229, 0.1);
-      
-      --text-main: #18181b; 
-      --text-soft: #52525b; 
-      
-      --input-bg: #ffffff; 
-      --hover-bg: rgba(0, 0, 0, 0.05);
+      --card-bg: #ffffff;
+      --card-border: #e8e3d5;
+
+      --primary: #d4af37;
+      --primary-hover: #b8932b;
+      --primary-text: #8a6a00;
+      --on-gold: #151100;
+      --primary-glow: rgba(212, 175, 55, 0.3);
+      --primary-alpha: rgba(212, 175, 55, 0.16);
+
+      --text-main: #16130a;
+      --text-soft: #686353;
+
+      --success: #047857; --success-alpha: rgba(4, 120, 87, 0.1);
+      --danger: #b91c1c; --danger-alpha: rgba(185, 28, 28, 0.1);
+      --warning: #b45309; --warning-alpha: rgba(180, 83, 9, 0.12);
+
+      --input-bg: #ffffff;
+      --hover-bg: rgba(212, 175, 55, 0.12);
       --selected-bg: var(--primary-alpha);
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 1px 2px 0 rgba(60, 45, 0, 0.06);
+      --shadow-md: 0 10px 25px -5px rgba(60, 45, 0, 0.1);
     }
-    
+
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; border-radius: 10px; margin: 4px; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
@@ -104,27 +113,27 @@
     html.light-theme ::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.15); border: 2px solid transparent; background-clip: padding-box; }
     html.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.3); border: 2px solid transparent; background-clip: padding-box; }
     
-    ::selection { background: var(--primary-alpha); color: var(--primary); }
-    ::-moz-selection { background: var(--primary-alpha); color: var(--primary); }
+    ::selection { background: var(--primary-alpha); color: var(--primary-text); }
+    ::-moz-selection { background: var(--primary-alpha); color: var(--primary-text); }
 
     /* Accessibility: Smart Focus Rings for Keyboard Navigation */
     *:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 2px; transition: outline-offset 0.1s ease; }
     .btn-primary:focus-visible, .btn-secondary:focus-visible, .tab-btn:focus-visible, .icon-btn:focus-visible { outline-offset: 4px; }
 
-    body { font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); font-size: 14px; min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; position: relative; z-index: 1; }
+    body { font-family: 'Manrope', sans-serif; background: transparent; color: var(--text-main); font-size: 14px; min-height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; position: relative; z-index: 1; }
     
     .bg-blobs { position: fixed; inset: -20%; z-index: -1; overflow: hidden; pointer-events: none; background: var(--bg-base); }
     .bg-blobs::before, .bg-blobs::after { content: ""; display: none; position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.2; animation: floatBlob 25s infinite alternate ease-in-out; }
     .bg-blobs::before { width: 50vw; height: 50vw; background: var(--primary); top: 10%; left: -10%; }
-    .bg-blobs::after { width: 40vw; height: 40vw; background: #a855f7; bottom: 10%; right: -5%; animation-delay: -12s; }
+    .bg-blobs::after { width: 40vw; height: 40vw; background: #e6c35a; bottom: 10%; right: -5%; animation-delay: -12s; }
     @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(15%, 20%) scale(1.2); } }
     html.light-theme .bg-blobs::before, html.light-theme .bg-blobs::after { opacity: 0.1; filter: blur(90px); }
-    h1, h2, h3, .name, .metric-value, .sidebar-category { font-family: 'Plus Jakarta Sans', sans-serif; }
+    h1, h2, h3, .name, .metric-value, .sidebar-category { font-family: 'Bricolage Grotesque', sans-serif; }
 
     /* =========================================================
        2. TYPOGRAPHY & BUTTONS
        ========================================================= */
-    .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); color: #fff; border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: 0 4px 12px var(--primary-glow); }
+    .btn-primary { background: var(--primary); color: var(--on-gold); border: none; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 800; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; box-shadow: 0 4px 12px var(--primary-glow); }
     .btn-primary { position: relative; overflow: hidden; }
     .btn-primary::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%); opacity: 0; transform: scale(0.5); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
     .btn-primary:hover:not(:disabled)::after { opacity: 1; transform: scale(1); }
@@ -132,22 +141,22 @@
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
     
     .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 16px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
-    .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary); }
+    .btn-secondary:hover:not(:disabled) { background: var(--input-bg); border-color: var(--primary); color: var(--primary-text); }
     .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
     
     .icon-btn { background: transparent; border: none; color: var(--text-soft); cursor: pointer; font-size: 13px; transition: 0.2s; padding: 6px 10px; border-radius: var(--radius-sm); font-weight: 600; border: 1px solid transparent; }
-    .icon-btn:hover { background: var(--input-bg); color: var(--primary); border-color: var(--card-border); }
+    .icon-btn:hover { background: var(--input-bg); color: var(--primary-text); border-color: var(--card-border); }
     
     .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.3px; text-transform: uppercase;}
     .bg-green { background: var(--success-alpha); color: var(--success); }
     .bg-red { background: var(--danger-alpha); color: var(--danger); }
     .bg-orange { background: var(--warning-alpha); color: var(--warning); }
-    .bg-blue { background: var(--primary-alpha); color: var(--primary); }
+    .bg-blue { background: var(--primary-alpha); color: var(--primary-text); }
     .bg-gray { background: var(--bg-base); color: var(--text-soft); border: 1px solid var(--card-border); }
     
-    .action-link { color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
+    .action-link { color: var(--primary-text); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block; padding: 4px 0;}
     .action-link:hover { color: var(--primary-hover); text-decoration: underline; }
-    .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
+    .role-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary-text); border: 1px solid var(--primary-alpha); padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 4px; display: inline-block; background: var(--primary-alpha); }
 
     /* =========================================================
        TACTILE BUTTON SQUISH (APPLE FEEL)
@@ -196,7 +205,7 @@
     /* =========================================================
        4. FORM INPUTS & DROPDOWNS
        ========================================================= */
-    .input-field { height: 44px; width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background-color: var(--input-bg) !important; color: var(--text-main) !important; margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.2s; color-scheme: dark; line-height: normal; }
+    .input-field { height: 44px; width: 100%; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background-color: var(--input-bg) !important; color: var(--text-main) !important; margin-bottom: 16px; outline: none; font-family: 'Manrope', sans-serif; font-size: 13px; transition: all 0.2s; color-scheme: dark; line-height: normal; }
     html.light-theme .input-field { color-scheme: light; }
     .input-field { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); } /* Add this line to make the lift smooth */
     .input-field:focus { 
@@ -214,13 +223,13 @@
     @keyframes dropIn { from {opacity:0; transform: translateY(-10px) scale(0.98);} to {opacity:1; transform:translateY(0) scale(1);} }
     
     .dropdown-content.export-menu a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; font-weight: 500; border-radius: var(--radius-sm); transition: 0.2s; font-size: 13px;}
-    .dropdown-content.export-menu a:hover { background-color: var(--primary-alpha); color: var(--primary); }
+    .dropdown-content.export-menu a:hover { background-color: var(--primary-alpha); color: var(--primary-text); }
 
     .multi-select-actions { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
     .multi-select-actions button { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: none; background: var(--input-bg); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;}
-    .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary); }
+    .multi-select-actions button:hover { background: var(--primary-alpha); color: var(--primary-text); }
     .check-wrap { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; padding: 10px 8px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 13px;}
-    .check-wrap:hover { background: var(--input-bg); color: var(--primary); }
+    .check-wrap:hover { background: var(--input-bg); color: var(--primary-text); }
     /* Premium Animated Checkboxes */
     .check-wrap input { 
         appearance: none; -webkit-appearance: none; 
@@ -232,7 +241,7 @@
     .check-wrap input:checked { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 10px var(--primary-glow); }
     .check-wrap input:checked::after { 
         content: ''; position: absolute; left: 5px; top: 1px; 
-        width: 5px; height: 10px; border: solid white; 
+        width: 5px; height: 10px; border: solid var(--on-gold); 
         border-width: 0 2px 2px 0; transform: rotate(45deg); 
         animation: checkMarkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
     }
@@ -252,7 +261,7 @@
     html.light-theme .sidebar { background: #ffffff; border-right: 1px solid rgba(0,0,0,0.05); box-shadow: 10px 0 30px rgba(0,0,0,0.03); }
     .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 32px 8px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px; }
     .sidebar-brand img { height: 36px; object-fit: contain; }
-    .brand-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .brand-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
     .brand-subtitle { font-size: 11px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600;}
     
     .tab-controls { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding-right: 8px; }
@@ -262,7 +271,7 @@
     .tab-btn { position: relative; overflow: hidden; }
     .tab-btn::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0); width: 4px; height: 60%; background: var(--primary); border-radius: 0 4px 4px 0; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; }
     .tab-btn:hover { background: var(--hover-bg, var(--input-bg)); color: var(--text-main); transform: translateX(4px); }
-    .tab-btn.active { background: var(--selected-bg, var(--primary-alpha)); color: var(--primary); transform: translateX(4px); font-weight: 700; }
+    .tab-btn.active { background: var(--selected-bg, var(--primary-alpha)); color: var(--primary-text); transform: translateX(4px); font-weight: 700; }
     .tab-btn.active::before { transform: translateY(-50%) scaleY(1); opacity: 1; box-shadow: 0 0 10px var(--primary); }
     .tab-icon { display: flex; align-items: center; justify-content: center; }
 
@@ -271,7 +280,7 @@
     .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: var(--bg-base); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 200; position: sticky; top: 0; }
     html.light-theme .header-bar { background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
     .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .header-title { font-weight: 700; font-size: 20px; color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif;}
+    .header-title { font-weight: 700; font-size: 20px; color: var(--text-main); font-family: 'Bricolage Grotesque', sans-serif;}
 
     .content-wrapper { padding: 32px 40px; flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
 
@@ -288,12 +297,12 @@
     .quick-dates { display: flex; gap: 8px; background: var(--input-bg); padding: 6px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); flex-wrap: wrap; }
     .quick-date-btn { background: transparent; border: none; color: var(--text-soft); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .quick-date-btn:hover { color: var(--text-main); background: var(--hover-bg, var(--bg-surface)); }
-    .quick-date-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
+    .quick-date-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary-text); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sub-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; background: var(--input-bg); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--card-border); width: fit-content;}
     .sub-tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-soft); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .sub-tab-btn:hover { color: var(--text-main); background: var(--hover-bg, var(--card-bg)); }
-    .sub-tab-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary); border-color: var(--card-border); box-shadow: var(--shadow-sm); }
+    .sub-tab-btn.active { background: var(--selected-bg, var(--card-bg)); color: var(--primary-text); border-color: var(--card-border); box-shadow: var(--shadow-sm); }
 
     .sortable-ghost { opacity: 0.5 !important; background: var(--primary-alpha) !important; border: 2px dashed var(--primary) !important; border-radius: var(--radius-sm); }
     .sortable-drag { cursor: grabbing !important; opacity: 1 !important; background: var(--card-bg) !important; border: 1px solid var(--primary) !important; box-shadow: 0 15px 30px rgba(0,0,0,0.3), var(--shadow-glow) !important; z-index: 9999 !important; border-radius: var(--radius-sm); }
@@ -303,13 +312,13 @@
     html.light-theme .widget-card { background: #ffffff; border-color: rgba(0,0,0,0.05); }
     .widget-card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--primary-alpha), transparent 40%); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: -1; }
     .widget-card:hover::before { opacity: 1; }
-    .widget-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.4), var(--shadow-glow); border-color: rgba(99, 102, 241, 0.5); }
+    .widget-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.4), var(--shadow-glow); border-color: rgba(212, 175, 55, 0.5); }
     .widget-card:active { cursor: grabbing; }
     .widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .widget-title { font-size: 12px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; pointer-events: none; letter-spacing: 0.5px;}
     .metric-value { font-size: 36px; font-weight: 800; background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; pointer-events: none; line-height: 1.1; letter-spacing: -0.5px;}
     .drag-handle { color: var(--text-soft); opacity: 0.3; cursor: grab; transition: 0.2s; font-size: 18px; line-height: 1;}
-    .widget-card:hover .drag-handle { opacity: 1; color: var(--primary); }
+    .widget-card:hover .drag-handle { opacity: 1; color: var(--primary-text); }
 
     .table-card { background: var(--table-bg, var(--card-bg)); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm);}
     .table-responsive { 
@@ -407,7 +416,7 @@
     .settings-panel h3 { font-size: 16px; margin-bottom: 12px; color: var(--text-main); }
     .del-btn { color: var(--danger); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 12px;}
     .del-btn:hover { background: var(--danger-alpha); border-color: var(--danger-alpha); }
-    .edit-btn { color: var(--primary); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; margin-right: 6px; font-size: 12px;}
+    .edit-btn { color: var(--primary-text); cursor: pointer; font-weight: 600; background: var(--bg-base); border: 1px solid var(--card-border); padding: 6px 12px; border-radius: var(--radius-sm); transition: 0.2s; margin-right: 6px; font-size: 12px;}
     .edit-btn:hover { background: var(--primary-alpha); border-color: var(--primary-alpha); }
 
     /* =========================================================
@@ -459,9 +468,9 @@
        ========================================================= */
     .branch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
     .live-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; }
-    .live-branch-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.5), var(--shadow-glow); border-color: rgba(99, 102, 241, 0.4); }
+    .live-branch-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.5), var(--shadow-glow); border-color: rgba(212, 175, 55, 0.4); }
     .live-branch-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-    .live-branch-count { font-size: 32px; font-weight: 800; color: var(--primary); }
+    .live-branch-count { font-size: 32px; font-weight: 800; color: var(--primary-text); }
     
     .live-staff-list { display: flex; flex-direction: column; gap: 12px; }
     .live-staff-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
@@ -507,7 +516,7 @@
     .roster-board { display: flex; gap: 20px; height: calc(100vh - 220px); align-items: flex-start; }
     .roster-branches { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; align-content: start; overflow-y: auto; height: 100%; padding-right: 8px;}
     .roster-branch-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); display: flex; flex-direction: column; max-height: 50vh;}
-    .roster-branch-header { padding: 12px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--primary); border-radius: var(--radius-md) var(--radius-md) 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 14px;}
+    .roster-branch-header { padding: 12px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--primary-text); border-radius: var(--radius-md) var(--radius-md) 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 14px;}
     .roster-list { flex: 1; padding: 12px; overflow-y: auto; min-height: 120px; display: flex; flex-direction: column; gap: 8px; }
     .roster-staff-item { background: var(--input-bg); border: 1px solid var(--card-border); padding: 10px 12px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; cursor: grab; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, background 0.25s; will-change: transform; }
     .roster-staff-item:hover { transform: translateY(-3px); box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4); background: var(--card-bg); border-color: rgba(255,255,255,0.1); }
@@ -519,11 +528,11 @@
 
     /* Premium Glassmorphism Date Picker (Flatpickr Override) */
     .input-field[readonly], .flatpickr-input[readonly] { background-color: var(--input-bg) !important; color: var(--text-main) !important; cursor: pointer; }
-    .flatpickr-calendar { background: rgba(24, 24, 27, 0.8) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), var(--shadow-glow) !important; border-radius: 16px !important; padding: 8px !important; }
+    .flatpickr-calendar { background: var(--card-bg) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), var(--shadow-glow) !important; border-radius: 16px !important; padding: 8px !important; }
     html.light-theme .flatpickr-calendar { background: rgba(255, 255, 255, 0.9) !important; border-color: rgba(0,0,0,0.1) !important; box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important; }
     .flatpickr-day.selected { background: var(--primary) !important; border-color: var(--primary) !important; box-shadow: 0 4px 10px var(--primary-glow) !important; font-weight: 800 !important; }
     .flatpickr-day:hover { background: var(--primary-alpha) !important; }
-    .flatpickr-months .flatpickr-month, .flatpickr-current-month .flatpickr-monthDropdown-months, .flatpickr-current-month input.cur-year { color: var(--text-main) !important; font-family: 'Plus Jakarta Sans', sans-serif !important; font-weight: 700 !important; }
+    .flatpickr-months .flatpickr-month, .flatpickr-current-month .flatpickr-monthDropdown-months, .flatpickr-current-month input.cur-year { color: var(--text-main) !important; font-family: 'Bricolage Grotesque', sans-serif !important; font-weight: 700 !important; }
     /* FIX: flatpickr calendar/time popup was opening BEHIND modals (default z-index 99999 < modal 1000000) */
     .flatpickr-calendar, .flatpickr-calendar.open, .flatpickr-calendar.inline { z-index: 2000000 !important; }
     .flatpickr-time input, .flatpickr-time .flatpickr-time-separator, .flatpickr-time .flatpickr-am-pm { color: var(--text-main) !important; font-weight: 700 !important; }
@@ -563,7 +572,7 @@
     @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
     .cmd-item { padding: 12px 16px; border-radius: var(--radius-sm); color: var(--text-main); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); font-size: 14px; font-weight: 500; animation: cmdPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform-origin: left center;}
-    .cmd-item:hover, .cmd-item.active { background: var(--primary-alpha); color: var(--primary); transform: translateX(4px); }
+    .cmd-item:hover, .cmd-item.active { background: var(--primary-alpha); color: var(--primary-text); transform: translateX(4px); }
     @keyframes cmdPop { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .cmd-item:nth-child(1) { animation-delay: 0.05s; }
     .cmd-item:nth-child(2) { animation-delay: 0.08s; }
@@ -612,7 +621,7 @@
     html.light-theme .context-menu { background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
     @keyframes menuPop { from { opacity: 0; transform: scale(0.9) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
   .context-menu-item { padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-  .context-menu-item:hover { background: var(--hover-bg, var(--primary-alpha)); color: var(--primary); }
+  .context-menu-item:hover { background: var(--hover-bg, var(--primary-alpha)); color: var(--primary-text); }
   .context-menu-item.text-danger:hover { color: var(--danger); background: var(--danger-alpha); }
   .context-menu-divider { height: 1px; background: var(--card-border); margin: 4px 0; }
 
@@ -629,9 +638,9 @@
   .drawer-close { background: var(--input-bg); border: none; color: var(--text-soft); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
   .drawer-close:hover { background: var(--danger-alpha); color: var(--danger); }
   .drawer-body { padding: 24px; overflow-y: auto; flex: 1; }
-  .drawer-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: var(--input-bg); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: var(--primary); }
+  .drawer-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: var(--input-bg); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: var(--primary-text); }
   .drawer-stat-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px; text-align: center; flex: 1; }
-  .drawer-stat-val { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; font-family: 'Plus Jakarta Sans', sans-serif;}
+  .drawer-stat-val { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; font-family: 'Bricolage Grotesque', sans-serif;}
   .drawer-stat-lbl { font-size: 11px; color: var(--text-soft); text-transform: uppercase; font-weight: 700; }
 
   @media print {
@@ -650,6 +659,39 @@
     .hide-on-print { display: none !important; visibility: hidden !important; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   }
+
+    /* =========================================================
+       RJ MOBILE GOLD THEME - refinements (matches Branches page)
+       ========================================================= */
+    h1, h2, h3, .brand-title, .header-title { letter-spacing: -0.015em; }
+    ::selection { background: var(--primary); color: var(--on-gold); }
+    ::-moz-selection { background: var(--primary); color: var(--on-gold); }
+    *:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.28); border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.55); border: 2px solid transparent; background-clip: padding-box; }
+    html.light-theme ::-webkit-scrollbar-thumb { background: rgba(138, 106, 0, 0.3); border: 2px solid transparent; background-clip: padding-box; }
+    html.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(138, 106, 0, 0.55); border: 2px solid transparent; background-clip: padding-box; }
+
+    /* Active sidebar tab = solid gold pill, like the reference tabs */
+    .tab-btn.active { background: var(--primary); color: var(--on-gold); box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35); }
+    .tab-btn.active::before { display: none; }
+    .tab-btn.active .tab-icon, .tab-btn.active svg { color: var(--on-gold); }
+
+    /* Inputs: gold focus ring */
+    .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-alpha); }
+
+    /* Toasts */
+    .toast-primary, .toast-success { color: var(--on-gold); }
+    .toast-error { color: #1c0505; }
+    html.light-theme .toast-success, html.light-theme .toast-error { color: #fff; }
+
+    /* Flatpickr */
+    .flatpickr-calendar { border-color: var(--card-border) !important; }
+    .flatpickr-day.selected, .flatpickr-day.selected:hover, .flatpickr-day.selected:focus { color: var(--on-gold) !important; }
+    .flatpickr-day.today { border-color: var(--primary) !important; }
+    .flatpickr-day.today:hover { background: var(--primary-alpha) !important; color: var(--text-main) !important; }
+    .flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg { fill: var(--text-soft) !important; }
+    .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg { fill: var(--primary) !important; }
   </style>
 </head>
 <body>
@@ -661,7 +703,7 @@
   <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" alt="RJ Mobile Logo" style="height: 48px; object-fit: contain; margin-bottom: 24px;" onerror="this.style.display='none'">
-        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px;">Workspace Login</h2>
+        <h2 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px;">Workspace Login</h2>
         <p style="color: var(--text-soft); margin-bottom: 32px; font-size: 14px;">Secure admin access.</p>
         
         <input type="email" id="email-input" class="input-field" placeholder="Admin Email" />
@@ -792,7 +834,7 @@
         <div class="header-bar">
           <div style="display: flex; flex-direction: column;">
             <div class="header-title" id="page-title">Overview</div>
-            <div id="live-admin-clock" style="font-size: 14px; margin-top: 4px; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Loading time...</div>
+            <div id="live-admin-clock" style="font-size: 14px; margin-top: 4px; letter-spacing: 0.5px; font-family: 'Manrope', sans-serif;">Loading time...</div>
           </div>
           <div class="header-controls" style="margin-left: auto;">
             <div class="dropdown" id="export-dropdown" style="display: none;">
@@ -804,7 +846,7 @@
                 <a href="#" data-export="pdf">📄 Download PDF</a>
                 <a href="#" data-export="xlsx">📈 Download Excel</a>
                 <div class="context-menu-divider" style="margin: 4px 0; height: 1px; background: var(--card-border);"></div>
-                <a href="#" data-export="custom" style="color: var(--primary);">🛠️ Custom Report Builder</a>
+                <a href="#" data-export="custom" style="color: var(--primary-text);">🛠️ Custom Report Builder</a>
               </div>
             </div>
             
@@ -975,7 +1017,7 @@
                         </div>
                     </div>
 
-                    <h3 style="margin: 24px 0 16px 0; font-size: 18px; font-family: 'Plus Jakarta Sans', sans-serif;">Deep Analysis</h3>
+                    <h3 style="margin: 24px 0 16px 0; font-size: 18px; font-family: 'Bricolage Grotesque', sans-serif;">Deep Analysis</h3>
                     <div class="chart-grid">
                         <div class="chart-card">
                             <h3><span></span>Attendance Trend</span> <button class="icon-btn" onclick="this.closest('.chart-card').classList.toggle('chart-expanded')" title="Toggle Fullscreen">⛶</button></h3>
@@ -1208,10 +1250,10 @@
                             
                             <div class="badge bg-blue" style="margin-bottom: 12px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Next Celebration</div>
                             <div id="admin-next-bday-emoji" style="font-size: 48px; position: relative; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: -5px;">🎉</div>
-                            <div id="admin-next-bday-name" style="font-size: 24px; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
+                            <div id="admin-next-bday-name" style="font-size: 24px; font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
                             <div id="admin-next-bday-date" style="color: #f1f5f9; margin-bottom: 8px; font-weight: 600; position: relative; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">--</div>
                             <div id="admin-next-bday-age" class="role-tag" style="position: relative; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">--</div>
-                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: #fff; background: var(--primary); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
+                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: var(--on-gold); background: var(--primary); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
                         </div>
                     </div>
 
@@ -1506,7 +1548,7 @@
 
   <!-- FLOATING BULK ACTION BAR -->
   <div id="bulk-action-bar" class="bulk-action-bar">
-      <div style="font-weight: 800; color: var(--text-main); font-size: 14px;"><span id="bulk-selected-count" style="color: var(--primary); font-size: 18px;">0</span> Selected</div>
+      <div style="font-weight: 800; color: var(--text-main); font-size: 14px;"><span id="bulk-selected-count" style="color: var(--primary-text); font-size: 18px;">0</span> Selected</div>
       <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
       <div style="display: flex; gap: 16px; align-items: center;">
           <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt" checked> RJ T-Shirt</label>
@@ -1878,7 +1920,7 @@
       
       <div style="background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px;">
           <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Dates Requested</div>
-          <div style="font-weight: 700; color: var(--primary); font-size: 14px; margin-bottom: 12px;" id="leave-review-dates">--</div>
+          <div style="font-weight: 700; color: var(--primary-text); font-size: 14px; margin-bottom: 12px;" id="leave-review-dates">--</div>
           
           <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Reason / Title</div>
           <div style="font-weight: 600; color: var(--text-main); font-size: 14px; margin-bottom: 12px;" id="leave-review-title">--</div>
@@ -1998,7 +2040,7 @@
           <div style="display: flex; align-items: center; gap: 16px;">
               <img src="logo.png" alt="RJ Mobile Logo" style="height: 48px; width: 48px; object-fit: contain;">
               <div>
-                  <h2 style="margin: 0; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800;">RJ Mobile</h2>
+                  <h2 style="margin: 0; color: #0f172a; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px; font-weight: 800;">RJ Mobile</h2>
                   <div style="color: #64748b; font-weight: 600; margin-top: 4px; font-size: 13px;">Salary Slip - <span id="slip-month">Month Year</span></div>
               </div>
           </div>
@@ -2145,7 +2187,7 @@
       <div class="drawer-header">
           <div>
               <div id="drawer-avatar" class="drawer-avatar">👤</div>
-              <h2 id="drawer-name" style="color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px;">Name</h2>
+              <h2 id="drawer-name" style="color: var(--text-main); font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px;">Name</h2>
               <div id="drawer-role" class="role-tag" style="margin-top: 8px;">Role</div>
           </div>
           <button class="drawer-close" onclick="window.closeStaffProfile()">&times;</button>
@@ -2170,7 +2212,7 @@
               <div class="drawer-stat-box"><div class="drawer-stat-val" id="drawer-stat-lates" style="color: var(--warning);">0</div><div class="drawer-stat-lbl">Lates</div></div>
           </div>
           <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-              <div class="drawer-stat-box"><div class="drawer-stat-val" id="drawer-stat-hours" style="color: var(--primary);">0h</div><div class="drawer-stat-lbl">Total Work</div></div>
+              <div class="drawer-stat-box"><div class="drawer-stat-val" id="drawer-stat-hours" style="color: var(--primary-text);">0h</div><div class="drawer-stat-lbl">Total Work</div></div>
               <div class="drawer-stat-box"><div class="drawer-stat-val" id="drawer-stat-absent" style="color: var(--danger);">0</div><div class="drawer-stat-lbl">Missed</div></div>
           </div>
 
@@ -2180,7 +2222,7 @@
   </div>
   
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm';
 
     const SUPABASE_URL = 'https://rezumapzlsjnkitxvsul.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlenVtYXB6bHNqbmtpdHh2c3VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTY2NjUsImV4cCI6MjA5OTkzMjY2NX0.IVUZVjZUuiM9qTcKAIIxJth_zSIGJUWTaubUV4Fy0_Y';
@@ -2265,7 +2307,7 @@
             
             // Time color changed from white to --primary accent color so it stands out cleanly from the header title
             const timeWidth = window.use12HourTime ? '90px' : '70px';
-            clockEl.innerHTML = `<span style="display: inline-block; min-width: ${timeWidth}; color: var(--primary); font-weight: 800; font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums;">${timeStr}</span> <span style="color: var(--text-soft); font-weight: 600;">• ${dateStr}</span>`;
+            clockEl.innerHTML = `<span style="display: inline-block; min-width: ${timeWidth}; color: var(--primary-text); font-weight: 800; font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums;">${timeStr}</span> <span style="color: var(--text-soft); font-weight: 600;">• ${dateStr}</span>`;
         }
     }, 1000);
 
@@ -2459,7 +2501,7 @@
     
     window.myCharts = {};
     Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--text-soft').trim() || '#a1a1aa';
-    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.family = "'Manrope', sans-serif";
 
     // Spotlight Hover Tracker
     document.addEventListener('mousemove', (e) => {
@@ -2577,7 +2619,7 @@
 
     function getAvatarHtml(name, profilePic, size = 40) {
         const initials = name ? name.substring(0,2).toUpperCase() : 'RJ';
-        const colors = ['#f43f5e', '#a855f7', '#0ea5e9', '#10b981', '#f59e0b'];
+        const colors = ['#f43f5e', '#e6c35a', '#0ea5e9', '#10b981', '#f59e0b'];
         const color = colors[(name || '').length % colors.length];
         
         if (profilePic) {
@@ -2710,6 +2752,11 @@
     };
 
     window.safeHTML = (str) => typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(str) : str;
+    // HTML-escape for text shown in innerHTML, and a safe JS string literal for inline onclick="" arguments
+    window.__esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    window.__jsArg = (v) => window.__esc(JSON.stringify(String(v ?? '')));
+    // Old versions saved the new-staff password in plain text as a "draft" - wipe it
+    try { localStorage.removeItem('draft_new-staff-pass'); } catch (e) {}
 
     // --- PROMISE-BASED CUSTOM CONFIRM MODAL ---
     window.customConfirm = function(msg) {
@@ -2789,7 +2836,7 @@
                 themeBtn.innerHTML = isLight() ? '🌙 Dark' : '☀️ Light';
                 themeBtn.title = isLight() ? 'Switch to dark theme' : 'Switch to light theme';
             }
-            if (fpThemeLink) fpThemeLink.href = `https://npmcdn.com/flatpickr/dist/themes/${isLight() ? 'light' : 'dark'}.css`;
+            if (fpThemeLink) fpThemeLink.href = `https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/${isLight() ? 'light' : 'dark'}.css`;
         };
         syncThemeUI();
 
@@ -3229,7 +3276,7 @@
             if (lType === 'Late Arrival') typeBadge = `<span class="badge bg-orange" style="margin-right: 8px; font-size: 10px;">Late</span>`;
             else if (lType === 'Early Departure') typeBadge = `<span class="badge" style="background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); margin-right: 8px; font-size: 10px;">Early</span>`;
 
-            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', '${lv.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}', '${lType}', '${lv.expected_time || ''}')">
+            return `<tr style="cursor: pointer;" onclick="window.openLeaveModal('${lv.id}', ${window.__jsArg(lv.employee_name)}, '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${lv.status}', '${lv.end_date}', '${lType}', '${lv.expected_time || ''}')">
                 <td style="color:var(--text-soft)">${submitDate}</td>
                 <td>
                   <div style="display: flex; align-items: center; gap: 10px;">
@@ -3238,7 +3285,7 @@
                   </div>
                 </td>
                 <td style="font-weight: 600;">${sDate} - ${eDate}</td>
-                <td>${typeBadge}<strong style="color: var(--primary);">${lv.reason_title}</strong></td>
+                <td>${typeBadge}<strong style="color: var(--primary-text);">${lv.reason_title}</strong></td>
                 <td>${statusBadge}</td>
             </tr>`;
         }).join('');
@@ -3623,7 +3670,7 @@
             allowInput: true, disableMobile: true, ...opts
         });
     };
-    ['manual-time', 'new-staff-start', 'new-staff-end', 'edit-staff-start', 'edit-staff-end'].forEach(id => initTimePicker(id));
+    ['manual-time', 'new-staff-start', 'new-staff-end', 'edit-staff-start', 'edit-staff-end', 'new-role-start', 'new-role-end', 'edit-role-start', 'edit-role-end', 'global-shift-start', 'global-shift-end'].forEach(id => initTimePicker(id));
     
     document.getElementById('filter-in-start')?.addEventListener('change', processStitchedData);
     document.getElementById('filter-in-end')?.addEventListener('change', processStitchedData);
@@ -3735,8 +3782,8 @@
           }
       } catch (e) { console.error(e); }
       
-      if(document.getElementById('global-shift-start')) document.getElementById('global-shift-start').value = globalShiftStart;
-      if(document.getElementById('global-shift-end')) document.getElementById('global-shift-end').value = globalShiftEnd;
+      if(document.getElementById('global-shift-start')) window.__fpSet('global-shift-start', globalShiftStart);
+      if(document.getElementById('global-shift-end')) window.__fpSet('global-shift-end', globalShiftEnd);
       
       try {
           const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
@@ -3820,7 +3867,7 @@
     }
 
     function populateReasonDropdowns() {
-        const opts = dbReasons.map(r => `<option value="${r.id}">${r.reason_name}</option>`).join('') + '<option value="Custom" style="font-weight:bold; color:var(--primary);">-- Type Custom Reason --</option>';
+        const opts = dbReasons.map(r => `<option value="${r.id}">${r.reason_name}</option>`).join('') + '<option value="Custom" style="font-weight:bold; color: var(--primary-text);">-- Type Custom Reason --</option>';
         const schedReason = document.getElementById('sched-reason');
         const excReason = document.getElementById('exc-reason');
         if(schedReason) schedReason.innerHTML = opts;
@@ -3981,7 +4028,7 @@
           if (filterBtn) {
               if (filtersActive) {
                   filterBtn.style.borderColor = 'var(--primary)';
-                  filterBtn.style.color = 'var(--primary)';
+                  filterBtn.style.color = 'var(--primary-text)';
                   filterBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg> Filters Active <span style="display:inline-block; width:8px; height:8px; background:var(--primary); border-radius:50%; margin-left:4px;"></span>`;
               } else {
                   filterBtn.style.removeProperty('border-color');
@@ -4426,7 +4473,7 @@
               badgeContainer.style.display = 'none'; 
               // Gamification: Perfect Day Confetti!
               if (totalPresent > 0 && totalLate === 0 && totalMissing === 0 && totalEarlyDepartures === 0 && document.getElementById('view-dashboard').style.display !== 'none') {
-                  setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#10b981', '#6366f1', '#ffffff'] }), 500);
+                  setTimeout(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#10b981', '#d4af37', '#ffffff'] }), 500);
               }
           }
       }
@@ -4520,7 +4567,7 @@
                 <tr>
                     <td><div style="font-weight: bold; color: var(--text-main); font-size: 14px; margin-bottom: 4px;">${displayTime}</div><div style="font-size: 12px; color: var(--text-soft);">${displayDate}</div></td>
                     <td>
-                        <strong style="color: var(--primary); font-size: 14px;">${log.staff_name || 'Unknown'}</strong>
+                        <strong style="color: var(--primary-text); font-size: 14px;">${log.staff_name || 'Unknown'}</strong>
                     </td>
                     <td>
                         <div style="font-weight: 700; color: var(--text-main); font-size: 14px;">${window.safeHTML(log.customer_name)}</div>
@@ -4602,7 +4649,7 @@
               tbody.innerHTML = `<tr><td colspan="8">
                   <div class="empty-state">
                       <div class="empty-state-icon">${isStaffEmpty ? '👥' : '📭'}</div>
-                      <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">${isStaffEmpty ? 'No Staff Found' : 'No Logs Found'}</h3>
+                      <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Bricolage Grotesque', sans-serif;">${isStaffEmpty ? 'No Staff Found' : 'No Logs Found'}</h3>
                       <p style="margin-bottom: 16px;">${isStaffEmpty ? 'Your workspace is empty. Add your team to start tracking.' : 'Try adjusting your date range or staff filters to see results.'}</p>
                       ${isStaffEmpty 
                           ? `<button class="btn-primary" onclick="document.querySelector('.tab-btn[data-view=\\'view-settings-hr\\']').click()">+ Add First Staff Member</button>`
@@ -4707,7 +4754,7 @@
                   <span style="color:var(--text-soft)">Out:</span> <strong>${outStr}</strong>
               </td>
               <td>
-                  <span style="font-weight:700; color:var(--primary); font-size:16px;">${row.formattedHours}</span><br>
+                  <span style="font-weight:700; color: var(--primary-text); font-size:16px;">${row.formattedHours}</span><br>
                   <div style="font-size:11px; color:var(--text-soft); font-weight:600; margin-top:4px;">
                     W: <span style="color:var(--success)">${row.formattedWork}</span> | T: <span style="color:var(--warning)">${row.formattedTravel}</span>
                   </div>
@@ -4766,7 +4813,7 @@
               tbody.innerHTML = `<tr><td colspan="5">
                   <div class="empty-state">
                       <div class="empty-state-icon">📭</div>
-                      <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">No Individual Punches Found</h3>
+                      <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Bricolage Grotesque', sans-serif;">No Individual Punches Found</h3>
                       <p style="margin-bottom: 16px;">Try adjusting your date range or staff filters.</p>
                   </div>
               </td></tr>`; 
@@ -4815,7 +4862,7 @@
               else if(log.action === 'Transit End') actionBadge = `<span class="badge bg-blue" style="font-size: 13px;">📍 TRANSIT END</span>`;
 
               let mapLinkHtml = (log.latitude && log.longitude)
-                  ? `<div style="color: var(--primary); font-size: 11px; margin-top: 6px; font-weight: 600;">📍 GPS Logged</div>`
+                  ? `<div style="color: var(--primary-text); font-size: 11px; margin-top: 6px; font-weight: 600;">📍 GPS Logged</div>`
                   : `<div style="color: var(--text-soft); font-size: 11px; margin-top: 6px;">No GPS Coordinates</div>`;
 
               let photoHtml = '';
@@ -4978,7 +5025,7 @@
                     <img src="${imgSrc}" class="live-staff-img" alt="Photo">
                     <div class="live-staff-info">
                         <div class="live-staff-name">${displayName}</div>
-                        <div style="font-size: 12px; color: var(--primary); font-weight: 600; text-transform: uppercase;">${role}</div>
+                        <div style="font-size: 12px; color: var(--primary-text); font-weight: 600; text-transform: uppercase;">${role}</div>
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">${timeLabel}</div>
@@ -5051,16 +5098,37 @@
             return showToast("Date and Time are required!", "error");
         }
 
+        // Validate the final timestamp BEFORE touching the DB
+        const tsDate = new Date(`${dateVal}T${timeVal}:00`);
+        if (isNaN(tsDate.getTime())) {
+            return showToast("Invalid date or time!", "error");
+        }
+        if (tsDate.getTime() > Date.now()) {
+            return showToast("Future time is not allowed. Pick the current time or earlier.", "error");
+        }
+
         const btn = document.getElementById('btn-save-manual');
         btn.innerText = "Saving..."; btn.disabled = true;
 
         try {
-            const timestampIso = new Date(`${dateVal}T${timeVal}:00`).toISOString();
+            const timestampIso = tsDate.toISOString();
             const staffObj = staffMap[staffId];
             const branchObj = branchMap[branchIdVal];
             const branchName = branchObj ? branchObj.branch_name : 'Manual Entry';
 
-            await supabaseClient.from('attendance_logs').insert([{
+            // Duplicate guard: same staff + same action within +-1 minute
+            const winStart = new Date(tsDate.getTime() - 60000).toISOString();
+            const winEnd = new Date(tsDate.getTime() + 60000).toISOString();
+            const { data: dupRows, error: dupErr } = await supabaseClient.from('attendance_logs')
+                .select('id').eq('staff_id', staffId).eq('action', actionVal)
+                .gte('timestamp', winStart).lte('timestamp', winEnd).limit(1);
+            if (dupErr) throw dupErr;
+            if (dupRows && dupRows.length) {
+                showToast(`${actionVal} already exists for this staff at this time!`, "warning");
+                return;
+            }
+
+            const { error: insErr } = await supabaseClient.from('attendance_logs').insert([{
                 staff_id: staffId,
                 employee_name: staffObj?.name || 'Unknown',
                 action: actionVal,
@@ -5071,12 +5139,14 @@
                 uniform_tshirt: tshirtVal,
                 uniform_idcard: idcardVal
             }]);
+            if (insErr) throw insErr;
 
             window.closeModal(document.getElementById('manual-entry-modal'));
             showToast("Manual log inserted successfully!", "success");
             fetchLogsFromDatabase(false); // Hard refresh to guarantee UI updates
         } catch (e) {
-            showToast("Failed to create entry", "error");
+            console.error(e);
+            showToast("Failed to create entry: " + (e?.message || "unknown error"), "error");
         } finally {
             btn.innerText = "Create Entry"; btn.disabled = false;
         }
@@ -5793,7 +5863,7 @@
                 <td style="font-size:16px; font-weight:700; color:var(--success); text-align: center;">${s.daysPresent}</td>
                 <td style="font-size:16px; font-weight:700; color:var(--danger); text-align: center;">${s.daysAbsent}</td>
                 <td><span style="font-size:12px; color:var(--text-soft)"><span style="color:var(--text-soft)">In:</span> <strong style="color: var(--text-main);">${avgIn}</strong><br><span style="color:var(--text-soft)">Out:</span> <strong style="color: var(--text-main);">${avgOut}</strong></span></td>
-                <td style="font-size:16px; font-weight:700; color:var(--primary); text-align: center;">${formattedTotal}</td>
+                <td style="font-size:16px; font-weight:700; color: var(--primary-text); text-align: center;">${formattedTotal}</td>
                 <td>
                   <span style="font-size:12px; color:var(--text-soft); font-weight:600;">
                     Work: <span style="color:var(--success)">${formattedWork}</span><br>
@@ -5942,7 +6012,7 @@
                 <td>
                   <strong style="color: var(--text-main); font-size: 14px;">${b.branch_name}</strong>
                 </td>
-                <td><span style="font-weight: 700; color: var(--primary); font-size: 14px;">${openCount}</span> <span style="color: var(--text-soft); font-size: 12px;">days</span></td>
+                <td><span style="font-weight: 700; color: var(--primary-text); font-size: 14px;">${openCount}</span> <span style="color: var(--text-soft); font-size: 12px;">days</span></td>
                 <td>
                     <div style="color:var(--success); font-weight:bold; font-size: 14px;">${avgOpen}</div>
                     <div style="font-size:11px; color:var(--text-soft); margin-top: 4px;">Latest: <span style="color:var(--text-main); font-weight:600;">${latestOpenStr}</span></div>
@@ -6060,7 +6130,7 @@
                 options: { 
                     maintainAspectRatio: false, 
                     interaction: { mode: 'index', intersect: false },
-                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)', titleFont: { size: 13 }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 8, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }, tooltip: { backgroundColor: 'rgba(18, 18, 18, 0.96)', titleFont: { size: 13 }, bodyFont: { size: 13 }, padding: 12, cornerRadius: 8, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
                     scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false } } }
                 }
             });
@@ -6082,7 +6152,7 @@
                 data: { labels: ['> 1 Hr Early', '0-1 Hr Early', 'Late (Unexcused)'], 
                         datasets: [{ data: [earlyOver1Hr, earlyWithin1Hr, lateArr], backgroundColor: [primary, success, danger], borderWidth: 2, borderColor: 'var(--card-bg)', hoverOffset: 4 }]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)', padding: 12, cornerRadius: 8 } }, cutout: '75%' }
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }, tooltip: { backgroundColor: 'rgba(18, 18, 18, 0.96)', padding: 12, cornerRadius: 8 } }, cutout: '75%' }
             });
         }
 
@@ -6116,7 +6186,7 @@
                     plugins: { 
                         legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }, 
                         tooltip: { 
-                            backgroundColor: 'rgba(24, 24, 27, 0.9)', 
+                            backgroundColor: 'rgba(18, 18, 18, 0.96)', 
                             padding: 12, 
                             cornerRadius: 8,
                             callbacks: {
@@ -6140,9 +6210,9 @@
             window.myCharts['role'] = new Chart(roleCanvas, {
                 type: 'pie',
                 data: { labels: Object.keys(roleCounts), 
-                        datasets: [{ data: Object.values(roleCounts), backgroundColor: [primary, success, warning, '#8b5cf6', '#ec4899', '#14b8a6'], borderWidth: 2, borderColor: 'var(--card-bg)', hoverOffset: 4 }]
+                        datasets: [{ data: Object.values(roleCounts), backgroundColor: [primary, success, warning, '#60a5fa', '#ec4899', '#14b8a6'], borderWidth: 2, borderColor: 'var(--card-bg)', hoverOffset: 4 }]
                 },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } }, tooltip: { backgroundColor: 'rgba(24, 24, 27, 0.9)', padding: 12, cornerRadius: 8 } } }
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } }, tooltip: { backgroundColor: 'rgba(18, 18, 18, 0.96)', padding: 12, cornerRadius: 8 } } }
             });
         }
 
@@ -6174,7 +6244,7 @@
                     datasets: [{ 
                         data: branchDataCounts, 
                         // Multiple attractive colors for different branches
-                        backgroundColor: [primary, success, warning, danger, '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#0ea5e9'], 
+                        backgroundColor: [primary, success, warning, danger, '#60a5fa', '#ec4899', '#14b8a6', '#f43f5e', '#0ea5e9'], 
                         borderWidth: 2, 
                         borderColor: 'var(--card-bg)', 
                         hoverOffset: 4 
@@ -6186,7 +6256,7 @@
                         // Legend right me dikhega jaise Role chart me dikhta hai
                         legend: { position: 'right', labels: { usePointStyle: true, padding: 15 } }, 
                         tooltip: { 
-                            backgroundColor: 'rgba(24, 24, 27, 0.9)', 
+                            backgroundColor: 'rgba(18, 18, 18, 0.96)', 
                             padding: 12, 
                             cornerRadius: 8 
                         } 
@@ -6352,7 +6422,7 @@
             const avatar = getAvatarHtml(row.name, staffObj?.profile_pic, 36);
 
             let rowOnClick = "";
-            let actionTd = `<a class="action-link" onclick="openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${currentActionType}')">Manage Reason</a>`;
+            let actionTd = `<a class="action-link" onclick="openExceptionModal('${row.staffId}', ${window.__jsArg(row.name)}, '${isoDate}', '${currentActionType}')">Manage Reason</a>`;
 
             if (currentActionTab === 'active-leaves') {
                 // Link request with matching exceptions for deep modal view
@@ -6372,11 +6442,11 @@
                     const lType = matchingRequest.leave_type || 'Absent';
                     const eTime = matchingRequest.expected_time || '';
 
-                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', '${matchingRequest.employee_name.replace(/'/g, "\\'")}', '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}', '${lType}', '${eTime}')" style="cursor:pointer;"`;
+                    rowOnClick = `onclick="window.openLeaveModal('${matchingRequest.id}', ${window.__jsArg(matchingRequest.employee_name)}, '${sDate} to ${eDate}', '${safeTitle}', '${safeDesc}', '${matchingRequest.status}', '${matchingRequest.end_date}', '${lType}', '${eTime}')" style="cursor:pointer;"`;
                     actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to view details</span>`;
                 } else {
                     // Fallback for manually generated exceptions outside of requests
-                    rowOnClick = `onclick="window.openExceptionModal('${row.staffId}', '${row.name.replace(/'/g, "\\'")}', '${isoDate}', '${currentActionType}')" style="cursor:pointer;"`;
+                    rowOnClick = `onclick="window.openExceptionModal('${row.staffId}', ${window.__jsArg(row.name)}, '${isoDate}', '${currentActionType}')" style="cursor:pointer;"`;
                     actionTd = `<span style="color:var(--text-soft); font-size: 12px;">Click row to edit</span>`;
                 }
             }
@@ -6909,13 +6979,13 @@
               const en = formatTime(r.shift_end);
               return `<tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <strong style="color: var(--text-main);">${r.role_name}</strong><br>
+                <strong style="color: var(--text-main);">${window.__esc(r.role_name)}</strong><br>
                 <span style="font-size:12px; color:var(--text-soft); font-weight: 600;">
                   ${st ? `${st} - ${en}` : 'Using Global Default'}
                 </span>
               </td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditRole('${r.id}', '${r.role_name.replace(/'/g, "\\'")}', '${st}', '${en}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditRole(${window.__jsArg(r.id)}, ${window.__jsArg(r.role_name)}, ${window.__jsArg(st)}, ${window.__jsArg(en)})">Edit</button>
                 <button class="del-btn" onclick="window.deleteRoleItem('${r.id}', this)">Remove</button>
               </td>
           </tr>`}).join('');
@@ -6924,9 +6994,9 @@
       const reasonTbody = document.getElementById('reason-settings-list');
       if (reasonTbody) {
           reasonTbody.innerHTML = reasonArr.map(r => `<tr>
-              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${r.reason_name}</strong></td>
+              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${window.__esc(r.reason_name)}</strong></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditReason('${r.id}', '${r.reason_name.replace(/'/g, "\\'")}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditReason(${window.__jsArg(r.id)}, ${window.__jsArg(r.reason_name)})">Edit</button>
                 <button class="del-btn" onclick="window.deleteReasonItem('${r.id}')">Remove</button>
               </td>
           </tr>`).join('');
@@ -6944,15 +7014,15 @@
                 <div style="display: flex; align-items: center; gap: 12px;">
                     ${avatar}
                     <div>
-                        <strong style="color: var(--text-main);">${s.name}</strong><br>
-                        <span class="role-tag">${roleName}</span><br>
-                        <span style="font-size:11px; color:var(--text-soft);">${s.email || 'No Email'} • ${s.phone_number || 'N/A'}</span>
+                        <strong style="color: var(--text-main);">${window.__esc(s.name)}</strong><br>
+                        <span class="role-tag">${window.__esc(roleName)}</span><br>
+                        <span style="font-size:11px; color:var(--text-soft);">${window.__esc(s.email || 'No Email')} • ${window.__esc(s.phone_number || 'N/A')}</span>
                     </div>
                 </div>
               </td>
               <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
               <td style="text-align:right; white-space:nowrap;">
-                <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditStaff(${window.__jsArg(s.id)}, ${window.__jsArg(s.name)}, ${window.__jsArg(s.role_id || '')}, ${window.__jsArg(st)}, ${window.__jsArg(en)}, ${window.__jsArg(s.email || '')}, '', ${window.__jsArg(s.default_branch_id || '')}, ${window.__jsArg(s.dob || '')}, ${window.__jsArg(s.joining_date || '')}, ${window.__jsArg(s.phone_number || '')}, ${window.__jsArg(s.base_salary || '')})">Edit</button>
                 <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
               </td>
           </tr>`}).join('');
@@ -6961,10 +7031,10 @@
       const branchTbody = document.getElementById('branch-settings-list');
       if (branchTbody) {
           branchTbody.innerHTML = branchArr.map(b => `<tr>
-              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${b.branch_name}</strong></td>
+              <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><strong style="color: var(--text-main);">${window.__esc(b.branch_name)}</strong></td>
               <td style="padding: 12px 16px; border-bottom: 1px solid var(--card-border);"><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">Lat: ${b.latitude || 'N/A'}<br>Lng: ${b.longitude || 'N/A'}<br>Radius: ${b.radius_meters || 100}m</span></td>
               <td style="text-align:right; white-space:nowrap; padding: 12px 16px; border-bottom: 1px solid var(--card-border);">
-                <button class="edit-btn" onclick="window.openEditBranch('${b.id}', '${b.branch_name.replace(/'/g, "\\'")}', '${b.latitude || ''}', '${b.longitude || ''}', '${b.radius_meters || 100}')">Edit</button>
+                <button class="edit-btn" onclick="window.openEditBranch(${window.__jsArg(b.id)}, ${window.__jsArg(b.branch_name)}, ${window.__jsArg(b.latitude || '')}, ${window.__jsArg(b.longitude || '')}, ${window.__jsArg(b.radius_meters || 100)})">Edit</button>
                 <button class="del-btn" onclick="window.deleteBranchItem('${b.id}')">Remove</button>
               </td>
           </tr>`).join('');
@@ -7012,8 +7082,8 @@
               role_name: roleName, shift_start: startVal, shift_end: endVal 
           }]);
           document.getElementById('new-role-name').value = '';
-          document.getElementById('new-role-start').value = '';
-          document.getElementById('new-role-end').value = '';
+          window.__fpSet('new-role-start', '');
+          window.__fpSet('new-role-end', '');
           await initialMetadataLoad(); 
           loadSettingsData();
           showToast("Role created successfully", "success");
@@ -7025,8 +7095,8 @@
     window.openEditRole = (id, currentName, start, end) => {
       document.getElementById('edit-role-id').value = id;
       document.getElementById('edit-role-name').value = currentName;
-      document.getElementById('edit-role-start').value = start || '';
-      document.getElementById('edit-role-end').value = end || '';
+      window.__fpSet('edit-role-start', start);
+      window.__fpSet('edit-role-end', end);
       document.getElementById('edit-role-modal').style.display = 'flex';
     };
     
@@ -7898,7 +7968,7 @@
         const countdownEl = document.getElementById('admin-next-bday-countdown');
         if (nextBday.daysLeft === 0) {
             countdownEl.innerText = "It's Today! 🎂🎉";
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#10b981', '#f59e0b'] });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#d4af37', '#10b981', '#f59e0b'] });
         } else if (nextBday.daysLeft === 1) {
             countdownEl.innerText = "Tomorrow!";
         } else {
@@ -8210,7 +8280,7 @@
               <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${saveText}</kbd></span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span style="color: var(--primary); font-weight: bold;">Load Saved Filter View</span>
+              <span style="color: var(--primary-text); font-weight: bold;">Load Saved Filter View</span>
               <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${loadText}</kbd></span>
             </div>
             
@@ -9069,7 +9139,7 @@
 
     // --- MODAL DRAFT CACHING ---
     document.addEventListener('DOMContentLoaded', () => {
-        const staffInputs = ['new-staff-name', 'new-staff-role', 'new-staff-email', 'new-staff-pass', 'new-staff-start', 'new-staff-end', 'new-staff-dob'];
+        const staffInputs = ['new-staff-name', 'new-staff-role', 'new-staff-email', 'new-staff-start', 'new-staff-end', 'new-staff-dob'];
         const roleInputs = ['new-role-name', 'new-role-start', 'new-role-end'];
         const manualInputs = ['manual-date', 'manual-time', 'manual-staff', 'manual-action', 'manual-branch'];
         const allDraftInputs = [...staffInputs, ...roleInputs, ...manualInputs];
@@ -9276,7 +9346,7 @@
                 </td>
                 <td><span style="font-size:12px; color:var(--text-soft); font-weight: 600;">${st ? `${st} - ${en}` : 'Using Role/Global Default'}</span></td>
                 <td style="text-align:right; white-space:nowrap;">
-                  <button class="edit-btn" onclick="window.openEditStaff('${s.id}', '${s.name.replace(/'/g, "\\'")}', '${s.role_id || ''}', '${st}', '${en}', '${s.email || ''}', '', '${s.default_branch_id || ''}', '${s.dob || ''}', '${s.joining_date || ''}', '${s.phone_number || ''}', '${s.base_salary || ''}')">Edit</button>
+                  <button class="edit-btn" onclick="window.openEditStaff(${window.__jsArg(s.id)}, ${window.__jsArg(s.name)}, ${window.__jsArg(s.role_id || '')}, ${window.__jsArg(st)}, ${window.__jsArg(en)}, ${window.__jsArg(s.email || '')}, '', ${window.__jsArg(s.default_branch_id || '')}, ${window.__jsArg(s.dob || '')}, ${window.__jsArg(s.joining_date || '')}, ${window.__jsArg(s.phone_number || '')}, ${window.__jsArg(s.base_salary || '')})">Edit</button>
                   <button class="del-btn" onclick="window.deleteStaffItem('${s.id}')">Remove</button>
                 </td>
             </tr>`}).join('');
@@ -9432,7 +9502,7 @@
                 if (p.status === 'Paid') {
                     const dateStr = p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-GB', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
                     statusHtml = `<span class="badge bg-green">🟢 Paid</span>${dateStr ? `<br><span style="font-size:10px; color:var(--text-soft); font-weight:600;">on ${dateStr}</span>` : ''}`;
-                    actionHtml = `<button class="btn-secondary" style="padding:4px 8px; font-size:12px; border-color:var(--primary); color:var(--primary);" onclick="window.openPayslip('${p.staff_id}')">📄 Payslip</button>`;
+                    actionHtml = `<button class="btn-secondary" style="padding:4px 8px; font-size:12px; border-color:var(--primary); color: var(--primary-text);" onclick="window.openPayslip('${p.staff_id}')">📄 Payslip</button>`;
                 }
 
                 return `<tr>
