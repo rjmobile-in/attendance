@@ -3769,84 +3769,93 @@
         }
     });
 
+    // Fetch the 6 metadata tables IN PARALLEL (was: 6 sequential round-trips)
+    async function fetchMetadataTables() {
+      const todayIso = toLocalISO(new Date());
+      const safe = async (q) => { try { const r = await q; return r.data; } catch (e) { console.error(e); return null; } };
+      const [shiftRow, roleData, reasonData, rosterData, staffData, branchesData] = await Promise.all([
+        safe(supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').single()),
+        safe(supabaseClient.from('roles_directory').select('*').order('role_name')),
+        safe(supabaseClient.from('leave_reasons').select('*').order('reason_name')),
+        safe(supabaseClient.from('staff_roster').select('*').gte('date', todayIso)),
+        safe(supabaseClient.from('staff_directory').select('*').order('name')),
+        safe(supabaseClient.from('branches_directory').select('*').order('branch_name'))
+      ]);
+
+      if (shiftRow && shiftRow.setting_value) {
+          globalShiftStart = shiftRow.setting_value.start || "10:00";
+          globalShiftEnd = shiftRow.setting_value.end || "19:00";
+      }
+      if (document.getElementById('global-shift-start')) window.__fpSet('global-shift-start', globalShiftStart);
+      if (document.getElementById('global-shift-end')) window.__fpSet('global-shift-end', globalShiftEnd);
+
+      dbRoles = roleData || [];      roleMap = {};   dbRoles.forEach(r => roleMap[r.id] = r);
+      dbReasons = reasonData || [];  reasonMap = {}; dbReasons.forEach(r => reasonMap[r.id] = r);
+      dbRoster = rosterData || [];   rosterMap = {}; dbRoster.forEach(r => rosterMap[`${r.staff_id}_${r.date}`] = r);
+      dbStaff = staffData || [];     staffMap = {};  dbStaff.forEach(s => staffMap[s.id] = s);
+      dbBranches = branchesData || []; branchMap = {}; dbBranches.forEach(b => branchMap[b.id] = b);
+    }
+
+    function repopulateMetadataUI() {
+      populateReasonDropdowns();
+      populateRoleDropdowns();
+      populateBranchDropdowns();
+      const opts = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      const schedSelect = document.getElementById('sched-staff');
+      if (schedSelect) schedSelect.innerHTML = opts;
+      const manualSelect = document.getElementById('manual-staff');
+      if (manualSelect) manualSelect.innerHTML = opts;
+      renderStaffFilterCheckboxes();
+      renderBranchFilterCheckboxes();
+      renderRoleFilterCheckboxes();
+    }
+
     async function initialMetadataLoad() {
       const loaderMsg = document.getElementById('loader-msg');
-      if(loaderMsg) loaderMsg.innerText = "Loading Metadata & Purging Photos...";
-      await executeLazyPhotoDelete();
+      if(loaderMsg) loaderMsg.innerText = "Loading Metadata...";
+      // Photo purge is housekeeping - don't make the user wait for it
+      executeLazyPhotoDelete();
 
-      try {
-          const { data } = await supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').single();
-          if (data && data.setting_value) {
-              globalShiftStart = data.setting_value.start || "10:00";
-              globalShiftEnd = data.setting_value.end || "19:00";
-          }
-      } catch (e) { console.error(e); }
-      
-      if(document.getElementById('global-shift-start')) window.__fpSet('global-shift-start', globalShiftStart);
-      if(document.getElementById('global-shift-end')) window.__fpSet('global-shift-end', globalShiftEnd);
-      
-      try {
-          const { data: roleData } = await supabaseClient.from('roles_directory').select('*').order('role_name');
-          dbRoles = roleData || [];
-          roleMap = {};
-          dbRoles.forEach(r => roleMap[r.id] = r);
-      } catch (err) { console.error(err); }
-
-      try {
-          const { data: reasonData } = await supabaseClient.from('leave_reasons').select('*').order('reason_name');
-          dbReasons = reasonData || [];
-          reasonMap = {};
-          dbReasons.forEach(r => reasonMap[r.id] = r);
-      } catch (err) { console.error(err); }
-      populateReasonDropdowns();
-
-      try {
-          const todayIso = toLocalISO(new Date());
-          const { data: rosterData } = await supabaseClient.from('staff_roster').select('*').gte('date', todayIso);
-          dbRoster = rosterData || [];
-          rosterMap = {};
-          dbRoster.forEach(r => rosterMap[`${r.staff_id}_${r.date}`] = r);
-      } catch (err) { console.error(err); }
-
-      try {
-          const { data: staffData } = await supabaseClient.from('staff_directory').select('*').order('name');
-          dbStaff = staffData || [];
-          staffMap = {};
-          dbStaff.forEach(s => staffMap[s.id] = s);
-      } catch (err) { console.error(err); }
-      
-      try {
-          const { data: branchesData } = await supabaseClient.from('branches_directory').select('*').order('branch_name');
-          dbBranches = branchesData || [];
-          branchMap = {};
-          dbBranches.forEach(b => branchMap[b.id] = b);
-      } catch (err) { console.error(err); }
+      await fetchMetadataTables();
 
       const uParams = new URLSearchParams(window.location.search);
       selectedStaffIds = uParams.get('staff') ? new Set(uParams.get('staff').split(',')) : new Set(dbStaff.map(s => s.id));
       selectedBranchIds = uParams.get('branches') ? new Set(uParams.get('branches').split(',')) : new Set(dbBranches.map(b => b.id));
       selectedRoleIds = uParams.get('roles') ? new Set(uParams.get('roles').split(',')) : new Set(dbRoles.map(r => r.id));
-      
-      populateRoleDropdowns(); 
-      populateBranchDropdowns(); 
-      
-      const schedSelect = document.getElementById('sched-staff');
-      if (schedSelect) schedSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-      const manualSelect = document.getElementById('manual-staff');
-      if (manualSelect) manualSelect.innerHTML = dbStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
-      renderStaffFilterCheckboxes();
-      renderBranchFilterCheckboxes();
-      renderRoleFilterCheckboxes();
-
-      // Legacy sync variables removed
+      repopulateMetadataUI();
 
       // Populate Settings Tables on direct page refresh
       if (typeof loadSettingsData === 'function') loadSettingsData();
 
       await fetchLogsFromDatabase();
     }
-    
+
+    // LIGHTWEIGHT reload used after Settings add/edit/delete.
+    // Only re-reads the small directory tables (parallel), keeps the user's filters,
+    // and re-renders from memory. Does NOT re-download attendance logs / leaves / exceptions.
+    async function reloadMetadata() {
+      const prevStaff = new Set(dbStaff.map(s => s.id));
+      const prevBranch = new Set(dbBranches.map(b => b.id));
+      const prevRole = new Set(dbRoles.map(r => r.id));
+
+      await fetchMetadataTables();
+
+      // Keep existing filter choices: drop deleted ids, auto-select newly created ones
+      const sync = (sel, prev, list) => {
+          const cur = new Set(list.map(x => x.id));
+          Array.from(sel).forEach(id => { if (!cur.has(id)) sel.delete(id); });
+          list.forEach(x => { if (!prev.has(x.id)) sel.add(x.id); });
+      };
+      sync(selectedStaffIds, prevStaff, dbStaff);
+      sync(selectedBranchIds, prevBranch, dbBranches);
+      sync(selectedRoleIds, prevRole, dbRoles);
+
+      repopulateMetadataUI();
+      if (typeof loadSettingsData === 'function') loadSettingsData();
+      processStitchedData(); // pure in-memory re-render (names/roles/shifts changed)
+    }
+
     function populateRoleDropdowns() {
         const opts = '<option value="">-- Select Role --</option>' + dbRoles.map(r => `<option value="${r.id}">${r.role_name}</option>`).join('');
         const newStaffRole = document.getElementById('new-staff-role');
@@ -4038,51 +4047,46 @@
           }
       } catch (err) { console.error(err); }
 
-      // FETCH ALL DATA FOR THE SELECTED RANGE
-      let allLogs = [];
-      let fetchCount = 1000;
-      let currentOffset = 0;
-      let keepFetching = true;
+      // FETCH ALL DATA (logs + exceptions + leaves) IN PARALLEL.
+      // Each table: page 1 (with exact count) -> remaining pages fetched concurrently.
+      const PAGE = 1000;
+      const fetchAllPages = async (buildQuery) => {
+          const first = await buildQuery().range(0, PAGE - 1);
+          let rows = first.data || [];
+          const total = first.count || 0;
+          if (rows.length < PAGE || total <= PAGE) return rows;
+          const jobs = [];
+          for (let off = PAGE; off < total; off += PAGE) jobs.push(buildQuery().range(off, off + PAGE - 1));
+          const pages = await Promise.all(jobs);
+          pages.forEach(r => { if (r.data) rows = rows.concat(r.data); });
+          return rows;
+      };
 
-      while(keepFetching) {
-          let query = supabaseClient
-            .from('attendance_logs')
-            .select('*')
-            .gte('timestamp', startISO)
-            .lte('timestamp', endISO);
-
+      const logsPromise = fetchAllPages(() => {
+          let q = supabaseClient.from('attendance_logs').select('*', { count: 'exact' })
+              .gte('timestamp', startISO).lte('timestamp', endISO);
           if (selectedStaffIds && selectedStaffIds.size > 0 && selectedStaffIds.size !== dbStaff.length) {
-              query = query.in('staff_id', Array.from(selectedStaffIds));
+              q = q.in('staff_id', Array.from(selectedStaffIds));
           }
+          return q.order('timestamp', { ascending: false }).order('id', { ascending: false });
+      });
+      const excPromise = fetchAllPages(() =>
+          supabaseClient.from('attendance_exceptions').select('*', { count: 'exact' }).order('id', { ascending: true }));
+      const leavesPromise = fetchAllPages(() =>
+          supabaseClient.from('leave_requests').select('*', { count: 'exact' })
+              .order('created_at', { ascending: false }).order('id', { ascending: false }));
 
-          const { data } = await query
-            .order('timestamp', { ascending: false })
-            .range(currentOffset, currentOffset + fetchCount - 1);
-            
-          if (data && data.length > 0) {
-              allLogs = [...allLogs, ...data];
-              currentOffset += fetchCount;
-              if (data.length < fetchCount) keepFetching = false;
-          } else {
-              keepFetching = false;
-          }
+      let allLogs, excData, leavesData;
+      try {
+          [allLogs, excData, leavesData] = await Promise.all([logsPromise, excPromise, leavesPromise]);
+      } catch (err) {
+          console.error('fetchLogsFromDatabase failed:', err);
+          isFetchingLogs = false;
+          showToast('Failed to load data. Try Refresh.', 'error');
+          return;
       }
 
       dbLogs = allLogs;
-
-      // Fetch all exceptions safely bypassing Supabase 1000-row limit
-      let excData = [];
-      let excOffset = 0;
-      let keepFetchingExc = true;
-      while(keepFetchingExc) {
-          const { data } = await supabaseClient.from('attendance_exceptions').select('*').range(excOffset, excOffset + 999);
-          if (data && data.length > 0) {
-              excData = [...excData, ...data];
-              excOffset += 1000;
-              if (data.length < 1000) keepFetchingExc = false;
-          } else { keepFetchingExc = false; }
-      }
-        
       window.allExceptionsList = excData || [];
       exceptionsData = {};
       
@@ -4100,17 +4104,6 @@
       // -------------------------------------------------------------
       // FETCH AND AUTO-REJECT LEAVES SAFELY
       // -------------------------------------------------------------
-      let leavesData = [];
-      let leavesOffset = 0;
-      let keepFetchingLeaves = true;
-      while(keepFetchingLeaves) {
-          const { data } = await supabaseClient.from('leave_requests').select('*').order('created_at', { ascending: false }).range(leavesOffset, leavesOffset + 999);
-          if (data && data.length > 0) {
-              leavesData = [...leavesData, ...data];
-              leavesOffset += 1000;
-              if (data.length < 1000) keepFetchingLeaves = false;
-          } else { keepFetchingLeaves = false; }
-      }
       dbLeaves = leavesData || [];
       
       let leavesToReject = [];
@@ -7084,8 +7077,7 @@
           document.getElementById('new-role-name').value = '';
           window.__fpSet('new-role-start', '');
           window.__fpSet('new-role-end', '');
-          await initialMetadataLoad(); 
-          loadSettingsData();
+          await reloadMetadata();
           showToast("Role created successfully", "success");
         } catch (err) { showToast("Failed to create role. Make sure table has shift_start & shift_end columns.", "error"); }
         finally { btn.innerText = "Create Role"; btn.disabled = false; }
@@ -7119,8 +7111,7 @@
           }).eq('id', id);
           
           window.closeModal(document.getElementById('edit-role-modal'));
-          await initialMetadataLoad();
-          loadSettingsData();
+          await reloadMetadata();
           showToast("Role updated everywhere", "success");
         } catch(e) { showToast("Failed to update role", "error"); }
         finally { btn.innerText = "Save Changes"; btn.disabled = false; }
@@ -7146,7 +7137,7 @@
                 showToast("Deletion undone.", "primary");
             } else {
                 await supabaseClient.from('roles_directory').delete().eq('id', rowId); 
-                await initialMetadataLoad(); 
+                await reloadMetadata(); 
             }
         }, undoSecs * 1000);
     };
@@ -7158,8 +7149,7 @@
             try {
                 await supabaseClient.from('leave_reasons').insert([{ reason_name: name }]);
                 document.getElementById('new-reason-name').value = '';
-                await initialMetadataLoad();
-                loadSettingsData();
+                await reloadMetadata();
                 showToast("Reason added successfully", "success");
             } catch(e) { showToast("Failed to add reason", "error"); }
             finally { btn.innerText = "Create Reason"; btn.disabled = false; }
@@ -7183,8 +7173,7 @@
             try {
                 await supabaseClient.from('leave_reasons').update({ reason_name: newName }).eq('id', id);
                 window.closeModal(document.getElementById('edit-reason-modal'));
-                await initialMetadataLoad();
-                loadSettingsData();
+                await reloadMetadata();
                 showToast("Reason updated", "success");
             } catch(e) { showToast("Failed to update reason", "error"); }
             finally { btn.innerText = "Save Changes"; btn.disabled = false; }
@@ -7194,8 +7183,7 @@
     window.deleteReasonItem = async (rowId) => {
         if(await window.customConfirm("Remove this reason from the list?")) {
             await supabaseClient.from('leave_reasons').delete().eq('id', rowId);
-            await initialMetadataLoad();
-            loadSettingsData();
+            await reloadMetadata();
             showToast("Reason removed", "primary");
         }
     };
@@ -7298,8 +7286,7 @@
               else newJoiningEl.value = '';
           }
           
-          await initialMetadataLoad(); 
-          loadSettingsData(); 
+          await reloadMetadata();
           showToast("Staff Auth & Profile created successfully!", "success");
           
         } catch (err) { 
@@ -7389,13 +7376,17 @@
                 const rName = roleMap[roleId]?.role_name || null;
                 const defBranchId = document.getElementById('edit-staff-branch').value || null;
                 const editJoiningDate = document.getElementById('edit-staff-joining').value || null;
-                await supabaseClient.from('staff_directory').update({
-                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate
+                const editPhone = document.getElementById('edit-staff-phone')?.value.trim() || null;
+                const editSalaryRaw = document.getElementById('edit-staff-salary')?.value;
+                const { error: updErr } = await supabaseClient.from('staff_directory').update({
+                    name: name, role_id: roleId, role: rName, shift_start: start, shift_end: end, email: newEmail, default_branch_id: defBranchId, dob: newDob, joining_date: editJoiningDate,
+                    phone_number: editPhone,
+                    base_salary: editSalaryRaw ? parseFloat(editSalaryRaw) : null
                 }).eq('id', id);
+                if (updErr) throw updErr;
 
                 window.closeModal(document.getElementById('edit-staff-modal'));
-                await initialMetadataLoad();
-                loadSettingsData();
+                await reloadMetadata();
                 showToast("Staff profile & login updated perfectly!", "success");
                 
             } catch(e) { 
@@ -7424,8 +7415,7 @@
               // 3. Akhir me Staff Directory (Database table) se delete karna
               await supabaseClient.from('staff_directory').delete().eq('id', rowId); 
               
-              await initialMetadataLoad(); // Refresh local cached data arrays
-              loadSettingsData(); // Re-render the tables
+              await reloadMetadata();
               showToast("Staff & Login removed successfully", "success"); 
           } catch(e) {
               console.error(e);
@@ -7450,8 +7440,7 @@
         document.getElementById('new-branch-lat').value = ''; 
         document.getElementById('new-branch-lng').value = ''; 
         document.getElementById('new-branch-radius').value = '100'; 
-        await initialMetadataLoad();
-        loadSettingsData(); 
+        await reloadMetadata();
         showToast("Geofence registered successfully", "success");
       } else { 
         showToast("Branch Name, Latitude, and Longitude are mandatory.", "error"); 
@@ -7492,8 +7481,7 @@
                 }
 
                 window.closeModal(document.getElementById('edit-branch-modal'));
-                await initialMetadataLoad();
-                loadSettingsData();
+                await reloadMetadata();
                 showToast("Branch Geofence updated", "success");
             } catch(e) { 
                 showToast("DB Error: " + (e.message || "Failed to update geofence"), "error"); 
@@ -7510,8 +7498,7 @@
     window.deleteBranchItem = async (rowId) => { 
       if(await window.customConfirm("Remove this branch geofence?")) { 
           await supabaseClient.from('branches_directory').delete().eq('id', rowId); 
-          await initialMetadataLoad(); // Refresh local cached data arrays
-          loadSettingsData(); // Re-render the tables
+          await reloadMetadata();
           showToast("Geofence removed", "primary"); 
       }
     };
@@ -9261,7 +9248,7 @@
                     if(document.getElementById('new-staff-dob')._flatpickr) document.getElementById('new-staff-dob')._flatpickr.clear();
                     if(document.getElementById('new-staff-joining')._flatpickr) document.getElementById('new-staff-joining')._flatpickr.clear();
                     
-                    await initialMetadataLoad(); loadSettingsData();
+                    await reloadMetadata();
                     showToast("Staff created successfully!", "success");
                 } catch (err) { showToast(`Error: ${err.message}`, "error"); }
                 finally { btn.innerText = "Add Staff"; btn.disabled = false; }
@@ -9311,7 +9298,7 @@
                     if (updErr) throw updErr;
 
                     window.closeModal(document.getElementById('edit-staff-modal'));
-                    await initialMetadataLoad(); loadSettingsData();
+                    await reloadMetadata();
                     showToast(newPass ? "Staff profile & new password updated!" : "Staff profile updated!", "success");
                 } catch(e) { console.error(e); showToast("Failed to update: " + (e.message || "unknown error"), "error"); } 
                 finally { btn.innerText = "Save Changes"; btn.disabled = false; }
