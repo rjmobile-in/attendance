@@ -692,6 +692,19 @@
     .flatpickr-day.today:hover { background: var(--primary-alpha) !important; color: var(--text-main) !important; }
     .flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg { fill: var(--text-soft) !important; }
     .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg { fill: var(--primary) !important; }
+
+    /* Payroll month picker (flatpickr monthSelect) theming */
+    .flatpickr-monthSelect-months { padding: 6px 0 2px; }
+    .flatpickr-monthSelect-month { color: var(--text-main) !important; font-weight: 700 !important; border-radius: 10px !important; background: transparent !important; transition: background .15s ease, color .15s ease; }
+    .flatpickr-monthSelect-month:hover, .flatpickr-monthSelect-month:focus { background: var(--primary-alpha) !important; color: var(--text-main) !important; }
+    .flatpickr-monthSelect-month.today { border: 1px solid var(--primary) !important; }
+    .flatpickr-monthSelect-month.selected, .flatpickr-monthSelect-month.selected:hover { background: var(--primary) !important; color: var(--on-gold) !important; box-shadow: 0 4px 10px var(--primary-glow) !important; }
+    .flatpickr-monthSelect-month.flatpickr-disabled { opacity: .3; cursor: not-allowed; background: transparent !important; }
+    .flatpickr-calendar.dayContainer .numInputWrapper, .flatpickr-current-month .numInputWrapper span.arrowUp:after { border-bottom-color: var(--text-soft) !important; }
+    .flatpickr-current-month .numInputWrapper span.arrowDown:after { border-top-color: var(--text-soft) !important; }
+    .payroll-month-nav { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main); font-size: 16px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s ease; padding: 0; }
+    .payroll-month-nav:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha); }
+    .payroll-month-nav:disabled { opacity: .35; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -1377,7 +1390,9 @@
                         <span style="color: var(--text-soft); font-size: 13px;">Monthly salary calculation, taxes, and payslips.</span>
                         <div style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
                             <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase;">Select Month:</label>
-                            <input type="text" id="payroll-month-picker" class="input-field" style="margin: 0; width: 150px; padding: 8px 12px; background: var(--card-bg) !important; cursor: pointer;" placeholder="Select Month">
+                            <button type="button" id="payroll-month-prev" class="payroll-month-nav" title="Previous month" aria-label="Previous month">&#8249;</button>
+                            <input type="text" id="payroll-month-picker" class="input-field" style="margin: 0; width: 150px; padding: 8px 12px; background: var(--card-bg) !important; cursor: pointer; text-align: center;" placeholder="Select Month">
+                            <button type="button" id="payroll-month-next" class="payroll-month-nav" title="Next month" aria-label="Next month">&#8250;</button>
                         </div>
                     </div>
 
@@ -9381,50 +9396,86 @@
     window.initPayrollPicker = function() {
         const mp = document.getElementById('payroll-month-picker');
         if (!mp) return;
-        
+
+        const toYM = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const firstAllowed = new Date(minLaunchDate.getFullYear(), minLaunchDate.getMonth(), 1);
+        const lastAllowed = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+
+        const updateNavButtons = (fp) => {
+            const cur = fp.selectedDates[0];
+            const prevBtn = document.getElementById('payroll-month-prev');
+            const nextBtn = document.getElementById('payroll-month-next');
+            if (!cur) return;
+            if (prevBtn) prevBtn.disabled = new Date(cur.getFullYear(), cur.getMonth() - 1, 1) < firstAllowed;
+            if (nextBtn) nextBtn.disabled = new Date(cur.getFullYear(), cur.getMonth() + 1, 1) > lastAllowed;
+        };
+
         if (!mp._flatpickr) {
-            flatpickr(mp, {
+            let lastValidDate = new Date();
+
+            const fp = flatpickr(mp, {
                 ...getFpConfig(),
                 plugins: [
                     new monthSelectPlugin({
                         shorthand: true, // "Jan", "Feb", etc.
-                        dateFormat: "Y-m", // Formatted for backend: e.g. "2026-08"
-                        altFormat: "F Y", // Displayed to user: e.g. "August 2026"
+                        dateFormat: "Y-m", // Backend format, e.g. "2026-08"
+                        altFormat: "F Y", // Shown to the user, e.g. "August 2026"
                     })
                 ],
                 altInput: true,
+                altInputClass: 'input-field',
+                allowInput: false,
+                minDate: firstAllowed,
+                maxDate: lastAllowed,
                 defaultDate: new Date(),
+                // Keep the last valid month if the picker is closed without a selection
+                onClose: function(selectedDates, dateStr, instance) {
+                    if (!selectedDates.length) instance.setDate(lastValidDate, false);
+                },
                 onChange: function(dates, dateStr, instance) {
-                    // 1. Update Global Dates automatically when month is selected
-                    if (dates.length > 0) {
-                        const selectedDate = dates[0];
-                        
-                        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-                        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-                        endDate.setHours(23, 59, 59, 999);
-                        
-                        localStorage.setItem('rj_active_date_range', 'custom');
-                        localStorage.setItem('rj_custom_start', startDate.toISOString());
-                        localStorage.setItem('rj_custom_end', endDate.toISOString());
-                        
-                        if (typeof window.checkAndSetActiveDateRange === 'function') window.checkAndSetActiveDateRange();
-                        if (typeof startPicker !== 'undefined' && startPicker) startPicker.setDate(startDate);
-                        if (typeof endPicker !== 'undefined' && endPicker) endPicker.setDate(endDate);
-                        
-                        // Fetch logs to sync top heading and background data
-                        if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false);
-                    }
+                    if (!dates.length || !dateStr) return;
+                    lastValidDate = dates[0];
 
-                    // 2. Render Payroll Data
+                    // 1. Update global dates to match the selected month
+                    const selectedDate = dates[0];
+                    startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+                    endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+                    endDate.setHours(23, 59, 59, 999);
+
+                    localStorage.setItem('rj_active_date_range', 'custom');
+                    localStorage.setItem('rj_custom_start', startDate.toISOString());
+                    localStorage.setItem('rj_custom_end', endDate.toISOString());
+
+                    if (typeof window.checkAndSetActiveDateRange === 'function') window.checkAndSetActiveDateRange();
+                    if (typeof startPicker !== 'undefined' && startPicker) startPicker.setDate(startDate);
+                    if (typeof endPicker !== 'undefined' && endPicker) endPicker.setDate(endDate);
+
+                    // Fetch logs to sync top heading and background data
+                    if (typeof fetchLogsFromDatabase === 'function') fetchLogsFromDatabase(false);
+
+                    // 2. Render payroll data
                     if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(dateStr);
+                    updateNavButtons(instance);
                 }
             });
 
+            // Previous / next month buttons
+            const shiftMonth = (delta) => {
+                const cur = fp.selectedDates[0] || new Date();
+                const target = new Date(cur.getFullYear(), cur.getMonth() + delta, 1);
+                if (target < firstAllowed || target > lastAllowed) return;
+                fp.setDate(target, true); // true = trigger onChange
+            };
+            const prevBtn = document.getElementById('payroll-month-prev');
+            const nextBtn = document.getElementById('payroll-month-next');
+            if (prevBtn) prevBtn.addEventListener('click', () => shiftMonth(-1));
+            if (nextBtn) nextBtn.addEventListener('click', () => shiftMonth(1));
+
             // Initial load for current month
-            const d = new Date();
-            const initVal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(initVal);
+            updateNavButtons(fp);
+            if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(toYM(new Date()));
         } else if (mp.value) {
+            updateNavButtons(mp._flatpickr);
             if (typeof fetchAndRenderPayroll === 'function') fetchAndRenderPayroll(mp.value);
         }
     };
@@ -9440,10 +9491,12 @@
 
     let currentPayrollData = [];
     
+    let payrollRequestId = 0;
     async function fetchAndRenderPayroll(monthYearStr) {
         const tbody = document.getElementById('payroll-tbody');
         if(!tbody) return;
         if(!monthYearStr) return;
+        const requestId = ++payrollRequestId; // ignore stale responses when months are switched quickly
         
         tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);"><div class="spinner-sm"></div><div style="margin-top:8px;">Calculating Payroll...</div></td></tr>`;
 
@@ -9465,6 +9518,7 @@
 
             // Fetch existing Payroll Records (Adjustments/Status)
             const { data: existingRecords } = await supabaseClient.from('payroll_records').select('*').eq('month_year', displayMonthYear);
+            if (requestId !== payrollRequestId) return; // a newer month was selected meanwhile
             const recordsMap = {};
             if(existingRecords) existingRecords.forEach(r => recordsMap[r.staff_id] = r);
 
