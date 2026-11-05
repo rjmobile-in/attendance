@@ -826,6 +826,11 @@
             <span class="tab-btn-text">Payroll & Salary</span>
           </button>
 
+          <button class="tab-btn" data-view="view-phones">
+            <span class="tab-icon">📱</span> 
+            <span class="tab-btn-text">Phone Incentives</span>
+          </button>
+
 
 
           <!-- Settings -->
@@ -1560,6 +1565,34 @@
                     </div>
                 </div>
 
+                <div id="view-phones" class="app-view" style="display: none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom: 20px;">
+                        <span style="color: var(--text-soft); font-size: 13px;">Manage phone models, specs and staff incentives.</span>
+                        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                            <select id="phone-filter-brand" class="input-field" style="margin:0; width: 130px; padding: 9px 12px;"></select>
+                            <select id="phone-filter-ram" class="input-field" style="margin:0; width: 130px; padding: 9px 12px;"></select>
+                            <select id="phone-filter-storage" class="input-field" style="margin:0; width: 130px; padding: 9px 12px;"></select>
+                            <input type="number" inputmode="numeric" id="phone-filter-pmin" class="input-field" min="0" placeholder="Min Price (₹)" style="margin:0; width: 130px; padding: 9px 12px;">
+                            <input type="number" inputmode="numeric" id="phone-filter-pmax" class="input-field" min="0" placeholder="Max Price (₹)" style="margin:0; width: 130px; padding: 9px 12px;">
+                            <select id="phone-sort" class="input-field" style="margin:0; width: 170px; padding: 9px 12px;">
+                                <option value="brand">Company (A → Z)</option>
+                                <option value="price-desc">Price (High → Low)</option>
+                                <option value="price-asc">Price (Low → High)</option>
+                                <option value="ram">RAM (Low → High)</option>
+                                <option value="storage">Storage (Low → High)</option>
+                            </select>
+                            <input type="text" id="phone-search" class="input-field" placeholder="Search phone..." style="margin:0; width: 200px;">
+                            <button id="btn-add-phone" class="btn-primary">+ Add Phone</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                        <table style="width: 100%;">
+                            <thead><tr><th>Company</th><th>Model</th><th>RAM</th><th>Storage</th><th>Price</th><th>Incentive</th><th>Notes</th><th style="text-align: right;">Actions</th></tr></thead>
+                            <tbody id="phone-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
 
             </div> <!-- End Export Container -->
         </div> <!-- End Content Wrapper -->
@@ -1812,6 +1845,49 @@
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-reason" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button id="btn-save-edit-reason" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="phone-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 id="phone-modal-title" style="margin-bottom: 8px;">Add Phone</h2>
+      <input type="hidden" id="phone-id">
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Company</label>
+          <input type="text" id="phone-brand" class="input-field" placeholder="e.g. Samsung" style="margin-top: 8px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Model</label>
+          <input type="text" id="phone-model" class="input-field" placeholder="e.g. Galaxy A55" style="margin-top: 8px;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">RAM</label>
+          <input type="text" id="phone-ram" class="input-field" placeholder="e.g. 8GB" style="margin-top: 8px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Storage</label>
+          <input type="text" id="phone-storage" class="input-field" placeholder="e.g. 128GB" style="margin-top: 8px;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Price (₹)</label>
+          <input type="number" id="phone-price" class="input-field" min="0" placeholder="e.g. 24999" style="margin-top: 8px;">
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Incentive (₹)</label>
+          <input type="number" id="phone-incentive" class="input-field" min="0" placeholder="0" style="margin-top: 8px;">
+        </div>
+      </div>
+      <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Notes</label>
+      <textarea id="phone-notes" class="input-field" rows="3" style="margin-top: 8px; resize: vertical;"></textarea>
+      <div style="display: flex; gap: 12px; margin-top: 16px;">
+        <button id="btn-cancel-phone" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+        <button id="btn-save-phone" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save</button>
       </div>
     </div>
   </div>
@@ -7560,6 +7636,160 @@
           await reloadMetadata();
           showToast("Geofence removed", "primary"); 
       }
+    };
+
+    // =========================================================================
+    //  PHONE INCENTIVES (phone_models table)
+    // =========================================================================
+    let phoneRows = [];
+
+    async function loadPhones() {
+      const { data, error } = await supabaseClient.from('phone_models').select('*').order('brand').order('model');
+      if (error) { showToast("DB Error: " + error.message, "error"); return; }
+      phoneRows = data || [];
+      fillPhoneFilters();
+      renderPhones();
+    }
+
+    function fillPhoneFilters() {
+      const defs = [
+        ['phone-filter-brand', 'brand', 'All Companies'],
+        ['phone-filter-ram', 'ram', 'All RAM'],
+        ['phone-filter-storage', 'storage', 'All Storage']
+      ];
+      defs.forEach(([id, key, label]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const cur = el.value;
+        const vals = [...new Set(phoneRows.map(p => p[key]).filter(Boolean))]
+          .sort((x, y) => key === 'brand' ? x.localeCompare(y) : (parseInt(x) || 0) - (parseInt(y) || 0));
+        el.innerHTML = `<option value="">${label}</option>` + vals.map(v => `<option value="${window.__esc(v)}">${window.__esc(v)}</option>`).join('');
+        el.value = vals.includes(cur) ? cur : '';
+      });
+    }
+
+    function renderPhones() {
+      const tbody = document.getElementById('phone-list');
+      if (!tbody) return;
+      const q = (document.getElementById('phone-search')?.value || '').trim().toLowerCase();
+      const fBrand = document.getElementById('phone-filter-brand')?.value || '';
+      const fRam = document.getElementById('phone-filter-ram')?.value || '';
+      const fStorage = document.getElementById('phone-filter-storage')?.value || '';
+      const pMinRaw = document.getElementById('phone-filter-pmin')?.value;
+      const pMaxRaw = document.getElementById('phone-filter-pmax')?.value;
+      const pMin = (pMinRaw === '' || pMinRaw == null || isNaN(parseFloat(pMinRaw))) ? null : parseFloat(pMinRaw);
+      const pMax = (pMaxRaw === '' || pMaxRaw == null || isNaN(parseFloat(pMaxRaw))) ? null : parseFloat(pMaxRaw);
+      const sortKey = document.getElementById('phone-sort')?.value || 'brand';
+      const sizeGB = (v) => {
+        const m = String(v || '').toUpperCase().replace(/\s+/g, '').match(/([\d.]+)(TB|GB|MB)?/);
+        if (!m) return 0;
+        const n = parseFloat(m[1]) || 0;
+        return m[2] === 'TB' ? n * 1024 : m[2] === 'MB' ? n / 1024 : n;
+      };
+      const sortFn = {
+        'brand': (a, b) => String(a.brand || '').localeCompare(String(b.brand || '')) || String(a.model || '').localeCompare(String(b.model || '')),
+        'price-desc': (a, b) => Number(b.mop || 0) - Number(a.mop || 0),
+        'price-asc': (a, b) => Number(a.mop || 0) - Number(b.mop || 0),
+        'ram': (a, b) => sizeGB(a.ram) - sizeGB(b.ram),
+        'storage': (a, b) => sizeGB(a.storage) - sizeGB(b.storage)
+      }[sortKey] || (() => 0);
+      const rows = phoneRows.filter(p => {
+        if (fBrand && p.brand !== fBrand) return false;
+        if (fRam && p.ram !== fRam) return false;
+        if (fStorage && p.storage !== fStorage) return false;
+        if (pMin !== null || pMax !== null) {
+          if (p.mop === null || p.mop === undefined || p.mop === '' || isNaN(Number(p.mop))) return false;
+          const pr = Number(p.mop);
+          if (pMin !== null && pr < pMin) return false;
+          if (pMax !== null && pr > pMax) return false;
+        }
+        return !q || [p.brand, p.model, p.ram, p.storage, p.notes].join(' ').toLowerCase().includes(q);
+      }).sort(sortFn);
+      const td = 'padding: 12px 16px; border-bottom: 1px solid var(--card-border);';
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="${td} text-align:center; color: var(--text-soft);">No phones found.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(p => `<tr>
+        <td style="${td}"><strong style="color: var(--text-main);">${window.__esc(p.brand)}</strong></td>
+        <td style="${td}">${window.__esc(p.model)}</td>
+        <td style="${td}">${window.__esc(p.ram || '-')}</td>
+        <td style="${td}">${window.__esc(p.storage || '-')}</td>
+        <td style="${td} font-weight: 700;">₹${Number(p.mop || 0).toLocaleString('en-IN')}</td>
+        <td style="${td} font-weight: 700;">₹${Number(p.incentive || 0).toLocaleString('en-IN')}</td>
+        <td style="${td} font-size:12px; color: var(--text-soft); max-width: 260px;">${window.__esc(p.notes || '')}</td>
+        <td style="${td} text-align:right; white-space:nowrap;">
+          <button class="edit-btn" onclick="window.openPhoneModal('${p.id}')">Edit</button>
+          <button class="del-btn" onclick="window.deletePhone('${p.id}')">Remove</button>
+        </td>
+      </tr>`).join('');
+    }
+
+    window.openPhoneModal = (id) => {
+      const p = id ? phoneRows.find(r => r.id === id) : null;
+      document.getElementById('phone-modal-title').innerText = p ? 'Edit Phone' : 'Add Phone';
+      document.getElementById('phone-id').value = p ? p.id : '';
+      document.getElementById('phone-brand').value = p?.brand || '';
+      document.getElementById('phone-model').value = p?.model || '';
+      document.getElementById('phone-ram').value = p?.ram || '';
+      document.getElementById('phone-storage').value = p?.storage || '';
+      document.getElementById('phone-price').value = p?.mop ?? '';
+      document.getElementById('phone-incentive').value = p?.incentive ?? '';
+      document.getElementById('phone-notes').value = p?.notes || '';
+      document.getElementById('phone-modal').style.display = 'flex';
+    };
+
+    document.getElementById('btn-add-phone')?.addEventListener('click', () => window.openPhoneModal(null));
+    document.getElementById('btn-cancel-phone')?.addEventListener('click', () => window.closeModal(document.getElementById('phone-modal')));
+    document.getElementById('phone-search')?.addEventListener('input', renderPhones);
+    ['phone-filter-brand', 'phone-filter-ram', 'phone-filter-storage', 'phone-sort'].forEach(id =>
+      document.getElementById(id)?.addEventListener('change', renderPhones));
+    ['phone-filter-pmin', 'phone-filter-pmax'].forEach(id =>
+      document.getElementById(id)?.addEventListener('input', renderPhones));
+    document.querySelector('.tab-btn[data-view="view-phones"]')?.addEventListener('click', loadPhones);
+
+    document.getElementById('btn-save-phone')?.addEventListener('click', async () => {
+      const id = document.getElementById('phone-id').value;
+      const payload = {
+        brand: document.getElementById('phone-brand').value.trim(),
+        model: document.getElementById('phone-model').value.trim(),
+        ram: document.getElementById('phone-ram').value.trim() || null,
+        storage: document.getElementById('phone-storage').value.trim() || null,
+        mop: parseFloat(document.getElementById('phone-price').value),
+        incentive: parseFloat(document.getElementById('phone-incentive').value) || 0,
+        notes: document.getElementById('phone-notes').value.trim() || null
+      };
+      if (!payload.brand || !payload.model) { showToast("Company and Model are required", "error"); return; }
+      if (isNaN(payload.mop) || payload.mop < 0) { showToast("Please enter a valid price", "error"); return; }
+
+      const btn = document.getElementById('btn-save-phone');
+      btn.innerText = "Saving..."; btn.disabled = true;
+      try {
+        let res;
+        if (id) {
+          payload.updated_at = new Date().toISOString();
+          res = await supabaseClient.from('phone_models').update(payload).eq('id', id).select();
+        } else {
+          res = await supabaseClient.from('phone_models').insert([payload]).select();
+        }
+        if (res.error) throw res.error;
+        if (!res.data || res.data.length === 0) throw new Error("Blocked by RLS policies.");
+        window.closeModal(document.getElementById('phone-modal'));
+        await loadPhones();
+        showToast(id ? "Phone updated" : "Phone added", "success");
+      } catch (e) {
+        showToast("DB Error: " + (e.message || "Failed to save phone"), "error");
+      } finally {
+        btn.innerText = "Save"; btn.disabled = false;
+      }
+    });
+
+    window.deletePhone = async (id) => {
+      if (!await window.customConfirm("Remove this phone permanently?")) return;
+      const { error } = await supabaseClient.from('phone_models').delete().eq('id', id);
+      if (error) { showToast("DB Error: " + error.message, "error"); return; }
+      await loadPhones();
+      showToast("Phone removed", "primary");
     };
 
     // --- LAZY LOADER FOR EXPORT SCRIPTS ---
