@@ -9768,6 +9768,17 @@
             dbStaff.forEach(staff => {
                 if (!staff.base_salary) return; // Skip if no salary defined
 
+                // Mid-month joiners: days before the joining date are NOT payable and NOT counted as absent.
+                let daysBeforeJoining = 0;
+                if (staff.joining_date) {
+                    const jm = String(staff.joining_date).match(/^(\d{4})-(\d{2})-(\d{2})/);
+                    if (jm) {
+                        const joinY = parseInt(jm[1], 10), joinM = parseInt(jm[2], 10), joinD = parseInt(jm[3], 10);
+                        if (joinY > yearInt || (joinY === yearInt && joinM > monthInt)) return; // joined after this month: no salary due
+                        if (joinY === yearInt && joinM === monthInt) daysBeforeJoining = joinD - 1;
+                    }
+                }
+
                 // Count Unique Present Days
                 const staffLogs = (pLogs || []).filter(l => getStaffId(l) === staff.id);
                 const uniqueDays = new Set(staffLogs.map(l => new Date(l.timestamp).toDateString()));
@@ -9775,7 +9786,7 @@
 
                 // NAYA LOGIC: Mahine me 4 chhutiya allowed hain (salary nahi kategi).
                 // 4 se zyada chhuti (absent) hone par hi paise katenge.
-                const totalAbsentDays = daysInMonth - presentDaysCount;
+                const totalAbsentDays = Math.max(0, daysInMonth - daysBeforeJoining - presentDaysCount);
                 const allowedPaidLeaves = 4;
                 
                 // Maximum 4 chhutti ka paisa milega, baaki deduct ho jayengi
