@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>RJ Mobile | Attendance Workspace</title>
   <link rel="icon" type="image/png" href="logo.png" />
    
@@ -707,7 +707,92 @@
     .payroll-month-nav { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main); font-size: 16px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s ease; padding: 0; }
     .payroll-month-nav:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha); }
     .payroll-month-nav:disabled { opacity: .35; cursor: not-allowed; }
-  </style>
+  
+    /* MOBILE RESPONSIVE STYLES */
+    .mobile-menu-btn { display: none !important; }
+    .sidebar-backdrop { display: none; }
+
+    @media (max-width: 900px) {
+      .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: var(--input-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-sm);
+        color: var(--text-main);
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 150;
+      }
+      .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 998;
+        display: none;
+      }
+      .sidebar-backdrop.active {
+        display: block !important;
+      }
+      .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: -300px !important;
+        height: 100vh !important;
+        width: 280px !important;
+        z-index: 999 !important;
+        transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-shadow: 20px 0 50px rgba(0,0,0,0.6) !important;
+      }
+      .sidebar.mobile-open {
+        left: 0 !important;
+      }
+      .main-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+      }
+      .header-bar {
+        padding: 12px 16px !important;
+        gap: 8px !important;
+      }
+      .header-title {
+        font-size: 16px !important;
+      }
+      .header-controls {
+        gap: 6px !important;
+      }
+      .content-wrapper {
+        padding: 14px !important;
+      }
+      .filter-section {
+        padding: 14px !important;
+      }
+      .table-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 12px !important;
+      }
+      .modal-card {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        padding: 16px !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+      }
+    }
+
+</style>
 </head>
 <body>
 
@@ -735,6 +820,7 @@
 
   <div id="dashboard">
     <div class="app-container">
+      <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="window.closeMobileSidebar()"></div>
       
       <!-- SIDEBAR NAVIGATION -->
       <aside class="sidebar" id="app-sidebar">
@@ -804,10 +890,7 @@
             <span id="pending-audits-badge" class="badge bg-orange" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
           </button>
 
-          <button class="tab-btn" data-view="view-customers">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path></svg></span> 
-            <span class="tab-btn-text">Customer Leads</span>
-          </button>
+          
 
           <!-- Analytics & HR -->
           <div class="sidebar-category">Analytics & Team</div>
@@ -816,10 +899,7 @@
             <span class="tab-btn-text">Staff Stats</span>
           </button>
           
-          <button class="tab-btn" data-view="view-birthdays">
-            <span class="tab-icon">🎂</span> 
-            <span class="tab-btn-text">Staff Birthdays</span>
-          </button>
+          
 
           <button class="tab-btn" data-view="view-payroll">
             <span class="tab-icon">💳</span> 
@@ -852,8 +932,10 @@
         
         <!-- HEADER -->
         <div class="header-bar">
-          <div style="display: flex; flex-direction: column;">
-            <div class="header-title" id="page-title">Overview</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="window.toggleMobileSidebar()" title="Menu">☰</button>
+            <div style="display: flex; flex-direction: column;">
+              <div class="header-title" id="page-title">Overview</div>
             <div id="live-admin-clock" style="font-size: 14px; margin-top: 4px; letter-spacing: 0.5px; font-family: 'Manrope', sans-serif;">Loading time...</div>
           </div>
           <div class="header-controls" style="margin-left: auto;">
@@ -1136,31 +1218,6 @@
                 </div>
 
                 <!-- VIEW: CUSTOMER LOGS -->
-                <div id="view-customers" class="app-view" style="display: none;">
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: 13px;">Track walkouts and expected customers submitted by your staff.</span>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-responsive">
-                            <table id="customers-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date & Time</th>
-                                        <th>Staff Name</th>
-                                        <th>Customer Details</th>
-                                        <th>Status</th>
-                                        <th>Reason / Remarks</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="customers-tbody">
-                                    <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- VIEW 5: STAFF STATS -->
                 <div id="view-stats" class="app-view" style="display: none;">
                     <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
@@ -1256,36 +1313,6 @@
                 </div>
                 
                 <!-- VIEW 11: BIRTHDAYS -->
-                <div id="view-birthdays" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <span style="color: var(--text-soft); font-size: 13px;">Upcoming staff celebrations. DOB is managed in HR Settings.</span>
-                    </div>
-                    
-                    <div class="widget-grid" id="bday-top-cards" style="grid-template-columns: 1fr;">
-                        <div id="bday-top-card" class="widget-card" style="padding: 40px 24px; padding-top: 350px; text-align: center; position: relative; overflow: hidden; min-height: 640px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; border-color: var(--primary);">
-                            <!-- Background Image Layer -->
-                            <div id="bday-top-bg" style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%); background-size: cover !important; background-position: center top !important; opacity: 0.95; z-index: 0; transition: opacity 0.5s;"></div>
-                            <!-- Dark Bottom Gradient for Text Readability -->
-                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--card-bg) 5%, rgba(18,27,51,0.8) 25%, transparent 65%); z-index: 1;"></div>
-                            
-                            <div class="badge bg-blue" style="margin-bottom: 12px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Next Celebration</div>
-                            <div id="admin-next-bday-emoji" style="font-size: 48px; position: relative; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: -5px;">🎉</div>
-                            <div id="admin-next-bday-name" style="font-size: 24px; font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
-                            <div id="admin-next-bday-date" style="color: #f1f5f9; margin-bottom: 8px; font-weight: 600; position: relative; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">--</div>
-                            <div id="admin-next-bday-age" class="role-tag" style="position: relative; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">--</div>
-                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: var(--on-gold); background: var(--primary); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
-                        </div>
-                    </div>
-
-                    <div class="table-card">
-                        <div style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                            📅 All Upcoming Birthdays
-                        </div>
-                        <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;" id="admin-bday-list-container">
-                        </div>
-                    </div>
-                </div>
-
                 <!-- VIEW 10: DUTY ROSTER -->
                 <div id="view-roster" class="app-view" style="display: none;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
@@ -1604,10 +1631,7 @@
   <div id="bulk-action-bar" class="bulk-action-bar">
       <div style="font-weight: 800; color: var(--text-main); font-size: 14px;"><span id="bulk-selected-count" style="color: var(--primary-text); font-size: 18px;">0</span> Selected</div>
       <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
-      <div style="display: flex; gap: 16px; align-items: center;">
-          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt" checked> RJ T-Shirt</label>
-          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-idcard" checked> ID Card</label>
-      </div>
+      <div style="color: var(--success); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">🟢 Biometric Live Attendance Verified</div>
       <button class="btn-primary" id="btn-bulk-save" onclick="window.executeBulkAuditSave()" style="margin-left: 8px; padding: 12px 20px;">Bulk Approve & Save</button>
   </div>
 
@@ -1657,13 +1681,7 @@
         </div>
       </div>
 
-      <div style="margin-top: 8px; margin-bottom: 16px;">
-          <label style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase;">Uniform Audit (At time of entry)</label>
-          <div style="display: flex; gap: 16px; margin-top: 8px;">
-              <label class="check-wrap" style="flex: 1; background: var(--bg-base); border: 1px solid var(--card-border); padding: 12px; border-radius: var(--radius-sm);"><input type="checkbox" id="manual-tshirt" checked> T-Shirt Present</label>
-              <label class="check-wrap" style="flex: 1; background: var(--bg-base); border: 1px solid var(--card-border); padding: 12px; border-radius: var(--radius-sm);"><input type="checkbox" id="manual-idcard" checked> ID Card Present</label>
-          </div>
-      </div>
+      
 
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-manual" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
@@ -1803,6 +1821,19 @@
           <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
       </div>
+      
+      <!-- Biometric Face Scan Management Block -->
+      <div style="margin-top: 14px; padding: 14px; background: var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; color: var(--text-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Biometric Face Scan</span>
+          <span id="edit-staff-face-status" class="badge bg-gray" style="font-size: 11px;">⚪ Loading...</span>
+        </div>
+        <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 10px;" id="edit-staff-face-desc">Face biometrics lock profile photo and authenticate daily attendance.</p>
+        <button type="button" id="btn-reset-staff-face" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 12px; padding: 10px; color: var(--danger); border-color: rgba(239, 68, 68, 0.4); display: none;">
+          🔄 Reset Face Biometrics (Allow Re-enrollment)
+        </button>
+      </div>
+
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-staff" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button id="btn-save-edit-staff" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Changes</button>
@@ -2086,11 +2117,12 @@
       </h3>
       <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://placehold.co/600x400/18181b/ef4444?text=Image+Purged/Expired'">
       <div id="audit-controls" style="display:none; flex-direction:column; gap:16px; margin-top:8px;">
-          <div class="modal-checkboxes">
-              <label class="check-wrap"><input type="checkbox" id="modal-tshirt"> RJ T-Shirt</label>
-              <label class="check-wrap"><input type="checkbox" id="modal-idcard"> ID Card</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--input-bg); border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+              <span style="font-size: 13px; font-weight: 600; color: var(--success); display: flex; align-items: center; gap: 6px;">
+                  <span>🟢</span> Biometric Live Verification Photo
+              </span>
           </div>
-          <button class="btn-primary" id="btn-modal-audit-save" style="justify-content:center; padding: 14px;">Approve & Save</button>
+          <button class="btn-primary" id="btn-modal-audit-save" style="justify-content:center; padding: 14px;">Approve & Mark Verified</button>
       </div>
     </div>
   </div>
@@ -2371,7 +2403,7 @@
                 }
             }
         }
-        if (document.getElementById('view-birthdays')?.style.display === 'block' && typeof renderAdminBirthdays === 'function') {
+        // birthdays view removed {
             renderAdminBirthdays();
         }
     }
@@ -2561,7 +2593,7 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
+                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
@@ -2750,8 +2782,8 @@
         
         if(logId && logId !== 'undefined' && logId !== 'null') {
             controls.style.display = 'flex';
-            document.getElementById('modal-tshirt').checked = (isTshirtChecked === true || isTshirtChecked === 'true');
-            document.getElementById('modal-idcard').checked = (isIdcardChecked === true || isIdcardChecked === 'true');
+            
+            
             
             const btn = document.getElementById('btn-modal-audit-save');
             btn.innerText = isReviewed ? "✏️ Update Audit" : "Approve & Save";
@@ -2763,16 +2795,14 @@
     };
 
     window.saveQuickAuditFromModal = async function(logId) {
-        const tshirt = document.getElementById('modal-tshirt').checked;
-        const idcard = document.getElementById('modal-idcard').checked;
         const btn = document.getElementById('btn-modal-audit-save');
         btn.innerText = "Saving..."; btn.disabled = true;
         
         const logIndex = dbLogs.findIndex(l => l.id === logId);
         if(logIndex !== -1) { 
             dbLogs[logIndex].uniform_reviewed = true; 
-            dbLogs[logIndex].uniform_tshirt = tshirt; 
-            dbLogs[logIndex].uniform_idcard = idcard; 
+             
+             
         }
 
         // AUTO-NEXT LOGIC (Optimized to prevent animation clash)
@@ -2834,7 +2864,7 @@
         window.updatePendingBadgeCount(-1);
 
         try {
-            await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard }).eq('id', logId);
+            await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true }).eq('id', logId);
             showToast("Audit Saved", "success");
             processStitchedData(); // FIX: Instantly refresh tables and stats without page reload
         } catch(e) { 
@@ -3125,11 +3155,9 @@
             'view-payroll': { date: false, time: false, role: false, branch: false, staff: true },
             
             // Customers: Date and staff filters relevant
-            'view-customers': { date: true, time: false, role: false, branch: false, staff: true },
-            
+                        
             // Birthdays: No filters needed
-            'view-birthdays': { date: false, time: false, role: false, branch: false, staff: false },
-            
+                        
             // Settings: No filters needed
             'view-settings-hr': { date: false, time: false, role: false, branch: false, staff: false },
             'view-settings-org': { date: false, time: false, role: false, branch: false, staff: false }
@@ -3250,7 +3278,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes(viewId)) {
+            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes(viewId)) {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -3270,7 +3298,7 @@
         
         if (viewId === 'view-settings-hr' || viewId === 'view-settings-org') {
             if (typeof loadSettingsData === 'function') loadSettingsData();
-        } else if (viewId !== 'view-birthdays') {
+        } else {
             // Just ping the Event Bus! It will automatically figure out what to render.
             window.RJEventBus.dispatchEvent(new CustomEvent('DATA_UPDATED'));
         }
@@ -4366,11 +4394,11 @@
           // Evaluate uniform compliance ONLY if the staff was present (has logs for the day)
           if (dailyLogs.length > 0) {
               let hasPendingAudit = dailyLogs.some(l => !l.uniform_reviewed);
-              let hasValidShirt = dailyLogs.some(l => l.uniform_reviewed && (l.uniform_tshirt === true || l.uniform_tshirt === 'true'));
-              let hasValidId = dailyLogs.some(l => l.uniform_reviewed && (l.uniform_idcard === true || l.uniform_idcard === 'true'));
+              // shirt check removed
+              // id check removed
 
-              if (!hasValidShirt && !hasPendingAudit) staffStatsTracker[staff.id].missedShirt++;
-              if (!hasValidId && !hasPendingAudit) staffStatsTracker[staff.id].missedId++;
+              // uniform penalty removed
+              // uniform penalty removed
           }
           
           const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
@@ -4393,8 +4421,8 @@
                     action: l.action,
                     photo: l.photo_capture,
                     reviewed: parseBool(l.uniform_reviewed),
-                    uTshirt: parseBool(l.uniform_tshirt),
-                    uIdcard: parseBool(l.uniform_idcard),
+                    uTshirt: false,
+                    uIdcard: false,
                     time: new Date(l.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime})
                 };
             });
@@ -4607,11 +4635,11 @@
         if (activeTab === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
         if ((activeTab === 'view-branch-ops' || activeTab === 'view-branch-matrix') && typeof renderBranchStats === 'function') window.renderBranchStats();
         if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
-        if (activeTab === 'view-birthdays' && typeof renderAdminBirthdays === 'function') renderAdminBirthdays();
+        
         if (activeTab === 'view-payroll') {
             if (typeof window.initPayrollPicker === 'function') window.initPayrollPicker();
         }
-        if (activeTab === 'view-customers' && typeof window.renderCustomerLogs === 'function') window.renderCustomerLogs();
+        
     });
 
     // --- ADMIN CUSTOMER LOGS LOGIC ---
@@ -5162,8 +5190,8 @@
         document.getElementById('manual-staff').value = '';
         document.getElementById('manual-action').value = 'Clock In';
         document.getElementById('manual-branch').value = '';
-        document.getElementById('manual-tshirt').checked = true;
-        document.getElementById('manual-idcard').checked = true;
+        
+        
 
         document.getElementById('manual-entry-modal').style.display = 'flex';
     });
@@ -5176,8 +5204,7 @@
         const staffId = document.getElementById('manual-staff').value;
         const actionVal = document.getElementById('manual-action').value;
         const branchIdVal = document.getElementById('manual-branch').value;
-        const tshirtVal = document.getElementById('manual-tshirt').checked;
-        const idcardVal = document.getElementById('manual-idcard').checked;
+        // Uniform audit removed
         const dateVal = document.getElementById('manual-date').value;
         const timeVal = document.getElementById('manual-time').value;
 
@@ -5226,8 +5253,7 @@
                 branch_id: branchIdVal,
                 timestamp: timestampIso,
                 uniform_reviewed: true,
-                uniform_tshirt: tshirtVal,
-                uniform_idcard: idcardVal
+                // uniform fields removed
             }]);
             if (insErr) throw insErr;
 
@@ -5276,8 +5302,8 @@
             const timeVal = log.timestamp ? new Date(log.timestamp).toTimeString().substring(0,5) : '';
             const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}" ${b.branch_name === log.branch ? 'selected' : ''}>${b.branch_name}</option>`).join('');
             
-            const hasTshirt = log.uniform_tshirt !== false; 
-            const hasIdcard = log.uniform_idcard !== false; 
+             
+             
 
             return `
             <div class="punch-row" data-logid="${log.id || ''}" style="display:flex; flex-direction:column; gap:8px; background:var(--input-bg); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
@@ -5311,7 +5337,7 @@
     };
 
     document.getElementById('btn-add-punch-row')?.addEventListener('click', () => {
-        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null, uniform_tshirt: true, uniform_idcard: true, uniform_reviewed: true });
+        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null, uniform_reviewed: true });
         window.renderPunchRows();
     });
 
@@ -5353,8 +5379,8 @@
                branch_id: branchObj ? branchObj.id : (existingLog.branch_id || null),
                timestamp: newIso,
                uniform_reviewed: true, 
-               uniform_tshirt: hasTshirt, 
-               uniform_idcard: hasIdcard,
+                
+               
                photo_capture: existingLog.photo_capture || null,
                latitude: existingLog.latitude || null,
                longitude: existingLog.longitude || null
@@ -5437,9 +5463,8 @@
                     <div class="audit-details">
                         <div><strong style="color: var(--text-main); font-size: 14px;">${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
                         <div style="font-size: 11px; color: var(--text-soft); font-weight: 600;">${dateStr} • ${timeStr}</div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="tshirt-${logId}" ${tChecked}> T-Shirt</label>
-                          <label class="check-wrap" style="flex: 1; padding:6px; font-size:12px; border: 1px solid var(--card-border);"><input type="checkbox" id="idcard-${logId}" ${iChecked}> ID Card</label>
+                        <div style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--input-bg); border-radius: var(--radius-sm); border: 1px solid var(--card-border); font-size: 11px; font-weight: 600; color: var(--success);">
+                          <span>🟢</span> Live Selfie Verified
                         </div>
                         ${btnHtml}
                     </div>
@@ -5480,14 +5505,12 @@
     };
 
     window.saveQuickAudit = async function(logId, btnElement) {
-        const tshirt = document.getElementById(`tshirt-${logId}`).checked;
-        const idcard = document.getElementById(`idcard-${logId}`).checked;
 
         const logIndex = dbLogs.findIndex(l => l.id === logId);
         if(logIndex !== -1) { 
             dbLogs[logIndex].uniform_reviewed = true; 
-            dbLogs[logIndex].uniform_tshirt = tshirt; 
-            dbLogs[logIndex].uniform_idcard = idcard; 
+             
+             
         }
 
         if (btnElement) {
@@ -5516,7 +5539,7 @@
         }
 
         try {
-            const updatePayload = { uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard };
+            const updatePayload = { uniform_reviewed: true };
             
             if (!navigator.onLine) {
                 // Queue for background sync
@@ -5685,8 +5708,7 @@
             if (!await window.customConfirm(`You are about to bulk-approve ${selectedAuditLogIds.size} photos at once. Are you sure?`)) return;
         }
         
-        const tshirt = document.getElementById('bulk-tshirt').checked;
-        const idcard = document.getElementById('bulk-idcard').checked;
+        // Uniform checkboxes removed
         const btn = document.getElementById('btn-bulk-save');
         const originalText = btn.innerText;
         
@@ -5704,13 +5726,13 @@
             const logIndex = dbLogs.findIndex(l => l.id === logId);
             if(logIndex !== -1) { 
                 dbLogs[logIndex].uniform_reviewed = true; 
-                dbLogs[logIndex].uniform_tshirt = tshirt; 
-                dbLogs[logIndex].uniform_idcard = idcard; 
+                 
+                 
             }
         });
 
         try {
-            const updatePayload = { uniform_reviewed: true, uniform_tshirt: tshirt, uniform_idcard: idcard };
+            const updatePayload = { uniform_reviewed: true };
             
             if (!navigator.onLine) {
                 // Queue for background sync
@@ -5737,7 +5759,7 @@
             selectedAuditLogIds.clear();
             
             // Reset the master toggles to TRUE (Safe Default) for the next time it opens
-            document.getElementById('bulk-tshirt').checked = true;
+            
             document.getElementById('bulk-idcard').checked = true;
             
             // OPTIMISTIC UI UPDATE (Smoothly fade out specific cards)
@@ -5798,15 +5820,15 @@
             const logIndex = dbLogs.findIndex(l => l.id === logId);
             if(logIndex !== -1) {
                 dbLogs[logIndex].uniform_reviewed = false;
-                dbLogs[logIndex].uniform_tshirt = false;
-                dbLogs[logIndex].uniform_idcard = false;
+                
+                
             }
         });
 
         try {
             // Revert database state
             await supabaseClient.from('attendance_logs')
-                .update({ uniform_reviewed: false, uniform_tshirt: false, uniform_idcard: false })
+                .update({ uniform_reviewed: false })
                 .in('id', window.lastBulkUpdateIds);
 
             showToast("Bulk approval undone.", "primary");
@@ -7447,6 +7469,32 @@
         });
     });
 
+    
+    // MOBILE DRAWER HANDLERS
+    window.toggleMobileSidebar = function() {
+        const sb = document.getElementById('app-sidebar');
+        const bd = document.getElementById('sidebar-backdrop');
+        if (sb) sb.classList.toggle('mobile-open');
+        if (bd) bd.classList.toggle('active');
+    };
+    window.closeMobileSidebar = function() {
+        const sb = document.getElementById('app-sidebar');
+        const bd = document.getElementById('sidebar-backdrop');
+        if (sb) sb.classList.remove('mobile-open');
+        if (bd) bd.classList.remove('active');
+    };
+
+    // Close mobile drawer on tab click
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    window.closeMobileSidebar();
+                }
+            });
+        });
+    });
+
     window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
@@ -7468,6 +7516,58 @@
             if (joinEl._flatpickr) joinEl._flatpickr.setDate(joiningDate || '');
             else joinEl.value = joiningDate || '';
         }
+        
+        // Populate Face Biometrics status & reset button
+        const staffObj = (typeof dbStaff !== 'undefined' ? dbStaff : []).find(s => s.id === id);
+        const faceBadge = document.getElementById('edit-staff-face-status');
+        const faceDesc = document.getElementById('edit-staff-face-desc');
+        const resetBtn = document.getElementById('btn-reset-staff-face');
+
+        if (faceBadge && faceDesc && resetBtn) {
+            const isEnrolled = staffObj && (staffObj.face_registered === true || (staffObj.face_descriptors && staffObj.face_descriptors.length > 0));
+            if (isEnrolled) {
+                faceBadge.className = 'badge bg-green';
+                faceBadge.innerHTML = '🟢 Enrolled & Locked';
+                const regDate = staffObj.face_registered_at ? new Date(staffObj.face_registered_at).toLocaleDateString() : '';
+                faceDesc.innerText = 'Face biometrics are active' + (regDate ? ' (enrolled ' + regDate + ')' : '') + '. Staff cannot alter their photo or face descriptors.';
+                resetBtn.style.display = 'flex';
+                resetBtn.onclick = async () => {
+                    if (await window.customConfirm('Reset face biometrics for ' + name + '? They will be prompted to re-scan their face on their next attendance.')) {
+                        resetBtn.disabled = true;
+                        resetBtn.innerText = 'Resetting...';
+                        try {
+                            const { error: rErr } = await supabaseClient.from('staff_directory').update({
+                                face_descriptors: null,
+                                face_registered: false,
+                                face_registered_at: null
+                            }).eq('id', id);
+                            if (rErr) throw rErr;
+                            staffObj.face_registered = false;
+                            staffObj.face_descriptors = null;
+                            staffObj.face_registered_at = null;
+                            faceBadge.className = 'badge bg-gray';
+                            faceBadge.innerHTML = '⚪ Not Enrolled';
+                            faceDesc.innerText = 'Face data cleared. Employee will re-enroll on next app launch.';
+                            resetBtn.style.display = 'none';
+                            showToast('Face biometrics reset for ' + name + '!', 'success');
+                            if (typeof reloadMetadata === 'function') await reloadMetadata();
+                        } catch (ex) {
+                            console.error(ex);
+                            showToast('Failed to reset face biometrics', 'error');
+                        } finally {
+                            resetBtn.disabled = false;
+                            resetBtn.innerText = '🔄 Reset Face Biometrics (Allow Re-enrollment)';
+                        }
+                    }
+                };
+            } else {
+                faceBadge.className = 'badge bg-gray';
+                faceBadge.innerHTML = '⚪ Not Enrolled';
+                faceDesc.innerText = 'Employee has not scanned their face yet. They will be prompted on their next attendance scan.';
+                resetBtn.style.display = 'none';
+            }
+        }
+
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
     
@@ -8283,7 +8383,7 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (e.currentTarget.getAttribute('data-view') === 'view-birthdays') renderAdminBirthdays();
+            
         });
     });
 
@@ -8776,8 +8876,8 @@
             // A. Photo Audit Modal
             const photoModal = document.getElementById('photo-modal');
             if (photoModal && photoModal.style.display === 'flex') {
-                if (isTKey) document.getElementById('modal-tshirt').click();
-                if (isIKey) document.getElementById('modal-idcard').click();
+                
+                
                 if (isEnter) { e.preventDefault(); document.getElementById('btn-modal-audit-save')?.click(); }
                 
                 // Left / Right Arrows to navigate through visible photos
@@ -8804,8 +8904,8 @@
             // B. Manual Entry Modal
             const manualModal = document.getElementById('manual-entry-modal');
             if (manualModal && manualModal.style.display === 'flex') {
-                if (isTKey) document.getElementById('manual-tshirt').click();
-                if (isIKey) document.getElementById('manual-idcard').click();
+                
+                
                 if (isEnter) { e.preventDefault(); document.getElementById('btn-save-manual')?.click(); }
                 return;
             }
@@ -8813,8 +8913,8 @@
             // C. Bulk Action Bar (Floating at bottom)
             const bulkBar = document.getElementById('bulk-action-bar');
             if (bulkBar && bulkBar.classList.contains('show')) {
-                if (isTKey) document.getElementById('bulk-tshirt').click();
-                if (isIKey) document.getElementById('bulk-idcard').click();
+                
+                
                 if (isEnter) { e.preventDefault(); document.getElementById('btn-bulk-save')?.click(); }
                 return;
             }
@@ -9490,6 +9590,32 @@
     
     // Modify Staff Editing to accept Phone and Salary
     const originalOpenEditStaff = window.openEditStaff;
+    
+    // MOBILE DRAWER HANDLERS
+    window.toggleMobileSidebar = function() {
+        const sb = document.getElementById('app-sidebar');
+        const bd = document.getElementById('sidebar-backdrop');
+        if (sb) sb.classList.toggle('mobile-open');
+        if (bd) bd.classList.toggle('active');
+    };
+    window.closeMobileSidebar = function() {
+        const sb = document.getElementById('app-sidebar');
+        const bd = document.getElementById('sidebar-backdrop');
+        if (sb) sb.classList.remove('mobile-open');
+        if (bd) bd.classList.remove('active');
+    };
+
+    // Close mobile drawer on tab click
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    window.closeMobileSidebar();
+                }
+            });
+        });
+    });
+
     window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
         originalOpenEditStaff(id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate);
         document.getElementById('edit-staff-phone').value = phone || '';

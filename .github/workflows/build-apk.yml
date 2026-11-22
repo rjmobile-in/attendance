@@ -1,0 +1,68 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Setup Android Project
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp logo.png www/ || true
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "RJ Admin" "com.rjmobile.attendanceadmin" --web-dir www
+          npx cap add android
+          npx cap sync android
+
+      - name: Generate App Icon
+        run: |
+          pip install Pillow --quiet
+          echo "aW1wb3J0IG9zCmZyb20gUElMIGltcG9ydCBJbWFnZQoKaWYgb3MucGF0aC5leGlzdHMoJ2xvZ28ucG5nJyk6CiAgICBpbSA9IEltYWdlLm9wZW4oJ2xvZ28ucG5nJykuY29udmVydCgnUkdCQScpCiAgICBkZW5zaXRpZXMgPSBbKDQ4LCAnbWRwaScpLCAoNzIsICdoZHBpJyksICg5NiwgJ3hoZHBpJyksICgxNDQsICd4eGhkcGknKSwgKDE5MiwgJ3h4eGhkcGknKV0KICAgIGZvciBkaW0sIGQgaW4gZGVuc2l0aWVzOgogICAgICAgIHJlc19kaXIgPSBmJ2FuZHJvaWQvYXBwL3NyYy9tYWluL3Jlcy9taXBtYXAte2R9JwogICAgICAgIG9zLm1ha2VkaXJzKHJlc19kaXIsIGV4aXN0X29rPVRydWUpCgogICAgICAgIGZnX2RpbSA9IGludChkaW0gKiAwLjY4KQogICAgICAgIGZnX3Jlc2l6ZWQgPSBpbS5yZXNpemUoKGZnX2RpbSwgZmdfZGltKSwgSW1hZ2UuUmVzYW1wbGluZy5MQU5DWk9TKQogICAgICAgIGZnX2NhbnZhcyA9IEltYWdlLm5ldygnUkdCQScsIChkaW0sIGRpbSksICgwLCAwLCAwLCAwKSkKICAgICAgICBmZ19jYW52YXMucGFzdGUoZmdfcmVzaXplZCwgKChkaW0gLSBmZ19kaW0pIC8vIDIsIChkaW0gLSBmZ19kaW0pIC8vIDIpLCBmZ19yZXNpemVkKQogICAgICAgIGZnX2NhbnZhcy5zYXZlKGYne3Jlc19kaXJ9L2ljX2xhdW5jaGVyX2ZvcmVncm91bmQucG5nJykKCiAgICAgICAgbGVnX2RpbSA9IGludChkaW0gKiAwLjgyKQogICAgICAgIGxlZ19yZXNpemVkID0gaW0ucmVzaXplKChsZWdfZGltLCBsZWdfZGltKSwgSW1hZ2UuUmVzYW1wbGluZy5MQU5DWk9TKQogICAgICAgIGxlZ19jYW52YXMgPSBJbWFnZS5uZXcoJ1JHQkEnLCAoZGltLCBkaW0pLCAoMjU1LCAyNTUsIDI1NSwgMjU1KSkKICAgICAgICBsZWdfY2FudmFzLnBhc3RlKGxlZ19yZXNpemVkLCAoKGRpbSAtIGxlZ19kaW0pIC8vIDIsIChkaW0gLSBsZWdfZGltKSAvLyAyKSwgbGVnX3Jlc2l6ZWQpCiAgICAgICAgbGVnX2NhbnZhcy5zYXZlKGYne3Jlc19kaXJ9L2ljX2xhdW5jaGVyLnBuZycpCiAgICAgICAgbGVnX2NhbnZhcy5zYXZlKGYne3Jlc19kaXJ9L2ljX2xhdW5jaGVyX3JvdW5kLnBuZycpCgogICAgdmFsdWVzX2RpciA9ICdhbmRyb2lkL2FwcC9zcmMvbWFpbi9yZXMvdmFsdWVzJwogICAgb3MubWFrZWRpcnModmFsdWVzX2RpciwgZXhpc3Rfb2s9VHJ1ZSkKICAgIHdpdGggb3BlbihmJ3t2YWx1ZXNfZGlyfS9pY19sYXVuY2hlcl9iYWNrZ3JvdW5kLnhtbCcsICd3JykgYXMgZjoKICAgICAgICBmLndyaXRlKCc8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJ1dGYtOCI/PjxyZXNvdXJjZXM+PGNvbG9yIG5hbWU9ImljX2xhdW5jaGVyX2JhY2tncm91bmQiPiNmZmZmZmY8L2NvbG9yPjwvcmVzb3VyY2VzPicpCiAgICBwcmludCgnSWNvbnMgd2l0aCBXSElURSBiYWNrZ3JvdW5kIGdlbmVyYXRlZCBzdWNjZXNzZnVsbHkhJykK" | base64 -d > generate_icons.py
+          python3 generate_icons.py || true
+
+      - name: Inject Permissions
+        run: |
+          sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET" \/>\n    <uses-permission android:name="android.permission.VIBRATE" \/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" \/>\n    <application/' android/app/src/main/AndroidManifest.xml
+
+      - name: Fix Kotlin Duplicate Classes
+        run: |
+          echo "configurations.all { exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'; exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8' }" >> android/app/build.gradle
+
+      - name: Configure Release Signing
+        run: |
+          echo "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" | base64 -d > android/app/rjmobile.keystore
+          echo "d2l0aCBvcGVuKCdhbmRyb2lkL2FwcC9idWlsZC5ncmFkbGUnKSBhcyBmOgogICAgcyA9IGYucmVhZCgpCgpzaWduaW5nID0gJycnCiAgICBzaWduaW5nQ29uZmlncyB7CiAgICAgICAgcmVsZWFzZSB7CiAgICAgICAgICAgIHN0b3JlRmlsZSBmaWxlKCJyam1vYmlsZS5rZXlzdG9yZSIpCiAgICAgICAgICAgIHN0b3JlUGFzc3dvcmQgInJqbW9iaWxlMTIzIgogICAgICAgICAgICBrZXlBbGlhcyAicmptb2JpbGUiCiAgICAgICAgICAgIGtleVBhc3N3b3JkICJyam1vYmlsZTEyMyIKICAgICAgICB9CiAgICB9CicnJwoKcyA9IHMucmVwbGFjZSgnYnVpbGRUeXBlcyB7Jywgc2lnbmluZyArICcgICAgYnVpbGRUeXBlcyB7JykKcyA9IHMucmVwbGFjZSgnbWluaWZ5RW5hYmxlZCBmYWxzZScsICdzaWduaW5nQ29uZmlnIHNpZ25pbmdDb25maWdzLnJlbGVhc2VcbiAgICAgICAgICAgIG1pbmlmeUVuYWJsZWQgZmFsc2UnKQoKd2l0aCBvcGVuKCdhbmRyb2lkL2FwcC9idWlsZC5ncmFkbGUnLCAndycpIGFzIGY6CiAgICBmLndyaXRlKHMpCgpwcmludCgnUmVsZWFzZSBzaWduaW5nIGluamVjdGVkIHN1Y2Nlc3NmdWxseSEnKQo=" | base64 -d > inject_signing.py
+          python3 inject_signing.py
+
+      - name: Build Signed APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: RJ-Attendance-Admin-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
