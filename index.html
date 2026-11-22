@@ -792,6 +792,182 @@
       }
     }
 
+
+    /* =========================================================
+       NATIVE MOBILE APP ENHANCEMENTS
+       ========================================================= */
+    :root {
+      --bottom-nav-height: 64px;
+    }
+
+    body {
+      padding-top: env(safe-area-inset-top, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: flex-start;
+      padding-top: 6px;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .bottom-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: transparent;
+      border: none;
+      color: var(--text-soft);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 0;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .bottom-nav-item .nav-icon {
+      font-size: 18px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+    .bottom-nav-item.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .bottom-nav-item.active .nav-icon {
+      transform: translateY(-2px);
+    }
+
+    /* MORE ACTIONS BOTTOM SHEET */
+    .mobile-bottom-sheet {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      width: 100vw;
+      max-height: 80vh;
+      background: var(--bg-surface, var(--card-bg));
+      border-radius: 20px 20px 0 0;
+      border-top: 1px solid var(--card-border);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+      z-index: 1100;
+      transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
+    }
+
+    .mobile-bottom-sheet.open {
+      bottom: 0;
+    }
+
+    .bottom-sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--text-soft);
+      opacity: 0.3;
+      border-radius: 2px;
+      margin: 10px auto 14px auto;
+    }
+
+    .bottom-sheet-header {
+      padding: 0 20px 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .bottom-sheet-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .bottom-sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 16px 20px;
+      overflow-y: auto;
+    }
+
+    .sheet-menu-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .sheet-menu-btn:active {
+      transform: scale(0.96);
+      border-color: var(--primary);
+    }
+
+    .sheet-menu-btn .sheet-icon {
+      font-size: 24px;
+    }
+
+    /* Touch & Content Area optimization */
+    .content-wrapper {
+      padding-bottom: calc(var(--bottom-nav-height) + 40px + env(safe-area-inset-bottom, 0)) !important;
+    }
+
+    /* Modal Mobile Native Bottom Sheet feel */
+    @media (max-width: 768px) {
+      .modal-overlay {
+        align-items: flex-end !important;
+        padding: 0 !important;
+      }
+      .modal-card {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-radius: 20px 20px 0 0 !important;
+        padding: 20px !important;
+        max-height: 85vh !important;
+        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0)) !important;
+      }
+      @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -884,11 +1060,7 @@
             <span class="tab-btn-text">Attendance Grid</span>
           </button>
 
-          <button class="tab-btn" data-view="view-audits" style="position: relative;">
-            <span class="tab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span> 
-            <span class="tab-btn-text">Photo Audits</span>
-            <span id="pending-audits-badge" class="badge bg-orange" style="display:none; position: absolute; right: 12px; padding: 2px 6px;">0</span>
-          </button>
+          
 
           
 
@@ -1199,18 +1371,7 @@
                 </div>
 
                 <!-- VIEW 4: PHOTO AUDITS -->
-                <div id="view-audits" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: 13px; display: flex; align-items: center; min-height: 42px;">Review check-in/out photos.</span>
-                        <div id="gallery-filters" style="display: flex; align-items: center; gap: 12px;">
-                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
-                                <input type="checkbox" id="master-audit-select" onchange="window.selectAllAudits(this)"> Select All Visible
-                            </label>
-                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
-                                <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
-                            </label>
-                        </div>
-                    </div>
+                
 
                     <div id="audit-gallery-container" style="user-select: none; -webkit-user-select: none; min-height: 400px; display: flex; flex-direction: column;">
                         <div class="audit-grid" id="audit-grid" style="flex: 1;"></div>
@@ -1628,8 +1789,7 @@
   </div> 
 
   <!-- FLOATING BULK ACTION BAR -->
-  <div id="bulk-action-bar" class="bulk-action-bar">
-      <div style="font-weight: 800; color: var(--text-main); font-size: 14px;"><span id="bulk-selected-count" style="color: var(--primary-text); font-size: 18px;">0</span> Selected</div>
+  
       <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
       <div style="color: var(--success); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">🟢 Biometric Live Attendance Verified</div>
       <button class="btn-primary" id="btn-bulk-save" onclick="window.executeBulkAuditSave()" style="margin-left: 8px; padding: 12px 20px;">Bulk Approve & Save</button>
@@ -2108,23 +2268,19 @@
     </div>
   </div>
 
-  <!-- AUDIT MODAL -->
+    <!-- CLEAN PHOTO PREVIEW LIGHTBOX -->
   <div id="photo-modal" class="modal-overlay" onclick="window.closeModal(this)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
-        <span id="photo-modal-title"></span>
-        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
-      </h3>
-      <img id="modal-image-src" class="modal-img" src="" alt="Audit Photo" onerror="this.onerror=null; this.src='https://placehold.co/600x400/18181b/ef4444?text=Image+Purged/Expired'">
-      <div id="audit-controls" style="display:none; flex-direction:column; gap:16px; margin-top:8px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--input-bg); border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-              <span style="font-size: 13px; font-weight: 600; color: var(--success); display: flex; align-items: center; gap: 6px;">
-                  <span>🟢</span> Biometric Live Verification Photo
-              </span>
-          </div>
-          <button class="btn-primary" id="btn-modal-audit-save" style="justify-content:center; padding: 14px;">Approve & Mark Verified</button>
+    <div class="modal-card" style="max-width: 480px; padding: 18px; text-align: center; border-radius: 16px;" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 id="photo-modal-title" style="margin: 0; color: var(--text-main); font-size: 16px; font-weight: 700;">Biometric Attendance Selfie</h3>
+        <span style="color: var(--text-soft); cursor: pointer; font-size: 26px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
       </div>
+      <div style="border-radius: 12px; overflow: hidden; background: #000; box-shadow: var(--shadow-md);">
+        <img id="modal-image-src" style="width: 100%; max-height: 440px; object-fit: contain; display: block;" src="" alt="Attendance Photo">
+      </div>
+      <div id="photo-modal-subtitle" style="margin-top: 10px; font-size: 13px; color: var(--success); font-weight: 600;">🟢 Live Selfie Verified</div>
     </div>
+  </div>
   </div>
 
   <!-- PAYROLL ADJUSTMENT MODAL -->
@@ -2756,125 +2912,14 @@
         }
     }
 
+    
     window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked, isReviewed) {
-        document.getElementById('photo-modal-title').innerText = "Audit Photo";
-        window.currentActiveAuditLogId = logId; 
         document.getElementById('modal-image-src').src = imageSrc;
-        const controls = document.getElementById('audit-controls');
-
-        // SILENT PRELOADER: Find the next visible photo and cache it in the browser
-        setTimeout(() => {
-            const currentBox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-            if (currentBox) {
-                const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none');
-                const currentIndex = allVisibleCards.indexOf(currentBox.closest('.audit-card'));
-                if (currentIndex !== -1 && currentIndex + 1 < allVisibleCards.length) {
-                    const nextImg = allVisibleCards[currentIndex + 1].querySelector('.audit-img');
-                    if (nextImg && nextImg.src) {
-                        const preloader = new Image();
-                        preloader.src = nextImg.src; // Forces the browser to download and cache it
-                    }
-                }
-            }
-        }, 50);
-        
-        if(logId && logId !== 'undefined' && logId !== 'null') {
-            controls.style.display = 'flex';
-            
-            
-            
-            const btn = document.getElementById('btn-modal-audit-save');
-            btn.innerText = isReviewed ? "✏️ Update Audit" : "Approve & Save";
-            btn.onclick = () => saveQuickAuditFromModal(logId);
-        } else {
-            controls.style.display = 'none';
-        }
         document.getElementById('photo-modal').style.display = 'flex';
     };
 
-    window.saveQuickAuditFromModal = async function(logId) {
-        const btn = document.getElementById('btn-modal-audit-save');
-        btn.innerText = "Saving..."; btn.disabled = true;
-        
-        const logIndex = dbLogs.findIndex(l => l.id === logId);
-        if(logIndex !== -1) { 
-            dbLogs[logIndex].uniform_reviewed = true; 
-             
-             
-        }
 
-        // AUTO-NEXT LOGIC (Optimized to prevent animation clash)
-        const cardCheckbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-        let movedToNext = false;
-        let nextCardToOpen = null;
-        
-        if (cardCheckbox) {
-            // Only find cards that are fully visible AND not currently fading out
-            const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none' && c.style.opacity !== '0');
-            const currentIndex = allVisibleCards.indexOf(cardCheckbox.closest('.audit-card'));
-            
-            if (currentIndex !== -1 && currentIndex + 1 < allVisibleCards.length) {
-                nextCardToOpen = allVisibleCards[currentIndex + 1];
-            }
-        }
-        
-        // 1. Fade out current card FIRST
-        if (cardCheckbox) {
-            const card = cardCheckbox.closest('.audit-card');
-            if (card) {
-                if (showOnlyPendingPhotos) {
-                    card.style.opacity = '0'; // Immediately hide to remove from ArrowKey index
-                    card.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-                    card.style.transform = 'scale(0.9)';
-                    setTimeout(() => card.style.display = 'none', 300);
-                } else {
-                    const btnElement = card.querySelector('.btn-primary');
-                    if (btnElement) {
-                        btnElement.innerText = "✏️ Update Audit";
-                        btnElement.className = "btn-secondary";
-                        btnElement.style.borderColor = "var(--success)";
-                        btnElement.style.color = "var(--success)";
-                    }
-                    const badge = card.querySelector('.audit-badge:last-child');
-                    if (badge) {
-                        badge.innerText = "✅ Audited";
-                        badge.style.background = "var(--success)";
-                        badge.style.color = "#fff";
-                        badge.style.borderColor = "rgba(255,255,255,0.2)";
-                    }
-                }
-            }
-        }
-
-        // 2. Open Next Card AFTER the current one is handled
-        if (nextCardToOpen) {
-            const imgWrap = nextCardToOpen.querySelector('.audit-img-wrap');
-            if (imgWrap) {
-                imgWrap.click(); // Jump to next photo
-                movedToNext = true;
-            }
-        }
-
-        if (!movedToNext) {
-            window.closeModal(document.getElementById('photo-modal'));
-        }
-
-        window.updatePendingBadgeCount(-1);
-
-        try {
-            await supabaseClient.from('attendance_logs').update({ uniform_reviewed: true }).eq('id', logId);
-            showToast("Audit Saved", "success");
-            processStitchedData(); // FIX: Instantly refresh tables and stats without page reload
-        } catch(e) { 
-            showToast("Error saving audit", "error"); 
-        } finally {
-            btn.disabled = false;
-            // Fix: Sirf tabhi text reset karo agar hum next photo pe nahi gaye hain
-            if (window.currentActiveAuditLogId === logId) {
-                btn.innerText = "Approve & Save"; 
-            }
-        }
-    };
+    
 
     window.safeHTML = (str) => typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(str) : str;
     // HTML-escape for text shown in innerHTML, and a safe JS string literal for inline onclick="" arguments
@@ -3144,8 +3189,7 @@
             'view-action': { date: true, time: false, role: true, branch: false, staff: true },
             
             // Audits: Date, role, and staff filters relevant
-            'view-audits': { date: true, time: false, role: true, branch: true, staff: true },
-            
+                        
             // Roster: Role, branch, and staff filters relevant (has its own date picker)
             'view-roster': { date: false, time: false, role: true, branch: true, staff: true },
             
@@ -3552,7 +3596,7 @@
         pendingToggleEl.addEventListener('change', (e) => {
             showOnlyPendingPhotos = e.target.checked;
             localStorage.setItem('rj_audit_pending_only', e.target.checked);
-            if (typeof renderAuditGallery === 'function') renderAuditGallery();
+            
         });
     }
 
@@ -4623,7 +4667,7 @@
         
         if (activeTab === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
         if (activeTab === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
-        if (activeTab === 'view-audits' && typeof renderAuditGallery === 'function') renderAuditGallery();
+        
         if (activeTab === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
         if (activeTab === 'view-action') {
             if (currentActionTab === 'leaves' && typeof renderLeaveTable === 'function') renderLeaveTable();
@@ -5422,171 +5466,11 @@
        }
     });
 
-    function renderAuditGallery() {
-        const grid = document.getElementById('audit-grid');
-        if(!grid) return;
-        let cardsHtml = '';
-        let photoCount = 0;
+    
 
-        processedData.forEach(r => {
-            const dateStr = r.date.toLocaleDateString(window.appDateFormat);
-            
-            const buildCard = (photo, logId, typeBadge, isReviewed, uTshirt, uIdcard, timeStr) => {
-                if (showOnlyPendingPhotos && isReviewed) return '';
-                if (!photo || photo.length < 100) return '';
-                
-                photoCount++;
-                const badgeColor = typeBadge.includes('IN') || typeBadge.includes('REACHED') ? 'var(--success)' : (typeBadge.includes('DEPARTED') ? 'var(--warning)' : 'var(--danger)');
-                
-                const tChecked = (uTshirt === true || uTshirt === 'true') ? 'checked' : '';
-                const iChecked = (uIdcard === true || uIdcard === 'true') ? 'checked' : '';
-                
-                const btnHtml = isReviewed 
-                    ? `<button class="btn-secondary" style="margin-top:auto; justify-content:center; padding:10px; border-color: var(--success); color: var(--success);" onclick="window.saveQuickAudit('${logId}', this)">✏️ Update Audit</button>`
-                    : `<button class="btn-primary" style="margin-top:auto; justify-content:center; padding:10px;" onclick="window.saveQuickAudit('${logId}', this)">Approve & Save</button>`;
+    
 
-                const statusBadgeHtml = isReviewed 
-                    ? `<span class="audit-badge" style="top: auto; bottom: 12px; left: 12px; right: auto; background: var(--success); border: 1px solid rgba(255,255,255,0.2);">✅ Audited</span>`
-                    : `<span class="audit-badge" style="top: auto; bottom: 12px; left: 12px; right: auto; background: var(--warning); color: #000; border: 1px solid rgba(0,0,0,0.2);">⏳ Pending</span>`;
-
-                const cardCheck = `<input type="checkbox" class="audit-card-checkbox" value="${logId}" ${selectedAuditLogIds.has(logId) ? 'checked' : ''} onclick="event.stopPropagation();" onchange="window.toggleAuditSelection('${logId}', this.checked, event)">`;
-                return `
-                <div class="audit-card" style="position: relative;">
-                    ${cardCheck}
-                    <div class="audit-img-wrap" onmousedown="window.handleLassoStart(event, '${logId}')" onmouseenter="window.handleLassoMove(event, '${logId}')" onclick="window.handleCardClick(event, '${logId}', '${photo}', ${uTshirt}, ${uIdcard}, ${isReviewed})">
-                        <img src="${photo}" loading="lazy" class="audit-img" alt="Audit Photo" draggable="false" ondragstart="return false;" onload="this.style.opacity=1" onerror="this.onerror=null; this.src='https://placehold.co/400x300/18181b/a1a1aa?text=Expired'; this.style.opacity=1;">
-                        <span class="audit-badge" style="background: ${badgeColor}; border: 1px solid rgba(255,255,255,0.2); z-index: 6;">${typeBadge}</span>
-                        ${statusBadgeHtml}
-                    </div>
-                    <div class="audit-details">
-                        <div><strong style="color: var(--text-main); font-size: 14px;">${r.name}</strong><br><span style="font-size:11px; color:var(--text-soft); font-weight: 600;">${r.branches}</span></div>
-                        <div style="font-size: 11px; color: var(--text-soft); font-weight: 600;">${dateStr} • ${timeStr}</div>
-                        <div style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--input-bg); border-radius: var(--radius-sm); border: 1px solid var(--card-border); font-size: 11px; font-weight: 600; color: var(--success);">
-                          <span>🟢</span> Live Selfie Verified
-                        </div>
-                        ${btnHtml}
-                    </div>
-                </div>
-                `;
-            };
-
-            if (r.photoLogs && r.photoLogs.length > 0) {
-                r.photoLogs.forEach(pl => {
-                    let typeBadge = '';
-                    if(pl.action === 'Clock In') typeBadge = 'IN';
-                    else if(pl.action === 'Clock Out') typeBadge = 'OUT';
-                    else if(pl.action === 'Transit Start') typeBadge = '🚗 DEPARTED';
-                    else if(pl.action === 'Transit End') typeBadge = '📍 REACHED';
-
-                    cardsHtml += buildCard(pl.photo, pl.id, typeBadge, pl.reviewed, pl.uTshirt, pl.uIdcard, pl.time);
-                });
-            }
-        });
-
-        if(photoCount === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 60px; color:var(--text-soft); font-weight: 600;">No photos match the current view filter!</div>';
-        } else {
-            grid.innerHTML = cardsHtml;
-        }
-        
-        if (typeof window.updateBulkActionBar === 'function') window.updateBulkActionBar();
-    }
-
-    window.updatePendingBadgeCount = function(changeObj) {
-        const badge = document.getElementById('pending-audits-badge');
-        if (badge) {
-            let current = parseInt(badge.innerText) || 0;
-            let newVal = Math.max(0, current + changeObj);
-            badge.innerText = newVal;
-            badge.style.display = newVal > 0 ? 'inline-block' : 'none';
-        }
-    };
-
-    window.saveQuickAudit = async function(logId, btnElement) {
-
-        const logIndex = dbLogs.findIndex(l => l.id === logId);
-        if(logIndex !== -1) { 
-            dbLogs[logIndex].uniform_reviewed = true; 
-             
-             
-        }
-
-        if (btnElement) {
-            const card = btnElement.closest('.audit-card');
-            if (card) {
-                if (showOnlyPendingPhotos) {
-                    card.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.9)';
-                    setTimeout(() => card.style.display = 'none', 300);
-                    window.updatePendingBadgeCount(-1);
-                } else {
-                    if (btnElement.innerText.includes("Approve")) window.updatePendingBadgeCount(-1);
-                    btnElement.innerText = "✏️ Update Audit";
-                    btnElement.className = "btn-secondary";
-                    btnElement.style.borderColor = "var(--success)";
-                    btnElement.style.color = "var(--success)";
-                    const badge = card.querySelector('.audit-badge:last-child');
-                    if (badge) {
-                        badge.innerText = "✅ Audited";
-                        badge.style.background = "var(--success)";
-                        badge.style.color = "#fff";
-                    }
-                }
-            }
-        }
-
-        try {
-            const updatePayload = { uniform_reviewed: true };
-            
-            if (!navigator.onLine) {
-                // Queue for background sync
-                const queue = await localforage.getItem('rj_offline_queue') || [];
-                queue.push({ type: 'audit_update', payload: { updateData: updatePayload, ids: [logId] } });
-                await localforage.setItem('rj_offline_queue', queue);
-                showToast("Audit Saved Offline", "primary");
-            } else {
-                // Normal online save
-                const { error } = await supabaseClient.from('attendance_logs').update(updatePayload).eq('id', logId);
-                if (error) throw error;
-                showToast("Audit Saved", "success");
-            }
-            
-            processStitchedData(); // Instantly refresh tables and stats
-        } catch(e) { 
-            showToast("Error saving audit", "error"); 
-            if (btnElement && showOnlyPendingPhotos) btnElement.closest('.audit-card').style.display = 'flex';
-        }
-    }
-
-    let isLassoDragging = false;
-    let lassoTargetState = true;
-
-    // Failsafe to stop dragging if mouse goes up anywhere on the window
-    window.addEventListener('mouseup', () => {
-        isLassoDragging = false;
-    });
-
-    window.handleLassoStart = function(event, logId) {
-        if (event.shiftKey) {
-            event.preventDefault(); // Prevent native text/image drag behavior
-            isLassoDragging = true;
-            
-            const checkbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-            if (checkbox) {
-                // Determine whether we are selecting or deselecting based on the first item clicked
-                lassoTargetState = !checkbox.checked;
-                checkbox.checked = lassoTargetState;
-                
-                if (lassoTargetState) selectedAuditLogIds.add(logId);
-                else selectedAuditLogIds.delete(logId);
-                
-                window.updateBulkActionBar();
-            }
-        } else if (event.ctrlKey || event.metaKey) {
-            event.preventDefault(); // Prevent text highlight while discrete clicking
-        }
-    };
+    
 
     window.handleLassoMove = function(event, logId) {
         if (isLassoDragging && event.shiftKey) {
@@ -5698,111 +5582,7 @@
         }
     };
 
-    window.executeBulkAuditSave = async function() {
-        if (selectedAuditLogIds.size === 0) return;
-        
-        // Safety Check for massive batches
-        if (selectedAuditLogIds.size > 20) {
-            if (!await window.customConfirm(`You are about to bulk-approve ${selectedAuditLogIds.size} photos at once. Are you sure?`)) return;
-        }
-        
-        // Uniform checkboxes removed
-        const btn = document.getElementById('btn-bulk-save');
-        const originalText = btn.innerText;
-        
-        btn.innerText = "Saving Batch...";
-        btn.disabled = true;
-
-        const selectedArray = Array.from(selectedAuditLogIds);
-        window.lastBulkUpdateIds = [...selectedArray]; // Store for Undo
-        
-        // 1. Create a deep clone snapshot for strict rollback
-        const dbLogsSnapshot = JSON.parse(JSON.stringify(dbLogs));
-
-        // Optimistically update the UI arrays locally
-        selectedArray.forEach(logId => {
-            const logIndex = dbLogs.findIndex(l => l.id === logId);
-            if(logIndex !== -1) { 
-                dbLogs[logIndex].uniform_reviewed = true; 
-                 
-                 
-            }
-        });
-
-        try {
-            const updatePayload = { uniform_reviewed: true };
-            
-            if (!navigator.onLine) {
-                // Queue for background sync
-                const queue = await localforage.getItem('rj_offline_queue') || [];
-                queue.push({ type: 'audit_update', payload: { updateData: updatePayload, ids: selectedArray } });
-                await localforage.setItem('rj_offline_queue', queue);
-            } else {
-                // Normal online save
-                const { error } = await supabaseClient.from('attendance_logs')
-                    .update(updatePayload)
-                    .in('id', selectedArray);
-
-                if (error) {
-                    dbLogs = dbLogsSnapshot; // Rollback local state
-                    throw error;
-                }
-            }
-
-            // Show success toast with 6-second duration and an embedded Undo button
-            const undoBtnHtml = `<button onclick="window.undoBulkSave(event)" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 4px; margin-left: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;">Undo</button>`;
-            const msg = !navigator.onLine ? `Approved ${selectedArray.length} photos Offline! ${undoBtnHtml}` : `Approved ${selectedArray.length} photos! ${undoBtnHtml}`;
-            showToast(msg, !navigator.onLine ? "primary" : "success", 6000);
-            
-            selectedAuditLogIds.clear();
-            
-            // Reset the master toggles to TRUE (Safe Default) for the next time it opens
-            
-            document.getElementById('bulk-idcard').checked = true;
-            
-            // OPTIMISTIC UI UPDATE (Smoothly fade out specific cards)
-            window.updatePendingBadgeCount(-selectedArray.length);
-            selectedArray.forEach((logId, idx) => {
-                const cardCheckbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-                if (cardCheckbox) {
-                    const card = cardCheckbox.closest('.audit-card');
-                    if (card) {
-                        if (showOnlyPendingPhotos) {
-                            card.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-                            // Staggered fade out so it looks really cool
-                            setTimeout(() => {
-                                card.style.opacity = '0';
-                                card.style.transform = 'scale(0.9)';
-                            }, idx * 25);
-                            setTimeout(() => card.style.display = 'none', 350 + (idx * 25));
-                        } else {
-                            const btnElement = card.querySelector('.btn-primary');
-                            if (btnElement) {
-                                btnElement.innerText = "✏️ Update Audit";
-                                btnElement.className = "btn-secondary";
-                                btnElement.style.borderColor = "var(--success)";
-                                btnElement.style.color = "var(--success)";
-                            }
-                            const badge = card.querySelector('.audit-badge:last-child');
-                            if (badge) {
-                                badge.innerText = "✅ Audited";
-                                badge.style.background = "var(--success)";
-                                badge.style.color = "#fff";
-                            }
-                        }
-                    }
-                }
-            });
-            window.updateBulkActionBar(); // Hide bar immediately
-
-        } catch(e) {
-            console.error("Bulk save error:", e);
-            showToast("Error during bulk approval. Try again.", "error");
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
-    };
+    
 
     window.undoBulkSave = async function(e) {
         if(e) {
@@ -7469,6 +7249,91 @@
 
     
     // MOBILE DRAWER HANDLERS
+    
+    // MOBILE APP NAVIGATION SYSTEM
+    window.switchMobileTab = function(viewId) {
+        window.closeMobileMoreSheet();
+        const tabBtn = document.querySelector(`.sidebar .tab-btn[data-view="${viewId}"]`);
+        if (tabBtn) {
+            tabBtn.click();
+        } else {
+            // Direct view switch fallback
+            document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
+            const targetView = document.getElementById(viewId);
+            if (targetView) targetView.style.display = 'block';
+        }
+
+        // Update bottom nav active state
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            if (item.getAttribute('data-nav') === viewId) {
+                item.classList.add('active');
+            } else if (item.getAttribute('data-nav') !== 'more') {
+                item.classList.remove('active');
+            }
+        });
+
+        // Smooth scroll to top of content
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) mainContent.scrollTop = 0;
+    };
+
+    window.openMobileMoreSheet = function() {
+        const sheet = document.getElementById('mobile-bottom-sheet');
+        const bd = document.getElementById('bottom-sheet-backdrop');
+        if (sheet) sheet.classList.add('open');
+        if (bd) bd.classList.add('active');
+    };
+
+    window.closeMobileMoreSheet = function() {
+        const sheet = document.getElementById('mobile-bottom-sheet');
+        const bd = document.getElementById('bottom-sheet-backdrop');
+        if (sheet) sheet.classList.remove('open');
+        if (bd) bd.classList.remove('active');
+    };
+
+    // Sync sidebar tab click with bottom navigation
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.sidebar .tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.getAttribute('data-view');
+                document.querySelectorAll('.bottom-nav-item').forEach(nav => {
+                    if (nav.getAttribute('data-nav') === view) {
+                        nav.classList.add('active');
+                    } else if (nav.getAttribute('data-nav') !== 'more') {
+                        nav.classList.remove('active');
+                    }
+                });
+            });
+        });
+    });
+
+    // Android Hardware / Gesture Back Button Handling
+    document.addEventListener('backbutton', function(e) {
+        // If bottom sheet is open, close it
+        const sheet = document.getElementById('mobile-bottom-sheet');
+        if (sheet && sheet.classList.contains('open')) {
+            e.preventDefault();
+            window.closeMobileMoreSheet();
+            return;
+        }
+
+        // If any modal is open, close it
+        const openModal = document.querySelector('.modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
+        if (openModal) {
+            e.preventDefault();
+            window.closeModal(openModal);
+            return;
+        }
+
+        // If not on overview tab, go back to overview
+        const activeNav = document.querySelector('.bottom-nav-item.active');
+        if (activeNav && activeNav.getAttribute('data-nav') !== 'view-dashboard') {
+            e.preventDefault();
+            window.switchMobileTab('view-dashboard');
+            return;
+        }
+    }, false);
+
     window.toggleMobileSidebar = function() {
         const sb = document.getElementById('app-sidebar');
         const bd = document.getElementById('sidebar-backdrop');
@@ -9590,6 +9455,91 @@
     const originalOpenEditStaff = window.openEditStaff;
     
     // MOBILE DRAWER HANDLERS
+    
+    // MOBILE APP NAVIGATION SYSTEM
+    window.switchMobileTab = function(viewId) {
+        window.closeMobileMoreSheet();
+        const tabBtn = document.querySelector(`.sidebar .tab-btn[data-view="${viewId}"]`);
+        if (tabBtn) {
+            tabBtn.click();
+        } else {
+            // Direct view switch fallback
+            document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
+            const targetView = document.getElementById(viewId);
+            if (targetView) targetView.style.display = 'block';
+        }
+
+        // Update bottom nav active state
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            if (item.getAttribute('data-nav') === viewId) {
+                item.classList.add('active');
+            } else if (item.getAttribute('data-nav') !== 'more') {
+                item.classList.remove('active');
+            }
+        });
+
+        // Smooth scroll to top of content
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) mainContent.scrollTop = 0;
+    };
+
+    window.openMobileMoreSheet = function() {
+        const sheet = document.getElementById('mobile-bottom-sheet');
+        const bd = document.getElementById('bottom-sheet-backdrop');
+        if (sheet) sheet.classList.add('open');
+        if (bd) bd.classList.add('active');
+    };
+
+    window.closeMobileMoreSheet = function() {
+        const sheet = document.getElementById('mobile-bottom-sheet');
+        const bd = document.getElementById('bottom-sheet-backdrop');
+        if (sheet) sheet.classList.remove('open');
+        if (bd) bd.classList.remove('active');
+    };
+
+    // Sync sidebar tab click with bottom navigation
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.sidebar .tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.getAttribute('data-view');
+                document.querySelectorAll('.bottom-nav-item').forEach(nav => {
+                    if (nav.getAttribute('data-nav') === view) {
+                        nav.classList.add('active');
+                    } else if (nav.getAttribute('data-nav') !== 'more') {
+                        nav.classList.remove('active');
+                    }
+                });
+            });
+        });
+    });
+
+    // Android Hardware / Gesture Back Button Handling
+    document.addEventListener('backbutton', function(e) {
+        // If bottom sheet is open, close it
+        const sheet = document.getElementById('mobile-bottom-sheet');
+        if (sheet && sheet.classList.contains('open')) {
+            e.preventDefault();
+            window.closeMobileMoreSheet();
+            return;
+        }
+
+        // If any modal is open, close it
+        const openModal = document.querySelector('.modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
+        if (openModal) {
+            e.preventDefault();
+            window.closeModal(openModal);
+            return;
+        }
+
+        // If not on overview tab, go back to overview
+        const activeNav = document.querySelector('.bottom-nav-item.active');
+        if (activeNav && activeNav.getAttribute('data-nav') !== 'view-dashboard') {
+            e.preventDefault();
+            window.switchMobileTab('view-dashboard');
+            return;
+        }
+    }, false);
+
     window.toggleMobileSidebar = function() {
         const sb = document.getElementById('app-sidebar');
         const bd = document.getElementById('sidebar-backdrop');
@@ -10103,5 +10053,78 @@
     };
 
   </script>
+
+    <!-- NATIVE MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+      <button class="bottom-nav-item active" data-nav="view-dashboard" onclick="window.switchMobileTab('view-dashboard')">
+        <span class="nav-icon">📊</span>
+        <span>Overview</span>
+      </button>
+      <button class="bottom-nav-item" data-nav="view-live" onclick="window.switchMobileTab('view-live')">
+        <span class="nav-icon">📍</span>
+        <span>Live</span>
+      </button>
+      <button class="bottom-nav-item" data-nav="view-logs" onclick="window.switchMobileTab('view-logs')">
+        <span class="nav-icon">📝</span>
+        <span>Logs</span>
+      </button>
+      <button class="bottom-nav-item" data-nav="view-stats" onclick="window.switchMobileTab('view-stats')">
+        <span class="nav-icon">📈</span>
+        <span>Stats</span>
+      </button>
+      <button class="bottom-nav-item" data-nav="more" onclick="window.openMobileMoreSheet()">
+        <span class="nav-icon">⚙️</span>
+        <span>More</span>
+      </button>
+    </nav>
+
+    <!-- MORE ACTIONS BOTTOM SHEET -->
+    <div class="sidebar-backdrop" id="bottom-sheet-backdrop" onclick="window.closeMobileMoreSheet()"></div>
+    <div class="mobile-bottom-sheet" id="mobile-bottom-sheet">
+      <div class="bottom-sheet-handle"></div>
+      <div class="bottom-sheet-header">
+        <div class="bottom-sheet-title">More Workspace Options</div>
+        <button onclick="window.closeMobileMoreSheet()" class="icon-btn" style="border:none; font-size: 20px; color: var(--text-soft);">&times;</button>
+      </div>
+      <div class="bottom-sheet-grid">
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-branch-ops')">
+          <span class="sheet-icon">🏢</span>
+          <span>Branch Ops</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-branch-matrix')">
+          <span class="sheet-icon">🔲</span>
+          <span>Branch Grid</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-roster')">
+          <span class="sheet-icon">📋</span>
+          <span>Duty Roster</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-matrix')">
+          <span class="sheet-icon">📅</span>
+          <span>Matrix</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-payroll')">
+          <span class="sheet-icon">💳</span>
+          <span>Payroll</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-phones')">
+          <span class="sheet-icon">📱</span>
+          <span>Incentives</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-settings-hr')">
+          <span class="sheet-icon">👥</span>
+          <span>HR Settings</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-settings-org')">
+          <span class="sheet-icon">⚙️</span>
+          <span>Shifts & Loc</span>
+        </button>
+        <button class="sheet-menu-btn" onclick="window.logoutAdmin()" style="border-color: rgba(239, 68, 68, 0.3); color: var(--danger);">
+          <span class="sheet-icon">🚪</span>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </div>
+
 </body>
 </html>
