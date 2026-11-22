@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>RJ Mobile | Attendance Workspace</title>
   <link rel="icon" type="image/png" href="logo.png" />
    
@@ -707,268 +707,7 @@
     .payroll-month-nav { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main); font-size: 16px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s ease; padding: 0; }
     .payroll-month-nav:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-alpha); }
     .payroll-month-nav:disabled { opacity: .35; cursor: not-allowed; }
-  
-    /* MOBILE RESPONSIVE STYLES */
-    .mobile-menu-btn { display: none !important; }
-    .sidebar-backdrop { display: none; }
-
-    @media (max-width: 900px) {
-      .mobile-menu-btn {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        background: var(--input-bg);
-        border: 1px solid var(--card-border);
-        border-radius: var(--radius-sm);
-        color: var(--text-main);
-        font-size: 20px;
-        cursor: pointer;
-        z-index: 150;
-      }
-      .sidebar-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        z-index: 998;
-        display: none;
-      }
-      .sidebar-backdrop.active {
-        display: block !important;
-      }
-      .sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        left: -300px !important;
-        height: 100vh !important;
-        width: 280px !important;
-        z-index: 999 !important;
-        transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        box-shadow: 20px 0 50px rgba(0,0,0,0.6) !important;
-      }
-      .sidebar.mobile-open {
-        left: 0 !important;
-      }
-      .main-content {
-        width: 100vw !important;
-        max-width: 100vw !important;
-      }
-      .header-bar {
-        padding: 12px 16px !important;
-        gap: 8px !important;
-      }
-      .header-title {
-        font-size: 16px !important;
-      }
-      .header-controls {
-        gap: 6px !important;
-      }
-      .content-wrapper {
-        padding: 14px !important;
-      }
-      .filter-section {
-        padding: 14px !important;
-      }
-      .table-container {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-      }
-      .kpi-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
-        gap: 12px !important;
-      }
-      .modal-card {
-        width: 95vw !important;
-        max-width: 95vw !important;
-        padding: 16px !important;
-        max-height: 90vh !important;
-        overflow-y: auto !important;
-      }
-    }
-
-
-    /* =========================================================
-       NATIVE MOBILE APP ENHANCEMENTS
-       ========================================================= */
-    :root {
-      --bottom-nav-height: 64px;
-    }
-
-    body {
-      padding-top: env(safe-area-inset-top, 0);
-      padding-bottom: env(safe-area-inset-bottom, 0);
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .mobile-bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100vw;
-      height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--card-border);
-      display: flex;
-      align-items: flex-start;
-      padding-top: 6px;
-      padding-bottom: env(safe-area-inset-bottom, 0);
-      z-index: 1000;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
-    }
-
-    .bottom-nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      background: transparent;
-      border: none;
-      color: var(--text-soft);
-      cursor: pointer;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 4px 0;
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-    }
-
-    .bottom-nav-item .nav-icon {
-      font-size: 18px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s ease;
-    }
-
-    .bottom-nav-item.active {
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    .bottom-nav-item.active .nav-icon {
-      transform: translateY(-2px);
-    }
-
-    /* MORE ACTIONS BOTTOM SHEET */
-    .mobile-bottom-sheet {
-      position: fixed;
-      bottom: -100%;
-      left: 0;
-      width: 100vw;
-      max-height: 80vh;
-      background: var(--bg-surface, var(--card-bg));
-      border-radius: 20px 20px 0 0;
-      border-top: 1px solid var(--card-border);
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-      z-index: 1100;
-      transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
-    }
-
-    .mobile-bottom-sheet.open {
-      bottom: 0;
-    }
-
-    .bottom-sheet-handle {
-      width: 40px;
-      height: 4px;
-      background: var(--text-soft);
-      opacity: 0.3;
-      border-radius: 2px;
-      margin: 10px auto 14px auto;
-    }
-
-    .bottom-sheet-header {
-      padding: 0 20px 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    .bottom-sheet-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    .bottom-sheet-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      padding: 16px 20px;
-      overflow-y: auto;
-    }
-
-    .sheet-menu-btn {
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 14px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-main);
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      transition: all 0.2s ease;
-    }
-
-    .sheet-menu-btn:active {
-      transform: scale(0.96);
-      border-color: var(--primary);
-    }
-
-    .sheet-menu-btn .sheet-icon {
-      font-size: 24px;
-    }
-
-    /* Touch & Content Area optimization */
-    .content-wrapper {
-      padding-bottom: calc(var(--bottom-nav-height) + 40px + env(safe-area-inset-bottom, 0)) !important;
-    }
-
-    /* Modal Mobile Native Bottom Sheet feel */
-    @media (max-width: 768px) {
-      .modal-overlay {
-        align-items: flex-end !important;
-        padding: 0 !important;
-      }
-      .modal-card {
-        width: 100vw !important;
-        max-width: 100vw !important;
-        border-radius: 20px 20px 0 0 !important;
-        padding: 20px !important;
-        max-height: 85vh !important;
-        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0)) !important;
-      }
-      @keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-      }
-    }
-
-</style>
+  </style>
 </head>
 <body>
 
@@ -996,7 +735,6 @@
 
   <div id="dashboard">
     <div class="app-container">
-      <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="window.closeMobileSidebar()"></div>
       
       <!-- SIDEBAR NAVIGATION -->
       <aside class="sidebar" id="app-sidebar">
@@ -1104,10 +842,8 @@
         
         <!-- HEADER -->
         <div class="header-bar">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="window.toggleMobileSidebar()" title="Menu">☰</button>
-            <div style="display: flex; flex-direction: column;">
-              <div class="header-title" id="page-title">Overview</div>
+          <div style="display: flex; flex-direction: column;">
+            <div class="header-title" id="page-title">Overview</div>
             <div id="live-admin-clock" style="font-size: 14px; margin-top: 4px; letter-spacing: 0.5px; font-family: 'Manrope', sans-serif;">Loading time...</div>
           </div>
           <div class="header-controls" style="margin-left: auto;">
@@ -1371,7 +1107,18 @@
                 </div>
 
                 <!-- VIEW 4: PHOTO AUDITS -->
-                
+                <div id="view-audits" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+                        <span style="color: var(--text-soft); font-size: 13px; display: flex; align-items: center; min-height: 42px;">Review check-in/out photos.</span>
+                        <div id="gallery-filters" style="display: flex; align-items: center; gap: 12px;">
+                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
+                                <input type="checkbox" id="master-audit-select" onchange="window.selectAllAudits(this)"> Select All Visible
+                            </label>
+                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
+                                <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
+                            </label>
+                        </div>
+                    </div>
 
                     <div id="audit-gallery-container" style="user-select: none; -webkit-user-select: none; min-height: 400px; display: flex; flex-direction: column;">
                         <div class="audit-grid" id="audit-grid" style="flex: 1;"></div>
@@ -1379,380 +1126,6 @@
                 </div>
 
                 <!-- VIEW: CUSTOMER LOGS -->
-                <!-- VIEW 5: STAFF STATS -->
-                <div id="view-stats" class="app-view" style="display: none;">
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                    <span style="color: var(--text-soft); font-size: 13px;">Aggregated metrics for the selected date range. Good for Payroll prep.</span>
-                    </div>
-
-                    <div class="table-card" id="stats-export-container">
-                    <div class="table-responsive">
-                        <table id="stats-table">
-                        <thead>
-                            <tr>
-                            <th onclick="window.sortStats('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Name ⇅</th>
-                            <th onclick="window.sortStats('role')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Role ⇅</th>
-                            <th onclick="window.sortStats('days')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Present ⇅</th>
-                            <th onclick="window.sortStats('absent')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Absent ⇅</th>
-                            <th>Avg In & Out</th>
-                            <th onclick="window.sortStats('hours')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Total Hours ⇅</th>
-                            <th>Work vs Travel</th>
-                            <th>Target vs Actual</th>
-                            <th onclick="window.sortStats('lateCount')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Late ⇅</th>
-                            <th onclick="window.sortStats('earlyCount')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Early ⇅</th>
-                            <th onclick="window.sortStats('noShirt')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">No Shirt ⇅</th>
-                            <th onclick="window.sortStats('noId')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">No ID ⇅</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stats-tbody">
-                            <tr><td colspan="12" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                        </tbody>
-                        </table>
-                    </div>
-                    </div>
-                </div>
-                
-                <!-- VIEW 12: BRANCH OPS -->
-                <div id="view-branch-ops" class="app-view" style="display: none;">
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: 13px;">Track daily opening/closing times and averages based on staff punches.</span>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-responsive">
-                            <table id="branch-ops-table">
-                                <thead>
-                                    <tr>
-                                        <th>Branch Name</th>
-                                        <th>Days Operated</th>
-                                        <th>Avg Open Time</th>
-                                        <th>Avg Close Time</th>
-                                        <th>Today's Live Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="branch-ops-tbody">
-                                    <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 13: BRANCH GRID MATRIX -->
-                <div id="view-branch-matrix" class="app-view" style="display: none;">
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                        <span style="color: var(--text-soft); font-size: 13px;">Daily operational timeline grid of all branches.</span>
-                    </div>
-                    <div class="table-card">
-                        <div class="table-responsive">
-                            <table id="branch-matrix-table">
-                                <thead><tr id="branch-matrix-header"></tr></thead>
-                                <tbody id="branch-matrix-body">
-                                    <tr><td colspan="100" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 6: ATTENDANCE MATRIX -->
-                <div id="view-matrix" class="app-view" style="display: none;">
-                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-                    <span style="color: var(--text-soft); font-size: 13px;">Showing dates derived from currently loaded logs.</span>
-                    </div>
-
-                    <div class="table-card">
-                    <div class="table-responsive">
-                        <table id="matrix-table">
-                        <thead><tr id="matrix-header"></tr></thead>
-                        <tbody id="matrix-body">
-                            <tr><td colspan="100" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                        </tbody>
-                        </table>
-                    </div>
-                    </div>
-                </div>
-                
-                <!-- VIEW 11: BIRTHDAYS -->
-                <!-- VIEW 10: DUTY ROSTER -->
-                <div id="view-roster" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
-                        <div style="display: flex; gap: 16px; align-items: center;">
-                            <span style="color: var(--text-soft); font-size: 13px;">Drag & Drop staff to assign them for the selected date.</span>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                            <button id="btn-save-as-default" class="btn-primary" title="Make current board layout the permanent default for everyone">📌 Save as Default</button>
-                            <div style="display: flex; gap: 12px; align-items: center; background: var(--card-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                                <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
-                                <input type="text" id="roster-date-picker" class="input-field" style="margin: 0; width: 140px; padding: 8px 12px; background: var(--input-bg) !important; border-color: var(--card-border);" placeholder="Select Date" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="roster-board">
-                        <div class="roster-branches" id="roster-branches-container">
-                            <!-- Branches injected here -->
-                        </div>
-                        
-                        <div class="roster-sidebar">
-                            <div class="roster-sidebar-header">
-                                <div style="font-weight: 800; font-size: 15px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
-                                    Staff Pool <span class="badge bg-gray" id="unassigned-count">0</span>
-                                </div>
-                                <div style="font-size: 11px; color: var(--text-soft); margin-top: 6px; font-weight: 500;">Unassigned staff. Drag here to remove overrides.</div>
-                            </div>
-                            <div class="roster-list" id="roster-unassigned-list" data-branch-id="unassigned">
-                                <!-- Unassigned staff injected here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 7: ACTION CENTER -->
-
-                <!-- VIEW 7: ACTION CENTER -->
-                <div id="view-action" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <span style="color: var(--text-soft); font-size: 13px;">Manage missing staff and resolve exceptions.</span>
-                            <div class="switch-wrap" id="wrap-show-excused" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg);">
-                                <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Approved / Excused</div></div>
-                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
-                                    <input type="checkbox" id="toggle-show-excused">
-                                    <span class="slider" style="border-radius: 20px;"></span>
-                                </label>
-                            </div>
-                            <div class="switch-wrap" id="wrap-past-leaves" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg); display: none;">
-                                <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Past Leaves</div></div>
-                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
-                                    <input type="checkbox" id="toggle-past-leaves">
-                                    <span class="slider" style="border-radius: 20px;"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Leave/Exception</button>
-                    </div>
-
-                    <div class="sub-tabs" id="action-center-tabs" style="margin-bottom: 24px;">
-                        <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
-                        <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
-                        <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
-                        <button class="sub-tab-btn" data-action-filter="leaves">Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
-                        <button class="sub-tab-btn" data-action-filter="active-leaves">Scheduled Leaves</button>
-                    </div>
-                    
-                    <div class="table-card" id="action-table-container">
-                        <div class="table-responsive">
-                            <table id="absent-table">
-                            <thead>
-                                <tr>
-                                <th onclick="window.sortActionCenter('date')" style="cursor: pointer;" title="Click to sort">Date ⇅</th>
-                                <th onclick="window.sortActionCenter('name')" style="cursor: pointer;" title="Click to sort">Staff Member ⇅</th>
-                                <th>Status & Details</th>
-                                <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="absent-tbody">
-                                <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
-                            </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- LEAVE REQUESTS TABLE -->
-                    <div class="table-card" id="leave-table-container" style="display: none;">
-                        <div class="table-responsive">
-                            <table id="leave-table">
-                            <thead>
-                                <tr>
-                                <th onclick="window.sortLeaves('date')" style="cursor: pointer;" title="Click to sort">Submitted On ⇅</th>
-                                <th onclick="window.sortLeaves('name')" style="cursor: pointer;" title="Click to sort">Staff Member ⇅</th>
-                                <th>Leave Dates</th>
-                                <th>Reason / Title</th>
-                                <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leave-tbody">
-                            </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 14: PAYROLL & SALARY -->
-                <div id="view-payroll" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: 13px;">Monthly salary calculation, taxes, and payslips.</span>
-                        <div style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                            <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase;">Select Month:</label>
-                            <button type="button" id="payroll-month-prev" class="payroll-month-nav" title="Previous month" aria-label="Previous month">&#8249;</button>
-                            <div id="payroll-month-wrap" style="position: relative;">
-                                <input type="hidden" id="payroll-month-picker" value="">
-                                <button type="button" id="payroll-month-btn" class="input-field" style="margin: 0; width: 170px; padding: 8px 12px; background: var(--card-bg) !important; cursor: pointer; text-align: center; font-weight: 700;" aria-haspopup="true" aria-expanded="false">Select Month</button>
-                                <div id="payroll-month-pop" class="payroll-month-pop" style="display:none;"></div>
-                            </div>
-                            <button type="button" id="payroll-month-next" class="payroll-month-nav" title="Next month" aria-label="Next month">&#8250;</button>
-                        </div>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-responsive">
-                            <table id="payroll-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Base Salary</th>
-                                        <th>Present Days</th>
-                                        <th>Payable Days</th>
-                                        <th>Calculated</th>
-                                        <th>Tax (2%)</th>
-                                        <th>Adjustments</th>
-                                        <th>Net Salary</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="payroll-tbody">
-                                    <tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);">Select a month to load payroll.</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 8: HR SETTINGS -->
-                <div id="view-settings-hr" class="app-view" style="display: none;">
-                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: 13px;">Manage people, roles, and leave reasons.</span>
-                    
-                    <div class="settings-grid">
-
-                        
-
-                        <div class="settings-panel" style="grid-column: 1 / -1;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div>
-                                    <h3>Staff Directory & Login Credentials</h3>
-                                    <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
-                                </div>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; margin: 0;"><input type="checkbox" id="toggle-draft-staff" checked> Auto-Save Draft</label>
-                                    <button id="btn-clear-staff-draft" class="btn-secondary" style="font-size: 11px; padding: 6px 10px; color: var(--warning); border-color: var(--warning-alpha);">Clear Draft</button>
-                                </div>
-                            </div>
-                            
-                            <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
-                                <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
-                                <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
-                                <option value="">-- Select Role --</option>
-                                </select>
-                                <input type="email" id="new-staff-email" class="input-field" placeholder="Login Email" style="margin:0; flex: 2; min-width: 150px;">
-                                <input type="tel" id="new-staff-phone" class="input-field" placeholder="Phone No." style="margin:0; flex: 1.5; min-width: 130px;">
-                                <input type="number" id="new-staff-salary" class="input-field" placeholder="Base Salary (₹)" style="margin:0; flex: 1.5; min-width: 130px;">
-                                <div style="display: flex; flex: 1.5; min-width: 160px; gap: 8px; margin-top: 8px;">
-    <div style="position: relative; flex: 1;">
-        <input type="password" id="new-staff-pass" class="input-field" placeholder="Password" style="margin:0; width: 100%; padding-right: 40px;">
-        <span onclick="var inp = document.getElementById('new-staff-pass'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
-    </div>
-    <button id="gen-pass-btn" class="btn-secondary" title="Auto-Generate 10-Digit Password" style="padding: 10px 14px; margin: 0; justify-content: center; height: 44px; font-size: 18px;">🎲</button>
-</div>
-                                
-                                <div style="width: 100%; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
-                                    <select id="new-staff-branch" class="input-field" style="margin:0; flex: 2; min-width: 140px;" title="Default Branch"></select>
-                                    <input type="text" id="new-staff-dob" class="input-field" title="Date of Birth" placeholder="DOB" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
-                                    <input type="text" id="new-staff-joining" class="input-field" title="Joining Date" placeholder="Joining Date" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
-                                    <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
-                                    <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
-                                    <button id="add-staff-btn" class="btn-primary" style="flex: 1; min-width: 100px; justify-content: center;">Add Staff</button>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                                <table>
-                                <thead><tr><th onclick="window.sortSettings('staff', 'name')" style="cursor:pointer;" title="Click to sort">Staff Details ⇅</th><th>Custom Shift Time</th><th style="text-align: right;">Actions</th></tr></thead>
-                                <tbody id="staff-settings-list"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="settings-panel">
-                            <h3>Role Configuration</h3>
-                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
-                            
-                            <div style="display:flex; flex-direction:column; gap:12px; background: var(--bg-base); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
-                                <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0;">
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="time" id="new-role-start" class="input-field" title="Role Shift Start (Leave blank for global default)" style="margin:0; flex: 1;">
-                                    <input type="time" id="new-role-end" class="input-field" title="Role Shift End (Leave blank for global default)" style="margin:0; flex: 1;">
-                                </div>
-                                <button id="add-role-btn" class="btn-primary" style="justify-content: center;">Create Role</button>
-                            </div>
-
-                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                                <table style="width: 100%;">
-                                <thead><tr><th>Role Details</th><th style="text-align: right;">Actions</th></tr></thead>
-                                <tbody id="role-settings-list"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="settings-panel">
-                            <h3>Leave/Exception Reasons</h3>
-                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
-                            <div style="display:flex; flex-direction: column; gap:12px;">
-                                <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
-                                <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
-                            </div>
-                            <table style="margin-top:24px; width: 100%;">
-                                <thead><tr><th onclick="window.sortSettings('reason', 'name')" style="cursor:pointer;" title="Click to sort">Reason Name ⇅</th><th style="text-align: right;">Actions</th></tr></thead>
-                                <tbody id="reason-settings-list"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW 9: ORG SETTINGS -->
-                <div id="view-settings-org" class="app-view" style="display: none;">
-                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: 13px;">Manage physical branches and organization-wide defaults.</span>
-                    
-                    <div class="settings-grid">
-                        
-
-                        <div class="settings-panel" style="grid-column: 1 / -1;">
-                            <h3>Geofence Branch Configuration</h3>
-                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Set GPS targets. Staff must be inside the radius of one of these branches to clock in.</p>
-                            
-                            <div style="display:flex; flex-direction: column; gap:12px; margin-top: 16px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
-                                <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name" style="margin:0;">
-                                <div style="display: flex; gap: 12px;">
-                                    <input type="number" id="new-branch-lat" class="input-field" placeholder="Latitude (e.g. 26.9124)" style="margin:0; flex: 1;">
-                                    <input type="number" id="new-branch-lng" class="input-field" placeholder="Longitude (e.g. 75.7873)" style="margin:0; flex: 1;">
-                                    <input type="number" id="new-branch-radius" class="input-field" placeholder="Radius (m)" value="100" style="margin:0; flex: 1;">
-                                </div>
-                                <button id="add-branch-btn" class="btn-primary" style="justify-content:center;">Register Branch Location</button>
-                            </div>
-
-                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                                <table style="width: 100%;">
-                                <thead><tr><th onclick="window.sortSettings('branch', 'name')" style="cursor:pointer;" title="Click to sort">Branch Details ⇅</th><th>Geofence Area</th><th style="text-align: right;">Actions</th></tr></thead>
-                                <tbody id="branch-settings-list"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="settings-panel">
-                            <h3>Global Shift Time Defaults</h3>
-                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
-                            <div style="display:flex; flex-direction: column; gap:12px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
-                                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
-                                <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
-                                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
-                                <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
-                                <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center; margin-top: 8px;">Save to Database</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div id="view-phones" class="app-view" style="display: none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom: 20px;">
                         <span style="color: var(--text-soft); font-size: 13px;">Manage phone models, specs and staff incentives.</span>
@@ -1791,7 +1164,10 @@
   <!-- FLOATING BULK ACTION BAR -->
   
       <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
-      <div style="color: var(--success); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">🟢 Biometric Live Attendance Verified</div>
+      <div style="display: flex; gap: 16px; align-items: center;">
+          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt" checked> RJ T-Shirt</label>
+          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-idcard" checked> ID Card</label>
+      </div>
       <button class="btn-primary" id="btn-bulk-save" onclick="window.executeBulkAuditSave()" style="margin-left: 8px; padding: 12px 20px;">Bulk Approve & Save</button>
   </div>
 
@@ -2270,15 +1646,15 @@
 
     <!-- CLEAN PHOTO PREVIEW LIGHTBOX -->
   <div id="photo-modal" class="modal-overlay" onclick="window.closeModal(this)">
-    <div class="modal-card" style="max-width: 480px; padding: 18px; text-align: center; border-radius: 16px;" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3 id="photo-modal-title" style="margin: 0; color: var(--text-main); font-size: 16px; font-weight: 700;">Biometric Attendance Selfie</h3>
-        <span style="color: var(--text-soft); cursor: pointer; font-size: 26px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
+    <div class="modal-card" style="max-width: 520px; padding: 20px; text-align: center;" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 id="photo-modal-title" style="margin: 0; color: var(--text-main); font-size: 16px;">Biometric Attendance Selfie</h3>
+        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
       </div>
-      <div style="border-radius: 12px; overflow: hidden; background: #000; box-shadow: var(--shadow-md);">
-        <img id="modal-image-src" style="width: 100%; max-height: 440px; object-fit: contain; display: block;" src="" alt="Attendance Photo">
+      <div style="border-radius: var(--radius-md); overflow: hidden; background: #000; box-shadow: var(--shadow-md);">
+        <img id="modal-image-src" style="width: 100%; max-height: 500px; object-fit: contain; display: block;" src="" alt="Attendance Photo">
       </div>
-      <div id="photo-modal-subtitle" style="margin-top: 10px; font-size: 13px; color: var(--success); font-weight: 600;">🟢 Live Selfie Verified</div>
+      <div id="photo-modal-subtitle" style="margin-top: 12px; font-size: 13px; color: var(--text-soft); font-weight: 500;"></div>
     </div>
   </div>
   </div>
@@ -2559,7 +1935,7 @@
                 }
             }
         }
-        // birthdays view removed
+        
     }
 
     // --- LIVE ADMIN CLOCK ---
@@ -2747,7 +2123,7 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
+                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
@@ -2915,6 +2291,8 @@
     
     window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked, isReviewed) {
         document.getElementById('modal-image-src').src = imageSrc;
+        const sub = document.getElementById('photo-modal-subtitle');
+        if (sub) sub.innerHTML = '🟢 Verified Live Attendance Photo';
         document.getElementById('photo-modal').style.display = 'flex';
     };
 
@@ -3320,7 +2698,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes(viewId)) {
+            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes(viewId)) {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -4435,12 +3813,12 @@
 
           // Evaluate uniform compliance ONLY if the staff was present (has logs for the day)
           if (dailyLogs.length > 0) {
-              let hasPendingAudit = dailyLogs.some(l => !l.uniform_reviewed);
-              // shirt check removed
-              // id check removed
+              
+              
+              
 
-              // uniform penalty removed
-              // uniform penalty removed
+              
+              
           }
           
           const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
@@ -4684,64 +4062,7 @@
         
     });
 
-    // --- ADMIN CUSTOMER LOGS LOGIC ---
-    window.renderCustomerLogs = async function() {
-        const tbody = document.getElementById('customers-tbody');
-        if (!tbody) return;
-
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px;"><div class="spinner-sm"></div></td></tr>`;
-
-        let sDate = new Date(startDate); sDate.setHours(0,0,0,0);
-        let eDate = new Date(endDate); eDate.setHours(23,59,59,999);
-
-        try {
-            // Apply Date Filter globally
-            let query = supabaseClient.from('customer_logs').select('*')
-                .gte('created_at', sDate.toISOString())
-                .lte('created_at', eDate.toISOString())
-                .order('created_at', { ascending: false });
-
-            // Apply Staff Global Filter (Admin UI top bar filter)
-            if (selectedStaffIds.size !== dbStaff.length && selectedStaffIds.size > 0) {
-                query = query.in('staff_id', Array.from(selectedStaffIds));
-            }
-
-            const { data, error } = await query;
-            if (error) throw error;
-
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-soft);">No customer logs found for this filter.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = data.map(log => {
-                const dateObj = new Date(log.created_at);
-                const displayDate = dateObj.toLocaleDateString(window.appDateFormat);
-                const displayTime = dateObj.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
-                
-                let statusBadge = log.log_type.includes('Walkout') 
-                    ? `<span class="badge bg-red">🚶‍♂️ Walkout</span>` 
-                    : `<span class="badge bg-green">📅 Expected</span>`;
-
-                return `
-                <tr>
-                    <td><div style="font-weight: bold; color: var(--text-main); font-size: 14px; margin-bottom: 4px;">${displayTime}</div><div style="font-size: 12px; color: var(--text-soft);">${displayDate}</div></td>
-                    <td>
-                        <strong style="color: var(--primary-text); font-size: 14px;">${log.staff_name || 'Unknown'}</strong>
-                    </td>
-                    <td>
-                        <div style="font-weight: 700; color: var(--text-main); font-size: 14px;">${window.safeHTML(log.customer_name)}</div>
-                        <div style="font-size: 12px; color: var(--text-soft); margin-top: 4px;">📞 ${window.safeHTML(log.customer_phone) || 'No Number'}</div>
-                    </td>
-                    <td>${statusBadge}</td>
-                    <td><div style="font-size: 13px; color: var(--text-main); line-height: 1.4;">${window.safeHTML(log.remarks)}</div></td>
-                </tr>`;
-            }).join('');
-        } catch (err) {
-            console.error(err);
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--danger); padding: 20px;">Failed to load logs.</td></tr>`;
-        }
-    };
+    
 
     let isGroupedView = true;
 
@@ -5232,8 +4553,8 @@
         document.getElementById('manual-staff').value = '';
         document.getElementById('manual-action').value = 'Clock In';
         document.getElementById('manual-branch').value = '';
-        
-        
+        document.getElementById('manual-tshirt').checked = true;
+        document.getElementById('manual-idcard').checked = true;
 
         document.getElementById('manual-entry-modal').style.display = 'flex';
     });
@@ -5246,7 +4567,7 @@
         const staffId = document.getElementById('manual-staff').value;
         const actionVal = document.getElementById('manual-action').value;
         const branchIdVal = document.getElementById('manual-branch').value;
-        // Uniform audit removed
+        
         const dateVal = document.getElementById('manual-date').value;
         const timeVal = document.getElementById('manual-time').value;
 
@@ -5295,7 +4616,7 @@
                 branch_id: branchIdVal,
                 timestamp: timestampIso,
                 uniform_reviewed: true,
-                // uniform fields removed
+                
             }]);
             if (insErr) throw insErr;
 
@@ -5344,8 +4665,8 @@
             const timeVal = log.timestamp ? new Date(log.timestamp).toTimeString().substring(0,5) : '';
             const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}" ${b.branch_name === log.branch ? 'selected' : ''}>${b.branch_name}</option>`).join('');
             
-             
-             
+            const hasTshirt = log.uniform_tshirt !== false; 
+            const hasIdcard = log.uniform_idcard !== false; 
 
             return `
             <div class="punch-row" data-logid="${log.id || ''}" style="display:flex; flex-direction:column; gap:8px; background:var(--input-bg); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
@@ -5379,7 +4700,7 @@
     };
 
     document.getElementById('btn-add-punch-row')?.addEventListener('click', () => {
-        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null, uniform_reviewed: true });
+        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null, uniform_tshirt: true, uniform_idcard: true, uniform_reviewed: true });
         window.renderPunchRows();
     });
 
@@ -5421,8 +4742,8 @@
                branch_id: branchObj ? branchObj.id : (existingLog.branch_id || null),
                timestamp: newIso,
                uniform_reviewed: true, 
-                
-               
+               uniform_tshirt: hasTshirt, 
+               uniform_idcard: hasIdcard,
                photo_capture: existingLog.photo_capture || null,
                latitude: existingLog.latitude || null,
                longitude: existingLog.longitude || null
@@ -5598,15 +4919,15 @@
             const logIndex = dbLogs.findIndex(l => l.id === logId);
             if(logIndex !== -1) {
                 dbLogs[logIndex].uniform_reviewed = false;
-                
-                
+                dbLogs[logIndex].uniform_tshirt = false;
+                dbLogs[logIndex].uniform_idcard = false;
             }
         });
 
         try {
             // Revert database state
             await supabaseClient.from('attendance_logs')
-                .update({ uniform_reviewed: false })
+                .update({ uniform_reviewed: false, uniform_tshirt: false, uniform_idcard: false })
                 .in('id', window.lastBulkUpdateIds);
 
             showToast("Bulk approval undone.", "primary");
@@ -7247,117 +6568,6 @@
         });
     });
 
-    
-    // MOBILE DRAWER HANDLERS
-    
-    // MOBILE APP NAVIGATION SYSTEM
-    window.switchMobileTab = function(viewId) {
-        window.closeMobileMoreSheet();
-        const tabBtn = document.querySelector(`.sidebar .tab-btn[data-view="${viewId}"]`);
-        if (tabBtn) {
-            tabBtn.click();
-        } else {
-            // Direct view switch fallback
-            document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
-            const targetView = document.getElementById(viewId);
-            if (targetView) targetView.style.display = 'block';
-        }
-
-        // Update bottom nav active state
-        document.querySelectorAll('.bottom-nav-item').forEach(item => {
-            if (item.getAttribute('data-nav') === viewId) {
-                item.classList.add('active');
-            } else if (item.getAttribute('data-nav') !== 'more') {
-                item.classList.remove('active');
-            }
-        });
-
-        // Smooth scroll to top of content
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) mainContent.scrollTop = 0;
-    };
-
-    window.openMobileMoreSheet = function() {
-        const sheet = document.getElementById('mobile-bottom-sheet');
-        const bd = document.getElementById('bottom-sheet-backdrop');
-        if (sheet) sheet.classList.add('open');
-        if (bd) bd.classList.add('active');
-    };
-
-    window.closeMobileMoreSheet = function() {
-        const sheet = document.getElementById('mobile-bottom-sheet');
-        const bd = document.getElementById('bottom-sheet-backdrop');
-        if (sheet) sheet.classList.remove('open');
-        if (bd) bd.classList.remove('active');
-    };
-
-    // Sync sidebar tab click with bottom navigation
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.sidebar .tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const view = btn.getAttribute('data-view');
-                document.querySelectorAll('.bottom-nav-item').forEach(nav => {
-                    if (nav.getAttribute('data-nav') === view) {
-                        nav.classList.add('active');
-                    } else if (nav.getAttribute('data-nav') !== 'more') {
-                        nav.classList.remove('active');
-                    }
-                });
-            });
-        });
-    });
-
-    // Android Hardware / Gesture Back Button Handling
-    document.addEventListener('backbutton', function(e) {
-        // If bottom sheet is open, close it
-        const sheet = document.getElementById('mobile-bottom-sheet');
-        if (sheet && sheet.classList.contains('open')) {
-            e.preventDefault();
-            window.closeMobileMoreSheet();
-            return;
-        }
-
-        // If any modal is open, close it
-        const openModal = document.querySelector('.modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
-        if (openModal) {
-            e.preventDefault();
-            window.closeModal(openModal);
-            return;
-        }
-
-        // If not on overview tab, go back to overview
-        const activeNav = document.querySelector('.bottom-nav-item.active');
-        if (activeNav && activeNav.getAttribute('data-nav') !== 'view-dashboard') {
-            e.preventDefault();
-            window.switchMobileTab('view-dashboard');
-            return;
-        }
-    }, false);
-
-    window.toggleMobileSidebar = function() {
-        const sb = document.getElementById('app-sidebar');
-        const bd = document.getElementById('sidebar-backdrop');
-        if (sb) sb.classList.toggle('mobile-open');
-        if (bd) bd.classList.toggle('active');
-    };
-    window.closeMobileSidebar = function() {
-        const sb = document.getElementById('app-sidebar');
-        const bd = document.getElementById('sidebar-backdrop');
-        if (sb) sb.classList.remove('mobile-open');
-        if (bd) bd.classList.remove('active');
-    };
-
-    // Close mobile drawer on tab click
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (window.innerWidth <= 900) {
-                    window.closeMobileSidebar();
-                }
-            });
-        });
-    });
-
     window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
         document.getElementById('edit-staff-id').value = id;
         document.getElementById('edit-staff-name').value = name;
@@ -8145,104 +7355,7 @@
         if(session?.user) currentUserEmail = session.user.email;
     });
 
-    function renderAdminBirthdays() {
-        const container = document.getElementById('admin-bday-list-container');
-        if (!container) return;
-
-        let bdayStaff = dbStaff.filter(s => s.dob && s.dob.trim() !== '');
-        if (bdayStaff.length === 0) {
-            container.innerHTML = '<div style="text-align: center; color: var(--text-soft); padding: 20px;">No staff birthdays found. Update DOBs in HR Settings.</div>';
-            document.getElementById('admin-next-bday-name').innerText = "No upcoming";
-            return;
-        }
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const enriched = bdayStaff.map(staff => {
-            const [year, month, day] = staff.dob.split('-');
-            const bdayThisYear = new Date(today.getFullYear(), parseInt(month) - 1, parseInt(day));
-            
-            let nextBday = new Date(bdayThisYear);
-            let turningAge = today.getFullYear() - parseInt(year);
-            
-            if (bdayThisYear.getTime() < today.getTime()) {
-                nextBday.setFullYear(today.getFullYear() + 1);
-                turningAge++;
-            }
-            
-            const diffDays = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
-            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString(window.appDateFormat);
-            
-            return { ...staff, daysLeft: diffDays, turningAge, formattedDate };
-        });
-
-        enriched.sort((a, b) => a.daysLeft - b.daysLeft);
-
-        let currentUserIndex = enriched.findIndex(s => s.email === currentUserEmail);
-        if (currentUserIndex !== -1) {
-            let pinnedBday = enriched.splice(currentUserIndex, 1)[0];
-            enriched.unshift(pinnedBday);
-        }
-
-        const nextBday = enriched[0];
-        document.getElementById('admin-next-bday-name').innerText = (nextBday.email === currentUserEmail) ? "Your Birthday" : nextBday.name;
-        document.getElementById('admin-next-bday-date').innerText = nextBday.formattedDate;
-        document.getElementById('admin-next-bday-age').innerText = `Turning ${nextBday.turningAge}`;
-
-        // Set Background Image for Next Birthday (Full Portrait)
-        const bgContainer = document.getElementById('bday-top-bg');
-        const emojiEl = document.getElementById('admin-next-bday-emoji');
-        if (nextBday.profile_pic) {
-            // Using 'contain' so the photo fits nicely without repeating or cropping, leaving clean space on the sides
-            bgContainer.style.background = `url('${nextBday.profile_pic}') no-repeat center center / contain`;
-            bgContainer.style.opacity = '0.95';
-            emojiEl.style.display = 'none'; // Hide emoji if photo exists
-        } else {
-            bgContainer.style.background = `linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%)`;
-            bgContainer.style.opacity = '1';
-            emojiEl.style.display = 'block';
-        }
-        
-        const countdownEl = document.getElementById('admin-next-bday-countdown');
-        if (nextBday.daysLeft === 0) {
-            countdownEl.innerText = "It's Today! 🎂🎉";
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#d4af37', '#10b981', '#f59e0b'] });
-        } else if (nextBday.daysLeft === 1) {
-            countdownEl.innerText = "Tomorrow!";
-        } else {
-            countdownEl.innerText = `In ${nextBday.daysLeft} Days`;
-        }
-
-        container.innerHTML = enriched.map(staff => {
-            const isCurrentUser = (staff.email === currentUserEmail);
-            const displayName = isCurrentUser ? "Your Birthday 📌" : staff.name;
-            
-            let tagClass = 'bg-gray';
-            let tagText = `In ${staff.daysLeft} days`;
-
-            if (staff.daysLeft === 0) { tagClass = 'bg-green'; tagText = 'Today! 🎂'; } 
-            else if (staff.daysLeft <= 7) { tagClass = 'bg-orange'; if (staff.daysLeft === 1) tagText = 'Tomorrow!'; }
-
-            // Global avatar function use karke list me photo lagana
-            let avatarHtml = getAvatarHtml(staff.name, staff.profile_pic, 44);
-
-            return `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    ${avatarHtml}
-                    <div>
-                        <div style="font-weight: 700; color: var(--text-main); font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                            ${displayName} 
-                            <span class="role-tag" ${isCurrentUser ? `style="background: var(--success-alpha); color: var(--success); border-color: var(--success-alpha);"` : ''}>Turning ${staff.turningAge}</span>
-                        </div>
-                        <div style="font-size: 13px; color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
-                    </div>
-                </div>
-                <div class="badge ${tagClass}" style="font-size: 12px; padding: 6px 12px;">${tagText}</div>
-            </div>`;
-        }).join('');
-    }
+    
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -9453,117 +8566,6 @@
     
     // Modify Staff Editing to accept Phone and Salary
     const originalOpenEditStaff = window.openEditStaff;
-    
-    // MOBILE DRAWER HANDLERS
-    
-    // MOBILE APP NAVIGATION SYSTEM
-    window.switchMobileTab = function(viewId) {
-        window.closeMobileMoreSheet();
-        const tabBtn = document.querySelector(`.sidebar .tab-btn[data-view="${viewId}"]`);
-        if (tabBtn) {
-            tabBtn.click();
-        } else {
-            // Direct view switch fallback
-            document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
-            const targetView = document.getElementById(viewId);
-            if (targetView) targetView.style.display = 'block';
-        }
-
-        // Update bottom nav active state
-        document.querySelectorAll('.bottom-nav-item').forEach(item => {
-            if (item.getAttribute('data-nav') === viewId) {
-                item.classList.add('active');
-            } else if (item.getAttribute('data-nav') !== 'more') {
-                item.classList.remove('active');
-            }
-        });
-
-        // Smooth scroll to top of content
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) mainContent.scrollTop = 0;
-    };
-
-    window.openMobileMoreSheet = function() {
-        const sheet = document.getElementById('mobile-bottom-sheet');
-        const bd = document.getElementById('bottom-sheet-backdrop');
-        if (sheet) sheet.classList.add('open');
-        if (bd) bd.classList.add('active');
-    };
-
-    window.closeMobileMoreSheet = function() {
-        const sheet = document.getElementById('mobile-bottom-sheet');
-        const bd = document.getElementById('bottom-sheet-backdrop');
-        if (sheet) sheet.classList.remove('open');
-        if (bd) bd.classList.remove('active');
-    };
-
-    // Sync sidebar tab click with bottom navigation
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.sidebar .tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const view = btn.getAttribute('data-view');
-                document.querySelectorAll('.bottom-nav-item').forEach(nav => {
-                    if (nav.getAttribute('data-nav') === view) {
-                        nav.classList.add('active');
-                    } else if (nav.getAttribute('data-nav') !== 'more') {
-                        nav.classList.remove('active');
-                    }
-                });
-            });
-        });
-    });
-
-    // Android Hardware / Gesture Back Button Handling
-    document.addEventListener('backbutton', function(e) {
-        // If bottom sheet is open, close it
-        const sheet = document.getElementById('mobile-bottom-sheet');
-        if (sheet && sheet.classList.contains('open')) {
-            e.preventDefault();
-            window.closeMobileMoreSheet();
-            return;
-        }
-
-        // If any modal is open, close it
-        const openModal = document.querySelector('.modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
-        if (openModal) {
-            e.preventDefault();
-            window.closeModal(openModal);
-            return;
-        }
-
-        // If not on overview tab, go back to overview
-        const activeNav = document.querySelector('.bottom-nav-item.active');
-        if (activeNav && activeNav.getAttribute('data-nav') !== 'view-dashboard') {
-            e.preventDefault();
-            window.switchMobileTab('view-dashboard');
-            return;
-        }
-    }, false);
-
-    window.toggleMobileSidebar = function() {
-        const sb = document.getElementById('app-sidebar');
-        const bd = document.getElementById('sidebar-backdrop');
-        if (sb) sb.classList.toggle('mobile-open');
-        if (bd) bd.classList.toggle('active');
-    };
-    window.closeMobileSidebar = function() {
-        const sb = document.getElementById('app-sidebar');
-        const bd = document.getElementById('sidebar-backdrop');
-        if (sb) sb.classList.remove('mobile-open');
-        if (bd) bd.classList.remove('active');
-    };
-
-    // Close mobile drawer on tab click
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (window.innerWidth <= 900) {
-                    window.closeMobileSidebar();
-                }
-            });
-        });
-    });
-
     window.openEditStaff = (id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate, phone, salary) => {
         originalOpenEditStaff(id, name, roleId, start, end, email, pass, defBranchId, dob, joiningDate);
         document.getElementById('edit-staff-phone').value = phone || '';
@@ -10053,78 +9055,5 @@
     };
 
   </script>
-
-    <!-- NATIVE MOBILE BOTTOM NAVIGATION BAR -->
-    <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-      <button class="bottom-nav-item active" data-nav="view-dashboard" onclick="window.switchMobileTab('view-dashboard')">
-        <span class="nav-icon">📊</span>
-        <span>Overview</span>
-      </button>
-      <button class="bottom-nav-item" data-nav="view-live" onclick="window.switchMobileTab('view-live')">
-        <span class="nav-icon">📍</span>
-        <span>Live</span>
-      </button>
-      <button class="bottom-nav-item" data-nav="view-logs" onclick="window.switchMobileTab('view-logs')">
-        <span class="nav-icon">📝</span>
-        <span>Logs</span>
-      </button>
-      <button class="bottom-nav-item" data-nav="view-stats" onclick="window.switchMobileTab('view-stats')">
-        <span class="nav-icon">📈</span>
-        <span>Stats</span>
-      </button>
-      <button class="bottom-nav-item" data-nav="more" onclick="window.openMobileMoreSheet()">
-        <span class="nav-icon">⚙️</span>
-        <span>More</span>
-      </button>
-    </nav>
-
-    <!-- MORE ACTIONS BOTTOM SHEET -->
-    <div class="sidebar-backdrop" id="bottom-sheet-backdrop" onclick="window.closeMobileMoreSheet()"></div>
-    <div class="mobile-bottom-sheet" id="mobile-bottom-sheet">
-      <div class="bottom-sheet-handle"></div>
-      <div class="bottom-sheet-header">
-        <div class="bottom-sheet-title">More Workspace Options</div>
-        <button onclick="window.closeMobileMoreSheet()" class="icon-btn" style="border:none; font-size: 20px; color: var(--text-soft);">&times;</button>
-      </div>
-      <div class="bottom-sheet-grid">
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-branch-ops')">
-          <span class="sheet-icon">🏢</span>
-          <span>Branch Ops</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-branch-matrix')">
-          <span class="sheet-icon">🔲</span>
-          <span>Branch Grid</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-roster')">
-          <span class="sheet-icon">📋</span>
-          <span>Duty Roster</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-matrix')">
-          <span class="sheet-icon">📅</span>
-          <span>Matrix</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-payroll')">
-          <span class="sheet-icon">💳</span>
-          <span>Payroll</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-phones')">
-          <span class="sheet-icon">📱</span>
-          <span>Incentives</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-settings-hr')">
-          <span class="sheet-icon">👥</span>
-          <span>HR Settings</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.switchMobileTab('view-settings-org')">
-          <span class="sheet-icon">⚙️</span>
-          <span>Shifts & Loc</span>
-        </button>
-        <button class="sheet-menu-btn" onclick="window.logoutAdmin()" style="border-color: rgba(239, 68, 68, 0.3); color: var(--danger);">
-          <span class="sheet-icon">🚪</span>
-          <span>Log Out</span>
-        </button>
-      </div>
-    </div>
-
 </body>
 </html>
