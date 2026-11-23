@@ -3317,14 +3317,26 @@
     // Fetch the 6 metadata tables IN PARALLEL (was: 6 sequential round-trips)
     async function fetchMetadataTables() {
       const todayIso = toLocalISO(new Date());
-      const safe = async (q) => { try { const r = await q; return r.data; } catch (e) { console.error(e); return null; } };
+      const safe = async (q, label = 'data') => {
+        try {
+          const r = await q;
+          // supabase-js does NOT throw on failures - it returns { data: null, error }
+          if (r && r.error) {
+            console.error(`[Metadata] Failed to load ${label}:`, r.error);
+            window.__metaLoadErrors = window.__metaLoadErrors || [];
+            window.__metaLoadErrors.push(`${label}: ${r.error.message || r.error.code || 'unknown error'}`);
+            return null;
+          }
+          return r ? r.data : null;
+        } catch (e) { console.error(`[Metadata] Exception loading ${label}:`, e); return null; }
+      };
       const [shiftRow, roleData, reasonData, rosterData, staffData, branchesData] = await Promise.all([
-        safe(supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').single()),
-        safe(supabaseClient.from('roles_directory').select('*').order('role_name')),
-        safe(supabaseClient.from('leave_reasons').select('*').order('reason_name')),
-        safe(supabaseClient.from('staff_roster').select('*').gte('date', todayIso)),
-        safe(supabaseClient.from('staff_directory').select('*').order('name')),
-        safe(supabaseClient.from('branches_directory').select('*').order('branch_name'))
+        safe(supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').maybeSingle(), 'system_settings'),
+        safe(supabaseClient.from('roles_directory').select('*').order('role_name'), 'roles_directory'),
+        safe(supabaseClient.from('leave_reasons').select('*').order('reason_name'), 'leave_reasons'),
+        safe(supabaseClient.from('staff_roster').select('*').gte('date', todayIso), 'staff_roster'),
+        safe(supabaseClient.from('staff_directory').select('*').order('name'), 'staff_directory'),
+        safe(supabaseClient.from('branches_directory').select('*').order('branch_name'), 'branches_directory')
       ]);
 
       if (shiftRow && shiftRow.setting_value) {
@@ -3339,6 +3351,13 @@
       dbRoster = rosterData || [];   rosterMap = {}; dbRoster.forEach(r => rosterMap[`${r.staff_id}_${r.date}`] = r);
       dbStaff = staffData || [];     staffMap = {};  dbStaff.forEach(s => staffMap[s.id] = s);
       dbBranches = branchesData || []; branchMap = {}; dbBranches.forEach(b => branchMap[b.id] = b);
+
+      if (window.__metaLoadErrors && window.__metaLoadErrors.length) {
+        showToast('Could not load: ' + window.__metaLoadErrors.join(' | '), 'error');
+        window.__metaLoadErrors = [];
+      } else if (!dbStaff.length) {
+        showToast('Staff list is empty. Check database access (RLS) for staff_directory.', 'error');
+      }
     }
 
     function repopulateMetadataUI() {
@@ -9057,3 +9076,4 @@
   </script>
 </body>
 </html>
+                              
