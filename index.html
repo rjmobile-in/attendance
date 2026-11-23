@@ -392,24 +392,9 @@
     .pagination-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 24px; }
 
     /* =========================================================
-       7. SETTINGS PANELS & AUDIT GALLERY
+       7. SETTINGS PANELS
        ========================================================= */
-    .bulk-action-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--primary); border-radius: var(--radius-lg); padding: 16px 24px; display: flex; align-items: center; gap: 24px; box-shadow: var(--shadow-glow), 0 10px 40px rgba(0,0,0,0.5); z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    html.light-theme .bulk-action-bar { background: #ffffff; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
-    .bulk-action-bar.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; }
-    .audit-card-checkbox { position: absolute; top: 12px; left: 12px; z-index: 10; width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.5); border-radius: 4px; }
     
-    .audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; background: transparent; border-radius: var(--radius-lg); margin-bottom: 24px; }
-    .audit-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; box-shadow: var(--shadow-sm);}
-    .audit-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-    .audit-img-wrap { width: 100%; height: 220px; background: var(--card-bg); border-bottom: 1px solid var(--card-border); position: relative; overflow: hidden;}
-    .audit-img-wrap::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(255,255,255,0) 8%, rgba(255,255,255,0.05) 18%, rgba(255,255,255,0) 33%); background-size: 200% 100%; animation: shimmerWave 1.2s linear infinite; z-index: 1; pointer-events: none; }
-    html.light-theme .audit-img-wrap::after { background-image: linear-gradient(110deg, rgba(0,0,0,0) 8%, rgba(0,0,0,0.04) 18%, rgba(0,0,0,0) 33%); }
-    .audit-img-wrap::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 5; pointer-events: none; }
-    .audit-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s, opacity 0.5s ease-in-out; cursor: pointer; opacity: 0; position: relative; z-index: 2; }
-    .audit-img-wrap:hover .audit-img { transform: scale(1.05); }
-    .audit-badge { position: absolute; top: 12px; right: 12px; background: rgba(9, 9, 11, 0.8); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: var(--radius-sm); font-weight: bold; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
-    .audit-details { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
     .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 32px;}
     .settings-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);}
@@ -591,7 +576,7 @@
     }
 
     /* 2. Sub-Tab Tables & Cards: Instant render without artificial delays */
-    tbody tr, .widget-card, .audit-card, .live-branch-card {
+    tbody tr, .widget-card, .live-branch-card {
         opacity: 1; 
         transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
@@ -798,10 +783,6 @@
             <span class="tab-btn-text">Attendance Grid</span>
           </button>
 
-          
-
-          
-
           <!-- Analytics & HR -->
           <div class="sidebar-category">Analytics & Team</div>
           <button class="tab-btn" data-view="view-stats">
@@ -809,7 +790,10 @@
             <span class="tab-btn-text">Staff Stats</span>
           </button>
           
-          
+          <button class="tab-btn" data-view="view-birthdays">
+            <span class="tab-icon">🎂</span> 
+            <span class="tab-btn-text">Staff Birthdays</span>
+          </button>
 
           <button class="tab-btn" data-view="view-payroll">
             <span class="tab-icon">💳</span> 
@@ -1095,7 +1079,6 @@
                             <th>Arrival</th>
                             <th>Departure</th>
                             <th>Route</th>
-                            <th>Timeline Audits</th>
                             </tr>
                         </thead>
                         <tbody id="master-tbody">
@@ -1106,26 +1089,408 @@
                     </div>
                 </div>
 
-                <!-- VIEW 4: PHOTO AUDITS -->
-                <div id="view-audits" class="app-view" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <span style="color: var(--text-soft); font-size: 13px; display: flex; align-items: center; min-height: 42px;">Review check-in/out photos.</span>
-                        <div id="gallery-filters" style="display: flex; align-items: center; gap: 12px;">
-                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
-                                <input type="checkbox" id="master-audit-select" onchange="window.selectAllAudits(this)"> Select All Visible
-                            </label>
-                            <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: var(--radius-md);">
-                                <input type="checkbox" id="toggle-pending-photos" checked> Show Only Pending Audits
-                            </label>
-                        </div>
+                <!-- VIEW 5: STAFF STATS -->
+                <div id="view-stats" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--text-soft); font-size: 13px;">Aggregated metrics for the selected date range. Good for Payroll prep.</span>
                     </div>
 
-                    <div id="audit-gallery-container" style="user-select: none; -webkit-user-select: none; min-height: 400px; display: flex; flex-direction: column;">
-                        <div class="audit-grid" id="audit-grid" style="flex: 1;"></div>
+                    <div class="table-card" id="stats-export-container">
+                    <div class="table-responsive">
+                        <table id="stats-table">
+                        <thead>
+                            <tr>
+                            <th onclick="window.sortStats('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Name ⇅</th>
+                            <th onclick="window.sortStats('role')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Role ⇅</th>
+                            <th onclick="window.sortStats('days')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Present ⇅</th>
+                            <th onclick="window.sortStats('absent')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Days Absent ⇅</th>
+                            <th>Avg In & Out</th>
+                            <th onclick="window.sortStats('hours')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Total Hours ⇅</th>
+                            <th>Work vs Travel</th>
+                            <th>Target vs Actual</th>
+                            <th onclick="window.sortStats('lateCount')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Late ⇅</th>
+                            <th onclick="window.sortStats('earlyCount')" style="cursor: pointer; user-select: none; transition: 0.2s; text-align: center;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Early ⇅</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tbody">
+                            <tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- VIEW 12: BRANCH OPS -->
+                <div id="view-branch-ops" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                        <span style="color: var(--text-soft); font-size: 13px;">Track daily opening/closing times and averages based on staff punches.</span>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="branch-ops-table">
+                                <thead>
+                                    <tr>
+                                        <th>Branch Name</th>
+                                        <th>Days Operated</th>
+                                        <th>Avg Open Time</th>
+                                        <th>Avg Close Time</th>
+                                        <th>Today's Live Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="branch-ops-tbody">
+                                    <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <!-- VIEW: CUSTOMER LOGS -->
+                <!-- VIEW 13: BRANCH GRID MATRIX -->
+                <div id="view-branch-matrix" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                        <span style="color: var(--text-soft); font-size: 13px;">Daily operational timeline grid of all branches.</span>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="branch-matrix-table">
+                                <thead><tr id="branch-matrix-header"></tr></thead>
+                                <tbody id="branch-matrix-body">
+                                    <tr><td colspan="100" style="text-align: center; padding: 40px; color: var(--text-soft);">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 6: ATTENDANCE MATRIX -->
+                <div id="view-matrix" class="app-view" style="display: none;">
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--text-soft); font-size: 13px;">Showing dates derived from currently loaded logs.</span>
+                    </div>
+
+                    <div class="table-card">
+                    <div class="table-responsive">
+                        <table id="matrix-table">
+                        <thead><tr id="matrix-header"></tr></thead>
+                        <tbody id="matrix-body">
+                            <tr><td colspan="100" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- VIEW 11: BIRTHDAYS -->
+                <div id="view-birthdays" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <span style="color: var(--text-soft); font-size: 13px;">Upcoming staff celebrations. DOB is managed in HR Settings.</span>
+                    </div>
+                    
+                    <div class="widget-grid" id="bday-top-cards" style="grid-template-columns: 1fr;">
+                        <div id="bday-top-card" class="widget-card" style="padding: 40px 24px; padding-top: 350px; text-align: center; position: relative; overflow: hidden; min-height: 640px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; border-color: var(--primary);">
+                            <!-- Background Image Layer -->
+                            <div id="bday-top-bg" style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%); background-size: cover !important; background-position: center top !important; opacity: 0.95; z-index: 0; transition: opacity 0.5s;"></div>
+                            <!-- Dark Bottom Gradient for Text Readability -->
+                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--card-bg) 5%, rgba(18,27,51,0.8) 25%, transparent 65%); z-index: 1;"></div>
+                            
+                            <div class="badge bg-blue" style="margin-bottom: 12px; position: relative; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Next Celebration</div>
+                            <div id="admin-next-bday-emoji" style="font-size: 48px; position: relative; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: -5px;">🎉</div>
+                            <div id="admin-next-bday-name" style="font-size: 24px; font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; color: #fff; position: relative; z-index: 2; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Loading...</div>
+                            <div id="admin-next-bday-date" style="color: #f1f5f9; margin-bottom: 8px; font-weight: 600; position: relative; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">--</div>
+                            <div id="admin-next-bday-age" class="role-tag" style="position: relative; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">--</div>
+                            <div id="admin-next-bday-countdown" style="margin-top: 16px; font-size: 18px; font-weight: 800; color: var(--on-gold); background: var(--primary); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); padding: 8px 16px; border-radius: var(--radius-md); display: inline-block; position: relative; z-index: 2;">--</div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                            📅 All Upcoming Birthdays
+                        </div>
+                        <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;" id="admin-bday-list-container">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 10: DUTY ROSTER -->
+                <div id="view-roster" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+                        <div style="display: flex; gap: 16px; align-items: center;">
+                            <span style="color: var(--text-soft); font-size: 13px;">Drag & Drop staff to assign them for the selected date.</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button id="btn-save-as-default" class="btn-primary" title="Make current board layout the permanent default for everyone">📌 Save as Default</button>
+                            <div style="display: flex; gap: 12px; align-items: center; background: var(--card-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                                <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Schedule For:</label>
+                                <input type="text" id="roster-date-picker" class="input-field" style="margin: 0; width: 140px; padding: 8px 12px; background: var(--input-bg) !important; border-color: var(--card-border);" placeholder="Select Date" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="roster-board">
+                        <div class="roster-branches" id="roster-branches-container">
+                            <!-- Branches injected here -->
+                        </div>
+                        
+                        <div class="roster-sidebar">
+                            <div class="roster-sidebar-header">
+                                <div style="font-weight: 800; font-size: 15px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+                                    Staff Pool <span class="badge bg-gray" id="unassigned-count">0</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-soft); margin-top: 6px; font-weight: 500;">Unassigned staff. Drag here to remove overrides.</div>
+                            </div>
+                            <div class="roster-list" id="roster-unassigned-list" data-branch-id="unassigned">
+                                <!-- Unassigned staff injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 7: ACTION CENTER -->
+
+                <!-- VIEW 7: ACTION CENTER -->
+                <div id="view-action" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="color: var(--text-soft); font-size: 13px;">Manage missing staff and resolve exceptions.</span>
+                            <div class="switch-wrap" id="wrap-show-excused" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg);">
+                                <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Approved / Excused</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="toggle-show-excused">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                            <div class="switch-wrap" id="wrap-past-leaves" style="width: fit-content; margin: 0; padding: 6px 12px; background: var(--input-bg); display: none;">
+                                <div><div style="color:var(--text-main); font-size:12px; font-weight: 600;">Show Past Leaves</div></div>
+                                <label class="switch" style="transform: scale(0.8); margin-bottom: 0; width: 36px; height: 20px;">
+                                    <input type="checkbox" id="toggle-past-leaves">
+                                    <span class="slider" style="border-radius: 20px;"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <button id="btn-open-schedule-leave" class="btn-primary">🗓 Schedule Leave/Exception</button>
+                    </div>
+
+                    <div class="sub-tabs" id="action-center-tabs" style="margin-bottom: 24px;">
+                        <button class="sub-tab-btn active" data-action-filter="absent">Absent</button>
+                        <button class="sub-tab-btn" data-action-filter="late">Late Arrivals</button>
+                        <button class="sub-tab-btn" data-action-filter="early">Early Departures</button>
+                        <button class="sub-tab-btn" data-action-filter="leaves">Requests <span id="pending-leave-badge" class="badge bg-orange" style="display:none; margin-left:6px; padding: 2px 6px;">0</span></button>
+                        <button class="sub-tab-btn" data-action-filter="active-leaves">Scheduled Leaves</button>
+                    </div>
+                    
+                    <div class="table-card" id="action-table-container">
+                        <div class="table-responsive">
+                            <table id="absent-table">
+                            <thead>
+                                <tr>
+                                <th onclick="window.sortActionCenter('date')" style="cursor: pointer;" title="Click to sort">Date ⇅</th>
+                                <th onclick="window.sortActionCenter('name')" style="cursor: pointer;" title="Click to sort">Staff Member ⇅</th>
+                                <th>Status & Details</th>
+                                <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absent-tbody">
+                                <tr><td colspan="4" style="text-align: center; padding: 40px; color: var(--text-soft);">No data loaded.</td></tr>
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- LEAVE REQUESTS TABLE -->
+                    <div class="table-card" id="leave-table-container" style="display: none;">
+                        <div class="table-responsive">
+                            <table id="leave-table">
+                            <thead>
+                                <tr>
+                                <th onclick="window.sortLeaves('date')" style="cursor: pointer;" title="Click to sort">Submitted On ⇅</th>
+                                <th onclick="window.sortLeaves('name')" style="cursor: pointer;" title="Click to sort">Staff Member ⇅</th>
+                                <th>Leave Dates</th>
+                                <th>Reason / Title</th>
+                                <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leave-tbody">
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 14: PAYROLL & SALARY -->
+                <div id="view-payroll" class="app-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                        <span style="color: var(--text-soft); font-size: 13px;">Monthly salary calculation, taxes, and payslips.</span>
+                        <div style="display: flex; gap: 12px; align-items: center; background: var(--input-bg); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                            <label style="font-size: 11px; font-weight: 800; color: var(--text-soft); text-transform: uppercase;">Select Month:</label>
+                            <button type="button" id="payroll-month-prev" class="payroll-month-nav" title="Previous month" aria-label="Previous month">&#8249;</button>
+                            <div id="payroll-month-wrap" style="position: relative;">
+                                <input type="hidden" id="payroll-month-picker" value="">
+                                <button type="button" id="payroll-month-btn" class="input-field" style="margin: 0; width: 170px; padding: 8px 12px; background: var(--card-bg) !important; cursor: pointer; text-align: center; font-weight: 700;" aria-haspopup="true" aria-expanded="false">Select Month</button>
+                                <div id="payroll-month-pop" class="payroll-month-pop" style="display:none;"></div>
+                            </div>
+                            <button type="button" id="payroll-month-next" class="payroll-month-nav" title="Next month" aria-label="Next month">&#8250;</button>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="payroll-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Base Salary</th>
+                                        <th>Present Days</th>
+                                        <th>Payable Days</th>
+                                        <th>Calculated</th>
+                                        <th>Tax (2%)</th>
+                                        <th>Adjustments</th>
+                                        <th>Net Salary</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payroll-tbody">
+                                    <tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-soft);">Select a month to load payroll.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 8: HR SETTINGS -->
+                <div id="view-settings-hr" class="app-view" style="display: none;">
+                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: 13px;">Manage people, roles, and leave reasons.</span>
+                    
+                    <div class="settings-grid">
+
+                        
+
+                        <div class="settings-panel" style="grid-column: 1 / -1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h3>Staff Directory & Login Credentials</h3>
+                                    <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Create staff profiles and provide them with their own login details for the mobile app.</p>
+                                </div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <label class="check-wrap" style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; margin: 0;"><input type="checkbox" id="toggle-draft-staff" checked> Auto-Save Draft</label>
+                                    <button id="btn-clear-staff-draft" class="btn-secondary" style="font-size: 11px; padding: 6px 10px; color: var(--warning); border-color: var(--warning-alpha);">Clear Draft</button>
+                                </div>
+                            </div>
+                            
+                            <div style="display:flex; gap:12px; flex-wrap: wrap; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                                <input type="text" id="new-staff-name" class="input-field" placeholder="Full Name" style="margin:0; flex: 2; min-width: 150px;">
+                                <select id="new-staff-role" class="input-field" style="margin:0; flex: 1.5; min-width: 120px;">
+                                <option value="">-- Select Role --</option>
+                                </select>
+                                <input type="email" id="new-staff-email" class="input-field" placeholder="Login Email" style="margin:0; flex: 2; min-width: 150px;">
+                                <input type="tel" id="new-staff-phone" class="input-field" placeholder="Phone No." style="margin:0; flex: 1.5; min-width: 130px;">
+                                <input type="number" id="new-staff-salary" class="input-field" placeholder="Base Salary (₹)" style="margin:0; flex: 1.5; min-width: 130px;">
+                                <div style="display: flex; flex: 1.5; min-width: 160px; gap: 8px; margin-top: 8px;">
+    <div style="position: relative; flex: 1;">
+        <input type="password" id="new-staff-pass" class="input-field" placeholder="Password" style="margin:0; width: 100%; padding-right: 40px;">
+        <span onclick="var inp = document.getElementById('new-staff-pass'); if(inp.type === 'password'){inp.type='text'; this.innerText='🙈'} else {inp.type='password'; this.innerText='👁️'}" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; font-size: 16px; user-select: none;" title="Toggle Password Visibility">👁️</span>
+    </div>
+    <button id="gen-pass-btn" class="btn-secondary" title="Auto-Generate 10-Digit Password" style="padding: 10px 14px; margin: 0; justify-content: center; height: 44px; font-size: 18px;">🎲</button>
+</div>
+                                
+                                <div style="width: 100%; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px;">
+                                    <select id="new-staff-branch" class="input-field" style="margin:0; flex: 2; min-width: 140px;" title="Default Branch"></select>
+                                    <input type="text" id="new-staff-dob" class="input-field" title="Date of Birth" placeholder="DOB" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
+                                    <input type="text" id="new-staff-joining" class="input-field" title="Joining Date" placeholder="Joining Date" style="margin:0; flex: 1; min-width: 90px; padding: 12px 8px; text-align: center;">
+                                    <input type="time" id="new-staff-start" class="input-field" title="Custom Start (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
+                                    <input type="time" id="new-staff-end" class="input-field" title="Custom End (Leave blank for Role/Global)" style="margin:0; flex: 1; min-width: 100px;">
+                                    <button id="add-staff-btn" class="btn-primary" style="flex: 1; min-width: 100px; justify-content: center;">Add Staff</button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                                <table>
+                                <thead><tr><th onclick="window.sortSettings('staff', 'name')" style="cursor:pointer;" title="Click to sort">Staff Details ⇅</th><th>Custom Shift Time</th><th style="text-align: right;">Actions</th></tr></thead>
+                                <tbody id="staff-settings-list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel">
+                            <h3>Role Configuration</h3>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage designations and their default shift timings.</p>
+                            
+                            <div style="display:flex; flex-direction:column; gap:12px; background: var(--bg-base); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                                <input type="text" id="new-role-name" class="input-field" placeholder="Role Name" style="margin:0;">
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="time" id="new-role-start" class="input-field" title="Role Shift Start (Leave blank for global default)" style="margin:0; flex: 1;">
+                                    <input type="time" id="new-role-end" class="input-field" title="Role Shift End (Leave blank for global default)" style="margin:0; flex: 1;">
+                                </div>
+                                <button id="add-role-btn" class="btn-primary" style="justify-content: center;">Create Role</button>
+                            </div>
+
+                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                                <table style="width: 100%;">
+                                <thead><tr><th>Role Details</th><th style="text-align: right;">Actions</th></tr></thead>
+                                <tbody id="role-settings-list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel">
+                            <h3>Leave/Exception Reasons</h3>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Manage reasons for absences, lates, and early departures.</p>
+                            <div style="display:flex; flex-direction: column; gap:12px;">
+                                <input type="text" id="new-reason-name" class="input-field" placeholder="New Reason (e.g. Sick Leave, Traffic)" style="margin:0;">
+                                <button id="add-reason-btn" class="btn-primary" style="justify-content:center;">Create Reason</button>
+                            </div>
+                            <table style="margin-top:24px; width: 100%;">
+                                <thead><tr><th onclick="window.sortSettings('reason', 'name')" style="cursor:pointer;" title="Click to sort">Reason Name ⇅</th><th style="text-align: right;">Actions</th></tr></thead>
+                                <tbody id="reason-settings-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 9: ORG SETTINGS -->
+                <div id="view-settings-org" class="app-view" style="display: none;">
+                    <span style="color: var(--text-soft); display:block; margin-bottom: 24px; font-size: 13px;">Manage physical branches and organization-wide defaults.</span>
+                    
+                    <div class="settings-grid">
+                        
+
+                        <div class="settings-panel" style="grid-column: 1 / -1;">
+                            <h3>Geofence Branch Configuration</h3>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Set GPS targets. Staff must be inside the radius of one of these branches to clock in.</p>
+                            
+                            <div style="display:flex; flex-direction: column; gap:12px; margin-top: 16px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 24px;">
+                                <input type="text" id="new-branch-name" class="input-field" placeholder="Branch Name" style="margin:0;">
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="number" id="new-branch-lat" class="input-field" placeholder="Latitude (e.g. 26.9124)" style="margin:0; flex: 1;">
+                                    <input type="number" id="new-branch-lng" class="input-field" placeholder="Longitude (e.g. 75.7873)" style="margin:0; flex: 1;">
+                                    <input type="number" id="new-branch-radius" class="input-field" placeholder="Radius (m)" value="100" style="margin:0; flex: 1;">
+                                </div>
+                                <button id="add-branch-btn" class="btn-primary" style="justify-content:center;">Register Branch Location</button>
+                            </div>
+
+                            <div class="table-responsive" style="border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
+                                <table style="width: 100%;">
+                                <thead><tr><th onclick="window.sortSettings('branch', 'name')" style="cursor:pointer;" title="Click to sort">Branch Details ⇅</th><th>Geofence Area</th><th style="text-align: right;">Actions</th></tr></thead>
+                                <tbody id="branch-settings-list"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="settings-panel">
+                            <h3>Global Shift Time Defaults</h3>
+                            <p style="font-size: 12px; color: var(--text-soft); margin-bottom: 16px;">Used when Staff or Role has no custom time set.</p>
+                            <div style="display:flex; flex-direction: column; gap:12px; background: var(--bg-base); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default Start Time</label>
+                                <input type="time" id="global-shift-start" class="input-field" value="10:00" style="margin:0;">
+                                <label style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-soft);">Default End Time</label>
+                                <input type="time" id="global-shift-end" class="input-field" value="19:00" style="margin:0;">
+                                <button id="save-global-shift-btn" class="btn-primary" style="justify-content:center; margin-top: 8px;">Save to Database</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="view-phones" class="app-view" style="display: none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom: 20px;">
                         <span style="color: var(--text-soft); font-size: 13px;">Manage phone models, specs and staff incentives.</span>
@@ -1160,16 +1525,6 @@
       </main>
     </div>
   </div> 
-
-  <!-- FLOATING BULK ACTION BAR -->
-  
-      <div style="width: 1px; height: 24px; background: var(--card-border);"></div>
-      <div style="display: flex; gap: 16px; align-items: center;">
-          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-tshirt" checked> RJ T-Shirt</label>
-          <label class="check-wrap" style="margin: 0; padding: 0;"><input type="checkbox" id="bulk-idcard" checked> ID Card</label>
-      </div>
-      <button class="btn-primary" id="btn-bulk-save" onclick="window.executeBulkAuditSave()" style="margin-left: 8px; padding: 12px 20px;">Bulk Approve & Save</button>
-  </div>
 
   <!-- MANUAL ENTRY MODAL -->
   <div id="manual-entry-modal" class="modal-overlay">
@@ -1217,7 +1572,6 @@
         </div>
       </div>
 
-      
 
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-manual" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
@@ -1237,22 +1591,6 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
           <span>Open Command Palette</span>
           <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">/</kbd> or <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Cmd+K</kbd></span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-          <span>Toggle T-Shirt (in Modal)</span>
-          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">T</kbd>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-          <span>Toggle ID Card (in Modal)</span>
-          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">I</kbd>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-          <span>Approve & Save (in Modal)</span>
-          <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Enter</kbd>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-          <span>Next / Previous Photo</span>
-          <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">←</kbd> <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">→</kbd></span>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
           <span>Range Select Checkboxes</span>
@@ -1357,7 +1695,7 @@
           <input type="time" id="edit-staff-end" class="input-field" style="margin-top: 8px;" title="Leave blank to use Role/Global default">
         </div>
       </div>
-      
+
       <!-- Biometric Face Scan Management Block -->
       <div style="margin-top: 14px; padding: 14px; background: var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -1369,7 +1707,6 @@
           🔄 Reset Face Biometrics (Allow Re-enrollment)
         </button>
       </div>
-
       <div style="display: flex; gap: 12px; margin-top: 16px;">
         <button id="btn-cancel-edit-staff" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">Cancel</button>
         <button id="btn-save-edit-staff" class="btn-primary" style="flex: 1; justify-content: center; padding: 12px;">Save Changes</button>
@@ -1644,19 +1981,15 @@
     </div>
   </div>
 
-    <!-- CLEAN PHOTO PREVIEW LIGHTBOX -->
+  <!-- IMAGE PREVIEW MODAL (profile pictures) -->
   <div id="photo-modal" class="modal-overlay" onclick="window.closeModal(this)">
-    <div class="modal-card" style="max-width: 520px; padding: 20px; text-align: center;" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <h3 id="photo-modal-title" style="margin: 0; color: var(--text-main); font-size: 16px;">Biometric Attendance Selfie</h3>
-        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1;" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
-      </div>
-      <div style="border-radius: var(--radius-md); overflow: hidden; background: #000; box-shadow: var(--shadow-md);">
-        <img id="modal-image-src" style="width: 100%; max-height: 500px; object-fit: contain; display: block;" src="" alt="Attendance Photo">
-      </div>
-      <div id="photo-modal-subtitle" style="margin-top: 12px; font-size: 13px; color: var(--text-soft); font-weight: 500;"></div>
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h3 style="margin-bottom: 0px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main);">
+        <span id="photo-modal-title"></span>
+        <span style="color: var(--text-soft); cursor: pointer; font-size: 24px; font-weight: bold; line-height: 1; transition: 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-soft)'" onclick="window.closeModal(document.getElementById('photo-modal'))">&times;</span>
+      </h3>
+      <img id="modal-image-src" class="modal-img" src="" alt="Profile Photo" onerror="this.onerror=null; this.src='https://placehold.co/600x400/18181b/ef4444?text=Image+Purged/Expired'">
     </div>
-  </div>
   </div>
 
   <!-- PAYROLL ADJUSTMENT MODAL -->
@@ -1795,8 +2128,6 @@
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Branch"> Branch / Route</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="First In" checked> Clock In Time</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Last Out" checked> Clock Out Time</label>
-          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="T-Shirt"> T-Shirt Present</label>
-          <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="ID Card"> ID Card Present</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Work Hours" checked> Work Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Travel Hours"> Travel Hours</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-cb" value="Total Hours" checked> Total Hours</label>
@@ -1818,8 +2149,6 @@
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="OT/Shortage" checked> OT / Shortage</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Lates" checked> Late Arrivals Count</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Total Early" checked> Early Departures Count</label>
-          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="T-Shirt Violations"> T-Shirt Violations</label>
-          <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="ID Card Violations"> ID Card Violations</label>
           <label class="check-wrap"><input type="checkbox" class="rep-col-sum-cb" value="Missed Out" checked> Missed Out</label>
       </div>
 
@@ -1935,7 +2264,9 @@
                 }
             }
         }
-        
+        if (document.getElementById('view-birthdays')?.style.display === 'block' && typeof renderAdminBirthdays === 'function') {
+            renderAdminBirthdays();
+        }
     }
 
     // --- LIVE ADMIN CLOCK ---
@@ -2073,7 +2404,7 @@
     const minLaunchDate = new Date('2026-08-01');
 
     // FIXED APP DEFAULTS (no user-configurable preferences)
-    const defaultPrefs = { memoryEnabled: true, startView: "dashboard", use12h: false, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", keyTshirt: "t", keyId: "i", gracePeriod: "5" };
+    const defaultPrefs = { memoryEnabled: true, startView: "dashboard", use12h: false, pageSize: "50", dateFormat: "en-GB", weekStart: "1", uiSounds: true, syncInterval: "2", undoTimer: "7", modSave: "Alt", modLoad: "Shift", keyCmd: "k", gracePeriod: "5" };
     const uiPrefs = { ...defaultPrefs };
     window.isMemoryEnabled = uiPrefs.memoryEnabled;
     
@@ -2123,7 +2454,7 @@
             
             const exportBtn = document.getElementById('export-dropdown');
             if (exportBtn) {
-                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
+                if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes('view-' + viewParam)) exportBtn.style.display = 'inline-block';
                 else exportBtn.style.display = 'none';
             }
             
@@ -2148,8 +2479,6 @@
     let isFetchingLogs = false;
     let hasMoreLogs = true;
     let activeSubTab = 'all';
-    let showOnlyPendingPhotos = true;
-    let selectedAuditLogIds = new Set(); // Tracks bulk selection
 
     let currentActionTab = 'absent';
 
@@ -2288,16 +2617,7 @@
         }
     }
 
-    
-    window.openAuditModal = function(imageSrc, logId, isTshirtChecked, isIdcardChecked, isReviewed) {
-        document.getElementById('modal-image-src').src = imageSrc;
-        const sub = document.getElementById('photo-modal-subtitle');
-        if (sub) sub.innerHTML = '🟢 Verified Live Attendance Photo';
-        document.getElementById('photo-modal').style.display = 'flex';
-    };
 
-
-    
 
     window.safeHTML = (str) => typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(str) : str;
     // HTML-escape for text shown in innerHTML, and a safe JS string literal for inline onclick="" arguments
@@ -2566,18 +2886,17 @@
             // Action Center: Date, role, and staff filters relevant
             'view-action': { date: true, time: false, role: true, branch: false, staff: true },
             
-            // Audits: Date, role, and staff filters relevant
-                        
+            
             // Roster: Role, branch, and staff filters relevant (has its own date picker)
             'view-roster': { date: false, time: false, role: true, branch: true, staff: true },
             
             // Payroll: Only staff filter relevant (has its own month picker)
             'view-payroll': { date: false, time: false, role: false, branch: false, staff: true },
             
-            // Customers: Date and staff filters relevant
-                        
+            
             // Birthdays: No filters needed
-                        
+            'view-birthdays': { date: false, time: false, role: false, branch: false, staff: false },
+            
             // Settings: No filters needed
             'view-settings-hr': { date: false, time: false, role: false, branch: false, staff: false },
             'view-settings-org': { date: false, time: false, role: false, branch: false, staff: false }
@@ -2698,7 +3017,7 @@
         
         const exportBtn = document.getElementById('export-dropdown');
         if (exportBtn) {
-            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll', 'view-customers'].includes(viewId)) {
+            if (['view-logs', 'view-stats', 'view-action', 'view-live', 'view-matrix', 'view-branch-ops', 'view-branch-matrix', 'view-payroll'].includes(viewId)) {
                 exportBtn.style.display = 'inline-block';
             } else {
                 exportBtn.style.display = 'none';
@@ -2718,7 +3037,7 @@
         
         if (viewId === 'view-settings-hr' || viewId === 'view-settings-org') {
             if (typeof loadSettingsData === 'function') loadSettingsData();
-        } else {
+        } else if (viewId !== 'view-birthdays') {
             // Just ping the Event Bus! It will automatically figure out what to render.
             window.RJEventBus.dispatchEvent(new CustomEvent('DATA_UPDATED'));
         }
@@ -2963,20 +3282,6 @@
         }
     };
 
-    const pendingToggleEl = document.getElementById('toggle-pending-photos');
-    if (pendingToggleEl) {
-        // 1. Restore saved state (default to true if no saved state exists)
-        const savedState = localStorage.getItem('rj_audit_pending_only');
-        showOnlyPendingPhotos = savedState === null ? true : savedState === 'true';
-        pendingToggleEl.checked = showOnlyPendingPhotos;
-        
-        // 2. Listen for changes and save to local storage
-        pendingToggleEl.addEventListener('change', (e) => {
-            showOnlyPendingPhotos = e.target.checked;
-            localStorage.setItem('rj_audit_pending_only', e.target.checked);
-            
-        });
-    }
 
     // Master Logs toggle switches are handled inline via onchange="renderMasterTable()"
 
@@ -3317,26 +3622,14 @@
     // Fetch the 6 metadata tables IN PARALLEL (was: 6 sequential round-trips)
     async function fetchMetadataTables() {
       const todayIso = toLocalISO(new Date());
-      const safe = async (q, label = 'data') => {
-        try {
-          const r = await q;
-          // supabase-js does NOT throw on failures - it returns { data: null, error }
-          if (r && r.error) {
-            console.error(`[Metadata] Failed to load ${label}:`, r.error);
-            window.__metaLoadErrors = window.__metaLoadErrors || [];
-            window.__metaLoadErrors.push(`${label}: ${r.error.message || r.error.code || 'unknown error'}`);
-            return null;
-          }
-          return r ? r.data : null;
-        } catch (e) { console.error(`[Metadata] Exception loading ${label}:`, e); return null; }
-      };
+      const safe = async (q) => { try { const r = await q; return r.data; } catch (e) { console.error(e); return null; } };
       const [shiftRow, roleData, reasonData, rosterData, staffData, branchesData] = await Promise.all([
-        safe(supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').maybeSingle(), 'system_settings'),
-        safe(supabaseClient.from('roles_directory').select('*').order('role_name'), 'roles_directory'),
-        safe(supabaseClient.from('leave_reasons').select('*').order('reason_name'), 'leave_reasons'),
-        safe(supabaseClient.from('staff_roster').select('*').gte('date', todayIso), 'staff_roster'),
-        safe(supabaseClient.from('staff_directory').select('*').order('name'), 'staff_directory'),
-        safe(supabaseClient.from('branches_directory').select('*').order('branch_name'), 'branches_directory')
+        safe(supabaseClient.from('system_settings').select('setting_value').eq('setting_name', 'global_shift').single()),
+        safe(supabaseClient.from('roles_directory').select('*').order('role_name')),
+        safe(supabaseClient.from('leave_reasons').select('*').order('reason_name')),
+        safe(supabaseClient.from('staff_roster').select('*').gte('date', todayIso)),
+        safe(supabaseClient.from('staff_directory').select('*').order('name')),
+        safe(supabaseClient.from('branches_directory').select('*').order('branch_name'))
       ]);
 
       if (shiftRow && shiftRow.setting_value) {
@@ -3351,13 +3644,6 @@
       dbRoster = rosterData || [];   rosterMap = {}; dbRoster.forEach(r => rosterMap[`${r.staff_id}_${r.date}`] = r);
       dbStaff = staffData || [];     staffMap = {};  dbStaff.forEach(s => staffMap[s.id] = s);
       dbBranches = branchesData || []; branchMap = {}; dbBranches.forEach(b => branchMap[b.id] = b);
-
-      if (window.__metaLoadErrors && window.__metaLoadErrors.length) {
-        showToast('Could not load: ' + window.__metaLoadErrors.join(' | '), 'error');
-        window.__metaLoadErrors = [];
-      } else if (!dbStaff.length) {
-        showToast('Staff list is empty. Check database access (RLS) for staff_directory.', 'error');
-      }
     }
 
     function repopulateMetadataUI() {
@@ -3378,7 +3664,7 @@
       const loaderMsg = document.getElementById('loader-msg');
       if(loaderMsg) loaderMsg.innerText = "Loading Metadata...";
       // Photo purge is housekeeping - don't make the user wait for it
-      executeLazyPhotoDelete();
+      
 
       await fetchMetadataTables();
 
@@ -3449,17 +3735,6 @@
 
     
 
-    async function executeLazyPhotoDelete() {
-      const cutoffDate = new Date(); 
-      cutoffDate.setDate(cutoffDate.getDate() - 3);
-      
-      try {
-        await supabaseClient.from('attendance_logs')
-          .update({ photo_capture: null })
-          .eq('uniform_reviewed', true)
-          .lte('timestamp', cutoffDate.toISOString());
-      } catch (err) { console.error(err); }
-    }
 
     function createFilterDropdown({ containerId, dataArray, selectedSet, labelKey, checkboxClass, btnTextId, allText, selectAllBtnId, deselectAllBtnId, searchInputId }) {
       const container = document.getElementById(containerId);
@@ -3545,22 +3820,6 @@
                   <td><div class="skeleton" style="width: 120px; height: 20px;"></div></td>
                   <td><div class="skeleton" style="width: 50px; height: 50px; border-radius: 8px;"></div></td>
               </tr>`).join('');
-          }
-          const auditGrid = document.getElementById('audit-grid');
-          if (auditGrid) {
-              auditGrid.innerHTML = Array(8).fill(`
-              <div class="audit-card" style="pointer-events: none; border-color: transparent;">
-                  <div class="skeleton" style="width: 100%; height: 220px; border-radius: 0;"></div>
-                  <div class="audit-details" style="gap: 12px;">
-                      <div class="skeleton" style="width: 70%; height: 18px;"></div>
-                      <div class="skeleton" style="width: 40%; height: 12px;"></div>
-                      <div style="display: flex; gap: 8px; margin-top: 4px;">
-                          <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
-                          <div class="skeleton" style="flex: 1; height: 32px; border-radius: var(--radius-sm);"></div>
-                      </div>
-                      <div class="skeleton" style="width: 100%; height: 38px; border-radius: var(--radius-sm); margin-top: auto;"></div>
-                  </div>
-              </div>`).join('');
           }
       }
       
@@ -3775,7 +4034,7 @@
          
          staffStatsTracker[staff.id] = { 
              id: staff.id, name: staff.name, role: staffRoleName, 
-             daysPresent: 0, daysAbsent: 0, totalHoursDec: 0, lateCount: 0, earlyCount: 0, missedShirt: 0, missedId: 0, missedOut: 0,
+             daysPresent: 0, daysAbsent: 0, totalHoursDec: 0, lateCount: 0, earlyCount: 0, missedOut: 0,
              dailyTargetHours: 0, sumInMins: 0, sumOutMins: 0, daysOut: 0, sumWorkMins: 0, sumTravelMins: 0
          };
          staff.joining_date_obj = staff.joining_date ? new Date(staff.joining_date) : new Date(minLaunchDate);
@@ -3830,15 +4089,6 @@
             dailyLogs = dailyLogs.filter(l => selectedBranchIds.has(getBranchId(l)));
           }
 
-          // Evaluate uniform compliance ONLY if the staff was present (has logs for the day)
-          if (dailyLogs.length > 0) {
-              
-              
-              
-
-              
-              
-          }
           
           const excAbsent = exceptionsData[`${staff.id}_${isoDateStr}_Absent`] || exceptionsData[`${staff.name}_${isoDateStr}_Absent`];
           const excLate = exceptionsData[`${staff.id}_${isoDateStr}_Late Arrival`] || exceptionsData[`${staff.name}_${isoDateStr}_Late Arrival`];
@@ -3850,21 +4100,6 @@
             let lastOutLog = null;
             
             let workMs = 0, travelMs = 0, currentState = 'out', lastTime = null;
-
-            let photoLogs = dailyLogs.filter(l => l.photo_capture).map(l => {
-                // Strict parsing to safely convert database 'false' strings to actual Booleans
-                const parseBool = (val) => val === true || val === 'true' || val === 1 || val === '1';
-                
-                return {
-                    id: l.id,
-                    action: l.action,
-                    photo: l.photo_capture,
-                    reviewed: parseBool(l.uniform_reviewed),
-                    uTshirt: false,
-                    uIdcard: false,
-                    time: new Date(l.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime})
-                };
-            });
 
             dailyLogs.forEach((l, idx) => {
                 if (idx === 0) firstInLog = l;
@@ -3961,7 +4196,6 @@
               branches: branchDisplayNames,
               excAbsent: excAbsent, excLate: excLate, excEarly: excEarly,
               firstInId: firstInLog?.id || null, lastOutId: lastOutLog?.id || null,
-              photoLogs: photoLogs,
               latitude: firstInLog?.latitude || lastOutLog?.latitude || null,
               longitude: firstInLog?.longitude || lastOutLog?.longitude || null
             });
@@ -4035,24 +4269,6 @@
           }
       }
 
-      // Calculate total pending photo audits
-      let pendingPhotoCount = 0;
-      processedData.forEach(r => {
-          if (r.photoLogs) {
-              pendingPhotoCount += r.photoLogs.filter(pl => !pl.reviewed).length;
-          }
-      });
-
-      const auditBadge = document.getElementById('pending-audits-badge');
-      if (auditBadge) {
-          if (pendingPhotoCount > 0) {
-              auditBadge.innerText = pendingPhotoCount;
-              auditBadge.style.display = 'inline-block';
-          } else {
-              auditBadge.style.display = 'none';
-          }
-      }
-
       // Broadcast that new data has been processed
       window.RJEventBus.dispatchEvent(new CustomEvent('DATA_UPDATED'));
     }
@@ -4064,7 +4280,6 @@
         
         if (activeTab === 'view-dashboard' && typeof renderAnalysisDashboard === 'function') renderAnalysisDashboard();
         if (activeTab === 'view-logs' && typeof renderMasterTable === 'function') renderMasterTable();
-        
         if (activeTab === 'view-live' && typeof renderLiveBranches === 'function') renderLiveBranches();
         if (activeTab === 'view-action') {
             if (currentActionTab === 'leaves' && typeof renderLeaveTable === 'function') renderLeaveTable();
@@ -4074,14 +4289,12 @@
         if (activeTab === 'view-matrix' && typeof generateMatrix === 'function') generateMatrix();
         if ((activeTab === 'view-branch-ops' || activeTab === 'view-branch-matrix') && typeof renderBranchStats === 'function') window.renderBranchStats();
         if (activeTab === 'view-stats' && typeof renderStaffStats === 'function') renderStaffStats();
-        
+        if (activeTab === 'view-birthdays' && typeof renderAdminBirthdays === 'function') renderAdminBirthdays();
         if (activeTab === 'view-payroll') {
             if (typeof window.initPayrollPicker === 'function') window.initPayrollPicker();
         }
-        
     });
 
-    
 
     let isGroupedView = true;
 
@@ -4129,7 +4342,6 @@
               <th>Arrival</th>
               <th>Departure</th>
               <th>Route</th>
-              <th>Timeline Audits</th>
           `;
 
           let dataToRender = [...processedData];
@@ -4146,7 +4358,7 @@
           
           if (dataToRender.length === 0) { 
               const isStaffEmpty = dbStaff.length === 0;
-              tbody.innerHTML = `<tr><td colspan="8">
+              tbody.innerHTML = `<tr><td colspan="7">
                   <div class="empty-state">
                       <div class="empty-state-icon">${isStaffEmpty ? '👥' : '📭'}</div>
                       <h3 style="color: var(--text-main); margin-bottom: 8px; font-family: 'Bricolage Grotesque', sans-serif;">${isStaffEmpty ? 'No Staff Found' : 'No Logs Found'}</h3>
@@ -4209,33 +4421,6 @@
 
             let mapLinkHtml = '';
             
-            let photosHTML = `<div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">`;
-            if (!row.photoLogs || row.photoLogs.length === 0) {
-                photosHTML += `<span class="badge bg-gray">Archived / Missing</span>`;
-            } else {
-                row.photoLogs.forEach(pl => {
-                    let badgeColor = pl.action.includes('Transit') ? 'var(--warning)' : (pl.action === 'Clock In' ? 'var(--success)' : 'var(--danger)');
-                    let shortAction = pl.action === 'Clock In' ? 'IN' : (pl.action === 'Clock Out' ? 'OUT' : (pl.action === 'Transit Start' ? '🚗 Move' : '📍 Reach'));
-                    
-                    if (pl.reviewed) {
-                        photosHTML += `
-                        <div style="display:flex; flex-direction:column; gap:4px; align-items:center; width: 60px;">
-                            <img src="${pl.photo}" loading="lazy" style="width: 50px; height: 50px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid var(--success);" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', ${pl.uTshirt}, ${pl.uIdcard}, true)">
-                            <span style="font-size: 10px; font-weight: 800; color: ${badgeColor}; text-align: center; line-height: 1;">${shortAction}</span>
-                            <span style="font-size: 9px; font-weight: 600; color: var(--text-soft);">${pl.time}</span>
-                        </div>`;
-                    } else {
-                        photosHTML += `
-                        <div style="display:flex; flex-direction:column; gap:4px; align-items:center; width: 60px;">
-                            <img src="${pl.photo}" loading="lazy" style="width: 50px; height: 50px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid var(--warning);" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', false, false, false)">
-                            <span class="badge bg-orange" style="font-size: 9px; padding: 2px 4px; cursor:pointer;" onclick="window.openAuditModal('${pl.photo}', '${pl.id}', false, false, false)">Audit</span>
-                            <span style="font-size: 10px; font-weight: 800; color: ${badgeColor}; text-align: center; line-height: 1;">${shortAction}</span>
-                        </div>`;
-                    }
-                });
-            }
-            photosHTML += `</div>`;
-
             const displayDate = row.date.toLocaleDateString(window.appDateFormat);
 
             const staffObj = staffMap[row.staffId];
@@ -4262,7 +4447,6 @@
               <td>${arrivalHtml}</td>
               <td>${departureHtml}</td>
               <td><div style="font-size:11px; color:var(--text-soft); font-weight:600;">${row.branches}</div> ${actionLinks} ${mapLinkHtml}</td>
-              <td>${photosHTML}</td>
             </tr>`;
           }).join('');
 
@@ -4283,7 +4467,6 @@
               <th onclick="window.sortLogs('name')" style="cursor: pointer; user-select: none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-soft)'" title="Click to sort">Staff Member ${logsSortCol === 'name' ? (logsSortAsc ? '↑' : '↓') : '⇅'}</th>
               <th>Action Details</th>
               <th>Location Data</th>
-              <th>Raw Photo</th>
           `;
 
           // Filter dbLogs independently
@@ -4365,16 +4548,6 @@
                   ? `<div style="color: var(--primary-text); font-size: 11px; margin-top: 6px; font-weight: 600;">📍 GPS Logged</div>`
                   : `<div style="color: var(--text-soft); font-size: 11px; margin-top: 6px;">No GPS Coordinates</div>`;
 
-              let photoHtml = '';
-              if (log.photo_capture) {
-                   let badgeColor = log.action.includes('Transit') ? 'var(--warning)' : (log.action === 'Clock In' ? 'var(--success)' : 'var(--danger)');
-                   photoHtml = `
-                   <img src="${log.photo_capture}" loading="lazy" style="width: 55px; height: 55px; border-radius: 8px; cursor: pointer; object-fit: cover; border: 2px solid ${badgeColor};" onclick="window.openAuditModal('${log.photo_capture}', '${log.id}', ${log.uniform_tshirt}, ${log.uniform_idcard}, ${log.uniform_reviewed})">
-                   `;
-              } else {
-                  photoHtml = `<span class="badge bg-gray" style="font-size: 10px;">Missing</span>`;
-              }
-
               const avatar = getAvatarHtml(sName, staffObj?.profile_pic, 36);
 
               return `<tr oncontextmenu="window.showContextMenu(event, '${sId}', '${sName.replace(/'/g, "\\'")}', '${toLocalISO(d)}', '${log.id}', null, '${d.toISOString()}', null, '${log.latitude || ''}', '${log.longitude || ''}')" style="cursor: pointer;" title="Right-click row for Options">
@@ -4387,7 +4560,6 @@
                   </td>
                   <td>${actionBadge}</td>
                   <td><div style="font-weight: 700; font-size: 13px; color: var(--text-main);">${bName}</div>${mapLinkHtml}</td>
-                  <td>${photoHtml}</td>
               </tr>`;
           }).join('');
 
@@ -4516,7 +4688,7 @@
                 const displayName = sObj ? sObj.name : log.employee_name;
                 
                 const timeIn = new Date(log.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime});
-                const imgSrc = log.photo_capture || 'https://placehold.co/50x50/18181b/f8fafc?text=?';
+                const imgSrc = sObj?.profile_pic || 'https://placehold.co/50x50/18181b/f8fafc?text=?';
                 
                 const timeLabel = branchId === 'transit' ? 'Started Travel' : 'In Since';
 
@@ -4572,8 +4744,6 @@
         document.getElementById('manual-staff').value = '';
         document.getElementById('manual-action').value = 'Clock In';
         document.getElementById('manual-branch').value = '';
-        document.getElementById('manual-tshirt').checked = true;
-        document.getElementById('manual-idcard').checked = true;
 
         document.getElementById('manual-entry-modal').style.display = 'flex';
     });
@@ -4586,7 +4756,6 @@
         const staffId = document.getElementById('manual-staff').value;
         const actionVal = document.getElementById('manual-action').value;
         const branchIdVal = document.getElementById('manual-branch').value;
-        
         const dateVal = document.getElementById('manual-date').value;
         const timeVal = document.getElementById('manual-time').value;
 
@@ -4634,9 +4803,7 @@
                 branch: branchName,
                 branch_id: branchIdVal,
                 timestamp: timestampIso,
-                uniform_reviewed: true,
-                
-            }]);
+                            }]);
             if (insErr) throw insErr;
 
             window.closeModal(document.getElementById('manual-entry-modal'));
@@ -4684,8 +4851,6 @@
             const timeVal = log.timestamp ? new Date(log.timestamp).toTimeString().substring(0,5) : '';
             const branchOpts = dbBranches.map(b => `<option value="${b.branch_name}" ${b.branch_name === log.branch ? 'selected' : ''}>${b.branch_name}</option>`).join('');
             
-            const hasTshirt = log.uniform_tshirt !== false; 
-            const hasIdcard = log.uniform_idcard !== false; 
 
             return `
             <div class="punch-row" data-logid="${log.id || ''}" style="display:flex; flex-direction:column; gap:8px; background:var(--input-bg); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--card-border);">
@@ -4705,21 +4870,13 @@
                     <input type="time" class="punch-time input-field" value="${timeVal}" style="margin:0; flex:1; padding:8px;">
                     <button class="icon-btn" onclick="window.removePunchRow(${idx})" style="color:var(--danger)">🗑</button>
                 </div>
-                <div style="display: flex; gap: 16px;">
-                    <label class="check-wrap" style="flex: 1; margin:0; padding:6px; font-size:11px; background:var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                        <input type="checkbox" class="punch-tshirt" ${hasTshirt ? 'checked' : ''}> T-Shirt
-                    </label>
-                    <label class="check-wrap" style="flex: 1; margin:0; padding:6px; font-size:11px; background:var(--bg-base); border: 1px solid var(--card-border); border-radius: var(--radius-sm);">
-                        <input type="checkbox" class="punch-idcard" ${hasIdcard ? 'checked' : ''}> ID Card
-                    </label>
-                </div>
             </div>`;
         }).join('');
         if(window.currentEditLogs.length === 0) punchList.innerHTML = '<div style="text-align:center; padding:10px; color:var(--text-soft);">No punches found. Add one below.</div>';
     };
 
     document.getElementById('btn-add-punch-row')?.addEventListener('click', () => {
-        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null, uniform_tshirt: true, uniform_idcard: true, uniform_reviewed: true });
+        window.currentEditLogs.push({ id: null, action: 'Clock In', branch: '', timestamp: null });
         window.renderPunchRows();
     });
 
@@ -4742,8 +4899,6 @@
            const action = row.querySelector('.punch-action').value;
            const branch = row.querySelector('.punch-branch').value;
            const timeStr = row.querySelector('.punch-time').value;
-           const hasTshirt = row.querySelector('.punch-tshirt').checked;
-           const hasIdcard = row.querySelector('.punch-idcard').checked;
            
            if(!timeStr || !branch) hasErrors = true;
            
@@ -4760,10 +4915,6 @@
                branch: branch, 
                branch_id: branchObj ? branchObj.id : (existingLog.branch_id || null),
                timestamp: newIso,
-               uniform_reviewed: true, 
-               uniform_tshirt: hasTshirt, 
-               uniform_idcard: hasIdcard,
-               photo_capture: existingLog.photo_capture || null,
                latitude: existingLog.latitude || null,
                longitude: existingLog.longitude || null
            };
@@ -4806,186 +4957,6 @@
        }
     });
 
-    
-
-    
-
-    
-
-    window.handleLassoMove = function(event, logId) {
-        if (isLassoDragging && event.shiftKey) {
-            const checkbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-            // Only update if the state differs (prevents unnecessary re-renders)
-            if (checkbox && checkbox.checked !== lassoTargetState) {
-                checkbox.checked = lassoTargetState;
-                
-                if (lassoTargetState) selectedAuditLogIds.add(logId);
-                else selectedAuditLogIds.delete(logId);
-                
-                window.updateBulkActionBar();
-            }
-        }
-    };
-
-    window.handleCardClick = function(event, logId, photoSrc, uTshirt, uIdcard, isReviewed) {
-        // Shift is now fully handled by Lasso Drag (mousedown/mouseenter); ignore click
-        if (event.shiftKey) {
-            event.preventDefault();
-            event.stopPropagation();
-            return; 
-        }
-
-        // Ctrl / Cmd + Click: Discrete Selection Toggle Quietly
-        if (event.ctrlKey || event.metaKey) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const checkbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-            if (!checkbox) return;
-
-            const newState = !checkbox.checked;
-            checkbox.checked = newState;
-
-            if (newState) selectedAuditLogIds.add(logId);
-            else selectedAuditLogIds.delete(logId);
-            
-            window.updateBulkActionBar();
-            return;
-        }
-
-        // Normal Click: Opens the preview modal
-        window.openAuditModal(photoSrc, logId, uTshirt, uIdcard, isReviewed);
-    };
-
-    let lastCheckedBox = null;
-
-    window.toggleAuditSelection = function(logId, isChecked, event) {
-        const currentBox = event.target;
-        
-        // If Shift is held and we have a previous box to reference
-        if (event && event.shiftKey && lastCheckedBox) {
-            // FIX: Only select visible checkboxes so we don't accidentally approve hidden photos
-            const checkboxes = Array.from(document.querySelectorAll('.audit-card-checkbox')).filter(cb => cb.closest('.audit-card').style.display !== 'none');
-            const start = checkboxes.indexOf(lastCheckedBox);
-            const end = checkboxes.indexOf(currentBox);
-            
-            // Protect against elements that might have disappeared from the DOM
-            if (start !== -1 && end !== -1) {
-                const min = Math.min(start, end);
-                const max = Math.max(start, end);
-                
-                for (let i = min; i <= max; i++) {
-                    checkboxes[i].checked = isChecked;
-                    if (isChecked) selectedAuditLogIds.add(checkboxes[i].value);
-                    else selectedAuditLogIds.delete(checkboxes[i].value);
-                }
-            }
-        } else {
-            // Standard single click
-            if (isChecked) selectedAuditLogIds.add(logId);
-            else selectedAuditLogIds.delete(logId);
-        }
-
-        lastCheckedBox = currentBox;
-        window.updateBulkActionBar();
-    };
-
-    window.selectAllAudits = function(checkboxEl) {
-        const isChecked = checkboxEl.checked;
-        const checkboxes = document.querySelectorAll('.audit-card-checkbox');
-        checkboxes.forEach(cb => {
-            cb.checked = isChecked;
-            if (isChecked) selectedAuditLogIds.add(cb.value);
-            else selectedAuditLogIds.delete(cb.value);
-        });
-        window.updateBulkActionBar();
-    };
-
-    window.updateBulkActionBar = function() {
-        const bar = document.getElementById('bulk-action-bar');
-        const countSpan = document.getElementById('bulk-selected-count');
-        const masterCheck = document.getElementById('master-audit-select');
-        
-        if (bar && countSpan) {
-            countSpan.innerText = selectedAuditLogIds.size;
-            if (selectedAuditLogIds.size > 0) bar.classList.add('show');
-            else bar.classList.remove('show');
-        }
-
-        const visibleCheckboxes = document.querySelectorAll('.audit-card-checkbox');
-        if (masterCheck) {
-            if (visibleCheckboxes.length > 0) {
-                masterCheck.checked = Array.from(visibleCheckboxes).every(cb => cb.checked);
-            } else {
-                masterCheck.checked = false;
-            }
-        }
-    };
-
-    
-
-    window.undoBulkSave = async function(e) {
-        if(e) {
-            e.stopPropagation();
-            const toast = e.target.closest('.toast');
-            if(toast) toast.style.display = 'none'; // Hide the toast immediately for snappy UX
-        }
-        
-        if (!window.lastBulkUpdateIds || window.lastBulkUpdateIds.length === 0) return;
-
-        // Revert local state
-        window.lastBulkUpdateIds.forEach(logId => {
-            const logIndex = dbLogs.findIndex(l => l.id === logId);
-            if(logIndex !== -1) {
-                dbLogs[logIndex].uniform_reviewed = false;
-                dbLogs[logIndex].uniform_tshirt = false;
-                dbLogs[logIndex].uniform_idcard = false;
-            }
-        });
-
-        try {
-            // Revert database state
-            await supabaseClient.from('attendance_logs')
-                .update({ uniform_reviewed: false, uniform_tshirt: false, uniform_idcard: false })
-                .in('id', window.lastBulkUpdateIds);
-
-            showToast("Bulk approval undone.", "primary");
-            
-            // OPTIMISTIC UI REVERT (Bring cards back smoothly)
-            window.updatePendingBadgeCount(window.lastBulkUpdateIds.length);
-            window.lastBulkUpdateIds.forEach((logId, idx) => {
-                const cardCheckbox = document.querySelector(`.audit-card-checkbox[value="${logId}"]`);
-                if (cardCheckbox) {
-                    const card = cardCheckbox.closest('.audit-card');
-                    if (card) {
-                        card.style.display = 'flex';
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'scale(1)';
-                        }, idx * 25);
-                        
-                        const btnElement = card.querySelector('.btn-secondary');
-                        if (btnElement) {
-                            btnElement.innerText = "Approve & Save";
-                            btnElement.className = "btn-primary";
-                            btnElement.style.removeProperty('border-color');
-                            btnElement.style.removeProperty('color');
-                        }
-                        const badge = card.querySelector('.audit-badge:last-child');
-                        if (badge) {
-                            badge.innerText = "⏳ Pending";
-                            badge.style.background = "var(--warning)";
-                            badge.style.color = "#000";
-                            badge.style.borderColor = "rgba(0,0,0,0.2)";
-                        }
-                    }
-                }
-            });
-            window.lastBulkUpdateIds = [];
-        } catch (err) {
-            showToast("Failed to undo action.", "error");
-        }
-    };
 
     let logsSortCol = 'date';
     let logsSortAsc = false; // Default: Newest first
@@ -5011,8 +4982,6 @@
             else if (column === 'hours') { valA = a.sumWorkMins + a.sumTravelMins; valB = b.sumWorkMins + b.sumTravelMins; }
             else if (column === 'lateCount') { valA = a.lateCount; valB = b.lateCount; }
             else if (column === 'earlyCount') { valA = a.earlyCount; valB = b.earlyCount; }
-            else if (column === 'noShirt') { valA = a.missedShirt; valB = b.missedShirt; }
-            else if (column === 'noId') { valA = a.missedId; valB = b.missedId; }
             
             if (valA < valB) return statsSortAsc ? -1 : 1;
             if (valA > valB) return statsSortAsc ? 1 : -1;
@@ -5024,7 +4993,7 @@
     function renderStaffStats() {
         const tbody = document.getElementById('stats-tbody');
         if(!tbody) return;
-        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 40px; color: var(--text-soft);">No data available.</td></tr>'; return; }
+        if(statsData.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 40px; color: var(--text-soft);">No data available.</td></tr>'; return; }
         
         tbody.innerHTML = statsData.map(s => {
             const expectedMins = Math.round(s.daysPresent * s.dailyTargetHours * 60);
@@ -5076,8 +5045,6 @@
 
             let lateCell = s.lateCount > 0 ? `<span style="color:var(--warning); font-weight: 800;">${s.lateCount}</span>` : `<span style="color:var(--text-soft)">0</span>`;
             let earlyCell = s.earlyCount > 0 ? `<span style="color:#f97316; font-weight: 800;">${s.earlyCount}</span>` : `<span style="color:var(--text-soft)">0</span>`;
-            let shirtCell = s.missedShirt > 0 ? `<span style="color:var(--danger); font-weight: 800;">${s.missedShirt}</span>` : `<span style="color:var(--text-soft)">0</span>`;
-            let idCell = s.missedId > 0 ? `<span style="color:var(--danger); font-weight: 800;">${s.missedId}</span>` : `<span style="color:var(--text-soft)">0</span>`;
 
             const staffObj = dbStaff.find(st => st.id === s.id);
             const avatar = getAvatarHtml(s.name, staffObj?.profile_pic, 36);
@@ -5103,8 +5070,6 @@
                 <td>${otHtml} <br><span style="font-size:11px; color:var(--text-soft); display: inline-block; margin-top: 4px;">Target: ${expectedFmt}</span></td>
                 <td style="font-size:15px; text-align: center;">${lateCell}</td>
                 <td style="font-size:15px; text-align: center;">${earlyCell}</td>
-                <td style="font-size:15px; text-align: center;">${shirtCell}</td>
-                <td style="font-size:15px; text-align: center;">${idCell}</td>
             </tr>`;
         }).join('');
     }
@@ -6608,7 +6573,6 @@
             if (joinEl._flatpickr) joinEl._flatpickr.setDate(joiningDate || '');
             else joinEl.value = joiningDate || '';
         }
-        
         // Populate Face Biometrics status & reset button
         const staffObj = (typeof dbStaff !== 'undefined' ? dbStaff : []).find(s => s.id === id);
         const faceBadge = document.getElementById('edit-staff-face-status');
@@ -6629,13 +6593,13 @@
                         resetBtn.innerText = 'Resetting...';
                         try {
                             const { error: rErr } = await supabaseClient.from('staff_directory').update({
-                                face_descriptors: null,
+                                face_descriptors: [],
                                 face_registered: false,
                                 face_registered_at: null
                             }).eq('id', id);
                             if (rErr) throw rErr;
                             staffObj.face_registered = false;
-                            staffObj.face_descriptors = null;
+                            staffObj.face_descriptors = [];
                             staffObj.face_registered_at = null;
                             faceBadge.className = 'badge bg-gray';
                             faceBadge.innerHTML = '⚪ Not Enrolled';
@@ -6659,7 +6623,6 @@
                 resetBtn.style.display = 'none';
             }
         }
-
         document.getElementById('edit-staff-modal').style.display = 'flex';
     };
     
@@ -7075,7 +7038,7 @@
         let columnHeaders, exportRows;
         
         if (isStatsView) {
-            columnHeaders = ["Staff Name", "Role", "Days Present", "Days Absent", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Late Arrivals", "Early Departs", "Missed Shirt", "Missed ID", "Missed Out"];
+            columnHeaders = ["Staff Name", "Role", "Days Present", "Days Absent", "Avg In", "Avg Out", "Total Hours", "Work Hours", "Travel Hours", "OT/Shortage", "Late Arrivals", "Early Departs", "Missed Out"];
             exportRows = statsData.map(s => {
                 let absentDays = 0;
                 missingData.forEach(m => { if(m.staffId === s.id) absentDays++; });
@@ -7088,7 +7051,7 @@
                     formatMinsToDuration(s.sumWorkMins), 
                     formatMinsToDuration(s.sumTravelMins),
                     s.otShortage || "-",
-                    s.lateCount, s.earlyCount, s.missedShirt, s.missedId, s.missedOut
+                    s.lateCount, s.earlyCount, s.missedOut
                 ];
             });
         } else if (isActionView) {
@@ -7207,7 +7170,7 @@
             });
         } else {
             // Logs View - Fully Expanded Columns
-            columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "Attendance", "Arrival", "Departure", "T-Shirt", "ID Card", "Branch List"];
+            columnHeaders = ["Date", "Staff Name", "Role", "First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "Attendance", "Arrival", "Departure", "Branch List"];
             let dataToExport = processedData;
             
             if (typeof currentLogsFilter !== 'undefined' && currentLogsFilter !== 'all') {
@@ -7231,16 +7194,6 @@
                 if(d.excEarly) departure = "Excused Early";
                 else if (d.isEarly) departure = "Early Out";
 
-                let hasShirt = "N/A", hasId = "N/A";
-                if (d.photoLogs && d.photoLogs.length > 0) {
-                    const reviewed = d.photoLogs.filter(pl => pl.reviewed);
-                    if (reviewed.length > 0) {
-                        hasShirt = reviewed.some(pl => !pl.uTshirt) ? "No" : "Yes";
-                        hasId = reviewed.some(pl => !pl.uIdcard) ? "No" : "Yes";
-                    } else {
-                        hasShirt = "Pending Audit"; hasId = "Pending Audit";
-                    }
-                }
                 
                 let cleanBranches = d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-";
                 
@@ -7249,7 +7202,7 @@
                   d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
                   d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A', 
                   d.formattedWork, d.formattedTravel, d.formattedHours,
-                  attendance, arrival, departure, hasShirt, hasId, cleanBranches
+                  attendance, arrival, departure, cleanBranches
                 ];
             });
         }
@@ -7374,11 +7327,108 @@
         if(session?.user) currentUserEmail = session.user.email;
     });
 
-    
+    function renderAdminBirthdays() {
+        const container = document.getElementById('admin-bday-list-container');
+        if (!container) return;
+
+        let bdayStaff = dbStaff.filter(s => s.dob && s.dob.trim() !== '');
+        if (bdayStaff.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: var(--text-soft); padding: 20px;">No staff birthdays found. Update DOBs in HR Settings.</div>';
+            document.getElementById('admin-next-bday-name').innerText = "No upcoming";
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const enriched = bdayStaff.map(staff => {
+            const [year, month, day] = staff.dob.split('-');
+            const bdayThisYear = new Date(today.getFullYear(), parseInt(month) - 1, parseInt(day));
+            
+            let nextBday = new Date(bdayThisYear);
+            let turningAge = today.getFullYear() - parseInt(year);
+            
+            if (bdayThisYear.getTime() < today.getTime()) {
+                nextBday.setFullYear(today.getFullYear() + 1);
+                turningAge++;
+            }
+            
+            const diffDays = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
+            const formattedDate = new Date(nextBday.getFullYear(), parseInt(month) - 1, parseInt(day)).toLocaleDateString(window.appDateFormat);
+            
+            return { ...staff, daysLeft: diffDays, turningAge, formattedDate };
+        });
+
+        enriched.sort((a, b) => a.daysLeft - b.daysLeft);
+
+        let currentUserIndex = enriched.findIndex(s => s.email === currentUserEmail);
+        if (currentUserIndex !== -1) {
+            let pinnedBday = enriched.splice(currentUserIndex, 1)[0];
+            enriched.unshift(pinnedBday);
+        }
+
+        const nextBday = enriched[0];
+        document.getElementById('admin-next-bday-name').innerText = (nextBday.email === currentUserEmail) ? "Your Birthday" : nextBday.name;
+        document.getElementById('admin-next-bday-date').innerText = nextBday.formattedDate;
+        document.getElementById('admin-next-bday-age').innerText = `Turning ${nextBday.turningAge}`;
+
+        // Set Background Image for Next Birthday (Full Portrait)
+        const bgContainer = document.getElementById('bday-top-bg');
+        const emojiEl = document.getElementById('admin-next-bday-emoji');
+        if (nextBday.profile_pic) {
+            // Using 'contain' so the photo fits nicely without repeating or cropping, leaving clean space on the sides
+            bgContainer.style.background = `url('${nextBday.profile_pic}') no-repeat center center / contain`;
+            bgContainer.style.opacity = '0.95';
+            emojiEl.style.display = 'none'; // Hide emoji if photo exists
+        } else {
+            bgContainer.style.background = `linear-gradient(135deg, var(--primary-alpha) 0%, var(--card-bg) 100%)`;
+            bgContainer.style.opacity = '1';
+            emojiEl.style.display = 'block';
+        }
+        
+        const countdownEl = document.getElementById('admin-next-bday-countdown');
+        if (nextBday.daysLeft === 0) {
+            countdownEl.innerText = "It's Today! 🎂🎉";
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#d4af37', '#10b981', '#f59e0b'] });
+        } else if (nextBday.daysLeft === 1) {
+            countdownEl.innerText = "Tomorrow!";
+        } else {
+            countdownEl.innerText = `In ${nextBday.daysLeft} Days`;
+        }
+
+        container.innerHTML = enriched.map(staff => {
+            const isCurrentUser = (staff.email === currentUserEmail);
+            const displayName = isCurrentUser ? "Your Birthday 📌" : staff.name;
+            
+            let tagClass = 'bg-gray';
+            let tagText = `In ${staff.daysLeft} days`;
+
+            if (staff.daysLeft === 0) { tagClass = 'bg-green'; tagText = 'Today! 🎂'; } 
+            else if (staff.daysLeft <= 7) { tagClass = 'bg-orange'; if (staff.daysLeft === 1) tagText = 'Tomorrow!'; }
+
+            // Global avatar function use karke list me photo lagana
+            let avatarHtml = getAvatarHtml(staff.name, staff.profile_pic, 44);
+
+            return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    ${avatarHtml}
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                            ${displayName} 
+                            <span class="role-tag" ${isCurrentUser ? `style="background: var(--success-alpha); color: var(--success); border-color: var(--success-alpha);"` : ''}>Turning ${staff.turningAge}</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-soft); font-weight: 500; margin-top: 4px;">${staff.formattedDate}</div>
+                    </div>
+                </div>
+                <div class="badge ${tagClass}" style="font-size: 12px; padding: 6px 12px;">${tagText}</div>
+            </div>`;
+        }).join('');
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            
+            if (e.currentTarget.getAttribute('data-view') === 'view-birthdays') renderAdminBirthdays();
         });
     });
 
@@ -7558,7 +7608,6 @@
                 { id: 'action', name: 'Action Center', icon: '⚠️' },
                 { id: 'logs', name: 'Attendance Logs', icon: '📋' },
                 { id: 'matrix', name: 'Attendance Grid', icon: '▦' },
-                { id: 'audits', name: 'Photo Audits', icon: '📷' },
                 { id: 'stats', name: 'Staff Stats', icon: '📈' },
                 { id: 'birthdays', name: 'Staff Birthdays', icon: '🎂' },
                 { id: 'settings-hr', name: 'HR Settings', icon: '⚙️' },
@@ -7636,8 +7685,6 @@
         const cmdText = `Ctrl/Cmd + ${uiPrefs.keyCmd.toUpperCase()}`;
         const saveText = `${uiPrefs.modSave} + [1-9]`;
         const loadText = `${uiPrefs.modLoad} + [1-9]`;
-        const tKey = uiPrefs.keyTshirt.toUpperCase();
-        const iKey = uiPrefs.keyId.toUpperCase();
 
         const modalHtml = `
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -7660,20 +7707,8 @@
               <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">/</kbd> or <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${cmdText}</kbd></span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span>Toggle T-Shirt (in Modals & Bulk)</span>
-              <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${tKey}</kbd>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span>Toggle ID Card (in Modals & Bulk)</span>
-              <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">${iKey}</kbd>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
               <span>Quick Save / Approve (in Modals)</span>
               <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">Enter</kbd>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
-              <span>Next / Previous Photo</span>
-              <span><kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">←</kbd> <kbd style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 4px; font-family: monospace;">→</kbd></span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
               <span>Range Select Checkboxes</span>
@@ -7853,64 +7888,15 @@
                 if (m.style.display === 'flex') window.closeModal(m);
             });
 
-            // Clear bulk selections
-            if (typeof selectedAuditLogIds !== 'undefined' && selectedAuditLogIds.size > 0) {
-                selectedAuditLogIds.clear();
-                document.querySelectorAll('.audit-card-checkbox').forEach(cb => cb.checked = false);
-                if (typeof window.updateBulkActionBar === 'function') window.updateBulkActionBar();
-            }
             return;
         }
 
-        // 3. Smart Hotkeys for ALL Uniform Checkboxes (Photo Audit, Manual Entry, Bulk Action)
+        // 3. Manual Entry modal: Enter saves the entry
         if (!isTyping) {
-            const isTKey = e.key.toLowerCase() === uiPrefs.keyTshirt.toLowerCase();
-            const isIKey = e.key.toLowerCase() === uiPrefs.keyId.toLowerCase();
-            const isEnter = e.key === 'Enter';
-
-            // A. Photo Audit Modal
-            const photoModal = document.getElementById('photo-modal');
-            if (photoModal && photoModal.style.display === 'flex') {
-                
-                
-                if (isEnter) { e.preventDefault(); document.getElementById('btn-modal-audit-save')?.click(); }
-                
-                // Left / Right Arrows to navigate through visible photos
-                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-                    if (!window.currentActiveAuditLogId) return;
-                    const currentBox = document.querySelector(`.audit-card-checkbox[value="${window.currentActiveAuditLogId}"]`);
-                    if (currentBox) {
-                        const currentCard = currentBox.closest('.audit-card');
-                        const allVisibleCards = Array.from(document.querySelectorAll('.audit-card')).filter(c => c.style.display !== 'none' && c.style.opacity !== '0');
-                        const currentIndex = allVisibleCards.indexOf(currentCard);
-                        if (currentIndex !== -1) {
-                            let nextIndex = e.key === 'ArrowRight' ? currentIndex + 1 : currentIndex - 1;
-                            if (nextIndex >= 0 && nextIndex < allVisibleCards.length) {
-                                const nextCard = allVisibleCards[nextIndex];
-                                const imgWrap = nextCard.querySelector('.audit-img-wrap');
-                                if (imgWrap) imgWrap.click();
-                            }
-                        }
-                    }
-                }
-                return; // Stop executing further if photo modal is open
-            }
-
-            // B. Manual Entry Modal
             const manualModal = document.getElementById('manual-entry-modal');
-            if (manualModal && manualModal.style.display === 'flex') {
-                
-                
-                if (isEnter) { e.preventDefault(); document.getElementById('btn-save-manual')?.click(); }
-                return;
-            }
-
-            // C. Bulk Action Bar (Floating at bottom)
-            const bulkBar = document.getElementById('bulk-action-bar');
-            if (bulkBar && bulkBar.classList.contains('show')) {
-                
-                
-                if (isEnter) { e.preventDefault(); document.getElementById('btn-bulk-save')?.click(); }
+            if (manualModal && manualModal.style.display === 'flex' && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('btn-save-manual')?.click();
                 return;
             }
         }
@@ -8207,11 +8193,6 @@
         let remainingQueue = [];
         for (let task of queue) {
             try {
-                if (task.type === 'audit_update') {
-                    await supabaseClient.from('attendance_logs')
-                        .update(task.payload.updateData)
-                        .in('id', task.payload.ids);
-                }
             } catch (e) {
                 remainingQueue.push(task); // Keep in queue if sync fails
             }
@@ -8228,7 +8209,6 @@
     window.addEventListener('offline', () => {
         showToast("You are offline! Approvals will save to your device and sync later.", "warning", 8000); 
         document.documentElement.style.filter = 'grayscale(0.2)'; // Softer visual cue
-        // Notice we no longer disable the bulk button!
     });
 
     document.querySelectorAll('.table-responsive').forEach(container => {
@@ -8261,7 +8241,6 @@
         if (img && img.src) {
             document.getElementById('photo-modal-title').innerText = "Profile Picture";
             document.getElementById('modal-image-src').src = img.src;
-            document.getElementById('audit-controls').style.display = 'none';
             document.getElementById('photo-modal').style.display = 'flex';
         }
     };
@@ -8304,16 +8283,6 @@
                 if(d.excEarly) departure = "Excused Early";
                 else if (d.isEarly) departure = "Early Out";
 
-                let hasShirt = "N/A", hasId = "N/A";
-                if (d.photoLogs && d.photoLogs.length > 0) {
-                    const reviewedLogs = d.photoLogs.filter(pl => pl.reviewed);
-                    if (reviewedLogs.length > 0) {
-                        hasShirt = reviewedLogs.some(pl => !pl.uTshirt) ? "No" : "Yes";
-                        hasId = reviewedLogs.some(pl => !pl.uIdcard) ? "No" : "Yes";
-                    } else {
-                        hasShirt = "Pending Audit"; hasId = "Pending Audit";
-                    }
-                }
 
                 let rowData = [];
                 selectedCols.forEach(col => {
@@ -8323,8 +8292,6 @@
                     if(col === "Branch") rowData.push(d.branches ? d.branches.replace(/🚗/g, "[Transit]").replace(/ → /g, ", ") : "-");
                     if(col === "First In") rowData.push(d.firstIn ? d.firstIn.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A');
                     if(col === "Last Out") rowData.push(d.lastOut ? d.lastOut.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit', hour12: window.use12HourTime}) : 'N/A');
-                    if(col === "T-Shirt") rowData.push(hasShirt);
-                    if(col === "ID Card") rowData.push(hasId);
                     if(col === "Work Hours") rowData.push(d.formattedWork);
                     if(col === "Travel Hours") rowData.push(d.formattedTravel);
                     if(col === "Total Hours") rowData.push(d.formattedHours);
@@ -8344,7 +8311,7 @@
                         if(col === "Role") rowData.push(staffMap[d.staffId]?.role || "Unassigned");
                         if(col === "Attendance") rowData.push(d.excAbsent ? "Excused Absent" : "Unexcused Absence");
                         if(col === "Arrival" || col === "Departure") rowData.push("Absent");
-                        if(["First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "T-Shirt", "ID Card", "Branch"].includes(col)) rowData.push("-");
+                        if(["First In", "Last Out", "Work Hours", "Travel Hours", "Total Hours", "Branch"].includes(col)) rowData.push("-");
                     });
                     exportRows.push(rowData);
                 });
@@ -8378,8 +8345,6 @@
                     if(col === "OT/Shortage") rowData.push(s.otShortage || "-");
                     if(col === "Total Lates") rowData.push(s.lateCount);
                     if(col === "Total Early") rowData.push(s.earlyCount);
-                    if(col === "T-Shirt Violations") rowData.push(s.missedShirt);
-                    if(col === "ID Card Violations") rowData.push(s.missedId);
                     if(col === "Missed Out") rowData.push(s.missedOut || 0);
                 });
                 exportRows.push(rowData);
@@ -9076,4 +9041,4 @@
   </script>
 </body>
 </html>
-                              
+          
